@@ -1,0 +1,25 @@
+services:
+  
+  postgres:
+    image: postgres:18
+    container_name: stash_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: stash_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - backend
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres-etc:/etc
+      - postgres-data:/var/lib/postgresql
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  postgres-data:
+  postgres-etc:
