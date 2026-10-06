@@ -221,6 +221,8 @@ Shown with the next question: title and description of the merge request `concep
 
 Result: the token was pasted into the answer instead of being set in the environment. The agent may not put a token into a command (`docs/agents/issue-tracker.md`, "Access"), so no merge request was opened in this session. The text of Q24 and the reviewer of Q25 stand for the next attempt.
 
+Follow-up in the same session: on the owner's instruction the token was saved as the user environment variable `GITLAB_TOKEN`, and the merge request was opened as !6 with the text of Q24 and `schwaigc` as reviewer.
+
 ## Open questions for the school management
 
 Legal questions the agent does not decide (grill flow, personal data). They are not answered in this log; the owner takes them to the data-protection contact of the school and records the answers here.
