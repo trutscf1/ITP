@@ -90,7 +90,7 @@ Available now:
 
 ```bash
 pnpm install                                            # install the workspace
-pnpm run lint | typecheck | build                       # root tasks through Turborepo
+pnpm run lint                                           # root tasks through Turborepo; likewise typecheck and build
 pnpm test                                               # acceptance tests (tests/)
 node tools/doc-check.mjs                                # consistency check of documentation/
 npx markdownlint-cli2 "documentation/**/*.md"           # markdown lint
