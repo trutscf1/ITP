@@ -4,7 +4,8 @@ Issues and merge requests for this repo live on GitLab in project `87030014` (`h
 
 ## Access
 
-- Token: a personal or project access token (scope `api`) of the person running the session, in the environment variable `GITLAB_TOKEN`. Never write it into a file, a commit, an issue, or command output.
+- Token: a **personal access token** (scope `api`) of the person running the session, in the environment variable `GITLAB_TOKEN`. Never write it into a file, a commit, an issue, a chat, or command output.
+- No project access token: it acts as a bot user, so issues, merge requests, and reviews would not carry the person's name, and it has no rights on the group (no epics) and, below the Maintainer role, none on branch protection and project settings.
 - If `GITLAB_TOKEN` is not set, stop and ask the user to set it.
 - Base: `API=https://gitlab.com/api/v4/projects/87030014`, header `PRIVATE-TOKEN: $GITLAB_TOKEN`.
 - Group of the project (for epics): `GROUP=https://gitlab.com/api/v4/groups/htl-villach%2Fit%2Fclasses%2F5bhitm-2026%2Fitp%2Fwaent%2Fproject1`.

@@ -11,6 +11,7 @@ New tasks and ideas for this developer land here first, before anyone plans them
 
 ## Open
 
+- [2026-10-06] Create a personal access token (scope `api`, expiry at the latest 2027-04-06), set it as `GITLAB_TOKEN` in the own terminal, and revoke the project access tokens used until now; then repeat the steps that were refused with HTTP 403 (below). Every team member needs an own token (`docs/agents/issue-tracker.md`, "Access").
 - [2026-10-06] Review and merge the migration MR !1 `concept/migrate-engineering-human` → `dev` (issue #86); a person other than the author reviews it.
 - [2026-10-06] Team review of the drafts in `GOAL.md` (roles R-1…R-3, success signals G-1.S1…S3) and of the *Serves* column in `ROADMAP.md`; only the wording of G-1 is confirmed.
 - [2026-10-06] Needs the Maintainer role or rights on the group; the agent's project token was refused (HTTP 403) on each: promote the feature issues #87–#100 to group epics (`/promote`); set push access on `main` to "no one" (Settings → Repository → Protected branches; today push and merge are allowed for Maintainers); protect `dev` the same way.
