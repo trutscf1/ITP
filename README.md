@@ -83,6 +83,20 @@ flowchart LR
 
 The planned technology is listed in the project proposal ([docs/projektantrag.md](docs/projektantrag.md)); binding choices and versions are recorded in [documentation/STACK.md](documentation/STACK.md) as they are made. The units share their data shapes through one contracts package.
 
+## Operation and deployment
+
+What exists today and what is planned (`documentation/ROADMAP.md`, R14 *Deployment*):
+
+| Topic | Today | Planned |
+| --- | --- | --- |
+| Start | `docker compose up -d` starts PostgreSQL and MongoDB; the web application is started by hand | One command starts every unit, the reverse proxy, and the databases |
+| Configuration | Variables in `.env` (copy of `.env.example`, never committed) | The same, for every unit |
+| Data | Named Docker volumes `postgres-data` and `mongo-data` | Backup and restore notes with the deployment |
+| Deployment | None | The GitLab CI pipeline deploys the whole stack to the team's own server when `main` is updated, TLS terminated by the reverse proxy |
+| Monitoring | None | Metrics, logs, and traces in Prometheus, Loki, Tempo, and Grafana (R2) |
+
+Releases are tagged `v<version>` on `main` and published as GitLab Releases; the rules are in [documentation/WORKFLOW.md](documentation/WORKFLOW.md), section *Releases*.
+
 ## Documentation
 
 | Where | What |
