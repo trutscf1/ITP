@@ -116,7 +116,7 @@ Mapped to technology in `documentation/STACK.md`, one section per track (§15). 
 
 ## 7. Data Model
 
-```
+```text
 HealthReport {
   unit: enum(web|identity|storage|worker|cms),
   version: string,                  // release version of the build; "0.0.0-dev" for local builds
@@ -174,7 +174,7 @@ The status page row for `identity` shows `down`.
 
 **Example 3 — invalid configuration (E-1).** `storage` started with `PORT=abc` and without `HEALTH_TIMEOUT_MS` set, where it is optional with a default:
 
-```
+```text
 Invalid configuration for unit "storage":
   PORT: expected an integer between 1 and 65535
 ```

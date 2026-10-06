@@ -22,32 +22,32 @@ Assumptions stated instead of asked (P-GRILL-4):
 **Q1 – Die vier Bereiche als lauffähige Einheiten**
 Frage: Welche lauffähigen Einheiten (eigener Prozess/Container) hat das System?
 Empfehlung: `web` (UI + eigene APIs/Proxy), `identity` (Konten, Rechte, Sharing), `storage` (Storage-API) + `worker` (Hintergrundjobs), `cms`; Observability ist Infrastruktur, keine Einheit.
-Antwort (für Q1–Q6 gemeinsam): „Alles außer Q5 passt, die Domain und der Server sind noch nicht vorhanden. commits mit https://www.conventionalcommits.org/en/v1.0.0/ und nutze https://keepachangelog.com/en/1.1.0/“
+Antwort (für Q1–Q6 gemeinsam): „Alles außer Q5 passt, die Domain und der Server sind noch nicht vorhanden. commits mit <https://www.conventionalcommits.org/en/v1.0.0/> und nutze <https://keepachangelog.com/en/1.1.0/“>
 
 **Q2 – Umfang der gemeinsamen Verträge**
 Frage: Was muss als gemeinsamer Vertrag definiert werden?
 Empfehlung: HTTP-APIs zwischen Einheiten, Job-Payloads der Queue, Konfigurationsschema je Einheit; OpenAPI nur für HTTP; Vertragsänderung braucht Review des Owners der konsumierenden Einheit.
-Antwort (für Q1–Q6 gemeinsam): „Alles außer Q5 passt, die Domain und der Server sind noch nicht vorhanden. commits mit https://www.conventionalcommits.org/en/v1.0.0/ und nutze https://keepachangelog.com/en/1.1.0/“
+Antwort (für Q1–Q6 gemeinsam): „Alles außer Q5 passt, die Domain und der Server sind noch nicht vorhanden. commits mit <https://www.conventionalcommits.org/en/v1.0.0/> und nutze <https://keepachangelog.com/en/1.1.0/“>
 
 **Q3 – Wann ist R1 fertig?**
 Frage: Ordnerstruktur + Tooling oder ein durchgehendes Walking Skeleton?
 Empfehlung: Walking Skeleton – ein Befehl startet alle Einheiten + Reverse Proxy + PostgreSQL; jede Einheit hat einen Health-Endpunkt nach Vertrag; `web` zeigt eine Statusseite, die jede Einheit über den Proxy abfragt; CI prüft Lint, Typecheck, Tests, Build; Pre-Commit-Hooks aktiv.
-Antwort (für Q1–Q6 gemeinsam): „Alles außer Q5 passt, die Domain und der Server sind noch nicht vorhanden. commits mit https://www.conventionalcommits.org/en/v1.0.0/ und nutze https://keepachangelog.com/en/1.1.0/“
+Antwort (für Q1–Q6 gemeinsam): „Alles außer Q5 passt, die Domain und der Server sind noch nicht vorhanden. commits mit <https://www.conventionalcommits.org/en/v1.0.0/> und nutze <https://keepachangelog.com/en/1.1.0/“>
 
 **Q4 – Wo läuft die CI/CD?**
 Frage: GitHub Actions (laut Antrag) oder GitLab CI?
 Empfehlung: GitLab CI, weil MRs, Merge-Checks und Reviews auf GitLab laufen; Abweichung vom Antrag wird dokumentiert und präsentiert.
-Antwort (für Q1–Q6 gemeinsam): „Alles außer Q5 passt, die Domain und der Server sind noch nicht vorhanden. commits mit https://www.conventionalcommits.org/en/v1.0.0/ und nutze https://keepachangelog.com/en/1.1.0/“
+Antwort (für Q1–Q6 gemeinsam): „Alles außer Q5 passt, die Domain und der Server sind noch nicht vorhanden. commits mit <https://www.conventionalcommits.org/en/v1.0.0/> und nutze <https://keepachangelog.com/en/1.1.0/“>
 
 **Q5 – Deployment schon in R1?**
 Frage: Wird das Walking Skeleton in R1 bereits automatisch auf einen Server deployt, und gibt es Server und Domain?
 Empfehlung: Ja, falls Server + Domain verfügbar: Deployment bei Push auf `main` mit TLS über den Reverse Proxy; sonst Deployment als eigenes Roadmap-Item vor dem ersten Release.
-Antwort (für Q1–Q6 gemeinsam): „Alles außer Q5 passt, die Domain und der Server sind noch nicht vorhanden. commits mit https://www.conventionalcommits.org/en/v1.0.0/ und nutze https://keepachangelog.com/en/1.1.0/“
+Antwort (für Q1–Q6 gemeinsam): „Alles außer Q5 passt, die Domain und der Server sind noch nicht vorhanden. commits mit <https://www.conventionalcommits.org/en/v1.0.0/> und nutze <https://keepachangelog.com/en/1.1.0/“>
 
 **Q6 – Sprache von Code und Dokumentation**
 Frage: In welcher Sprache werden Code, Commits und `documentation/` geschrieben?
 Empfehlung: Englisch für Code, Commits und `documentation/`; Deutsch für Präsentation und schulische Unterlagen in `docs/`.
-Antwort (für Q1–Q6 gemeinsam): „Alles außer Q5 passt, die Domain und der Server sind noch nicht vorhanden. commits mit https://www.conventionalcommits.org/en/v1.0.0/ und nutze https://keepachangelog.com/en/1.1.0/“
+Antwort (für Q1–Q6 gemeinsam): „Alles außer Q5 passt, die Domain und der Server sind noch nicht vorhanden. commits mit <https://www.conventionalcommits.org/en/v1.0.0/> und nutze <https://keepachangelog.com/en/1.1.0/“>
 
 Ergebnis Runde 1: Q1–Q4, Q6 wie empfohlen. Q5: kein Deployment in R1 (Server und Domain fehlen) – Deployment wird ein eigenes Roadmap-Item vor dem ersten Release. Neu: Commits nach Conventional Commits 1.0.0, Changelog nach Keep a Changelog 1.1.0.
 
