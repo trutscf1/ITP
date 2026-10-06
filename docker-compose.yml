@@ -1,0 +1,39 @@
+services:
+  
+  postgres:
+    image: postgres:18
+    container_name: stash_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: stash_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - backend
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres-etc:/etc
+      - postgres-data:/var/lib/postgresql
+
+  mongodb:
+    hostname: mongodb
+    image: mongo:8.0
+    environment:
+      - MONGODB_INITDB_ROOT_USERNAME=${MONGO_USER}
+      - MONGODB_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-data:/data/db
+      - mongo-config:/data/configdb
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  postgres-data:
+  postgres-etc:
+  mongo-data:
+  mongo-config:

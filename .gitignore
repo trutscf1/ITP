@@ -2,5 +2,6 @@
 CLAUDE.local.md
 .claude/settings.local.json
 
-# secrets
+# env files (can opt-in for committing if needed)
+.env*
 .env
