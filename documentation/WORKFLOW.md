@@ -67,7 +67,9 @@ Presented at the final presentation (`docs/anforderungen_software_projekte.md`, 
 
 ## Issues
 
-Every change starts with an issue (§3). Each issue has: description, acceptance criteria, weight, assignee, sprint milestone, and a label (`feature`, `bug`, `documentation`). Bugs and defects are always recorded as their own issue.
+Every change starts with an issue (§3). Each issue has: description, acceptance criteria, weight, assignee, sprint milestone, exactly one `type::` label and exactly one `status::` label; `priority::`, `area::`, and `env::` are optional. The label set and its rules are owned by `.gitlab/workflows/labels.md` (its branch names `development` / `develop` mean `dev` here). Bugs and defects are always recorded as their own issue.
+
+**Board:** the GitLab issue board "Kanban" has one column per status label — Backlog, Ready, In Progress, In Review, Done (`.gitlab/workflows/issue_board_setup.md`). Moving a card changes the `status::` label; `status::blocked` has no column and is set by hand.
 
 **Two kinds of issues:** every roadmap item has one **concept issue** `<R>: concept – <feature>` (label `ready-for-human`, owner = feature owner); its owner starts it with `/grill-with-docs <R>`. Implementation issues are cut from the approved concept (`/to-tickets`), one track per person. Triage state is one of the labels in `docs/agents/triage-labels.md`.
 
