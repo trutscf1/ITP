@@ -1,0 +1,3 @@
+{
+  "extends": "@stash/config/tsconfig.base.json"
+}
