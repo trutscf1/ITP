@@ -83,6 +83,28 @@ flowchart LR
 
 The planned technology is listed in the project proposal ([docs/projektantrag.md](docs/projektantrag.md)); binding choices and versions are recorded in [documentation/STACK.md](documentation/STACK.md) as they are made. The units share their data shapes through one contracts package.
 
+## Data model
+
+Draft of the relational schema, derived from the project proposal (`docs/projektantrag.md`). Table names are plural, as the SQL style guide of the school demands. The binding diagram, created in Vertabelo, and the Prisma schema come with the story *Data model and Prisma schema* (`SCF-US-4`, [documentation/work-items/scaffolding/](documentation/work-items/scaffolding/)); they replace this draft. The application's own `users` table is in a 1:1 relation to the table of the authentication library.
+
+```mermaid
+erDiagram
+  auth_users ||--|| users : "1:1"
+  users ||--o{ team_members : joins
+  teams ||--o{ team_members : has
+  users ||--o{ folders : owns
+  folders ||--o{ folders : "parent of"
+  folders ||--o{ files : contains
+  folders ||--o{ folder_permissions : "is granted by"
+  teams ||--o{ folder_permissions : receives
+  users ||--o{ folder_permissions : receives
+  users ||--o{ share_links : creates
+  files ||--o{ share_links : "is shared by"
+  folders ||--o{ share_links : "is shared by"
+  users ||--o| storage_quotas : has
+  users ||--o{ audit_logs : causes
+```
+
 ## Operation and deployment
 
 What exists today and what is planned (`documentation/ROADMAP.md`, R14 *Deployment*):
