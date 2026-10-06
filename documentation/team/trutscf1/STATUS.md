@@ -43,3 +43,5 @@ Carried over from `ROADMAP-DETAILS.md` at the switch to team mode on 2026-10-06;
 | Question | Waiting for (handle) | Since |
 | --- | --- | --- |
 | Review and merge of MR !1 (migration to `engineering-human`) | schauby1, schwaigc, or tschudea07 | 2026-10-06 |
+| Review and merge of MR !2 (team mode), after !1 | schauby1, schwaigc, or tschudea07 | 2026-10-06 |
+| Review and merge of MR !3 (user stories as work items, issue #101), after !2 | schauby1, schwaigc, or tschudea07 | 2026-10-06 |
