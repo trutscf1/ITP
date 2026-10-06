@@ -142,4 +142,18 @@ Every change starts with an issue, happens on its own branch, and reaches `dev` 
 
 ## Licence notes
 
-The repository is public, so all content must be licence-free. Licence notes for third-party content and dependencies are collected here as they are added; so far the project contains only the default assets of the Next.js starter in `next/public/`.
+The repository is public, so all content must be licence-free. Licences of what the project uses today (the licence of a dependency is the one it declares; check again when a version changes):
+
+| Component | Licence | Use |
+| --- | --- | --- |
+| Next.js, React, Tailwind CSS | MIT | web application |
+| Prisma | Apache-2.0 | database access |
+| TypeScript | Apache-2.0 | language |
+| Biome | MIT or Apache-2.0 | lint and format |
+| pnpm, Turborepo | MIT | package manager and task runner |
+| PostgreSQL 18 (Docker image) | PostgreSQL Licence | relational database, runs as a container |
+| MongoDB 8.0 (Docker image) | SSPL | metadata database, runs as a container; not part of the delivered source |
+| Geist and Geist Mono fonts | SIL Open Font Licence 1.1 | loaded by the starter layout |
+| Next.js starter images in `next/public/` | default assets of the starter | placeholders; to be replaced by own assets |
+
+Open points: MongoDB's SSPL is not an OSI-approved licence, so the team decides whether the proposal's choice stays; third-party content added later is entered here when it is added.
