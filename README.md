@@ -8,7 +8,7 @@ The project goal, its target users, and its non-goals are in [documentation/GOAL
 
 Early scaffold. What exists today:
 
-- a Next.js application in `next/` (App Router, React, Tailwind CSS, Biome, Prisma)
+- a pnpm and Turborepo workspace with the five units in `apps/` and the shared packages in `packages/`; the Next.js application is the `web` unit in `apps/web/` (App Router, React, Tailwind CSS, Biome, Prisma), the other units are empty
 - a `docker-compose.yml` that starts PostgreSQL 18 and MongoDB 8
 - the project documentation in `documentation/`
 
@@ -26,17 +26,19 @@ cp .env.example .env
 docker compose up -d
 
 # 3. start the web application
-cd next
 pnpm install
-pnpm dev
+pnpm --filter @stash/web dev
 ```
 
-The web application then runs at <http://localhost:3000>. It reads the database connection from `DATABASE_URL`; put that variable into `next/.env`, matching the PostgreSQL values of step 1.
+The web application then runs at <http://localhost:3000>. It reads the database connection from `DATABASE_URL`; put that variable into `apps/web/.env`, matching the PostgreSQL values of step 1.
 
 Checks:
 
 ```bash
-cd next && pnpm lint                            # Biome check of the application
+pnpm run lint                                  # Biome check of every package, through Turborepo
+pnpm run typecheck                             # TypeScript check of every package
+pnpm run build                                 # build of every package
+pnpm test                                      # acceptance tests of the repository layout
 node tools/doc-check.mjs documentation          # consistency check of the documentation
 npx markdownlint-cli2 "documentation/**/*.md"   # markdown lint
 ```
@@ -94,4 +96,4 @@ Every change starts with an issue, happens on its own branch, and reaches `dev` 
 
 ## Licence notes
 
-The repository is public, so all content must be licence-free. Licence notes for third-party content and dependencies are collected here as they are added; so far the project contains only the default assets of the Next.js starter in `next/public/`.
+The repository is public, so all content must be licence-free. Licence notes for third-party content and dependencies are collected here as they are added; so far the project contains only the default assets of the Next.js starter in `apps/web/public/`.
