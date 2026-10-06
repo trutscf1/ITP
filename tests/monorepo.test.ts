@@ -10,7 +10,10 @@ const units = ["web", "identity", "storage", "worker", "cms"] as const;
 const packages = ["contracts", "ui", "config"] as const;
 
 function readJson(path: string): Record<string, unknown> {
-  return JSON.parse(readFileSync(join(root, path), "utf8")) as Record<string, unknown>;
+  return JSON.parse(readFileSync(join(root, path), "utf8")) as Record<
+    string,
+    unknown
+  >;
 }
 
 function atLeast(actual: string, minimum: string): boolean {
@@ -59,7 +62,10 @@ describe("SCF-AC-1.1 Workspace layout", () => {
 describe("SCF-AC-1.3 Root tasks", () => {
   for (const task of ["lint", "typecheck", "build"] as const) {
     it(`SCF-AC-1.3 runs ${task} through Turborepo`, () => {
-      const scripts = readJson("package.json").scripts as Record<string, string>;
+      const scripts = readJson("package.json").scripts as Record<
+        string,
+        string
+      >;
       assert.equal(scripts[task], `turbo run ${task}`);
     });
   }
@@ -80,7 +86,8 @@ describe("SCF-AC-1.4 Pinned versions", () => {
   });
 
   it("SCF-AC-1.4 uses Next.js >= 16.3 and React >= 19.2 in the web unit", () => {
-    const dependencies = readJson("apps/web/package.json").dependencies as Record<string, string>;
+    const dependencies = readJson("apps/web/package.json")
+      .dependencies as Record<string, string>;
     assert.ok(atLeast(dependencies.next as string, "16.3.0"));
     assert.ok(atLeast(dependencies.react as string, "19.2.0"));
   });
