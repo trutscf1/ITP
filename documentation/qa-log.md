@@ -108,3 +108,11 @@ Assumptions stated with the round, none rejected:
 ➡️ no recommendation
 
 > **Answer:** Slices schneiden, README schreiben, #1–#3 einordnen
+
+## Round 5 — 2026-10-06 — delivery
+
+❓ **Q14** - **GitLab-Einstellungen**: Welche der bisher verweigerten Änderungen soll ich jetzt mit deinem Token vornehmen? Options (multi-select): main: Push für niemanden / dev schützen / Merge-Einstellungen / Epics versuchen
+
+➡️ no recommendation
+
+> **Answer:** main: Push für niemanden, dev schützen

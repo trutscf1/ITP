@@ -11,11 +11,11 @@ New tasks and ideas for this developer land here first, before anyone plans them
 
 ## Open
 
-- [2026-10-06] Create a personal access token (scope `api`, expiry at the latest 2027-04-06), set it as `GITLAB_TOKEN` in the own terminal, and revoke the project access tokens used until now; then repeat the steps that were refused with HTTP 403 (below). Every team member needs an own token (`docs/agents/issue-tracker.md`, "Access").
+- [2026-10-06] Revoke the two project access tokens used until 2026-10-06 (Project → Settings → Access tokens). The other three team members each create an own personal access token (`docs/agents/issue-tracker.md`, "Access").
 - [2026-10-06] Review and merge the migration MR !1 `concept/migrate-engineering-human` → `dev` (issue #86); a person other than the author reviews it.
 - [2026-10-06] Team review of the drafts in `GOAL.md` (roles R-1…R-3, success signals G-1.S1…S3) and of the *Serves* column in `ROADMAP.md`; only the wording of G-1 is confirmed.
-- [2026-10-06] Needs the Maintainer role or rights on the group; the agent's project token was refused (HTTP 403) on each: promote the feature issues #87–#100 to group epics (`/promote`); set push access on `main` to "no one" (Settings → Repository → Protected branches; today push and merge are allowed for Maintainers); protect `dev` the same way.
-- [2026-09-29] Configure GitLab per `docs/git_workflow_commands.md` §2.3–2.6 (default branch `dev`, squash never, "delete source branch" off, pipeline must succeed) and the GitHub mirror (§18). Needs the Maintainer role; the agent's token was refused (HTTP 403).
+- [2026-10-06] Promote the feature issues #87–#100 to group epics (`/promote`); needs a membership in the group, which `trutscf1` does not have — ask the teacher or a group owner.
+- [2026-09-29] Set the merge settings per `docs/git_workflow_commands.md` §2.3 (squash never, "delete source branch" off, pipeline must succeed, discussions resolved) and the GitHub mirror (§18). Not chosen on 2026-10-06 (`qa-log.md`, Q14); the default branch is already `dev`.
 - [2026-10-06] Owners review what was proposed for them on 2026-10-06: the cut of the six Sprint 1 stories into two slices each (#102–#107), the labels of #1–#3, the scope and estimate of #2 Corporate Identity, and the `README.md`.
 - [2026-10-06] `next/.gitignore` also ignores `.env*`; the application reads `DATABASE_URL`, which has no example file yet. Add `next/.env.example` with the first change to the application's configuration.
 - [2026-09-29] Prioritize R2–R14 as must / should / could before Sprint 2 planning (capacity ≈ 350 h vs. ≈ 490 h estimated, `ROADMAP.md` "Capacity").
