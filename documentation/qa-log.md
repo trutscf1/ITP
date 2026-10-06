@@ -69,3 +69,28 @@ Assumptions stated with the inventory, none rejected:
 ➡️ Jetzt angleichen
 
 > **Answer:** Jetzt angleichen (Recommended)
+
+## Round 3 — 2026-10-06 — team
+
+Assumptions stated with the round, none rejected:
+
+- **A6**: Handles are the GitLab usernames `trutscf1`, `schauby1`, `schwaigc`, `tschudea07`; PM approver and profile maintainer is `trutscf1`.
+- **A7**: MR !1 is still open, so the new branches build on it; the team switch and the story files become two separate MRs into `dev`.
+
+❓ **Q9** - **Umfang der Story-Dateien**: Wie sollen die 48 User Stories ins Repo, obwohl 13 Features noch kein Konzept haben? Options: Alle 48 mit Konzept-Entwürfen / Nur die R1-Stories jetzt / Alle 48 ohne Konzepte
+
+➡️ Alle 48 mit Konzept-Entwürfen
+
+> **Answer:** Alle 48 mit Konzept-Entwürfen (Recommended)
+
+❓ **Q10** - **Sprache und Form**: In welcher Form sollen Story und Akzeptanzkriterien in den Dateien stehen? Options: Englisch, Given/When/Then / Deutsch, Given/When/Then / Deutsch, wörtlich
+
+➡️ Englisch, Given/When/Then
+
+> **Answer:** Englisch, Given/When/Then (Recommended)
+
+❓ **Q11** - **GitLab-Issues**: Sollen die 48 Issues auf GitLab an die Story-Dateien angeglichen werden? Options: Später, nach dem Review / Jetzt angleichen / Nur Nummern eintragen
+
+➡️ Später, nach dem Review
+
+> **Answer:** Jetzt angleichen

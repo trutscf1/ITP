@@ -18,7 +18,7 @@ The single place where technology and version constraints live (`MANIFEST.md`, "
 
 Every row traces to the capability IDs (`SCF-C-x`, later other prefixes) that demand it.
 
-## 1. Platform — Fabian
+## 1. Platform — `trutscf1`
 
 | Capability | Technology | Version constraint | Notes |
 | --- | --- | --- | --- |
@@ -34,7 +34,7 @@ Every row traces to the capability IDs (`SCF-C-x`, later other prefixes) that de
 
 Module mapping (folder layout), configuration & secrets, build/run commands: _open_.
 
-## 2. Contracts, storage & worker — Yannick
+## 2. Contracts, storage & worker — `schauby1`
 
 | Capability | Technology | Version constraint | Notes |
 | --- | --- | --- | --- |
@@ -44,7 +44,7 @@ Module mapping (folder layout), configuration & secrets, build/run commands: _op
 
 Type mapping (neutral type → concrete type) and error mapping (`E-x` → concrete representation): _open_.
 
-## 3. Identity & CI — Andreas
+## 3. Identity & CI — `tschudea07`
 
 | Capability | Technology | Version constraint | Notes |
 | --- | --- | --- | --- |
@@ -54,7 +54,7 @@ Type mapping (neutral type → concrete type) and error mapping (`E-x` → concr
 | SCF-C-10 secret scanner, code scanner, dependency auditor, container image scanner | _open_ | | start from `docs/security_next_js.md` |
 | SCF-C-11 commit message linter | _open_ | | |
 
-## 4. Web — Christopher
+## 4. Web — `schwaigc`
 
 | Capability | Technology | Version constraint | Notes |
 | --- | --- | --- | --- |

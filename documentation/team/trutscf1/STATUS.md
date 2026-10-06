@@ -1,0 +1,41 @@
+---
+doc: status
+format: engineering-human/2
+title: Status of one developer
+audience: [developer, agent]
+handle: "trutscf1"
+---
+# Status — trutscf1
+
+Session positions of one developer (P-TEAM-3). Precise enough that a fresh session — this developer's or a new owner's — can continue without chat history. The team-wide entry point is `documentation/ROADMAP-DETAILS.md`; it links here and never copies these positions.
+
+## Current positions
+
+| Feature | Concept document | Phase | Branch | MR | Next step |
+| --- | --- | --- | --- | --- | --- |
+| Scaffolding & shared contracts (R1) | [concepts/scaffolding.md](../../concepts/scaffolding.md) (legacy format) | 6, test concept | — | — | Migrate the concept with `/engineering-human migrate scaffolding`, then write the test concept |
+| Scaffolding & shared contracts (R1), track Platform & cms | [concepts/scaffolding.track-platform.md](../../concepts/scaffolding.track-platform.md) | 5, architecture | — | — | Write the "Plan" section of the track file before the first MR |
+
+Sprint 1 (until 2026-10-26), GitLab issues: US-41 #78, US-44 #81 (shared: US-01 #38, US-02 #39, US-03 #40, US-48 #85).
+
+## Project-wide notes
+
+Carried over from `ROADMAP-DETAILS.md` at the switch to team mode on 2026-10-06; this developer does the project controlling.
+
+- **Branches (2026-10-06)**: `main` exists on `origin`. `dev` exists on `origin` and holds the application scaffold pushed by `schauby1` (Next.js app in `next/`, Prisma, `docker-compose.yml`, `CHANGELOG.md`); it does not contain the documentation commit of `main`. The migration to `engineering-human` reached `dev` through MR !1 (issue #86), which also brought the documentation commit of `main` into `dev`.
+- **Team**: four members, areas per `docs/projektantrag.md`.
+- **Concept phase**: R1 concept `concepts/scaffolding.md` written: requirements, decisions Q1–Q11, work split into slices S0–S6 (§15). Q12 decided; Phase 4 signed off 2026-09-29 by `trutscf1`. Open: Phase 6 test concept (worked examples 1–5 are the first cases); R1 is split into four tracks with exclusive paths (`concepts/scaffolding.md` §15, Q13): Platform & cms (`trutscf1`: #4, #5, #6, #18, #19, #21, #22), Contracts, storage & worker (`schauby1`: #7, #8, #12, #13), Identity & CI (`tschudea07`: #9, #10, #11, #17), Web (`schwaigc`: #15, #16); Sprint 2: #14, #20 (`trutscf1`). Plan files `concepts/scaffolding.track-*.md`, `STACK.md` with one section per track. Pre-existing #1, #3 have no milestone; #2 Corporate Identity was put into Sprint 1 by the team without estimate.
+- **GitLab issues (2026-09-29, on request): #4–#37 deleted permanently; only #1–#3 (created by the team) remain. Issue numbers below and in `concepts/scaffolding.md` §15 / the track files refer to the deleted issues.**
+- **Concept issues (deleted)** (one per roadmap item, `ready-for-human`): R2 #23, R3 #24, R4 #25 (Sprint 1), R5 #26 (Sprint 1), R6 #27, R7 #28, R8 #29, R9 #30, R10 #31, R11 #32, R12 #33, R13 #34, R14 #35, O1 #36, O2 #37 (optional, `needs-triage`, unassigned). Unscheduled ones get a sprint at Sprint 2 planning after the must/should/could prioritization.
+- **Time frame**: 4 h per person per week; Sprint 1 runs 2026-09-30 … 2026-10-27 (last merge to `main` 2026-10-26); final submission 2027-04-06 (`WORKFLOW.md`). R2–R14 pre-concept.
+- **R1 next step**: slice S0 (all four together) creates `STACK.md` and the module specifications; then S1–S5 in parallel.
+- **GitLab user stories (2026-10-06)**: #38–#85 are the user stories US-01…US-48 (created by `trutscf1`, weight = story points, no milestone, no time estimate). Each is assigned to the person named under "Verantwortlich" in its description (`tschudea07` 15, `schauby1` 12, `schwaigc` 7, `trutscf1` 10; US-01, US-02, US-03, US-48 to all four) and carries `type::story` (US-48: `type::documentation`), `priority::` from its description, an `area::` label, and `status::backlog` (US-01 and US-48, which have no dependencies: `status::ready`). #1–#3 have no `type::` / `status::` label yet.
+- **Sprint 1 plan (2026-10-06)**: budget 12 h per person until the sprint end, 1 story point counted as 1 h, shared stories split evenly (4 h each). In milestone Sprint 1 with `status::ready` and time estimate = weight: shared US-01 #38, US-02 #39, US-03 #40, US-48 #85; `tschudea07` US-05 #42, US-07 #44 (11 h); `schauby1` US-19 #56, US-25 #62 (12 h); `schwaigc` US-31 #68 (9 h); `trutscf1` US-41 #78, US-44 #81 (11 h). The remaining hours go to #2 Corporate Identity (`schwaigc`, `tschudea07`; no estimate) and #1 Projektmanagement (`trutscf1`). Seven of these stories are above the 4 h issue limit of `WORKFLOW.md` and are not split yet.
+- **GitLab board and labels (2026-10-06)**: board "Kanban" with the columns Backlog, Ready, In Progress, Review, Done. The labels on GitLab match `WORKFLOW.md` ("Labels"). Unused leftovers, not deleted: `feature`, `bug`, `documentation`, `ready-for-agent`, `type::technical-improvement`.
+- **GitLab**: milestones Sprint 1–6 + Final exist. Project settings: default branch is still `main`, merge method `merge`, squash off by default, "delete source branch" on; protected branches and the pipeline merge check are not configured yet (`next.md`).
+
+## Open questions waiting for others
+
+| Question | Waiting for (handle) | Since |
+| --- | --- | --- |
+| Review and merge of MR !1 (migration to `engineering-human`) | schauby1, schwaigc, or tschudea07 | 2026-10-06 |

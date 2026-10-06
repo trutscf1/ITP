@@ -10,7 +10,7 @@ How work moves through this repo — branches, labels, merge requests, the Defin
 
 ## Mode
 
-- **Mode:** solo layout; the switch to team mode is decided ([ADR-0002](adr/0002-adopt-engineering-human.md)) and follows as its own change with `/engineering-human team` (P-TEAM-1…5)
+- **Mode:** team (P-TEAM-1…5, [ADR-0003](adr/0003-switch-to-team-mode.md)); team roster and roles in `team/TEAM.md`
 - **Git host / tracker:** GitLab — `htl-villach/it/classes/5bhitm-2026/itp/waent/project1/SJ26_27_5BHITM_ITP_trutscf1_project1`. People use `glab` as in `docs/git_workflow_commands.md`; agents use the REST API (`docs/agents/issue-tracker.md`). Mirror to GitHub with **all branches**; the GitHub user `gamgamstyle` gets the Reporter role (§18).
 - **Time tracking:** on for humans (P-TIME-1; school requirement, see "Time tracking")
 - **Host tier:** GitLab Premium/Ultimate, project in a group — determined by the agent's tier check on 2026-10-06 (the group epics API answers), not assumed, and re-checked before every `tickets` publish (P-TRK-4). Features are group epics with the story issues as native child items.
@@ -18,7 +18,7 @@ How work moves through this repo — branches, labels, merge requests, the Defin
 
 ## Team
 
-Four developers; each owns the areas and roadmap features assigned in `docs/projektantrag.md` ("Projektgruppe") and [ROADMAP.md](ROADMAP.md). Work is split into **tracks**, one per person: each track owns exclusive paths, its own plan file, and its own issues; tracks meet only at interfaces fixed in the feature's concept document. A change in another track's paths is requested as an issue for that track's owner. Template: `documentation/concepts/scaffolding.md` §15.
+Four developers (`team/TEAM.md`); each owns the areas assigned in `docs/projektantrag.md` ("Projektgruppe") and the roadmap features in the Owner column of [ROADMAP.md](ROADMAP.md). Work is split into **tracks**, one per person: each track owns exclusive paths, its own plan file, and its own issues; tracks meet only at interfaces fixed in the feature's concept document. A change in another track's paths is requested as an issue for that track's owner. Template: `documentation/concepts/scaffolding.md` §15.
 
 ## Branches (P-GIT-1…3)
 
@@ -161,7 +161,7 @@ An issue is done, and its MR may be merged, only when every item holds:
 6. `pnpm run lint` and `biome check` report no errors.
 7. The MR title, description, and commit subjects are understandable without looking up IDs (P-GIT-4, P-MR-1, P-HUM-4).
 8. A person other than the author reviewed the MR against this list and commented (P-MR-2).
-9. Status is current: the MR carries the position in `ROADMAP-DETAILS.md` (or the developer's `STATUS.md`) and the *Status* stage in `ROADMAP.md` for the state after the merge, and the issue is closed or confirmed at the merge (P-ROAD-4).
+9. Status is current: the MR carries the position in the developer's `team/<handle>/STATUS.md` and the *Status* stage in `ROADMAP.md` for the state after the merge, and the issue is closed or confirmed at the merge (P-ROAD-4).
 10. `pre-commit run --all-files` passes: no secrets (Gitleaks), no Semgrep errors, no high/critical vulnerabilities (`pnpm audit --prod`).
 11. TypeScript uses explicit types throughout; the linter reports no `any`.
 12. No `.env`, secrets, or build output are committed; new environment variables are in `.env.example`.
