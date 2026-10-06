@@ -13,7 +13,10 @@ New tasks and ideas for this developer land here first, before anyone plans them
 
 - [2026-10-06] Review and merge the migration MR !1 `concept/migrate-engineering-human` → `dev` (issue #86); a person other than the author reviews it.
 - [2026-10-06] Team review of the drafts in `GOAL.md` (roles R-1…R-3, success signals G-1.S1…S3) and of the *Serves* column in `ROADMAP.md`; only the wording of G-1 is confirmed.
-- [2026-10-06] Give the GitLab user stories US-01…US-48 (#38–#85) their work-item files, feature epics, and IDs with the concept prefix as each feature's concept is written (ADR-0002, P-TRK-2). Seven Sprint 1 stories are weighted 5 and need slices of at most 4 h.
+- [2026-10-06] Promote the feature issues #87–#100 to group epics (`/promote`, needs rights on the group) and set push access on `main` to "no one" (Settings → Repository → Protected branches; needs the Maintainer role). Today `main` allows push and merge for Maintainers.
+- [2026-10-06] Seven Sprint 1 stories are weighted 5 and need slices of at most 4 h; each owner cuts them in the concept.
+- [2026-10-06] The story SCF-US-1 (set up the monorepo) names the apps `web`, `storage-api`, `worker`, `cms`, while the R1 concept requires the five units `web`, `identity`, `storage`, `worker`, `cms` (SCF-F-1); SCF-US-5 names GitHub Actions, while `WORKFLOW.md` binds GitLab CI. Resolve both when the R1 concept is migrated.
+- [2026-10-06] Five stories name a role that is not in `GOAL.md` (developer, content editor, visitor); decide whether `GOAL.md` gets more roles (needs an ADR) or the stories are reworded.
 - [2026-10-06] `.gitignore` on `dev` ignores `.env*`, which also hides `.env.example`; the Definition of Done requires that file to be committed. Decide with `schauby1`.
 - [2026-09-29] Configure GitLab per `docs/git_workflow_commands.md` §2.3–2.6 (default branch `dev`, protected branches, squash never, "delete source branch" off, pipeline must succeed) and the GitHub mirror (§18).
 - [2026-09-29] Decide on `README.md`: the school requires a setup guide and an architecture overview.
