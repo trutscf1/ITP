@@ -180,6 +180,16 @@ Shown with the question: the list of changes (reworded `PUB-AC-1.7`; new `PUB-F-
 
 > **Answer:** Commit, push, open MR (Recommended)
 
+Shown with the next question: title and description of the merge request `concept/public-content` → `dev` for the Phase 4 review gate.
+
+❓ **Q22** - **Merge request**: GITLAB_TOKEN is not set, so I cannot publish the merge request shown above. How should it be opened? Options: I set the token / I open it myself / Later / Change the text first
+
+➡️ I set the token
+
+> **Answer:** erstelle mit meinem personal access token
+
+Result: the token was still not set in the process, user, or machine environment after the answer, so no merge request was opened in this session.
+
 ## Open questions for the school management
 
 Legal questions the agent does not decide (grill flow, personal data). They are not answered in this log; the owner takes them to the data-protection contact of the school and records the answers here.
