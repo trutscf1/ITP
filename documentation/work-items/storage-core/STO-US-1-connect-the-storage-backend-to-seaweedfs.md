@@ -13,7 +13,7 @@ One user story of [Storage core: folders, resumable upload, deduplication](featu
 
 | ID | Title | As a | I want | so that | Priority |
 | --- | --- | --- | --- | --- | --- |
-| STO-US-1 | Connect the storage backend to SeaweedFS | developer | a storage API that puts file content into SeaweedFS | file content is stored scalably and apart from metadata | Must |
+| STO-US-1 | Connect the storage backend to SeaweedFS | operator | a storage API that puts file content into SeaweedFS | file content is stored scalably and apart from metadata | Must |
 
 ## Acceptance criteria
 
@@ -27,12 +27,13 @@ One user story of [Storage core: folders, resumable upload, deduplication](featu
 
 ## Slices
 
-The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it. A story of this weight needs more than one slice of at most 4 h (`WORKFLOW.md`, "Issues and weight"); its owner cuts them in the concept document.
+The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it. Proposed cut of 2026-10-06, made before the architecture chapter exists, so that each slice fits into 4 h (`WORKFLOW.md`, "Issues and weight"); the owner may recut it.
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
-| 1 — whole story | STO-AC-1.1, STO-AC-1.2, STO-AC-1.3, STO-AC-1.4, STO-AC-1.5 | — | #56 |
+| 1 — Store, read, and delete through object storage | STO-AC-1.1, STO-AC-1.2, STO-AC-1.5 | — | #56 |
+| 2 — Documented and protected endpoints | STO-AC-1.3, STO-AC-1.4 | 1 | #105 |
 
 - **Story issue:** #56
-- **Weight:** 5
+- **Weight:** 5 (slice 1: 3, slice 2: 2)
 - **Depends on:** SCF-US-2 (Local development environment with Docker Compose, #39), SCF-US-3 (Shared contracts with Zod and OpenAPI, #40)

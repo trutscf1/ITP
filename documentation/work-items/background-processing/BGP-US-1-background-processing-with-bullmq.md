@@ -13,7 +13,7 @@ One user story of [Background processing: thumbnails, virus scan, OCR, scheduled
 
 | ID | Title | As a | I want | so that | Priority |
 | --- | --- | --- | --- | --- | --- |
-| BGP-US-1 | Background processing with BullMQ | developer | a job queue for background tasks | costly processing such as thumbnails or virus scans is decoupled from the upload | Must |
+| BGP-US-1 | Background processing with BullMQ | operator | a job queue for background tasks | costly processing such as thumbnails or virus scans is decoupled from the upload | Must |
 
 ## Acceptance criteria
 

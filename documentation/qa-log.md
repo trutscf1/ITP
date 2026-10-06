@@ -94,3 +94,17 @@ Assumptions stated with the round, none rejected:
 ➡️ Später, nach dem Review
 
 > **Answer:** Jetzt angleichen
+
+## Round 4 — 2026-10-06 — delivery
+
+❓ **Q12** - **Rollen in GOAL.md**: Fünf Stories nennen Rollen, die GOAL.md nicht kennt (Entwickler, Content-Redakteur, Besucher). Wie löse ich das? Options: Zwei Rollen ergänzen / Nur umformulieren / So lassen
+
+➡️ Zwei Rollen ergänzen
+
+> **Answer:** Zwei Rollen ergänzen (Recommended)
+
+❓ **Q13** - **Weitere Punkte**: Welche der übrigen offenen Punkte soll ich zusätzlich selbst erledigen? Sie greifen in die Arbeit der Besitzer ein oder sind inhaltliche Entscheidungen. Options (multi-select): Slices schneiden / README schreiben / #1–#3 einordnen / Nichts davon
+
+➡️ no recommendation
+
+> **Answer:** Slices schneiden, README schreiben, #1–#3 einordnen

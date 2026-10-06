@@ -20,7 +20,7 @@ One user story of [Scaffolding & shared contracts](feature.md) and the acceptanc
 | ID | Title | Given | When | Then |
 | --- | --- | --- | --- | --- |
 | SCF-AC-6.1 | Commit check | A developer's local clone | They create a commit | Commitlint checks the message against Conventional Commits in a git hook |
-| SCF-AC-6.2 | Changelog from commits | The commits since the last release | A release tag is created | The changelog is generated from them |
+| SCF-AC-6.2 | Changelog from commits | The commits since the last release | The release merge request is prepared | A changelog draft for the new version is generated from them |
 | SCF-AC-6.3 | Release tags | A release | It is published | Its tag follows SemVer (for example `v1.0.0`) and a GitLab Release with the changelog exists |
 
 ## Slices

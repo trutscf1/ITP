@@ -27,12 +27,13 @@ One user story of [Scaffolding & shared contracts](feature.md) and the acceptanc
 
 ## Slices
 
-The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it. A story of this weight needs more than one slice of at most 4 h (`WORKFLOW.md`, "Issues and weight"); its owner cuts them in the concept document.
+The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it. Proposed cut of 2026-10-06, made before the architecture chapter exists, so that each slice fits into 4 h (`WORKFLOW.md`, "Issues and weight"); the owner may recut it.
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
-| 1 — whole story | SCF-AC-2.1, SCF-AC-2.2, SCF-AC-2.3, SCF-AC-2.4, SCF-AC-2.5 | — | #39 |
+| 1 — Stack starts with one command | SCF-AC-2.1, SCF-AC-2.2, SCF-AC-2.4 | — | #39 |
+| 2 — Offline start and image scan | SCF-AC-2.3, SCF-AC-2.5 | 1 | #103 |
 
 - **Story issue:** #39
-- **Weight:** 5
+- **Weight:** 5 (slice 1: 3, slice 2: 2)
 - **Depends on:** SCF-US-1 (Set up the monorepo, #38)

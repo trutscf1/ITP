@@ -27,12 +27,13 @@ One user story of [Design system & accessibility modes](feature.md) and the acce
 
 ## Slices
 
-The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it. A story of this weight needs more than one slice of at most 4 h (`WORKFLOW.md`, "Issues and weight"); its owner cuts them in the concept document.
+The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it. Proposed cut of 2026-10-06, made before the architecture chapter exists, so that each slice fits into 4 h (`WORKFLOW.md`, "Issues and weight"); the owner may recut it.
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
-| 1 — whole story | DSA-AC-1.1, DSA-AC-1.2, DSA-AC-1.3, DSA-AC-1.4, DSA-AC-1.5 | — | #68 |
+| 1 — Tokens and themes | DSA-AC-1.1, DSA-AC-1.2, DSA-AC-1.3 | — | #68 |
+| 2 — Contrast and Storybook | DSA-AC-1.4, DSA-AC-1.5 | 1 | #106 |
 
 - **Story issue:** #68
-- **Weight:** 5
+- **Weight:** 5 (slice 1: 3, slice 2: 2)
 - **Depends on:** SCF-US-1 (Set up the monorepo, #38)
