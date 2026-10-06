@@ -41,7 +41,15 @@ node tools/doc-check.mjs documentation          # consistency check of the docum
 npx markdownlint-cli2 "documentation/**/*.md"   # markdown lint
 ```
 
-Once the images and dependencies are present locally, the project must start without internet access (school requirement).
+### Start without internet access
+
+The school requires that the application starts locally without internet access. What that needs today:
+
+1. Prepare once while online: `docker compose pull` (PostgreSQL and MongoDB images) and `pnpm install` (fills the local pnpm store).
+2. Afterwards, offline: `docker compose up -d`, `pnpm install --offline`, then start the web application as in the quick start.
+3. Settings that decide whether a feature may use the internet live in `.env` and are never hard-coded. Features that need the internet (login with GitHub, Google, or Microsoft, bot protection) must be switchable off there; they arrive with the identity feature (R3, [ROADMAP.md](documentation/ROADMAP.md)).
+
+Known gap: the starter layout loads its fonts through `next/font/google`, which fetches them at build time. A build without internet fails until the fonts are bundled locally.
 
 ## Architecture overview
 
