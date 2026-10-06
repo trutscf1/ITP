@@ -141,3 +141,31 @@ Assumptions stated with the round, none rejected:
 ➡️ #38, dann #85
 
 > **Answer:** #38, dann #85 (Recommended)
+
+## Round 7 — 2026-10-06 — delivery (revise !4, !5)
+
+Fabian's reviews of !4 and !5 (not approved) are worked through under `/engineering-human revise`. The questions concern !5; they are logged here because this file ships with !4.
+
+❓ **Q18** - **!5 SCF-AC-7.4**: Der Vertabelo-ER-Diagrammteil gehört zu SCF-US-4. Wie lösen wir Fabians Punkt, dass #85 sonst nicht erledigt ist? Options: Zweiter Slice / Kriterium ändern / So lassen
+
+➡️ Zweiter Slice
+
+> **Answer:** Zweiter Slice (Recommended)
+
+❓ **Q19** - **Startbilder**: Fabian will keine Dritt-Logos im öffentlichen Repo. next.svg und vercel.svg stecken in der Starter-Seite page.tsx, file/globe/window.svg sind ungenutzt. Was soll passieren? Options: Ungenutzte löschen / Starter-Seite ersetzen / Nur dokumentieren
+
+➡️ Ungenutzte löschen
+
+> **Answer:** Ungenutzte löschen (Recommended)
+
+❓ **Q20** - **MongoDB/SSPL**: Fabian will dafür ein Issue statt eines README-Hinweises. Soll ich es anlegen? Options: Issue anlegen / Nicht anlegen
+
+➡️ Issue anlegen
+
+> **Answer:** Issue anlegen (Recommended)
+
+❓ **Q21** - **Antworten**: Soll ich jetzt die Antworten auf Fabians Kommentare in !4 und !5 posten und die neuen !4-Commits pushen? Options: Pushen und posten / Nur pushen / Noch nichts
+
+➡️ Pushen und posten
+
+> **Answer:** Pushen und posten (Recommended)
