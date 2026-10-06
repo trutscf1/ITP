@@ -23,19 +23,19 @@ Rough effort estimate (to be refined per concept): R1 61 h (issue breakdown in `
 | Version | Feature | Serves | Status | Depends on | Feasibility | Owner | Ref |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 0.1.0 | Scaffolding & shared contracts | G-1.S1 (self-hosting) | concept | – | high | trutscf1 | R1 |
-| – | Observability baseline | G-1 (on their own server) | idea | R1 | medium | trutscf1 | R2 |
-| – | Identity: accounts, external login, MFA | G-1 (data under their control) | idea | R1 | high | tschudea07 | R3 |
-| – | Design system & accessibility modes | G-1.S2 (accessibility) | idea | R1 | medium | schwaigc | R4 |
-| – | Storage core: folders, resumable upload, deduplication | G-1 (store and organize files) | idea | R3 | medium | schauby1 | R5 |
-| – | Web client: dashboard, file browser, preview | G-1 (organize and use files) | idea | R4, R5 | medium | schwaigc | R6 |
-| – | Teams, roles, inherited permissions, quotas, audit log | G-1 (share; data under their control) | idea | R3, R5 | medium | tschudea07 | R7 |
-| – | Share links with password and expiry | G-1 (share files) | idea | R7 | high | tschudea07 | R8 |
-| – | Background processing: thumbnails, virus scan, OCR, scheduled jobs | G-1 (store and search files) | idea | R5 | medium | schauby1 | R9 |
-| – | Full-text search | G-1 (search files) | idea | R7, R9 | medium | schauby1 | R10 |
-| – | Public content: landing page, help center, changelog, legal pages | G-1.S3 (scope of the project application) | idea | R1 | high | trutscf1 | R11 |
-| – | Offline mode: installable web app with sync and conflict handling | G-1 (use files offline) | idea | R6, R7 | low | trutscf1 | R12 |
-| – | Load tests & operations dashboards | G-1 (on their own server) | idea | R2, R5, R9 | medium | trutscf1 | R13 |
-| – | Deployment: automatic deploy on push to `main`, TLS | G-1.S1 (self-hosting) | idea | R1 | high | tschudea07 | R14 |
+| – | Observability baseline | G-1 (on their own server) | concept | R1 | medium | trutscf1 | R2 |
+| – | Identity: accounts, external login, MFA | G-1 (data under their control) | concept | R1 | high | tschudea07 | R3 |
+| – | Design system & accessibility modes | G-1.S2 (accessibility) | concept | R1 | medium | schwaigc | R4 |
+| – | Storage core: folders, resumable upload, deduplication | G-1 (store and organize files) | concept | R3 | medium | schauby1 | R5 |
+| – | Web client: dashboard, file browser, preview | G-1 (organize and use files) | concept | R4, R5 | medium | schwaigc | R6 |
+| – | Teams, roles, inherited permissions, quotas, audit log | G-1 (share; data under their control) | concept | R3, R5 | medium | tschudea07 | R7 |
+| – | Share links with password and expiry | G-1 (share files) | concept | R7 | high | tschudea07 | R8 |
+| – | Background processing: thumbnails, virus scan, OCR, scheduled jobs | G-1 (store and search files) | concept | R5 | medium | schauby1 | R9 |
+| – | Full-text search | G-1 (search files) | concept | R7, R9 | medium | schauby1 | R10 |
+| – | Public content: landing page, help center, changelog, legal pages | G-1.S3 (scope of the project application) | concept | R1 | high | trutscf1 | R11 |
+| – | Offline mode: installable web app with sync and conflict handling | G-1 (use files offline) | concept | R6, R7 | low | trutscf1 | R12 |
+| – | Load tests & operations dashboards | G-1 (on their own server) | concept | R2, R5, R9 | medium | trutscf1 | R13 |
+| – | Deployment: automatic deploy on push to `main`, TLS | G-1.S1 (self-hosting) | concept | R1 | high | tschudea07 | R14 |
 | – | End-to-end encryption | G-1 (data under their control) | idea | R5, R12 | low | — | O1 |
 | – | Kubernetes (k3s) operation | G-1.S1 (self-hosting) | idea | R1 | medium | — | O2 |
 

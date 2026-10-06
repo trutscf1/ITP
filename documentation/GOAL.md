@@ -23,6 +23,8 @@ Project application: [docs/projektantrag.md](../docs/projektantrag.md), the agre
 | R-1 | Member | A person in a school, club, or small company who uploads, organizes, finds, shares, and uses files offline, also with a screen reader, keyboard only, or high contrast. |
 | R-2 | Operator | The person who runs the platform on the organisation's own infrastructure and needs to start it with one command and see errors and bottlenecks at once. |
 | R-3 | Link recipient | A person without an account who opens a share link and needs to reach exactly the shared file or folder. |
+| R-4 | Visitor | A person without an account who reads the public pages — landing page, help center, changelog, legal pages — to learn what the product offers and who operates it. |
+| R-5 | Content editor | The person who maintains the public pages through the content management system, without changing code. |
 
 The role names in user stories (`As a …`) are taken from this table.
 

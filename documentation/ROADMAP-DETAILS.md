@@ -15,19 +15,19 @@ Positions live in one STATUS file per developer (P-TEAM-3). This index only says
 | Feature | Owner | Phase | Status file |
 | --- | --- | --- | --- |
 | Scaffolding & shared contracts (R1) | trutscf1 | 6, test concept | [team/trutscf1/STATUS.md](team/trutscf1/STATUS.md) |
-| Observability baseline (R2) | trutscf1 | — (no concept yet) | [team/trutscf1/STATUS.md](team/trutscf1/STATUS.md) |
-| Identity: accounts, external login, MFA (R3) | tschudea07 | — (no concept yet) | [team/tschudea07/STATUS.md](team/tschudea07/STATUS.md) |
-| Design system & accessibility modes (R4) | schwaigc | — (no concept yet) | [team/schwaigc/STATUS.md](team/schwaigc/STATUS.md) |
-| Storage core: folders, resumable upload, deduplication (R5) | schauby1 | — (no concept yet) | [team/schauby1/STATUS.md](team/schauby1/STATUS.md) |
-| Web client: dashboard, file browser, preview (R6) | schwaigc | — (no concept yet) | [team/schwaigc/STATUS.md](team/schwaigc/STATUS.md) |
-| Teams, roles, inherited permissions, quotas, audit log (R7) | tschudea07 | — (no concept yet) | [team/tschudea07/STATUS.md](team/tschudea07/STATUS.md) |
-| Share links with password and expiry (R8) | tschudea07 | — (no concept yet) | [team/tschudea07/STATUS.md](team/tschudea07/STATUS.md) |
-| Background processing: thumbnails, virus scan, OCR, scheduled jobs (R9) | schauby1 | — (no concept yet) | [team/schauby1/STATUS.md](team/schauby1/STATUS.md) |
-| Full-text search (R10) | schauby1 | — (no concept yet) | [team/schauby1/STATUS.md](team/schauby1/STATUS.md) |
-| Public content: landing page, help center, changelog, legal pages (R11) | trutscf1 | — (no concept yet) | [team/trutscf1/STATUS.md](team/trutscf1/STATUS.md) |
-| Offline mode: installable web app with sync and conflict handling (R12) | trutscf1 | — (no concept yet) | [team/trutscf1/STATUS.md](team/trutscf1/STATUS.md) |
-| Load tests & operations dashboards (R13) | trutscf1 | — (no concept yet) | [team/trutscf1/STATUS.md](team/trutscf1/STATUS.md) |
-| Deployment: automatic deploy on push to `main`, TLS (R14) | tschudea07 | — (no concept yet) | [team/tschudea07/STATUS.md](team/tschudea07/STATUS.md) |
+| Observability baseline (R2) | trutscf1 | 1, grill (draft from the tracker issues) | [team/trutscf1/STATUS.md](team/trutscf1/STATUS.md) |
+| Identity: accounts, external login, MFA (R3) | tschudea07 | 1, grill (draft from the tracker issues) | [team/tschudea07/STATUS.md](team/tschudea07/STATUS.md) |
+| Design system & accessibility modes (R4) | schwaigc | 1, grill (draft from the tracker issues) | [team/schwaigc/STATUS.md](team/schwaigc/STATUS.md) |
+| Storage core: folders, resumable upload, deduplication (R5) | schauby1 | 1, grill (draft from the tracker issues) | [team/schauby1/STATUS.md](team/schauby1/STATUS.md) |
+| Web client: dashboard, file browser, preview (R6) | schwaigc | 1, grill (draft from the tracker issues) | [team/schwaigc/STATUS.md](team/schwaigc/STATUS.md) |
+| Teams, roles, inherited permissions, quotas, audit log (R7) | tschudea07 | 1, grill (draft from the tracker issues) | [team/tschudea07/STATUS.md](team/tschudea07/STATUS.md) |
+| Share links with password and expiry (R8) | tschudea07 | 1, grill (draft from the tracker issues) | [team/tschudea07/STATUS.md](team/tschudea07/STATUS.md) |
+| Background processing: thumbnails, virus scan, OCR, scheduled jobs (R9) | schauby1 | 1, grill (draft from the tracker issues) | [team/schauby1/STATUS.md](team/schauby1/STATUS.md) |
+| Full-text search (R10) | schauby1 | 1, grill (draft from the tracker issues) | [team/schauby1/STATUS.md](team/schauby1/STATUS.md) |
+| Public content: landing page, help center, changelog, legal pages (R11) | trutscf1 | 1, grill (draft from the tracker issues) | [team/trutscf1/STATUS.md](team/trutscf1/STATUS.md) |
+| Offline mode: installable web app with sync and conflict handling (R12) | trutscf1 | 1, grill (draft from the tracker issues) | [team/trutscf1/STATUS.md](team/trutscf1/STATUS.md) |
+| Load tests & operations dashboards (R13) | trutscf1 | 1, grill (draft from the tracker issues) | [team/trutscf1/STATUS.md](team/trutscf1/STATUS.md) |
+| Deployment: automatic deploy on push to `main`, TLS (R14) | tschudea07 | 1, grill (draft from the tracker issues) | [team/tschudea07/STATUS.md](team/tschudea07/STATUS.md) |
 | End-to-end encryption (O1) | — | — (no concept yet) | — |
 | Kubernetes (k3s) operation (O2) | — | — (no concept yet) | — |
 
@@ -54,3 +54,6 @@ Append-only record of processed tasks; entries are marked done instead of being 
 | 2026-09-29 | Delete GitLab issues | On request: #4–#37 deleted permanently (HTTP 204); #1–#3 could not be deleted with the project token (HTTP 403, created by team members). Labels and milestones kept |
 | 2026-10-06 | Migrate the project from `engineering-profile` to `engineering-human` | Done on `concept/migrate-engineering-human`, MR !1 into `dev` (issue #86) — `GOAL.md` (G-1 confirmed, roles and signals drafted), `MANIFEST.md` replaced (the old copy had no project-specific rule left), `CLAUDE.md`, `WORKFLOW.md`, `ROADMAP.md` (Serves, stages), `VERSIONING.md`, `CONTEXT.md`, `qa-log.md`, ADR-0002, ADR-0001 moved to `documentation/adr/`, `.claude/settings.json` (merge policy `ask`) with the status hook, `.gitlab/` templates replaced, `tools/doc-check.mjs`, markdown lint, CI job for the documentation checks; R1 concept and track files marked legacy. GitLab labels renamed to the `WORKFLOW.md` set (8 renamed, 7 created). Open: review and merge of the MR, team switch (`next.md`) |
 | 2026-10-06 | `trutscf1` — switch the project to team mode | Done on `chore/team-mode` — skill vendored in `.claude/skills/engineering-human/`, `team/TEAM.md`, one `STATUS.md` and one inbox per developer, positions moved out of this file, shared `next.md` removed, Owner column in `ROADMAP.md`, ADR-0003. `main` on GitLab: already protected (push and merge for Maintainers only); tightening push to "no one" needs a Maintainer |
+| 2026-10-06 | `trutscf1` — bring the 48 user stories of the tracker into the repository | Done on `concept/user-story-work-items` — one work-item folder per roadmap feature with `feature.md` and 48 story files (English, Given/When/Then, new IDs with the concept prefix); 13 concept drafts with feature goal and one requirement per acceptance criterion, stage `concept` in `ROADMAP.md`. On GitLab the issues #38–#85 carry the new IDs, story, and criteria. Open: every owner reviews and grills their drafts |
+| 2026-10-06 | `trutscf1` — resolve the contradictions and the open inbox items | Done on `concept/user-story-work-items` — stories aligned with the R1 concept and `WORKFLOW.md` (five units in SCF-US-1, GitLab CI in SCF-US-5, changelog draft in the release MR in SCF-US-6); roles `R-4` (visitor) and `R-5` (content editor) in `GOAL.md` with ADR-0004, two stories reworded to the operator; six Sprint 1 stories cut into two slices each (#102–#107); #1–#3 labelled and linked; `README.md` with quick start and architecture overview; `.env.example` added and no longer ignored. Refused for the agent's token (HTTP 403), left in the inbox of `trutscf1`: project settings, branch protection, group epics |
+| 2026-10-06 | `trutscf1` — switch the agent to a personal access token and protect the branches | Done — the token acts as `trutscf1` (Maintainer); `main`: push for no one, merge by Maintainers; `dev`: push for no one, merge by Developers and Maintainers. Not chosen: merge settings, epics (`qa-log.md`, Q14) |
