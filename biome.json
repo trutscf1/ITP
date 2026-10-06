@@ -13,6 +13,8 @@
       "!.next",
       "!dist",
       "!build",
+      "!.claude",
+      "!tools",
       "!**/src/prisma/contract.d.ts",
       "!**/src/prisma/contract.json",
       "!**/migrations"
