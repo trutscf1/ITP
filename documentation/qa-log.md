@@ -116,3 +116,31 @@ Assumptions stated with the round, none rejected:
 ➡️ no recommendation
 
 > **Answer:** main: Push für niemanden, dev schützen
+
+## Round 6 — 2026-10-06 — delivery
+
+Merge decisions (P-MR-4, fixed options Merge now / No / Later / I merge myself), each MR approved by `schwaigc`:
+
+❓ **Q15** - **Merge !1**: concept/migrate-engineering-human nach dev mergen (Migration auf engineering-human, von schwaigc freigegeben)?
+
+> **Answer:** Merge now
+
+❓ **Q16** - **Merge !2**: chore/team-mode nach dev mergen (Team-Modus, von schwaigc freigegeben)? Nur nach !1.
+
+> **Answer:** Merge now
+
+❓ **Q17** - **Merge !3**: concept/user-story-work-items nach dev mergen (48 User Stories als Work Items, von schwaigc freigegeben)? Nur nach !2.
+
+> **Answer:** Merge now
+
+❓ **Q18** - **Feature**: Welches deiner Features soll zuerst gegrillt werden? Options: Public content / Observability baseline / Offline mode / Load tests
+
+➡️ Public content
+
+> **Answer:** Public content (Recommended)
+
+❓ **Q19** - **Session**: Wo soll das Grilling laufen? Options: Neue Session / Hier weitermachen
+
+➡️ Neue Session
+
+> **Answer:** Neue Session (Recommended)

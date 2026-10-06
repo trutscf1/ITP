@@ -52,11 +52,11 @@ Ziel ist die Entwicklung einer selbstgehosteten Cloud-Storage-Plattform, auf der
 
 Personen inkl. vorgeschlagener Aufgabenverteilung:
 
-| Person | Bereich | Aufgaben |
-| --- | --- | --- |
-| Andreas Tschuden | Identity & Sharing | Authentifizierung mit Better Auth (OAuth2, MFA, Passkeys), Teams und Rollen, Berechtigungssystem, Share-Links, Audit-Log, Quoten, Prisma-Schema-Koordination, CI/CD-Pipeline |
-| Yannick Schaub | Storage Engine & Processing | Storage-API, Chunked Uploads (tus), SeaweedFS, Redis, BullMQ-Worker (Thumbnails, Virenscan, OCR, Cronjobs), MongoDB und Suche |
-| Christopher Schwaiger | Web-Client & Design-System | React-Dashboard, Dateibrowser und Vorschau, Design-Tokens mit vier UI-Systemen, ARIA- und Barrierefreiheits-Modi, Storybook, End-to-End-Tests |
-| Fabian Trutschnig | Offline, Content & Observability | Strapi-CMS (Landingpage, Hilfe-Center, Changelog), OpenTelemetry, Prometheus, Loki, Tempo, Grafana, Lasttests, Projekt-Controlling |
+| Person                | Bereich                          | Aufgaben                                                                                                                                                                     |
+| --------------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Andreas Tschuden      | Identity & Sharing               | Authentifizierung mit Better Auth (OAuth2, MFA, Passkeys), Teams und Rollen, Berechtigungssystem, Share-Links, Audit-Log, Quoten, Prisma-Schema-Koordination, CI/CD-Pipeline |
+| Yannick Schaub        | Storage Engine & Processing      | Storage-API, Chunked Uploads (tus), SeaweedFS, Redis, BullMQ-Worker (Thumbnails, Virenscan, OCR, Cronjobs), MongoDB und Suche                                                |
+| Christopher Schwaiger | Web-Client & Design-System       | React-Dashboard, Dateibrowser und Vorschau, Design-Tokens mit vier UI-Systemen, ARIA- und Barrierefreiheits-Modi, Storybook, End-to-End-Tests                                |
+| Fabian Trutschnig     | Offline, Content & Observability | Strapi-CMS (Landingpage, Hilfe-Center, Changelog), OpenTelemetry, Prometheus, Loki, Tempo, Grafana, Lasttests, Projekt-Controlling                                           |
 
 Gemeinsam: Projekt-Scaffolding, Schnittstellen-Verträge, Integrationstermine, Dokumentation und Präsentation.
