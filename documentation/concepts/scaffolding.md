@@ -1,3 +1,10 @@
+---
+doc: concept
+format: legacy   # pre-engineering-human section numbers; migrated on the next change (P-DOC-5, ADR-0002)
+title: "Scaffolding & shared contracts"
+audience: [product, developer, reviewer, agent]
+id-prefix: "SCF"
+---
 # Scaffolding & Shared Contracts Concept — Consolidated Requirements
 
 Roadmap item R1. Requirement prefix `SCF`. Q&A transcript: [scaffolding.qa-log.md](scaffolding.qa-log.md).
@@ -42,7 +49,7 @@ Give the four team members a repository in which each can build their own area i
 | Local stack | All units plus reverse proxy and relational database, started by one command on a developer machine. |
 | Owner | The team member responsible for a unit (`docs/projektantrag.md`, "Projektgruppe"). |
 
-Terms are promoted to `CONTEXT.md` (repo root) when the first domain feature (R3) introduces the glossary.
+These terms are also in the glossary `documentation/CONTEXT.md`.
 
 ## 3. Functional Requirements
 
@@ -246,7 +253,7 @@ None: no data exists yet. The relational database starts empty in R1.
 
 ## 15. Architecture & Vertical Slices
 
-Module specifications are written per track in the track's plan file. The track split below is final. The unit split and routing are recorded in `docs/adr/0001-five-units-behind-one-origin.md`.
+Module specifications are written per track in the track's plan file. The track split below is final. The unit split and routing are recorded in `documentation/adr/0001-five-units-behind-one-origin.md`.
 
 ### System Overview (Pipeline Flow)
 

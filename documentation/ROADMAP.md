@@ -1,6 +1,12 @@
+---
+doc: roadmap
+format: engineering-human/2
+title: Roadmap
+audience: [product, developer, reviewer, agent]
+---
 # Roadmap
 
-Ordered backlog of pre-concept feature intentions (P-ROAD-1), derived from the agreed project proposal `docs/projektantrag.md`. Order encodes dependencies, not dates: features whose dependencies are met run in parallel across the four owners. Every entry goes through the phases in [MANIFEST.md](MANIFEST.md) before implementation. Status lives in [ROADMAP-DETAILS.md](ROADMAP-DETAILS.md).
+The ordered list of features this project plans to build, for everyone who wants to know what comes next and why (P-ROAD-1). It is derived from the agreed project proposal `docs/projektantrag.md`. The order follows dependencies, not dates: features whose dependencies are met run in parallel across the four owners. Every entry is an intention that still goes through the concept process in [MANIFEST.md](MANIFEST.md) before anyone implements it. Only the lifecycle stage of each feature is tracked here; where work currently stands is in [ROADMAP-DETAILS.md](ROADMAP-DETAILS.md).
 
 Versions are assigned at sprint planning: one sprint = one release `v0.<sprint>.0` (`WORKFLOW.md`, "Sprints and time budget").
 
@@ -10,24 +16,41 @@ Versions are assigned at sprint planning: one sprint = one release `v0.<sprint>.
 
 Rough effort estimate (to be refined per concept): R1 61 h (issue breakdown in `concepts/scaffolding.md` §15), R2 30, R3 45, R4 40, R5 40, R6 40, R7 40, R8 15, R9 40, R10 25, R11 25, R12 60, R13 15, R14 15 — **≈ 490 h in total, about 1.4 × the capacity**. The team prioritizes the items (must / should / could) before Sprint 2 planning; items that do not fit become deviations from the proposal and are presented as such.
 
-| # | Version | Feature | Status | Depends on | Feasibility |
-| --- | --- | --- | --- | --- | --- |
-| R1 | 0.1.0 | Scaffolding & shared contracts | concept (`concepts/scaffolding.md`) | – | High |
-| R2 | – | Observability baseline | pre-concept | R1 | Medium |
-| R3 | – | Identity: accounts, external login, MFA | pre-concept | R1 | High |
-| R4 | – | Design system & accessibility modes | pre-concept | R1 | Medium |
-| R5 | – | Storage core: folders, resumable upload, deduplication | pre-concept | R3 | Medium |
-| R6 | – | Web client: dashboard, file browser, preview | pre-concept | R4, R5 | Medium |
-| R7 | – | Teams, roles, inherited permissions, quotas, audit log | pre-concept | R3, R5 | Medium |
-| R8 | – | Share links with password and expiry | pre-concept | R7 | High |
-| R9 | – | Background processing: thumbnails, virus scan, OCR, scheduled jobs | pre-concept | R5 | Medium |
-| R10 | – | Full-text search | pre-concept | R7, R9 | Medium |
-| R11 | – | Public content: landing page, help center, changelog, legal pages | pre-concept | R1 | High |
-| R12 | – | Offline mode: installable web app with sync and conflict handling | pre-concept | R6, R7 | Low |
-| R13 | – | Load tests & operations dashboards | pre-concept | R2, R5, R9 | Medium |
-| R14 | – | Deployment: automatic deploy on push to `main`, TLS | pre-concept, blocked: no server and domain | R1 | High |
-| O1 | – | *Optional:* end-to-end encryption | out of mandatory scope | R5, R12 | Low |
-| O2 | – | *Optional:* Kubernetes (k3s) operation | out of mandatory scope | R1 | Medium |
+## Overview
+
+*Ref* is the short name other rows and documents use for a feature (`R1`); `O1` and `O2` are the optional extensions of the project proposal, outside the mandatory scope. R14 is blocked until a server and a domain exist.
+
+| Version | Feature | Serves | Status | Depends on | Feasibility | Ref |
+| --- | --- | --- | --- | --- | --- | --- |
+| 0.1.0 | Scaffolding & shared contracts | G-1.S1 (self-hosting) | concept | – | high | R1 |
+| – | Observability baseline | G-1 (on their own server) | idea | R1 | medium | R2 |
+| – | Identity: accounts, external login, MFA | G-1 (data under their control) | idea | R1 | high | R3 |
+| – | Design system & accessibility modes | G-1.S2 (accessibility) | idea | R1 | medium | R4 |
+| – | Storage core: folders, resumable upload, deduplication | G-1 (store and organize files) | idea | R3 | medium | R5 |
+| – | Web client: dashboard, file browser, preview | G-1 (organize and use files) | idea | R4, R5 | medium | R6 |
+| – | Teams, roles, inherited permissions, quotas, audit log | G-1 (share; data under their control) | idea | R3, R5 | medium | R7 |
+| – | Share links with password and expiry | G-1 (share files) | idea | R7 | high | R8 |
+| – | Background processing: thumbnails, virus scan, OCR, scheduled jobs | G-1 (store and search files) | idea | R5 | medium | R9 |
+| – | Full-text search | G-1 (search files) | idea | R7, R9 | medium | R10 |
+| – | Public content: landing page, help center, changelog, legal pages | G-1.S3 (scope of the project application) | idea | R1 | high | R11 |
+| – | Offline mode: installable web app with sync and conflict handling | G-1 (use files offline) | idea | R6, R7 | low | R12 |
+| – | Load tests & operations dashboards | G-1 (on their own server) | idea | R2, R5, R9 | medium | R13 |
+| – | Deployment: automatic deploy on push to `main`, TLS | G-1.S1 (self-hosting) | idea | R1 | high | R14 |
+| – | End-to-end encryption | G-1 (data under their control) | idea | R5, R12 | low | O1 |
+| – | Kubernetes (k3s) operation | G-1.S1 (self-hosting) | idea | R1 | medium | O2 |
+
+*Serves* names the part of the project goal in [GOAL.md](GOAL.md) this feature advances. A feature that serves no part of the goal does not belong here (P-GOAL-2).
+
+*Status* is one of these stages (P-ROAD-1) and is updated at every phase boundary, merge, and release (P-ROAD-4):
+
+| Stage | Meaning |
+| --- | --- |
+| idea | Listed, no concept document yet |
+| concept | Concept document in Phases 1–6 |
+| ready | Concept approved, issues cut, nothing merged yet |
+| in progress | At least one issue being implemented or merged, not all |
+| in dev | All stories merged into `dev`, not yet released |
+| released | Part of a release tag on `main` |
 
 ## Feature notes
 

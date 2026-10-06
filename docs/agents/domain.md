@@ -1,35 +1,21 @@
-# Domain Docs
+# Domain docs
 
-How the engineering skills should consume this repo's domain documentation when exploring the codebase.
+How agents and skills read this repo's domain documentation before they explore the code. Written by `/engineering-human setup`; edit it directly if the layout changes.
 
-## Before exploring, read these
+## Read these first
 
-- **`CONTEXT.md`** at the repo root.
-- **`docs/adr/`**: read ADRs that touch the area you're about to work in.
+1. `documentation/GOAL.md` — the project goal `G-1` everything derives from.
+2. `documentation/CONTEXT.md` — the glossary. In a multi-context repo, the root `CONTEXT-MAP.md` lists one glossary per context; read each one relevant to the topic.
+3. `documentation/adr/` — the decision records that touch the area you work in.
 
-If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The `/domain-modeling` skill (reached via `/grill-with-docs` and `/improve-codebase-architecture`) creates them lazily when terms or decisions actually get resolved.
+The root `CONTEXT-MAP.md` only points to these files. Never create a root `CONTEXT.md` or `docs/adr/`. If a file does not exist yet, proceed silently; `/domain-modeling` creates it when a term or decision is actually resolved.
 
-## File structure
+## Use the glossary's words
 
-Single-context repo:
-
-```
-/
-├── CONTEXT.md
-├── docs/adr/
-│   ├── 0001-five-units-behind-one-origin.md
-│   └── …
-└── documentation/        ← concept documents (source of truth, see documentation/MANIFEST.md)
-```
-
-## Use the glossary's vocabulary
-
-When your output names a domain concept (in an issue title, a refactor proposal, a hypothesis, a test name), use the term as defined in `CONTEXT.md`. Don't drift to synonyms the glossary explicitly avoids.
-
-If the concept you need isn't in the glossary yet, that's a signal: either you're inventing language the project doesn't use (reconsider) or there's a real gap (note it for `/domain-modeling`).
+When your output names a domain concept — an issue title, a test name, a refactor proposal — use the term exactly as `documentation/CONTEXT.md` defines it. A missing term is a signal: either you are inventing language the project does not use, or there is a real gap to note for `/domain-modeling`.
 
 ## Flag ADR conflicts
 
-If your output contradicts an existing ADR, surface it explicitly rather than silently overriding:
+If your output contradicts an ADR, say so explicitly instead of overriding it silently:
 
-> _Contradicts ADR-0001 (five units behind one origin), but worth reopening because…_
+> *Contradicts ADR-0007 (event-sourced orders), but worth reopening because …*

@@ -1,3 +1,10 @@
+---
+doc: qa-log
+format: engineering-human/2
+title: "Question log — Scaffolding & shared contracts"
+audience: [developer, reviewer, agent]
+concept: "scaffolding.md"
+---
 # R1 Scaffolding & Shared Contracts – Q&A Log
 
 Verbatim transcript of the grilling for `scaffolding.md` (P-GRILL-2). Question numbers match the concept document's "Resolved Questions" table.

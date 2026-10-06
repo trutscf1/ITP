@@ -1,4 +1,18 @@
+---
+doc: stack
+format: engineering-human/2
+title: Stack document
+audience: [developer, agent]
+---
 # Stack Document
+
+The single place where technology lives, for developers and agents turning the stack-neutral concept documents into code (P-DES-4). It names technology freely but holds no requirement, business rule, or behavior — those belong in a concept document.
+
+## 0. In Plain Words
+
+The system is planned as one repository written in TypeScript, with five separately running units behind a reverse proxy and a relational database, all started together in containers. The project proposal (`docs/projektantrag.md`) names the planned technology, and the school sets minimum versions. Most concrete choices are still open: each track's owner fills in their section below before their first merge request.
+
+## Sections per track
 
 The single place where technology and version constraints live (`MANIFEST.md`, "The Stack Document"). **Split into one section per track** (`concepts/scaffolding.md` §15, Q13): only the section's owner edits it. Minimum versions required by the school: `docs/anforderungen_software_projekte.md` ("Projektanforderungen für projekte"); technology agreed in the proposal: `docs/projektantrag.md`.
 
@@ -49,4 +63,4 @@ Type mapping (neutral type → concrete type) and error mapping (`E-x` → concr
 
 ## 5. Stack ADRs
 
-Technology choices with lock-in are recorded in `docs/adr/`.
+Technology choices with lock-in are recorded in `documentation/adr/`.

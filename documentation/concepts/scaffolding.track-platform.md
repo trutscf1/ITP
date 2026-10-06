@@ -1,3 +1,10 @@
+---
+doc: concept
+format: legacy   # pre-engineering-human section numbers; migrated on the next change (P-DOC-5, ADR-0002)
+title: "Scaffolding & shared contracts"
+audience: [product, developer, reviewer, agent]
+id-prefix: "SCF"
+---
 # R1 Track: Platform & cms — Fabian Trutschnig
 
 Plan file of one track of `scaffolding.md` (§15, Q13). **Only Fabian edits this file.** Requirements, interfaces, and examples come from [scaffolding.md](scaffolding.md); this file never restates them, it references them by ID.

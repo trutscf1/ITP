@@ -1,0 +1,6 @@
+# personal Claude Code files (P-TEAM-2)
+CLAUDE.local.md
+.claude/settings.local.json
+
+# secrets
+.env
