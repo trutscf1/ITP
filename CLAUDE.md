@@ -89,6 +89,9 @@ pre-commit run --all-files    # Gitleaks, Semgrep, pnpm audit
 Available now:
 
 ```bash
+pnpm install                                            # install the workspace
+pnpm run lint | typecheck | build                       # root tasks through Turborepo
+pnpm test                                               # acceptance tests (tests/)
 node tools/doc-check.mjs                                # consistency check of documentation/
 npx markdownlint-cli2 "documentation/**/*.md"           # markdown lint
 ```
