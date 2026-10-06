@@ -45,7 +45,7 @@ Refs: #<issue>
 ```
 
 - Types: `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `style`, `build`, `ci`, `chore`, `revert`.
-- Scopes: a unit (`web`, `identity`, `storage`, `worker`, `cms`), `contracts`, `deps`, `ci`, `repo`.
+- Scopes: a unit (`web`, `identity`, `storage`, `worker`, `cms`), a shared package (`contracts`, `ui`, `config`), `deps`, `ci`, `repo`.
 - Requirement ID per P-GIT-4; `[no-req]` for pure chores.
 - Breaking change: `!` after the scope and a `BREAKING CHANGE: <what>` footer.
 - Description in English, lowercase start, about 50 characters, understandable without looking the ID up.
