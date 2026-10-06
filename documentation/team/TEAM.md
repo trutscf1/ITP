@@ -17,7 +17,7 @@ Who works on this repo and who owns what (P-TEAM-1…5), for every team member a
 | schwaigc | developer — Web client & design system | [schwaigc/STATUS.md](schwaigc/STATUS.md) |
 | tschudea07 | developer — Identity & sharing; CI/CD | [tschudea07/STATUS.md](tschudea07/STATUS.md) |
 
-Each member adds `Developer handle: <handle>` to their own gitignored `CLAUDE.local.md` so the agent knows whose status file and inbox to use.
+Each member copies `CLAUDE.local.md.example` from the repo root to `CLAUDE.local.md` and enters their own handle (`Developer handle: <handle>`), so the agent knows whose status file and inbox to use. `CLAUDE.local.md` is ignored by git: it differs per person and is never committed.
 
 ## Roles
 
