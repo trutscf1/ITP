@@ -123,6 +123,63 @@ Shown with the question: the table of work-item changes (reworded `PUB-AC-1.3`, 
 
 > **Answer:** Commit and push (Recommended)
 
+## Round 6 — 2026-10-06 — artifact interactions (trutscf1)
+
+Notes: the standing decisions apply as confirmed in Q1. The skills `privacy-by-design` and `doubt-driven-development` are not installed in this session.
+
+Assumptions stated with the round, none rejected:
+
+- **A21**: Q12–Q14 concern only the team's own installation, so they do not block Phase 3 or the Phase 4 gate.
+- **A22**: The health report of `cms` gets a second, essential dependency check `content-store`, because `cms` now has its own database (`PUB-F-1`).
+- **A23**: Images on public pages are delivered by the `web` unit and kept with the last loaded version. Otherwise `PUB-F-4` (no anonymous access) would block them and `PUB-F-8` (last version) would not cover them.
+- **A24**: If `web` cannot determine whether a member session is valid (Identity down or not built yet), the person counts as having no session and sees the landing page.
+- **A25**: The footer sits in the shared layout of `web`, so pages of other features get it without own work. Whether legal pages are readable offline belongs to the offline-mode concept.
+- **A26**: The privacy template in `PUB-F-22` also covers the IP address in the audit log and login rate limiting, and e-mail delivery. A feature that stores a new kind of personal data adds its paragraph in the same MR.
+- **A27**: Changes that other concepts need (Identity: captcha notice text; scaffolding: see Q17) are recorded in §14/§15 of the concept and put into the owner's inbox; their concepts are not edited here. `scaffolding.md` is legacy, so its change lands with its pending migration.
+- **A28**: The public `/cms/health` reveals that no administrator exists yet. Accepted, since the registration form at `/cms` shows the same.
+
+❓ **Q16** - **School answers**: Have the answers of the school management to Q12–Q14 (operator in the legal pages, lawful basis for editor accounts, review of the templates) arrived? Options: Not yet, continue / Yes, I have them / Not asked yet, continue
+
+➡️ Not yet, continue
+
+> **Answer:** Not yet, continue (Recommended)
+
+❓ **Q17** - **Fresh stack is degraded**: [SCF-NF-1] demands that every unit reaches `ok` after the start, but with [PUB-F-9] (administrator check) a fresh `cms` is `degraded` until someone registers. Which rule gives way? Options: Narrow SCF-NF-1 / Test administrator from configuration / Drop the health check
+
+➡️ Narrow SCF-NF-1
+
+> **Answer:** Narrow SCF-NF-1 (Recommended)
+
+❓ **Q18** - **Reason on the status page**: The status page shows only the unit name and `ok`/`degraded`/`down` ([SCF-F-8]). How does the operator learn that `cms` is degraded because no administrator registered? Options: Show the failed checks / Setup guide only / Notice in the admin panel only
+
+➡️ Show the failed checks
+
+> **Answer:** Show the failed checks (Recommended)
+
+❓ **Q19** - **Changelog at a release**: Changelog entries are written by hand (Q2) and the seed holds only version 0.1.0 ([PUB-F-7]). What happens to the public changelog when the team releases a new version? Options: Release step, seed fixed / Seed grows per release / No rule
+
+➡️ Release step, seed fixed
+
+> **Answer:** Release step, seed fixed (Recommended)
+
+## Round 7 — 2026-10-06 — artifact interactions (trutscf1)
+
+Shown with the question: the list of changes (reworded `PUB-AC-1.7`; new `PUB-F-31`, `PUB-F-32`, `PUB-F-33`; extended `PUB-F-22`; new §11, §14, §15 with the required changes to `scaffolding.md`, `identity.md`, and `WORKFLOW.md`).
+
+❓ **Q20** - **Shared understanding**: Do the answers Q16–Q19, the assumptions A21–A28, and the changes listed above describe Phase 3 as you want it, so that I write them into the concept and the work items now? Options: Yes, write it / Change something first / Stop here
+
+➡️ Yes, write it
+
+> **Answer:** Yes, write it (Recommended)
+
+## Round 8 — 2026-10-06 — artifact interactions (trutscf1)
+
+❓ **Q21** - **Commit**: Phase 3 is written on concept/public-content (8 files; doc-check 0 errors, markdown lint 0 issues). The Phase 4 gate needs a merge request that another member approves. How should the changes go into the repository? The foreign change in documentation/qa-log.md (rounds of a review session running in the same folder) stays uncommitted in every option. Options: Commit, push, open MR / Commit and push / Commit locally only / Do not commit
+
+➡️ Commit, push, open MR
+
+> **Answer:** Commit, push, open MR (Recommended)
+
 ## Open questions for the school management
 
 Legal questions the agent does not decide (grill flow, personal data). They are not answered in this log; the owner takes them to the data-protection contact of the school and records the answers here.

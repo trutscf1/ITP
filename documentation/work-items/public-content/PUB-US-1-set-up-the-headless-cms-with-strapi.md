@@ -25,7 +25,7 @@ One user story of [Public content: landing page, help center, changelog, legal p
 | PUB-AC-1.4 | Cached delivery | A public page whose content an editor published at 10:00:00 | A visitor opens the page at 10:01:00 or later | The page shows the published change |
 | PUB-AC-1.5 | Seed content | A fresh installation whose CMS holds no content | The stack starts for the first time | Example content exists for every content type in German and English; a CMS that already holds content is not changed |
 | PUB-AC-1.6 | CMS unavailable | A public page that was loaded at least once, and the `cms` unit stopped | A visitor opens the page | The page shows its last loaded version |
-| PUB-AC-1.7 | Unclaimed administrator | A fresh installation in which nobody registered as administrator yet | The operator opens the status page | The row of `cms` shows `degraded`; after the first administrator registered it shows `ok` |
+| PUB-AC-1.7 | Unclaimed administrator | A fresh installation in which nobody registered as administrator yet | The operator opens the status page | The row of `cms` shows `degraded` and names the check `administrator-account`; after the first administrator registered it shows `ok` |
 
 ## Slices
 
