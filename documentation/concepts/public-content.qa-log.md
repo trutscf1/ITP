@@ -190,6 +190,37 @@ Shown with the next question: title and description of the merge request `concep
 
 Result: the token was still not set in the process, user, or machine environment after the answer, so no merge request was opened in this session.
 
+## Round 9 — 2026-10-06 — review gate (trutscf1)
+
+Notes: the standing decisions apply as confirmed in Q1. Both checks were run fresh (doc-check 0 errors, markdown lint 0 issues).
+
+Assumptions stated with the round, none rejected:
+
+- **A29**: The entry point is the Phase 4 gate, not Phase 5, because the manifest forbids architecture work before the sign-off.
+- **A30**: The foreign change in `documentation/qa-log.md` (round 7 of a review session) stays uncommitted on this branch.
+
+❓ **Q23** - **Phase 4 gate**: The merge request concept/public-content → dev is not open and GITLAB_TOKEN is still not set (process and user environment). Phase 5 (architecture) may not start before another member approves it. How do we get through the gate? Options: I set the token / I open it myself / MR is already open / Already approved
+
+➡️ I set the token
+
+> **Answer:** I set the token (Recommended)
+
+Shown with the next question: title and description of the merge request `concept/public-content` → `dev` for the Phase 4 review gate.
+
+❓ **Q24** - **Merge request**: Shall I publish the merge request shown above (concept/public-content → dev) as soon as GITLAB_TOKEN is set in your Windows user environment? Options: Token is set, publish / Change the text first / I open it myself / Later
+
+➡️ Token is set, publish
+
+> **Answer:** here: [token removed from the log]
+
+❓ **Q25** - **Reviewer**: Which member should be set as reviewer of the merge request? The PM approver is you, and you are the author, so another member has to sign off (P-MR-2). Options: schwaigc / tschudea07 / schauby1 / No reviewer set
+
+➡️ schwaigc
+
+> **Answer:** schwaigc (Recommended)
+
+Result: the token was pasted into the answer instead of being set in the environment. The agent may not put a token into a command (`docs/agents/issue-tracker.md`, "Access"), so no merge request was opened in this session. The text of Q24 and the reviewer of Q25 stand for the next attempt.
+
 ## Open questions for the school management
 
 Legal questions the agent does not decide (grill flow, personal data). They are not answered in this log; the owner takes them to the data-protection contact of the school and records the answers here.
