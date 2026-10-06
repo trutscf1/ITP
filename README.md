@@ -132,6 +132,10 @@ Releases are tagged `v<version>` on `main` and published as GitLab Releases; the
 | [documentation/team/TEAM.md](documentation/team/TEAM.md) | Team members, roles, ownership |
 | [docs/](docs/) | The school's binding requirements and the project proposal |
 
+## Definition of Done
+
+The Definition of Done is binding for every issue and merge request: [documentation/WORKFLOW.md](documentation/WORKFLOW.md), section *Definition of Done*. It is kept only there so that it cannot drift; a merge request is merged only when every item holds.
+
 ## Working on the project
 
 Every change starts with an issue, happens on its own branch, and reaches `dev` through a merge request reviewed by another person; `main` only receives releases. The rules are in [documentation/WORKFLOW.md](documentation/WORKFLOW.md), the commands in [docs/git_workflow_commands.md](docs/git_workflow_commands.md). Sessions with Claude Code start with `/engineering-human` ([CLAUDE.md](CLAUDE.md)).
