@@ -16,7 +16,7 @@ Session positions of one developer (P-TEAM-3). Precise enough that a fresh sessi
 | Scaffolding & shared contracts (R1) | [concepts/scaffolding.md](../../concepts/scaffolding.md) (legacy format) | 6, test concept | — | — | Migrate the concept with `/engineering-human migrate scaffolding`, then write the test concept |
 | Scaffolding & shared contracts (R1), track Platform & cms | [concepts/scaffolding.track-platform.md](../../concepts/scaffolding.track-platform.md) | 5, architecture | — | — | Write the "Plan" section of the track file before the first MR |
 | Observability baseline (R2) | [concepts/observability.md](../../concepts/observability.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human observability` |
-| Public content: landing page, help center, changelog, legal pages (R11) | [concepts/public-content.md](../../concepts/public-content.md) | 1, grill (draft) | `concept/public-content` | — | Start the grilling in a fresh session with `/engineering-human public-content`; tracking issue #108 |
+| Public content: landing page, help center, changelog, legal pages (R11) | [concepts/public-content.md](../../concepts/public-content.md) | 2, open questions (Phase 1 grilled 2026-10-06, Q1–Q11) | `concept/public-content` | — | Phase 1 is committed and pushed; no MR before the Phase 4 gate. Next: take Q12–Q14 to the school management, then Phase 3 (artifact interactions: health report of `cms`, status page, footer of the web client) in a fresh session with `/engineering-human public-content`; the issues #78–#81 and a new issue for PUB-US-5 follow with `tickets`; tracking issue #108 |
 | Offline mode: installable web app with sync and conflict handling (R12) | [concepts/offline-mode.md](../../concepts/offline-mode.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human offline-mode` |
 | Load tests & operations dashboards (R13) | [concepts/load-tests.md](../../concepts/load-tests.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human load-tests` |
 
@@ -42,4 +42,4 @@ Carried over from `ROADMAP-DETAILS.md` at the switch to team mode on 2026-10-06;
 
 | Question | Waiting for (handle) | Since |
 | --- | --- | --- |
-| — | — | — |
+| Public content Q12–Q14: operator named in the team's legal pages, lawful basis for editor accounts, review of the legal templates ([question log](../../concepts/public-content.qa-log.md)) | school management, asked by `trutscf1` | 2026-10-06 |
