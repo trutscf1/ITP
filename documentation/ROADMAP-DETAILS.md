@@ -8,30 +8,32 @@ audience: [developer, reviewer, agent]
 
 Where the project stands right now, for anyone starting a work session — human or agent (P-ROAD-2). It is the single status entry point: it must be precise enough that a fresh session needs no chat history. Other documents link here and never copy this status.
 
-## Current positions (solo mode)
+## Status index (team mode)
 
-| Feature | Concept document | Phase | Branch | MR | Next step |
-| --- | --- | --- | --- | --- | --- |
-| Scaffolding & shared contracts (R1) | [concepts/scaffolding.md](concepts/scaffolding.md) (legacy format) | 6, test concept | — | — | Migrate the concept with `/engineering-human migrate scaffolding`, then write the test concept |
-| Migration to `engineering-human` | [adr/0002-adopt-engineering-human.md](adr/0002-adopt-engineering-human.md) | — | — | !1, issue #86 | Switch to team mode with `/engineering-human team` |
+Positions live in one STATUS file per developer (P-TEAM-3). This index only says who owns what and where to look.
 
-Details behind the rows:
-
-- **Branches (2026-10-06)**: `main` exists on `origin`. `dev` exists on `origin` and holds the application scaffold pushed by Yannick (Next.js app in `next/`, Prisma, `docker-compose.yml`, `CHANGELOG.md`); it does not contain the documentation commit of `main`. The migration to `engineering-human` reached `dev` through MR !1 (issue #86), which also brought the documentation commit of `main` into `dev`.
-- **Team**: four members, areas per `docs/projektantrag.md`.
-- **Concept phase**: R1 concept `concepts/scaffolding.md` written: requirements, decisions Q1–Q11, work split into slices S0–S6 (§15). Q12 decided; Phase 4 signed off 2026-09-29 by Fabian Trutschnig. Open: Phase 6 test concept (worked examples 1–5 are the first cases); R1 is split into four tracks with exclusive paths (`concepts/scaffolding.md` §15, Q13): Platform & cms (Fabian: #4, #5, #6, #18, #19, #21, #22), Contracts, storage & worker (Yannick: #7, #8, #12, #13), Identity & CI (Andreas: #9, #10, #11, #17), Web (Christopher: #15, #16); Sprint 2: #14, #20 (Fabian). Plan files `concepts/scaffolding.track-*.md`, `STACK.md` with one section per track. Pre-existing #1, #3 have no milestone; #2 Corporate Identity was put into Sprint 1 by the team without estimate.
-- **GitLab issues (2026-09-29, on request): #4–#37 deleted permanently; only #1–#3 (created by the team) remain. Issue numbers below and in `concepts/scaffolding.md` §15 / the track files refer to the deleted issues.**
-- **Concept issues (deleted)** (one per roadmap item, `ready-for-human`): R2 #23, R3 #24, R4 #25 (Sprint 1), R5 #26 (Sprint 1), R6 #27, R7 #28, R8 #29, R9 #30, R10 #31, R11 #32, R12 #33, R13 #34, R14 #35, O1 #36, O2 #37 (optional, `needs-triage`, unassigned). Unscheduled ones get a sprint at Sprint 2 planning after the must/should/could prioritization.
-- **Time frame**: 4 h per person per week; Sprint 1 runs 2026-09-30 … 2026-10-27 (last merge to `main` 2026-10-26); final submission 2027-04-06 (`WORKFLOW.md`). R2–R14 pre-concept.
-- **R1 next step**: slice S0 (all four together) creates `STACK.md` and the module specifications; then S1–S5 in parallel.
-- **GitLab user stories (2026-10-06)**: #38–#85 are the user stories US-01…US-48 (created by Fabian, weight = story points, no milestone, no time estimate). Each is assigned to the person named under "Verantwortlich" in its description (Andreas 15, Yannick 12, Christopher 7, Fabian 10; US-01, US-02, US-03, US-48 to all four) and carries `type::story` (US-48: `type::documentation`), `priority::` from its description, an `area::` label, and `status::backlog` (US-01 and US-48, which have no dependencies: `status::ready`). #1–#3 have no `type::` / `status::` label yet.
-- **Sprint 1 plan (2026-10-06)**: budget 12 h per person until the sprint end, 1 story point counted as 1 h, shared stories split evenly (4 h each). In milestone Sprint 1 with `status::ready` and time estimate = weight: shared US-01 #38, US-02 #39, US-03 #40, US-48 #85; Andreas US-05 #42, US-07 #44 (11 h); Yannick US-19 #56, US-25 #62 (12 h); Christopher US-31 #68 (9 h); Fabian US-41 #78, US-44 #81 (11 h). The remaining hours go to #2 Corporate Identity (Christopher, Andreas; no estimate) and #1 Projektmanagement (Fabian). Seven of these stories are above the 4 h issue limit of `WORKFLOW.md` and are not split yet.
-- **GitLab board and labels (2026-10-06)**: board "Kanban" with the columns Backlog, Ready, In Progress, Review, Done. The labels on GitLab match `WORKFLOW.md` ("Labels"). Unused leftovers, not deleted: `feature`, `bug`, `documentation`, `ready-for-agent`, `type::technical-improvement`.
-- **GitLab**: milestones Sprint 1–6 + Final exist. Project settings: default branch is still `main`, merge method `merge`, squash off by default, "delete source branch" on; protected branches and the pipeline merge check are not configured yet (`next.md`).
+| Feature | Owner | Phase | Status file |
+| --- | --- | --- | --- |
+| Scaffolding & shared contracts (R1) | trutscf1 | 6, test concept | [team/trutscf1/STATUS.md](team/trutscf1/STATUS.md) |
+| Observability baseline (R2) | trutscf1 | — (no concept yet) | [team/trutscf1/STATUS.md](team/trutscf1/STATUS.md) |
+| Identity: accounts, external login, MFA (R3) | tschudea07 | — (no concept yet) | [team/tschudea07/STATUS.md](team/tschudea07/STATUS.md) |
+| Design system & accessibility modes (R4) | schwaigc | — (no concept yet) | [team/schwaigc/STATUS.md](team/schwaigc/STATUS.md) |
+| Storage core: folders, resumable upload, deduplication (R5) | schauby1 | — (no concept yet) | [team/schauby1/STATUS.md](team/schauby1/STATUS.md) |
+| Web client: dashboard, file browser, preview (R6) | schwaigc | — (no concept yet) | [team/schwaigc/STATUS.md](team/schwaigc/STATUS.md) |
+| Teams, roles, inherited permissions, quotas, audit log (R7) | tschudea07 | — (no concept yet) | [team/tschudea07/STATUS.md](team/tschudea07/STATUS.md) |
+| Share links with password and expiry (R8) | tschudea07 | — (no concept yet) | [team/tschudea07/STATUS.md](team/tschudea07/STATUS.md) |
+| Background processing: thumbnails, virus scan, OCR, scheduled jobs (R9) | schauby1 | — (no concept yet) | [team/schauby1/STATUS.md](team/schauby1/STATUS.md) |
+| Full-text search (R10) | schauby1 | — (no concept yet) | [team/schauby1/STATUS.md](team/schauby1/STATUS.md) |
+| Public content: landing page, help center, changelog, legal pages (R11) | trutscf1 | — (no concept yet) | [team/trutscf1/STATUS.md](team/trutscf1/STATUS.md) |
+| Offline mode: installable web app with sync and conflict handling (R12) | trutscf1 | — (no concept yet) | [team/trutscf1/STATUS.md](team/trutscf1/STATUS.md) |
+| Load tests & operations dashboards (R13) | trutscf1 | — (no concept yet) | [team/trutscf1/STATUS.md](team/trutscf1/STATUS.md) |
+| Deployment: automatic deploy on push to `main`, TLS (R14) | tschudea07 | — (no concept yet) | [team/tschudea07/STATUS.md](team/tschudea07/STATUS.md) |
+| End-to-end encryption (O1) | — | — (no concept yet) | — |
+| Kubernetes (k3s) operation (O2) | — | — (no concept yet) | — |
 
 ## Log
 
-Append-only record of processed tasks; entries are marked done instead of being deleted.
+Append-only record of processed tasks; entries are marked done instead of being deleted. From 2026-10-06 on, every task starts with the author's handle.
 
 | Date | Task | Result |
 | --- | --- | --- |
@@ -51,3 +53,4 @@ Append-only record of processed tasks; entries are marked done instead of being 
 | 2026-10-06 | Plan Sprint 1 with 12 h per person | Done — 11 user stories in milestone Sprint 1 (43 h of 48 h), `status::ready`, time estimate set; selection by dependency order and priority, see "Current positions" |
 | 2026-09-29 | Delete GitLab issues | On request: #4–#37 deleted permanently (HTTP 204); #1–#3 could not be deleted with the project token (HTTP 403, created by team members). Labels and milestones kept |
 | 2026-10-06 | Migrate the project from `engineering-profile` to `engineering-human` | Done on `concept/migrate-engineering-human`, MR !1 into `dev` (issue #86) — `GOAL.md` (G-1 confirmed, roles and signals drafted), `MANIFEST.md` replaced (the old copy had no project-specific rule left), `CLAUDE.md`, `WORKFLOW.md`, `ROADMAP.md` (Serves, stages), `VERSIONING.md`, `CONTEXT.md`, `qa-log.md`, ADR-0002, ADR-0001 moved to `documentation/adr/`, `.claude/settings.json` (merge policy `ask`) with the status hook, `.gitlab/` templates replaced, `tools/doc-check.mjs`, markdown lint, CI job for the documentation checks; R1 concept and track files marked legacy. GitLab labels renamed to the `WORKFLOW.md` set (8 renamed, 7 created). Open: review and merge of the MR, team switch (`next.md`) |
+| 2026-10-06 | `trutscf1` — switch the project to team mode | Done on `chore/team-mode` — skill vendored in `.claude/skills/engineering-human/`, `team/TEAM.md`, one `STATUS.md` and one inbox per developer, positions moved out of this file, shared `next.md` removed, Owner column in `ROADMAP.md`, ADR-0003. `main` on GitLab: already protected (push and merge for Maintainers only); tightening push to "no one" needs a Maintainer |

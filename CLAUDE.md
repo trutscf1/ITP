@@ -4,7 +4,7 @@ This file provides guidance to Claude Code when working in this repository. It i
 
 ## Mandatory skill
 
-**Every grilling, planning, concept, or delivery session starts with `/engineering-human`** (P-GRILL-5, P-WS-6), and every content change in this project is made under that skill. If the skill is not available in the session, stop and tell the user before changing anything.
+**Every grilling, planning, concept, or delivery session starts with `/engineering-human`** (P-GRILL-5, P-WS-6), and every content change in this project is made under that skill. The skill is part of this repository (`.claude/skills/engineering-human/`); if it is not available in the session, stop and tell the user before changing anything.
 
 ## School requirements (`docs/`) — binding
 
@@ -23,7 +23,9 @@ This project follows the AI-first, documentation-driven process defined in `docu
 
 When you build or materially change a feature, update the owning document in the same change (P-GIT-5) — never let code and concept drift.
 
-Process documents: `documentation/WORKFLOW.md` (git/tracker binding, mode, Definition of Done), `ROADMAP.md` (ordered backlog), `ROADMAP-DETAILS.md` (single status entry point — start every session here), `next.md` (task inbox), `VERSIONING.md`.
+Process documents: `documentation/WORKFLOW.md` (git/tracker binding, mode, Definition of Done), `ROADMAP.md` (ordered backlog), `ROADMAP-DETAILS.md` (single status entry point — start every session here), `VERSIONING.md`.
+
+**Team mode:** the engineering profile is vendored in `.claude/skills/engineering-human/` and binding for everyone. Each developer keeps `Developer handle: <handle>` and personal-scope preferences in the gitignored `CLAUDE.local.md`; session positions and inbox live in `documentation/team/<handle>/`. Roles and ownership: `documentation/team/TEAM.md`.
 
 ## Standing conventions (engineering profile)
 
