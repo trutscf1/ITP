@@ -9,5 +9,6 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     }
-  }
+  },
+  "agentGuidance": false
 }
