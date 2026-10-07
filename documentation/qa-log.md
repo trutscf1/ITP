@@ -116,3 +116,56 @@ Assumptions stated with the round, none rejected:
 ➡️ no recommendation
 
 > **Answer:** main: Push für niemanden, dev schützen
+
+## Round 6 — 2026-10-06 — delivery (implement #38, #85)
+
+Assumptions stated with the round, none rejected:
+
+- **A6**: The acceptance tests of #38 use the Node.js test runner (`node --test`) with TypeScript type stripping, because `STACK.md` has no test runner yet (SCF-C-13 is open) and TypeScript is mandatory (`docs/anforderungen_software_projekte.md`).
+- **A7**: The units `identity`, `storage`, `worker`, `cms` and the packages `contracts`, `ui`, `config` are minimal TypeScript packages in this issue; their behavior comes with later issues. Strict typing (SCF-AC-1.2) and the quick start (SCF-AC-1.5) are slice 2, issue #102.
+
+❓ **Q15** - **Verzeichnislayout**: Wie soll das Monorepo für SCF-AC-1.1 aufgebaut werden (die vorhandene Next.js-App liegt heute in next/)? Options: apps/ + packages/ / next/ behalten / Layout offen lassen
+
+➡️ apps/ + packages/
+
+> **Answer:** apps/ + packages/ (Recommended)
+
+❓ **Q16** - **STACK.md**: Der Abschnitt 1 (Platform) gehört laut TEAM.md trutscf1 und ist noch _open_. Wie gehe ich damit um, da #38 Workspace, Task-Runner und Ordnerlayout festlegt? Options: In diesem Branch füllen / Nur im MR vorschlagen / Erst Fabian fragen
+
+➡️ In diesem Branch füllen
+
+> **Answer:** In diesem Branch füllen (Recommended)
+
+❓ **Q17** - **Reihenfolge**: Mit welchem Issue soll ich beginnen? Beide bekommen einen eigenen feature-Branch von frisch gepulltem dev. Options: #38, dann #85 / #85, dann #38 / Parallel
+
+➡️ #38, dann #85
+
+> **Answer:** #38, dann #85 (Recommended)
+
+## Round 7 — 2026-10-06 — delivery (revise !4, !5)
+
+Fabian's reviews of !4 and !5 (not approved) are worked through under `/engineering-human revise`. The questions concern !5; they are logged here because this file ships with !4.
+
+❓ **Q18** - **!5 SCF-AC-7.4**: Der Vertabelo-ER-Diagrammteil gehört zu SCF-US-4. Wie lösen wir Fabians Punkt, dass #85 sonst nicht erledigt ist? Options: Zweiter Slice / Kriterium ändern / So lassen
+
+➡️ Zweiter Slice
+
+> **Answer:** Zweiter Slice (Recommended)
+
+❓ **Q19** - **Startbilder**: Fabian will keine Dritt-Logos im öffentlichen Repo. next.svg und vercel.svg stecken in der Starter-Seite page.tsx, file/globe/window.svg sind ungenutzt. Was soll passieren? Options: Ungenutzte löschen / Starter-Seite ersetzen / Nur dokumentieren
+
+➡️ Ungenutzte löschen
+
+> **Answer:** Ungenutzte löschen (Recommended)
+
+❓ **Q20** - **MongoDB/SSPL**: Fabian will dafür ein Issue statt eines README-Hinweises. Soll ich es anlegen? Options: Issue anlegen / Nicht anlegen
+
+➡️ Issue anlegen
+
+> **Answer:** Issue anlegen (Recommended)
+
+❓ **Q21** - **Antworten**: Soll ich jetzt die Antworten auf Fabians Kommentare in !4 und !5 posten und die neuen !4-Commits pushen? Options: Pushen und posten / Nur pushen / Noch nichts
+
+➡️ Pushen und posten
+
+> **Answer:** Pushen und posten (Recommended)
