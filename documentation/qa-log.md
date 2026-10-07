@@ -117,30 +117,139 @@ Assumptions stated with the round, none rejected:
 
 > **Answer:** main: Push für niemanden, dev schützen
 
-## Round 6 — 2026-10-06 — delivery
+## Round 6 — 2026-10-06 — delivery (implement #38, #85)
+
+Assumptions stated with the round, none rejected:
+
+- **A6**: The acceptance tests of #38 use the Node.js test runner (`node --test`) with TypeScript type stripping, because `STACK.md` has no test runner yet (SCF-C-13 is open) and TypeScript is mandatory (`docs/anforderungen_software_projekte.md`).
+- **A7**: The units `identity`, `storage`, `worker`, `cms` and the packages `contracts`, `ui`, `config` are minimal TypeScript packages in this issue; their behavior comes with later issues. Strict typing (SCF-AC-1.2) and the quick start (SCF-AC-1.5) are slice 2, issue #102.
+
+❓ **Q15** - **Verzeichnislayout**: Wie soll das Monorepo für SCF-AC-1.1 aufgebaut werden (die vorhandene Next.js-App liegt heute in next/)? Options: apps/ + packages/ / next/ behalten / Layout offen lassen
+
+➡️ apps/ + packages/
+
+> **Answer:** apps/ + packages/ (Recommended)
+
+❓ **Q16** - **STACK.md**: Der Abschnitt 1 (Platform) gehört laut TEAM.md trutscf1 und ist noch _open_. Wie gehe ich damit um, da #38 Workspace, Task-Runner und Ordnerlayout festlegt? Options: In diesem Branch füllen / Nur im MR vorschlagen / Erst Fabian fragen
+
+➡️ In diesem Branch füllen
+
+> **Answer:** In diesem Branch füllen (Recommended)
+
+❓ **Q17** - **Reihenfolge**: Mit welchem Issue soll ich beginnen? Beide bekommen einen eigenen feature-Branch von frisch gepulltem dev. Options: #38, dann #85 / #85, dann #38 / Parallel
+
+➡️ #38, dann #85
+
+> **Answer:** #38, dann #85 (Recommended)
+
+## Round 7 — 2026-10-06 — delivery (revise !4, !5)
+
+Fabian's reviews of !4 and !5 (not approved) are worked through under `/engineering-human revise`. The questions concern !5; they are logged here because this file ships with !4.
+
+❓ **Q18** - **!5 SCF-AC-7.4**: Der Vertabelo-ER-Diagrammteil gehört zu SCF-US-4. Wie lösen wir Fabians Punkt, dass #85 sonst nicht erledigt ist? Options: Zweiter Slice / Kriterium ändern / So lassen
+
+➡️ Zweiter Slice
+
+> **Answer:** Zweiter Slice (Recommended)
+
+❓ **Q19** - **Startbilder**: Fabian will keine Dritt-Logos im öffentlichen Repo. next.svg und vercel.svg stecken in der Starter-Seite page.tsx, file/globe/window.svg sind ungenutzt. Was soll passieren? Options: Ungenutzte löschen / Starter-Seite ersetzen / Nur dokumentieren
+
+➡️ Ungenutzte löschen
+
+> **Answer:** Ungenutzte löschen (Recommended)
+
+❓ **Q20** - **MongoDB/SSPL**: Fabian will dafür ein Issue statt eines README-Hinweises. Soll ich es anlegen? Options: Issue anlegen / Nicht anlegen
+
+➡️ Issue anlegen
+
+> **Answer:** Issue anlegen (Recommended)
+
+❓ **Q21** - **Antworten**: Soll ich jetzt die Antworten auf Fabians Kommentare in !4 und !5 posten und die neuen !4-Commits pushen? Options: Pushen und posten / Nur pushen / Noch nichts
+
+➡️ Pushen und posten
+
+> **Answer:** Pushen und posten (Recommended)
+
+## Round 8 — 2026-10-06 — delivery
 
 Merge decisions (P-MR-4, fixed options Merge now / No / Later / I merge myself), each MR approved by `schwaigc`:
 
-❓ **Q15** - **Merge !1**: concept/migrate-engineering-human nach dev mergen (Migration auf engineering-human, von schwaigc freigegeben)?
+❓ **Q22** - **Merge !1**: concept/migrate-engineering-human nach dev mergen (Migration auf engineering-human, von schwaigc freigegeben)?
 
 > **Answer:** Merge now
 
-❓ **Q16** - **Merge !2**: chore/team-mode nach dev mergen (Team-Modus, von schwaigc freigegeben)? Nur nach !1.
+❓ **Q23** - **Merge !2**: chore/team-mode nach dev mergen (Team-Modus, von schwaigc freigegeben)? Nur nach !1.
 
 > **Answer:** Merge now
 
-❓ **Q17** - **Merge !3**: concept/user-story-work-items nach dev mergen (48 User Stories als Work Items, von schwaigc freigegeben)? Nur nach !2.
+❓ **Q24** - **Merge !3**: concept/user-story-work-items nach dev mergen (48 User Stories als Work Items, von schwaigc freigegeben)? Nur nach !2.
 
 > **Answer:** Merge now
 
-❓ **Q18** - **Feature**: Welches deiner Features soll zuerst gegrillt werden? Options: Public content / Observability baseline / Offline mode / Load tests
+❓ **Q25** - **Feature**: Welches deiner Features soll zuerst gegrillt werden? Options: Public content / Observability baseline / Offline mode / Load tests
 
 ➡️ Public content
 
 > **Answer:** Public content (Recommended)
 
-❓ **Q19** - **Session**: Wo soll das Grilling laufen? Options: Neue Session / Hier weitermachen
+❓ **Q26** - **Session**: Wo soll das Grilling laufen? Options: Neue Session / Hier weitermachen
 
 ➡️ Neue Session
 
 > **Answer:** Neue Session (Recommended)
+
+## Round 9 — 2026-10-06 — delivery
+
+Review of the merge requests of `schwaigc` (`feature/38-monorepo-setup`, `feature/85-project-documentation`):
+
+❓ **Q27** - **MR-Auswahl**: Welche Merge Request soll ich reviewen? Lokal sehe ich zwei neue Branches von schwaigc, die noch nicht in dev sind. Options: Beide / #38 Monorepo-Setup / #85 Projektdoku
+
+➡️ Beide
+
+> **Answer:** die merge requests von christopher, dass ist der accestoken: [token removed from the log]
+
+❓ **Q28** - **GitLab-Token**: GITLAB_TOKEN ist in dieser Sitzung nicht gesetzt (weder Prozess noch Benutzer-Umgebung). Ohne ihn kann ich MR-Beschreibung, Threads und Pipeline nicht lesen und nicht approven. Wie weiter? Options: Ich setze den Token / Nur lokales Review
+
+➡️ Ich setze den Token
+
+> **Answer:** Ich setze den Token (Recommended)
+
+❓ **Q29** - **Review posten**: Beide MRs (!4 Monorepo, !5 Projektdoku) sind nicht freigabefähig, daher approve ich nicht. Soll ich die Review-Kommentare unter deinem Namen auf GitLab posten? Options: Beide posten / Nur !4 posten / Nicht posten
+
+➡️ Beide posten
+
+> **Answer:** Beide posten (Recommended)
+
+## Round 10 — 2026-10-07 — delivery
+
+Second review of the merge requests of `schwaigc` (!4 at commit `8cb0ef4`, !5 at commit `9a7b581`). Shown with the questions: the result tables and the comment for !4.
+
+❓ **Q30** - **Review of !4**: All three blockers are fixed and verified. Shall I post the comment shown above on !4 under your name and approve the merge request? Options: Post and approve / Post only / Change the text first / Do not post
+
+➡️ Post and approve
+
+> **Answer:** Post and approve (Recommended)
+
+❓ **Q31** - **Review of !5**: Nothing reviewable changed, and schwaigc announced a rebase after !4 is merged. What should happen on !5 now? Options: No comment / Short confirmation
+
+➡️ No comment
+
+> **Answer:** Short confirmation
+
+Result: the comment was posted on !4 and !4 was approved as `trutscf1`; a short confirmation of the split into #109 and #110 was posted on !5.
+
+## Round 11 — 2026-10-07 — delivery
+
+Merge of !4 (`feature/38-monorepo-setup` → `dev`) at commit `8cb0ef4`. Shown with the question: the check table (acceptance criteria met, pipeline green, no open threads, approved by `trutscf1`; Definition of Done 14 not met, 10 not runnable).
+
+Assumption stated with the round, not rejected:
+
+- **A8**: Definition of Done 10 (pre-commit checks) is treated as not applicable until the pre-commit configuration exists, as it was for !1–!3.
+
+❓ **Q32** - **Time tracking on !4**: Definition of Done 14 is not met, because no time is recorded on #38 or !4. How do we handle this before the merge? Options: Wait for the bookings / Time is booked now / Merge, book afterwards
+
+➡️ Wait for the bookings
+
+> **Answer:** Book 10min review time for me and merge
+
+Result: 10 minutes of review time were recorded on !4 for `trutscf1` on the owner's explicit instruction, a deviation from P-TIME-1 for this one entry (agents never book time). The answer names the merge, so it counts as _Merge now_ (P-MR-4). !4 was merged into `dev` with merge commit `725d327`, the branch is kept, and #38 is closed with `status::done`. The implementation time of `schwaigc` is still not recorded (Definition of Done 14).

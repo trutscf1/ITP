@@ -22,17 +22,26 @@ Every row traces to the capability IDs (`SCF-C-x`, later other prefixes) that de
 
 | Capability | Technology | Version constraint | Notes |
 | --- | --- | --- | --- |
-| Runtime & language | _open_ | | |
-| SCF-C-1 workspace & task runner | _open_ | | |
-| Shared lint / format / type configuration | _open_ | | |
-| SCF-C-13 unit test runner (shared) | _open_ | | |
+| Runtime & language | Node.js, TypeScript (strict, no `any`) | Node.js 24 LTS ≥ 24.14.0 (`.tool-versions`, `engines`); TypeScript 5 | School minimum (`docs/anforderungen_software_projekte.md`). Set by #38 (SCF-US-1). |
+| SCF-C-1 workspace & task runner | pnpm workspaces, Turborepo | pnpm 10 (`packageManager`); Turborepo 2 | One lockfile at the root; tasks `lint`, `typecheck`, `build` run through `turbo run`. Set by #38. |
+| Shared lint / format / type configuration | Biome (lint, format); shared TypeScript base config | Biome 2.4; `@stash/config` | `biome.json` at the root, generated Prisma files excluded; `packages/config/tsconfig.base.json` with `strict`. Set by #38. |
+| SCF-C-13 unit test runner (shared) | Node.js test runner (`node --test`), TypeScript by type stripping | Node.js 24 | Provisional, for the acceptance tests of #38 (`tests/`); the owner may replace it. Browser end-to-end runner: section 4. |
 | SCF-C-7 container runtime & stack | _open_ | | |
 | SCF-C-6 reverse proxy | _open_ | | |
 | SCF-C-8 relational database | _open_ | | |
 | SCF-C-5 content management system | _open_ | | |
 | SCF-C-12 changelog draft generator | _open_ | | |
 
-Module mapping (folder layout), configuration & secrets, build/run commands: _open_.
+Module mapping (folder layout), set by #38:
+
+| Path | Package | Role |
+| --- | --- | --- |
+| `apps/web` | `@stash/web` | Unit `web` (Next.js app) |
+| `apps/identity`, `apps/storage`, `apps/worker`, `apps/cms` | `@stash/<unit>` | The other four units; empty until their issues |
+| `packages/contracts`, `packages/ui`, `packages/config` | `@stash/<name>` | Shared packages; `config` holds the TypeScript base config |
+| `tests/` | – | Acceptance tests that run at the repository root |
+
+Build/run commands (root): `pnpm install`, `pnpm run lint`, `pnpm run typecheck`, `pnpm run build`, `pnpm test`. Configuration & secrets: _open_.
 
 ## 2. Contracts, storage & worker — `schauby1`
 
