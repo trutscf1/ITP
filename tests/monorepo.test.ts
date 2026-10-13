@@ -133,3 +133,33 @@ describe("SCF-AC-1.4 Pinned versions", () => {
     assert.match(devDependencies["@types/node"] as string, /^\^?24/);
   });
 });
+
+describe("SCF-AC-1.5 Quick start", () => {
+  const readme = readFileSync(join(root, "README.md"), "utf8");
+  const section = readme.match(/^## Quick start\n([\s\S]*?)(?=^## )/m)?.[1];
+
+  it("SCF-AC-1.5 has a Quick start section in the README", () => {
+    assert.ok(section, "no '## Quick start' section");
+  });
+
+  it("SCF-AC-1.5 the guide names the steps to start the project", () => {
+    assert.match(section ?? "", /cp \.env\.example \.env/);
+    assert.match(section ?? "", /docker compose up/);
+    assert.match(section ?? "", /pnpm install/);
+    assert.match(section ?? "", /pnpm --filter @stash\/web dev/);
+  });
+
+  it("SCF-AC-1.5 the guide is short (at most 30 lines)", () => {
+    assert.ok((section ?? "").trim().split("\n").length <= 30);
+  });
+
+  it("SCF-AC-1.5 the commands of the guide exist", () => {
+    assert.ok(existsSync(join(root, ".env.example")));
+    assert.ok(existsSync(join(root, "docker-compose.yml")));
+    const scripts = readJson("apps/web/package.json").scripts as Record<
+      string,
+      string
+    >;
+    assert.ok(scripts.dev);
+  });
+});
