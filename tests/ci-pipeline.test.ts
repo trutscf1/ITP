@@ -10,7 +10,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 type Rule = { if?: string; when?: string };
 type Cache = { key?: string | { files?: string[] }; paths?: string[] };
 type Job = {
-  image?: string;
+  image?: string | { name: string };
   script?: string[];
   cache?: Cache[];
   rules?: unknown;
@@ -26,6 +26,11 @@ type CiVariables = Record<string, string | undefined>;
 
 function readCi(): CiConfig {
   return parse(readFileSync(join(root, ".gitlab-ci.yml"), "utf8")) as CiConfig;
+}
+
+function imageOf(name: string): string {
+  const image = readJob(name).image;
+  return typeof image === "string" ? image : (image?.name ?? "");
 }
 
 function readJob(name: string): Job {
@@ -141,6 +146,100 @@ describe("SCF-AC-1.4 Pinned versions in CI", () => {
     const toolVersions = readFileSync(join(root, ".tool-versions"), "utf8");
     const pinned = toolVersions.match(/^nodejs\s+(\S+)$/m)?.[1];
     assert.ok(pinned, "nodejs entry missing");
-    assert.equal(readJob(".pnpm").image, `node:${pinned}-alpine`);
+    assert.equal(imageOf(".pnpm"), `node:${pinned}-alpine`);
+  });
+});
+
+function scriptOf(name: string): string {
+  return (readJob(name).script ?? []).join("\n");
+}
+
+function jobNames(): string[] {
+  return Object.keys(readCi()).filter(
+    (key) =>
+      !key.startsWith(".") &&
+      !["workflow", "default", "stages", "include", "variables"].includes(key),
+  );
+}
+
+describe("SCF-AC-5.2 Pipeline steps", () => {
+  it("SCF-AC-5.2 runs the Biome check over the whole repository", () => {
+    assert.match(scriptOf("lint"), /pnpm exec biome ci \./);
+  });
+
+  it("SCF-AC-5.2 runs the accessibility check (axe) against the built web client", () => {
+    assert.match(scriptOf("accessibility"), /pnpm run test:accessibility/);
+  });
+
+  it("SCF-AC-5.2 runs the accessibility check on the Playwright image of the pinned version", () => {
+    const pkg = JSON.parse(
+      readFileSync(join(root, "package.json"), "utf8"),
+    ) as {
+      devDependencies: Record<string, string>;
+    };
+    const version = pkg.devDependencies.playwright;
+    assert.match(version ?? "", /^\d+\.\d+\.\d+$/, "Playwright not pinned");
+    assert.equal(
+      imageOf("accessibility"),
+      `mcr.microsoft.com/playwright:v${version}-noble`,
+    );
+  });
+
+  it("SCF-AC-5.2 runs the dependency audit on production dependencies", () => {
+    assert.match(scriptOf("dependency-audit"), /pnpm audit --prod/);
+  });
+
+  it("SCF-AC-5.2 scans every image of docker-compose.yml with Trivy", () => {
+    assert.match(imageOf("container-scan"), /^aquasec\/trivy:\d/);
+    assert.match(scriptOf("container-scan"), /docker-compose\.yml/);
+    assert.match(scriptOf("container-scan"), /trivy image/);
+  });
+
+  it("SCF-F-15 runs the secret scan with Gitleaks", () => {
+    assert.match(imageOf("secret-scan"), /gitleaks:v\d/);
+    assert.match(scriptOf("secret-scan"), /--config \.gitleaks\.toml/);
+  });
+
+  it("SCF-F-15 runs the code scan with Semgrep", () => {
+    assert.match(imageOf("code-scan"), /semgrep:\d/);
+    assert.match(scriptOf("code-scan"), /--config \.semgrep\.yml/);
+  });
+});
+
+describe("SCF-AC-5.3 Failing conditions", () => {
+  it("SCF-AC-5.3 lets no job fail without failing the pipeline", () => {
+    for (const name of jobNames()) {
+      const job = readJob(name) as Job & { allow_failure?: unknown };
+      assert.notEqual(job.allow_failure, true, `${name} may fail`);
+    }
+  });
+
+  it("SCF-AC-5.3 fails the dependency audit on high and critical", () => {
+    assert.match(scriptOf("dependency-audit"), /--audit-level=high/);
+  });
+
+  it("SCF-AC-5.3 fails the container scan on high and critical", () => {
+    const script = scriptOf("container-scan");
+    assert.match(script, /--severity HIGH,CRITICAL/);
+    assert.match(script, /--exit-code 1/);
+  });
+
+  it("SCF-AC-5.3 fails the code scan on any finding of severity error", () => {
+    assert.match(scriptOf("code-scan"), /--error/);
+  });
+
+  it("SCF-AC-5.3 ignores a known image vulnerability only with a reason and an expiry date", () => {
+    const lines = readFileSync(join(root, ".trivyignore"), "utf8").split("\n");
+    let reason = false;
+    lines.forEach((line, index) => {
+      if (line.trim() === "") {
+        reason = false;
+      } else if (line.startsWith("# ")) {
+        reason = true;
+      } else {
+        assert.match(line, /^\S+ exp:\d{4}-\d{2}-\d{2}$/, `line ${index + 1}`);
+        assert.ok(reason, `line ${index + 1} has no reason above it`);
+      }
+    });
   });
 });
