@@ -9,7 +9,9 @@
     "typecheck": {
       "dependsOn": ["^build"]
     },
-    "test": {},
+    "test": {
+      "cache": false
+    },
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
