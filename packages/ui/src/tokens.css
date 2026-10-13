@@ -27,6 +27,14 @@
   --radius-md: 0.5rem;
 }
 
+/* The dark: variant follows the chosen dark themes, not the system setting. */
+@custom-variant dark (&:where(
+    [data-theme="dark"],
+    [data-theme="dark"] *,
+    [data-theme="night"],
+    [data-theme="night"] *
+  ));
+
 :root,
 [data-theme="light"] {
   color-scheme: light;

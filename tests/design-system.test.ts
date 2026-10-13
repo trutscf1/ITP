@@ -12,7 +12,9 @@ const overrides = ["dark", "sepia", "night"] as const;
 function declaredTokens(css: string, selector: string): Set<string> {
   const blocks = css.matchAll(/([^{}]+)\{([^{}]*)\}/g);
   for (const [, selectors, body] of blocks) {
-    if ((selectors as string).includes(selector)) {
+    // Only the text after the last statement or comment is the selector.
+    const prelude = (selectors as string).split(/;|\*\//).pop() as string;
+    if (prelude.includes(selector)) {
       return new Set(
         [...(body as string).matchAll(/(--[\w-]+)\s*:/g)].map(
           (m) => m[1] as string,
