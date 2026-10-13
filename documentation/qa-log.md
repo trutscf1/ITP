@@ -191,3 +191,39 @@ Fabian's reviews of !4 and !5 (not approved) are worked through under `/engineer
 ➡️ `yaml` hinzufügen
 
 > **Answer:** `yaml` hinzufügen (Recommended)
+
+❓ **Q25** - **MR für #42**: Soll ich den MR „SCF-US-5 CI pipeline: checks run on every push and merge request“ (feature/42-ci-pipeline → dev) öffnen und #42 auf status::review setzen? Options: MR öffnen / Noch nicht
+
+➡️ MR öffnen
+
+> **Answer:** MR öffnen (Recommended)
+
+❓ **Q26** - **Trivy-Scan**: Alle Images aus docker-compose.yml haben high/critical CVEs (v.a. gosu in postgres und mongo, upstream). Wie soll der Container-Scan-Job sich verhalten? Options: Strikt, mit .trivyignore / Strikt ohne Ausnahmen / allow_failure bis #103
+
+➡️ Strikt, mit .trivyignore
+
+> **Answer:** Strikt, mit .trivyignore (Recommended)
+
+❓ **Q27** - **axe in CI**: SCF-AC-5.2 verlangt axe in der Pipeline, das Scaffolding-Konzept hat in Q11 entschieden: „accessibility checks with R4“. Was gilt? Options: Job jetzt, Seiten mit R4 / Q11 gilt, AC anpassen
+
+➡️ Job jetzt, Seiten mit R4
+
+> **Answer:** Job jetzt, Seiten mit R4 (Recommended)
+
+❓ **Q28** - **next-Update**: Der audit-Job wäre sofort rot wegen next 16.3.7 (High, SSRF, behoben ab 16.3.8). apps/web gehört zum Web-Track (schwaigc). Wie vorgehen? Options: Im #104-MR bumpen / Issue für schwaigc
+
+➡️ Im #104-MR bumpen
+
+> **Answer:** Im #104-MR bumpen (Recommended)
+
+❓ **Q29** - **!5 mit .next-Build**: Soll ich auf MR !5 einen Kommentar posten, dass der Branch Build-Output (`apps/web/.next/`) enthält, den Gitleaks meldet (DoD 12)? Options: Kommentar posten / Nur dir melden
+
+➡️ Kommentar posten
+
+> **Answer:** Kommentar posten (Recommended)
+
+❓ **Q30** - **pnpm-Härtung**: Semgrep (p/nodejs) verlangt `blockExoticSubdeps`, `trustPolicy: no-downgrade` und `minimumReleaseAge` in pnpm-workspace.yaml. Wie umgehen? Options: Alle drei, 7 Tage / Alle drei, 1 Tag / Regeln abschalten
+
+➡️ Alle drei, 7 Tage
+
+> **Answer:** Alle drei, 7 Tage (Recommended)
