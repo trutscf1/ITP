@@ -63,3 +63,16 @@ describe("SCF-AC-6.1 Commit check", () => {
     );
   });
 });
+
+describe("SCF-AC-6.1 Breaking changes", () => {
+  it("SCF-AC-6.1 rejects a breaking change marker without its BREAKING CHANGE footer", async () => {
+    assert.equal(
+      await check("fix(web)!: rename status route [SCF-F-8]"),
+      false,
+    );
+  });
+
+  it("SCF-AC-6.1 accepts a commit without scope when no single scope fits", async () => {
+    assert.equal(await check("ci: add a job [SCF-F-15]"), true);
+  });
+});
