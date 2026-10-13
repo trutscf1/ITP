@@ -64,6 +64,8 @@ test:
     - *pnpm-store
   script:
     - pnpm test
+    # Unit tests of the units and packages that define a test task (SCF-F-12).
+    - pnpm exec turbo run test
 
 build:
   extends: .pnpm
@@ -78,11 +80,12 @@ accessibility:
   image: mcr.microsoft.com/playwright:v1.63.0-noble
   stage: test
   variables:
-    BASE_URL: http://localhost:3000
+    PORT: "3000"
+    BASE_URL: http://localhost:$PORT
   script:
     - pnpm exec turbo run build --filter=@stash/web
-    - pnpm --filter @stash/web exec next start --port 3000 &
-    - for attempt in $(seq 1 30); do wget -q -O /dev/null "$BASE_URL" && break; sleep 1; done
+    # The check waits for the server itself and fails if it does not come up.
+    - pnpm --filter @stash/web exec next start --port "$PORT" &
     - pnpm run test:accessibility
 
 # Production dependencies with a known high or critical vulnerability fail the pipeline
