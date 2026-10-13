@@ -209,3 +209,9 @@ Asked under `/engineering-human implement 68` (DSA-US-1, slice 1). The concept `
 ➡️ Pushen + MR per Push-Option
 
 > **Answer:** Pushen + MR per Push-Option (Recommended)
+
+❓ **Q28** - **Issues**: Darf ich ein neues Issue für DSA-US-1 Slice 3 anlegen, die Beschreibung von #68 an die Story-Datei angleichen und bei #102 die Zeile „Lint für Root-Dateien“ korrigieren? Options: Ja, alle drei / Nein
+
+➡️ Ja, alle drei
+
+> **Answer:** Ja, alle drei (Recommended)

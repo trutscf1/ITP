@@ -69,7 +69,7 @@ Type mapping (neutral type → concrete type) and error mapping (`E-x` → concr
 | --- | --- | --- | --- |
 | SCF-C-3 web application framework | _open_ | | |
 | SCF-C-13 browser end-to-end test runner | _open_ | | |
-| DSA-F-1 design tokens | CSS custom properties in a Tailwind CSS `@theme` block (`packages/ui/src/tokens.css`, exported as `@stash/ui/tokens.css`) | Tailwind CSS 4 | The `@theme` values are the light theme; dark, sepia, and night override the colour tokens on `[data-theme]`. Set by #68. |
+| DSA-F-1 design tokens | CSS custom properties in a Tailwind CSS `@theme` block (`packages/ui/src/tokens.css`, exported as `@stash/ui/tokens.css`) | Tailwind CSS 4 | The `@theme` values are the light theme; spacing tokens are named `tight`, `snug`, `base`, `roomy`, `loose` because Tailwind CSS 4 would let `xs` to `xl` replace the container sizes of `max-w-*` (tested in `tests/design-system.test.ts`); dark, sepia, and night override the colour tokens on `[data-theme]`. Set by #68. |
 | DSA-F-2 theme switching and memory | `data-theme` on `<html>`, cookie `stash-theme` (one year, `SameSite=Lax`) read by the root layout | – | `packages/ui/src/theme.ts`; the profile takes over with DSA-F-16. Set by #68. |
 | DSA-F-3 component primitives | Radix UI (`radix-ui`) styled with Tailwind CSS | `radix-ui` 1.6.7, React 19 | First component: the theme switcher (toggle group). Set by #68. |
 | Design-system tests | Node.js test runner on the token stylesheet, the theme helpers, and the package wiring (`tests/design-system.test.ts`, `tests/theme.test.ts`) | Node.js 24 | Rendering in a browser is left to SCF-C-13. |

@@ -34,7 +34,7 @@ The vertical slices that deliver this story. One slice is delivered by the story
 | --- | --- | --- | --- |
 | 1 — Tokens and themes | DSA-AC-1.1, DSA-AC-1.2, DSA-AC-1.3 | — | #68 |
 | 2 — Contrast and Storybook | DSA-AC-1.4, DSA-AC-1.5 | 1 | #106 |
-| 3 — Theme in the profile | DSA-AC-1.6 | 1, IDN-US-2 (log in) | — |
+| 3 — Theme in the profile | DSA-AC-1.6 | 1, IDN-US-2 (log in, #46) | #112 |
 
 - **Story issue:** #68
 - **Weight:** 6 (slice 1: 3, slice 2: 2, slice 3: 1)
