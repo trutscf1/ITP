@@ -10,7 +10,8 @@
     "lint": "biome check .",
     "format": "biome format --write",
     "contract:emit": "prisma contract emit",
-    "typecheck": "next typegen && tsc --noEmit"
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "node --test"
   },
   "dependencies": {
     "@prisma/orm-postgres": "8.0.0-rc.13",

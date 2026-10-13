@@ -6,9 +6,11 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "dev": "tsc --watch --preserveWatchOutput",
+    "build": "tsc",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
-    "build": "tsc"
+    "test": "node --test"
   },
   "devDependencies": {
     "@stash/config": "workspace:*"
