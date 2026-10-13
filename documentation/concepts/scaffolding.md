@@ -351,7 +351,7 @@ Load in Sprint 1 against 16 h capacity: Fabian 17 h, Andreas 15 h, Yannick 12 h,
 | SCF-F-10 | Contracts (#8) |
 | SCF-F-12 | Platform (#6); each owner provides the tasks in their units |
 | SCF-F-13, F-14, F-15, NF-6 | Identity & CI (#9, #11, #17) |
-| SCF-F-16 | Platform (#14, Sprint 2) |
+| SCF-F-16 | Identity & CI (#44, SCF-US-6; the first cut's #14 was deleted) |
 | SCF-NF-1 | Platform (#22) |
 | SCF-NF-2 | all later features |
 | SCF-NF-3, NF-4 | Contracts core (#7); each unit's owner |

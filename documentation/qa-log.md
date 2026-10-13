@@ -234,6 +234,18 @@ Fabian's reviews of !4 and !5 (not approved) are worked through under `/engineer
 
 > **Answer:** So lassen, NF-6 präzisieren (Recommended)
 
+❓ **Q32** - **MR für #104**: Soll ich den MR „SCF-US-5 CI pipeline: security, audit, image, and accessibility checks“ (nach !8 mergen) öffnen und #104 auf status::review setzen? Options: MR öffnen / Noch nicht
+
+➡️ MR öffnen
+
+> **Answer:** MR öffnen (Recommended)
+
+❓ **Q33** - **MR für #44**: Soll ich den MR „SCF-US-6 Commit check, changelog draft, and release on SemVer tags“ (nach !8 und !11 mergen) öffnen, #44 auf status::review setzen und den Log-Eintrag für diese Session mitschicken? Options: MR öffnen / Noch nicht
+
+➡️ MR öffnen
+
+> **Answer:** MR öffnen (Recommended)
+
 ## Round 9 — 2026-10-13 — delivery (`tschudea07`, revise !11)
 
 Review of !11 by `schwaigc`, point 1: `SCF-AC-5.3` and `SCF-AC-2.5` were stricter than `SCF-NF-6` after Q31. On `tschudea07`'s instruction to resolve the review, both criteria now carry the wording of `SCF-NF-6` (fixable findings; accepted exceptions with reason and expiry), in the story files and in the issues #42, #104, #39, #103. The work items belong to `trutscf1`: the approval as PM is requested on !11 and still open.

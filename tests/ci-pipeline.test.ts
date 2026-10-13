@@ -11,6 +11,9 @@ type Rule = { if?: string; when?: string };
 type Cache = { key?: string | { files?: string[] }; paths?: string[] };
 type Job = {
   image?: string | { name: string };
+  stage?: string;
+  needs?: string[];
+  release?: { tag_name?: string; description?: string };
   script?: string[];
   cache?: Cache[];
   rules?: unknown;
@@ -24,8 +27,14 @@ type CiConfig = {
   stages?: string[];
 };
 type CiVariables = Record<string, string | undefined>;
-type PreCommitHook = { id: string; args?: string[] };
+type PreCommitHook = {
+  id: string;
+  args?: string[];
+  entry?: string;
+  stages?: string[];
+};
 type PreCommitConfig = {
+  default_install_hook_types?: string[];
   repos: { repo: string; rev?: string; hooks: PreCommitHook[] }[];
 };
 
@@ -146,8 +155,12 @@ describe("SCF-AC-5.4 Run time", () => {
     assert.ok(minutes(timeout) <= 10);
   });
 
-  it("SCF-AC-5.4 runs all checks in parallel in one stage", () => {
-    assert.deepEqual(readCi().stages, ["test"]);
+  it("SCF-AC-5.4 runs all checks in parallel in the first stage", () => {
+    assert.equal(readCi().stages?.[0], "test");
+    for (const name of jobNames()) {
+      if (readJob(name).rules !== undefined) continue;
+      assert.equal(readJob(name).stage, "test", `${name} is not in stage test`);
+    }
   });
 
   it("SCF-AC-5.4 caches the pnpm store by lockfile and the Turborepo cache", () => {
@@ -176,7 +189,9 @@ describe("SCF-AC-1.4 Pinned versions in CI", () => {
     const toolVersions = readFileSync(join(root, ".tool-versions"), "utf8");
     const pinned = toolVersions.match(/^nodejs\s+(\S+)$/m)?.[1];
     assert.ok(pinned, "nodejs entry missing");
-    assert.equal(imageOf(".pnpm"), `node:${pinned}-alpine`);
+    for (const name of [".pnpm", "release-notes"]) {
+      assert.equal(imageOf(name), `node:${pinned}-alpine`, name);
+    }
   });
 
   it("SCF-AC-1.4 checks the Node.js major version inside the Playwright image", () => {
@@ -287,5 +302,60 @@ describe("SCF-F-14 Same scanners before the commit and in the pipeline", () => {
       ...scriptOf("code-scan").matchAll(/--config (\S+)/g),
     ].map((match) => match[1]);
     assert.deepEqual(hookConfigs, pipelineConfigs);
+  });
+});
+
+describe("SCF-AC-6.1 Commit check in the hook and the pipeline", () => {
+  it("SCF-AC-6.1 checks the message with commitlint in the commit-msg hook", () => {
+    const config = parse(
+      readFileSync(join(root, ".pre-commit-config.yaml"), "utf8"),
+    ) as PreCommitConfig;
+    assert.ok(config.default_install_hook_types?.includes("commit-msg"));
+    const hook = readPreCommitRepo("local").hooks.find(
+      (entry) => entry.id === "commitlint",
+    );
+    assert.ok(hook, "commitlint hook missing");
+    assert.match(hook.entry ?? "", /commitlint --edit/);
+    assert.deepEqual(hook.stages, ["commit-msg"]);
+  });
+
+  it("SCF-F-13 checks the commits of the change again in the pipeline", () => {
+    const job = readJob("commit-messages");
+    assert.equal(job.rules, undefined);
+    assert.match(scriptOf("commit-messages"), /pnpm exec commitlint --from/);
+  });
+});
+
+function onlyOnTags(name: string): boolean {
+  const rules = readJob(name).rules as Rule[] | undefined;
+  assert.ok(rules, `${name} has no rules`);
+  const runs = (variables: CiVariables): boolean =>
+    rules.some((rule) => rule.if !== undefined && evaluate(rule.if, variables));
+  return (
+    runs({ CI_COMMIT_TAG: "v1.0.0" }) &&
+    !runs(push("dev")) &&
+    !runs({ CI_PIPELINE_SOURCE: "merge_request_event" })
+  );
+}
+
+describe("SCF-AC-6.3 Release tags", () => {
+  it("SCF-AC-6.3 runs a pipeline for a pushed tag", () => {
+    assert.equal(pipelineRuns({ CI_COMMIT_TAG: "v1.0.0" }), true);
+  });
+
+  it("SCF-AC-6.3 takes the release notes of the tag from CHANGELOG.md, only on tags", () => {
+    assert.equal(onlyOnTags("release-notes"), true);
+    assert.match(
+      scriptOf("release-notes"),
+      /node scripts\/changelog\.ts notes "\$CI_COMMIT_TAG"/,
+    );
+  });
+
+  it("SCF-AC-6.3 publishes a GitLab Release for the tag with those notes, only on tags", () => {
+    assert.equal(onlyOnTags("release"), true);
+    const job = readJob("release");
+    assert.deepEqual(job.needs, ["release-notes"]);
+    assert.equal(job.release?.tag_name, "$CI_COMMIT_TAG");
+    assert.match(job.release?.description ?? "", /release-notes\.md/);
   });
 });

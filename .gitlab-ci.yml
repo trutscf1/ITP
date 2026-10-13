@@ -7,12 +7,15 @@ workflow:
     - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
       when: never
     - if: $CI_COMMIT_BRANCH
+    # A release tag runs the checks once more and publishes the GitLab Release (SCF-AC-6.3).
+    - if: $CI_COMMIT_TAG
 
 include:
   - local: .gitlab/ci/docs.yml
 
 stages:
   - test
+  - release
 
 # A run must finish in under 10 minutes (SCF-AC-5.4); a job that hangs fails instead of
 # blocking the merge request. A newer push cancels the older, now pointless run.
@@ -146,3 +149,46 @@ code-scan:
     # elsewhere.
     - unset SEMGREP_IN_DOCKER
     - semgrep scan --config p/javascript --config p/typescript --config p/react --config p/nodejs --config p/owasp-top-ten --config .semgrep.yml --error
+
+# The commit messages of the change, checked again (SCF-F-13): in a merge request every commit
+# since the merge base, on a branch every commit not yet on the default branch.
+commit-messages:
+  extends: .pnpm
+  stage: test
+  cache:
+    - *pnpm-store
+  variables:
+    GIT_DEPTH: 0
+  script:
+    - apk add --no-cache git
+    - git fetch --quiet origin "$CI_DEFAULT_BRANCH"
+    - base="${CI_MERGE_REQUEST_DIFF_BASE_SHA:-$(git merge-base HEAD "origin/$CI_DEFAULT_BRANCH")}"
+    - pnpm exec commitlint --from "$base" --to HEAD --verbose
+
+# Release notes for a pushed tag: the tag must be SemVer (v1.0.0) and CHANGELOG.md must have
+# its section, otherwise the job fails and no release is published (SCF-AC-6.3).
+release-notes:
+  stage: release
+  image: node:24.14.0-alpine
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - node scripts/changelog.ts notes "$CI_COMMIT_TAG" > release-notes.md
+  artifacts:
+    paths:
+      - release-notes.md
+
+# The GitLab Release for the tag, with the notes of its changelog section (SCF-AC-6.3).
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/cli:v1.74.0
+  rules:
+    - if: $CI_COMMIT_TAG
+  needs:
+    - release-notes
+  script:
+    - echo "Publishing the release $CI_COMMIT_TAG"
+  release:
+    tag_name: $CI_COMMIT_TAG
+    name: $CI_COMMIT_TAG
+    description: ./release-notes.md
