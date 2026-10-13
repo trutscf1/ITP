@@ -1,0 +1,40 @@
+# Known high and critical vulnerabilities in the third-party images of docker-compose.yml that
+# this repository cannot fix itself (SCF-AC-5.3). Every entry needs a reason and expires at the
+# end of Sprint 2; after that the container scan fails again until the image is replaced or the
+# entry is renewed with a new reason. Replacing the images is SCF-US-2 slice 2 (#103).
+# Found with Trivy 0.69.3 on 2026-10-13, unfixed vulnerabilities are not reported (--ignore-unfixed).
+
+# gosu in postgres:18 and mongo:8.0 is built with an old Go standard library (and golang.org/x/net);
+# gosu only drops root privileges at container start and opens no network connection.
+# Upstream must rebuild it.
+CVE-2025-61726 exp:2026-11-23
+CVE-2025-61729 exp:2026-11-23
+CVE-2025-68121 exp:2026-11-23
+CVE-2026-25679 exp:2026-11-23
+CVE-2026-27145 exp:2026-11-23
+CVE-2026-32280 exp:2026-11-23
+CVE-2026-32281 exp:2026-11-23
+CVE-2026-32283 exp:2026-11-23
+CVE-2026-33811 exp:2026-11-23
+CVE-2026-33814 exp:2026-11-23
+CVE-2026-33818 exp:2026-11-23
+CVE-2026-39820 exp:2026-11-23
+CVE-2026-39821 exp:2026-11-23
+CVE-2026-39822 exp:2026-11-23
+CVE-2026-39836 exp:2026-11-23
+CVE-2026-42499 exp:2026-11-23
+CVE-2026-42504 exp:2026-11-23
+CVE-2026-56853 exp:2026-11-23
+CVE-2026-56858 exp:2026-11-23
+CVE-2026-56859 exp:2026-11-23
+CVE-2026-56860 exp:2026-11-23
+CVE-2026-56862 exp:2026-11-23
+CVE-2026-78667 exp:2026-11-23
+CVE-2026-78669 exp:2026-11-23
+CVE-2026-97031 exp:2026-11-23
+
+# js-yaml in the Node.js tools bundled with mongo:8.0 (mongosh); the stack does not run mongosh.
+# Upstream must update it.
+CVE-2026-59869 exp:2026-11-23
+CVE-2026-84375 exp:2026-11-23
+GHSA-5p4m-2wfm-xmqj exp:2026-11-23

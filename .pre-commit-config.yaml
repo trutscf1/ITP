@@ -1,0 +1,49 @@
+# Local checks before every commit (SCF-F-14), from docs/security_next_js.md; the pipeline runs
+# the same scanners with the same configuration files (SCF-F-15).
+# The commit-msg hook checks the message format with commitlint (SCF-F-13, SCF-AC-6.1).
+# Setup once per clone: pip install pre-commit && pre-commit install
+default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [pre-commit]
+repos:
+  # Secrets in the staged changes
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.0
+    hooks:
+      - id: gitleaks
+        name: gitleaks (staged)
+        args: ["protect", "--staged", "--config=.gitleaks.toml"]
+        pass_filenames: false
+
+  # Code scan; the registry rule sets are named here because .semgrep.yml cannot include them
+  - repo: https://github.com/semgrep/semgrep
+    rev: v1.148.0
+    hooks:
+      - id: semgrep
+        name: semgrep
+        # pre-commit passes the file names itself, so .semgrepignore does not apply here.
+        exclude: ^\.claude/
+        args:
+          - "--config=p/javascript"
+          - "--config=p/typescript"
+          - "--config=p/react"
+          - "--config=p/nodejs"
+          - "--config=p/owasp-top-ten"
+          - "--config=.semgrep.yml"
+          - "--error"
+          - "--timeout=120"
+
+  # Production dependencies with high or critical vulnerabilities
+  - repo: local
+    hooks:
+      - id: pnpm-audit
+        name: pnpm audit (prod, high+critical)
+        entry: pnpm audit --prod --audit-level=high
+        language: system
+        pass_filenames: false
+
+      # Commit message format of documentation/WORKFLOW.md, configured in commitlint.config.ts
+      - id: commitlint
+        name: commitlint
+        entry: pnpm exec commitlint --edit
+        language: system
+        stages: [commit-msg]

@@ -1,0 +1,17 @@
+# Secret scan configuration (SCF-F-14, SCF-F-15), from docs/security_next_js.md: the default
+# rules, plus an allowlist for generated code and for the dummy value of the example
+# configuration. Only the value "change-me" is allowed, so a real secret pasted into
+# .env.example is still found.
+title = "gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Generated files and the dummy value of .env.example"
+paths = [
+  '''src/generated/.*''',
+]
+regexes = [
+  '''change-me''',
+]
