@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { createRequire } from "node:module";
+import { dirname, join, resolve } from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 
@@ -37,6 +38,62 @@ describe("DSA-AC-1.1 Central tokens", () => {
       );
     });
   }
+});
+
+interface TailwindCompiler {
+  build(candidates: string[]): string;
+}
+
+/** Compiles the token stylesheet with Tailwind CSS 4 and returns the CSS of `candidates`. */
+async function buildUtilities(candidates: string[]): Promise<string> {
+  const require = createRequire(join(root, "packages/ui/package.json"));
+  const tailwind = require("tailwindcss") as {
+    compile(
+      css: string,
+      options: {
+        base: string;
+        loadStylesheet(
+          id: string,
+          base: string,
+        ): Promise<{ path: string; base: string; content: string }>;
+      },
+    ): Promise<TailwindCompiler>;
+  };
+  const tokens = readFileSync(join(root, "packages/ui/src/tokens.css"), "utf8");
+  const compiler = await tailwind.compile(`@import "tailwindcss";\n${tokens}`, {
+    base: root,
+    loadStylesheet: async (id, base) => {
+      const path =
+        id === "tailwindcss"
+          ? join(
+              dirname(require.resolve("tailwindcss/package.json")),
+              "index.css",
+            )
+          : resolve(base, id);
+      return { path, base: dirname(path), content: readFileSync(path, "utf8") };
+    },
+  });
+  return compiler.build(candidates);
+}
+
+describe("DSA-AC-1.1 Tokens do not break Tailwind utilities", () => {
+  const containers = ["xs", "sm", "md", "lg", "xl", "2xl", "3xl", "7xl"];
+
+  it("DSA-AC-1.1 keeps max-w-* on the container sizes of Tailwind CSS", async () => {
+    const css = await buildUtilities(containers.map((name) => `max-w-${name}`));
+    assert.doesNotMatch(
+      css,
+      /max-width:\s*var\(--spacing-/,
+      "a spacing token shadows a container size",
+    );
+    assert.match(css, /max-width:\s*var\(--container-md\)/);
+  });
+
+  it("DSA-AC-1.1 turns a spacing token into spacing utilities", async () => {
+    const css = await buildUtilities(["p-base", "gap-tight"]);
+    assert.match(css, /padding:\s*var\(--spacing-base\)/);
+    assert.match(css, /gap:\s*var\(--spacing-tight\)/);
+  });
 });
 
 describe("DSA-AC-1.2 Four themes", () => {
