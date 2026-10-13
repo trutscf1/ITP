@@ -169,3 +169,25 @@ Fabian's reviews of !4 and !5 (not approved) are worked through under `/engineer
 ➡️ Pushen und posten
 
 > **Answer:** Pushen und posten (Recommended)
+
+## Round 8 — 2026-10-13 — delivery (implement #68)
+
+Asked under `/engineering-human implement 68` (DSA-US-1, slice 1). The concept `concepts/design-system.md` is still a draft, so these answers close the documentation gaps the slice needs. Stated assumptions: A1 the package is `@stash/ui` (the criterion named `@nimbus/ui`); A2 slice 1 ships the theme switcher as its Radix component; A3 the acceptance tests run with `node --test`, browser end-to-end tests stay with WEB-US-4; A4 without `GITLAB_TOKEN` the work stays local until push and MR are confirmed.
+
+❓ **Q22** - **Themes**: Welche vier Themes soll DSA-AC-1.2 liefern (neben Hell und Dunkel)? Hoher Kontrast gehört zu DSA-US-2 und zählt hier nicht. Options: Hell, Dunkel, Sepia, Nacht / Hell, Dunkel, System, Sepia / Hell, Dunkel, Ozean, Wald
+
+➡️ Hell, Dunkel, Sepia, Nacht
+
+> **Answer:** Hell, Dunkel, Sepia, Nacht (Recommended)
+
+❓ **Q23** - **Speichern**: DSA-AC-1.2 verlangt 'im Profil gespeichert', aber ein Benutzerprofil gibt es erst mit Identity (R3). Wie liefert Slice 1 das? Options: Cookie jetzt, Profil später / localStorage jetzt, Profil später / Auf Identity warten
+
+➡️ Cookie jetzt, Profil später
+
+> **Answer:** Cookie jetzt, Profil später (Recommended)
+
+❓ **Q24** - **Commits**: Du willst viele einzelne Commits. Wie fein? Options: Ein Commit pro Schritt / Ein Commit pro AC
+
+➡️ Ein Commit pro Schritt
+
+> **Answer:** Ein Commit pro Schritt (Recommended)
