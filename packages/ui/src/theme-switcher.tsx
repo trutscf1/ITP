@@ -44,13 +44,13 @@ export function ThemeSwitcher({ initialTheme }: ThemeSwitcherProps) {
       value={theme}
       onValueChange={choose}
       aria-label="Theme"
-      className="inline-flex gap-xs rounded-md border border-border bg-surface p-xs"
+      className="inline-flex gap-tight rounded-md border border-border bg-surface p-tight"
     >
       {themes.map((name) => (
         <ToggleGroup.Item
           key={name}
           value={name}
-          className="rounded-md px-sm py-xs text-sm text-foreground data-[state=on]:bg-accent data-[state=on]:text-accent-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="rounded-md px-snug py-tight text-sm text-foreground data-[state=on]:bg-accent data-[state=on]:text-accent-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           {labels[name]}
         </ToggleGroup.Item>
