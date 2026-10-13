@@ -1,6 +1,7 @@
 packages:
   - apps/*
   - packages/*
+  - tests
 
 # Supply-chain hardening, required by the code scan (Semgrep p/nodejs, SCF-F-15):
 # no dependencies from git URLs or tarballs below the direct ones, no downgrade of a package's
