@@ -59,3 +59,31 @@ describe("DSA-AC-1.2 Four themes", () => {
     });
   }
 });
+
+describe("DSA-AC-1.3 Component base", () => {
+  const pkg = JSON.parse(
+    readFileSync(join(root, "packages/ui/package.json"), "utf8"),
+  ) as Record<string, Record<string, string> | undefined>;
+  const needs = { ...pkg.dependencies, ...pkg.peerDependencies };
+
+  it("DSA-AC-1.3 builds @stash/ui on Radix UI and Tailwind CSS 4", () => {
+    assert.ok(needs["radix-ui"], "radix-ui missing");
+    assert.match(needs.tailwindcss ?? "", /^\^?4/);
+  });
+
+  it("DSA-AC-1.3 builds the theme switcher from a Radix primitive", () => {
+    const source = readFileSync(
+      join(root, "packages/ui/src/theme-switcher.tsx"),
+      "utf8",
+    );
+    assert.match(source, /from "radix-ui"/);
+  });
+
+  it("DSA-AC-1.3 the web unit loads the tokens of @stash/ui", () => {
+    const css = readFileSync(
+      join(root, "apps/web/src/app/globals.css"),
+      "utf8",
+    );
+    assert.match(css, /@import "@stash\/ui\/tokens\.css"/);
+  });
+});
