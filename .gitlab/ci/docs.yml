@@ -10,7 +10,7 @@
 
 docs:
   stage: test
-  image: node:24-alpine
+  image: node:24.14.0-alpine
   variables:
     GIT_DEPTH: 0
   rules:
