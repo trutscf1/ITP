@@ -243,6 +243,32 @@ Assumptions stated with the round, none rejected:
 
 > **Answer:** Stop here
 
+## Round 11 — 2026-10-13 — review gate, revise !6 (trutscf1)
+
+Notes: `schwaigc` reviewed !6 on 2026-10-13 and requested changes in one thread: point 1 (a legal page can be unpublished and then answers "page not found") blocks the approval, points 2–4 are suggestions. Each point was checked against the concept and holds.
+
+Assumptions stated with the round, none rejected (shown in the chat as A29–A33; renumbered here, because A29–A31 are taken):
+
+- **A32**: The skill `receiving-code-review` is not installed in this session; the agent applies its procedure itself (verify each point against the concept, then fix it or answer with the reason).
+- **A33**: `PUB-F-29` (missing translation) and `PUB-E-5` (page not found) agree like this: a help article without a published German version answers "page not found"; a landing section or a changelog entry without one is left out of its page.
+- **A34**: Review point 2: new requirement `PUB-F-34` — the setup guide contains "register the CMS administrator" as a numbered step right after the start command, derived from `PUB-AC-1.7`.
+- **A35**: Review point 3: `PUB-F-13` (source and licence) says that the `cms` unit does not judge the licence, that choosing licence-free images is the editor's duty, and that the seed images are licence-free. `PUB-AC-2.3` stays unchanged.
+- **A36**: Review point 4: `docs/projektantrag.md` is restored to the version on `dev`; the change was whitespace only.
+
+❓ **Q28** - **Unpublished legal page**: An editor can unpublish a legal page today ([PUB-F-3]), and it then answers "page not found" ([PUB-F-29]), against the rule that legal pages are always reachable (Q3). Which rule closes the gap? Options: Cannot be unpublished / Fall back to built-in text / Both
+
+➡️ Cannot be unpublished
+
+> **Answer:** Cannot be unpublished (Recommended)
+
+Shown with the next question: the two fix commits (the concept changes with requirement ID `PUB-F-24`; the restored `docs/projektantrag.md`) and the drafted reply to the review thread, point by point.
+
+❓ **Q29** - **Publish the revision**: Shall I commit the two commits shown above, push them to concept/public-content, and post the reply shown above in the review thread of schwaigc on !6? Options: Commit, push, reply / Commit and push only / Change something first / Commit locally only
+
+➡️ Commit, push, reply
+
+> **Answer:** Commit, push, reply (Recommended)
+
 ## Open questions for the school management
 
 Legal questions the agent does not decide (grill flow, personal data). They are not answered in this log; the owner takes them to the data-protection contact of the school and records the answers here.
