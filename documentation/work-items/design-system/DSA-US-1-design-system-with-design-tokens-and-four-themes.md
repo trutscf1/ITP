@@ -19,11 +19,12 @@ One user story of [Design system & accessibility modes](feature.md) and the acce
 
 | ID | Title | Given | When | Then |
 | --- | --- | --- | --- | --- |
-| DSA-AC-1.1 | Central tokens | The package `@nimbus/ui` | A developer needs a colour, spacing, or type value | The design tokens are defined centrally there |
-| DSA-AC-1.2 | Four themes | A member | They switch between the four themes including light and dark | The theme changes without a reload and the choice is saved in the profile |
+| DSA-AC-1.1 | Central tokens | The package `@stash/ui` | A developer needs a colour, spacing, or type value | The design tokens are defined centrally there |
+| DSA-AC-1.2 | Four themes | A member | They switch between the four themes light, dark, sepia, and night | The theme changes without a reload and the browser remembers the choice for the next visit |
 | DSA-AC-1.3 | Component base | A component of the design system | A developer builds it | It is based on Radix UI and Tailwind CSS 4 |
 | DSA-AC-1.4 | Contrast | Any of the four themes | Text is shown | It meets the WCAG AA contrast of at least 4.5:1 |
 | DSA-AC-1.5 | Storybook | A component of the design system | A developer opens Storybook | The component is documented there |
+| DSA-AC-1.6 | Theme in the profile | A signed-in member | They choose a theme | The choice is saved in their profile and applies on every device they sign in on |
 
 ## Slices
 
@@ -33,7 +34,8 @@ The vertical slices that deliver this story. One slice is delivered by the story
 | --- | --- | --- | --- |
 | 1 — Tokens and themes | DSA-AC-1.1, DSA-AC-1.2, DSA-AC-1.3 | — | #68 |
 | 2 — Contrast and Storybook | DSA-AC-1.4, DSA-AC-1.5 | 1 | #106 |
+| 3 — Theme in the profile | DSA-AC-1.6 | 1, IDN-US-2 (log in) | — |
 
 - **Story issue:** #68
-- **Weight:** 5 (slice 1: 3, slice 2: 2)
-- **Depends on:** SCF-US-1 (Set up the monorepo, #38)
+- **Weight:** 6 (slice 1: 3, slice 2: 2, slice 3: 1)
+- **Depends on:** SCF-US-1 (Set up the monorepo, #38); slice 3 also on IDN-US-2 (Log in and log out with rate limiting)
