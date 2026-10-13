@@ -1,5 +1,14 @@
 import assert from "node:assert/strict";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import {
+  existsSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+} from "node:fs";
+import { createRequire } from "node:module";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -50,5 +59,50 @@ describe("DSA-AC-1.5 Storybook", () => {
     );
     assert.match(preview, /applyTheme\(/);
     assert.match(styles, /@import "\.\.\/src\/tokens\.css"/);
+  });
+
+  it("DSA-AC-1.5 Storybook builds and lists a story for every component", () => {
+    const require = createRequire(join(ui, "package.json"));
+    const packageFile = require.resolve("storybook/package.json");
+    const manifest = JSON.parse(readFileSync(packageFile, "utf8")) as {
+      bin: string | Record<string, string>;
+    };
+    const bin =
+      typeof manifest.bin === "string" ? manifest.bin : manifest.bin.storybook;
+    const output = mkdtempSync(join(tmpdir(), "storybook-"));
+    try {
+      const build = spawnSync(
+        process.execPath,
+        [
+          join(dirname(packageFile), bin as string),
+          "build",
+          "--output-dir",
+          output,
+        ],
+        {
+          cwd: ui,
+          encoding: "utf8",
+          timeout: 120_000,
+          env: { ...process.env, STORYBOOK_DISABLE_TELEMETRY: "1" },
+        },
+      );
+      assert.equal(build.status, 0, build.stdout + build.stderr);
+      const index = JSON.parse(
+        readFileSync(join(output, "index.json"), "utf8"),
+      ) as { entries: Record<string, { type: string; importPath: string }> };
+      const stories = Object.values(index.entries).filter(
+        (entry) => entry.type === "story",
+      );
+      for (const component of components) {
+        assert.ok(
+          stories.some((entry) =>
+            entry.importPath.endsWith(`/${component}.stories.tsx`),
+          ),
+          `Storybook lists no story for ${component}`,
+        );
+      }
+    } finally {
+      rmSync(output, { recursive: true, force: true });
+    }
   });
 });
