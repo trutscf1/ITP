@@ -59,7 +59,7 @@ Type mapping (neutral type → concrete type) and error mapping (`E-x` → concr
 | --- | --- | --- | --- |
 | SCF-C-4 HTTP server framework (`identity`) | _open_ | | |
 | Database access layer (`identity`) | _open_ | | |
-| SCF-C-9 CI service | GitLab CI | – | Q4. `.gitlab-ci.yml`: one pipeline per change (merge request pipeline while an MR is open, otherwise branch pipeline); lint, typecheck, test, build in parallel on `node:24-alpine`; 10-minute job timeout; pnpm store cached by lockfile, Turborepo cache per job and branch (SCF-US-5) |
+| SCF-C-9 CI service | GitLab CI | – | Q4. `.gitlab-ci.yml`: one pipeline per change (merge request pipeline while an MR is open, otherwise branch pipeline); lint, typecheck, test, build in parallel on the `node` image of the version in `.tool-versions`; 10-minute job timeout; pnpm store cached by lockfile, Turborepo cache per job, shared by all branches (SCF-US-5) |
 | SCF-C-10 secret scanner, code scanner, dependency auditor, container image scanner | _open_ | | start from `docs/security_next_js.md` |
 | SCF-C-11 commit message linter | _open_ | | |
 
