@@ -20,24 +20,25 @@ default:
   timeout: 10m
   interruptible: true
 
-# Node.js and pnpm as pinned in .tool-versions and package.json (SCF-AC-1.4).
+# Node.js as pinned in .tool-versions, pnpm as pinned in package.json (SCF-AC-1.4); a test
+# keeps the image tag and .tool-versions equal.
 .pnpm:
-  image: node:24-alpine
+  image: node:24.14.0-alpine
   before_script:
     - corepack enable
     - pnpm config set store-dir .pnpm-store
     - pnpm install --frozen-lockfile
-  # The pnpm store changes only with the lockfile; the Turborepo cache is kept per job and
-  # branch, and a new branch starts from the cache of the default branch.
+  # The pnpm store changes only with the lockfile. Turborepo entries are addressed by the hash
+  # of their inputs, so one cache per job can be shared by all branches; GitLab still keeps
+  # protected branches (dev, main) apart from the others.
   cache:
-    - key:
+    - &pnpm-store
+      key:
         files:
           - pnpm-lock.yaml
       paths:
         - .pnpm-store
-    - key: turbo-$CI_JOB_NAME-$CI_COMMIT_REF_SLUG
-      fallback_keys:
-        - turbo-$CI_JOB_NAME-$CI_DEFAULT_BRANCH
+    - key: turbo-$CI_JOB_NAME
       paths:
         - .turbo/cache
 
@@ -53,9 +54,12 @@ typecheck:
   script:
     - pnpm run typecheck
 
+# The acceptance tests run with node --test, not through Turborepo: no Turborepo cache.
 test:
   extends: .pnpm
   stage: test
+  cache:
+    - *pnpm-store
   script:
     - pnpm test
 
