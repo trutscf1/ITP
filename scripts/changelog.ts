@@ -24,15 +24,20 @@ export function draftChangelog(commits: Commit[]): string {
   for (const { subject, body } of commits) {
     const match = subject.match(header);
     if (!match) continue;
-    const [, type, scope, bang, description] = match;
-    const breaking = body.match(/^BREAKING[ -]CHANGE: (.+)$/m)?.[1];
-    if (bang || breaking) {
-      const note = breaking ? ` — BREAKING: ${breaking}` : " — BREAKING";
+    const [, type, scope, bang, description = ""] = match;
+    const footers = [...body.matchAll(/^BREAKING[ -]CHANGE: (.+)$/gm)].map(
+      (footer) => footer[1],
+    );
+    if (bang || footers.length > 0) {
+      const note =
+        footers.length > 0
+          ? ` — BREAKING: ${footers.join("; ")}`
+          : " — BREAKING";
       sections.Changed.push(entry(scope, `${description}${note}`));
     } else if (type === "feat") {
-      sections.Added.push(entry(scope, description as string));
+      sections.Added.push(entry(scope, description));
     } else if (type === "fix") {
-      sections.Fixed.push(entry(scope, description as string));
+      sections.Fixed.push(entry(scope, description));
     }
   }
   const lines: string[] = ["## [Unreleased]", ""];
@@ -43,18 +48,41 @@ export function draftChangelog(commits: Commit[]): string {
   return lines.join("\n").replace(/\n\n$/, "\n");
 }
 
+// The newest release tag by SemVer order. Tags sit on main, so they are not reachable from dev;
+// git describe would not find them there.
+export function latestReleaseTag(tags: string[]): string | undefined {
+  const versions = tags
+    .map((tag) => tag.match(semverTag)?.[1])
+    .filter((version): version is string => version !== undefined)
+    .map((version) => version.split(".").map(Number));
+  versions.sort(
+    (a, b) =>
+      (b[0] ?? 0) - (a[0] ?? 0) ||
+      (b[1] ?? 0) - (a[1] ?? 0) ||
+      (b[2] ?? 0) - (a[2] ?? 0),
+  );
+  const newest = versions[0];
+  return newest ? `v${newest.join(".")}` : undefined;
+}
+
 export function releaseNotes(changelog: string, tag: string): string {
   const version = tag.match(semverTag)?.[1];
   if (!version) throw new Error(`${tag} is not a SemVer tag such as v1.0.0`);
   const lines = changelog.split("\n");
   const start = lines.findIndex((line) => line.startsWith(`## [${version}]`));
   if (start === -1)
-    throw new Error(`CHANGELOG.md has no section for ${version}`);
+    throw new Error(`the changelog has no section for ${version}`);
   const end = lines.findIndex(
     (line, index) => index > start && /^## \[|^\[[^\]]+\]: /.test(line),
   );
-  const section = lines.slice(start + 1, end === -1 ? undefined : end);
-  return `${section.join("\n").trim()}\n`;
+  const section = lines
+    .slice(start + 1, end === -1 ? undefined : end)
+    .join("\n")
+    .trim();
+  if (section === "") {
+    throw new Error(`the changelog section for ${version} is empty`);
+  }
+  return `${section}\n`;
 }
 
 function git(args: string[]): string {
@@ -65,12 +93,9 @@ function git(args: string[]): string {
 }
 
 function commitsSinceLastTag(): Commit[] {
-  let range = "HEAD";
-  try {
-    range = `${git(["describe", "--tags", "--abbrev=0", "--match", "v*"]).trim()}..HEAD`;
-  } catch {
-    // No release tag yet: every commit counts.
-  }
+  const tag = latestReleaseTag(git(["tag", "--list", "v*"]).split("\n"));
+  // Before the first release every commit counts.
+  const range = tag ? `${tag}..HEAD` : "HEAD";
   return git(["log", "--no-merges", "--format=%s%x1f%b%x1e", range])
     .split("\x1e")
     .map((record) => record.trim())

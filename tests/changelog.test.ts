@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { draftChangelog, releaseNotes } from "../scripts/changelog.ts";
+import {
+  draftChangelog,
+  latestReleaseTag,
+  releaseNotes,
+} from "../scripts/changelog.ts";
 
 // Example 5 of documentation/concepts/scaffolding.md §9 and WORKFLOW.md "Changelog".
 describe("SCF-AC-6.2 Changelog from commits", () => {
@@ -92,5 +96,41 @@ describe("SCF-AC-6.3 Release tags", () => {
 
   it("SCF-AC-6.3 refuses a release without a changelog section", () => {
     assert.throws(() => releaseNotes(changelog, "v0.3.0"), /no section/);
+  });
+});
+
+describe("SCF-AC-6.2 Last release tag", () => {
+  it("SCF-AC-6.2 takes the highest SemVer tag, also when it is not reachable from dev", () => {
+    assert.equal(
+      latestReleaseTag(["v0.9.0", "v0.10.0", "v-test", "v1.0", "release-2"]),
+      "v0.10.0",
+    );
+  });
+
+  it("SCF-AC-6.2 finds no release tag before the first release", () => {
+    assert.equal(latestReleaseTag(["v-test"]), undefined);
+  });
+
+  it("SCF-AC-6.2 lists every breaking change footer of a commit", () => {
+    const draft = draftChangelog([
+      {
+        subject: "feat(storage)!: move uploads [STO-F-2]",
+        body: "BREAKING CHANGE: old path removed\nBREAKING CHANGE: new size limit",
+      },
+    ]);
+    assert.match(
+      draft,
+      /^- storage: move uploads \[STO-F-2\] — BREAKING: old path removed; new size limit$/m,
+    );
+  });
+});
+
+describe("SCF-AC-6.3 Release notes content", () => {
+  it("SCF-AC-6.3 refuses a changelog section without entries", () => {
+    assert.throws(
+      () =>
+        releaseNotes("## [1.0.0] - 2027-04-05\n\n## [0.9.0]\n- x\n", "v1.0.0"),
+      /section for 1.0.0 is empty/,
+    );
   });
 });
