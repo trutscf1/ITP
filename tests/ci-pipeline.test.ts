@@ -27,8 +27,14 @@ type CiConfig = {
   stages?: string[];
 };
 type CiVariables = Record<string, string | undefined>;
-type PreCommitHook = { id: string; args?: string[] };
+type PreCommitHook = {
+  id: string;
+  args?: string[];
+  entry?: string;
+  stages?: string[];
+};
 type PreCommitConfig = {
+  default_install_hook_types?: string[];
   repos: { repo: string; rev?: string; hooks: PreCommitHook[] }[];
 };
 
@@ -183,7 +189,9 @@ describe("SCF-AC-1.4 Pinned versions in CI", () => {
     const toolVersions = readFileSync(join(root, ".tool-versions"), "utf8");
     const pinned = toolVersions.match(/^nodejs\s+(\S+)$/m)?.[1];
     assert.ok(pinned, "nodejs entry missing");
-    assert.equal(imageOf(".pnpm"), `node:${pinned}-alpine`);
+    for (const name of [".pnpm", "release-notes"]) {
+      assert.equal(imageOf(name), `node:${pinned}-alpine`, name);
+    }
   });
 
   it("SCF-AC-1.4 checks the Node.js major version inside the Playwright image", () => {
@@ -301,11 +309,11 @@ describe("SCF-AC-6.1 Commit check in the hook and the pipeline", () => {
   it("SCF-AC-6.1 checks the message with commitlint in the commit-msg hook", () => {
     const config = parse(
       readFileSync(join(root, ".pre-commit-config.yaml"), "utf8"),
-    ) as PreCommitConfig & { default_install_hook_types?: string[] };
+    ) as PreCommitConfig;
     assert.ok(config.default_install_hook_types?.includes("commit-msg"));
     const hook = readPreCommitRepo("local").hooks.find(
       (entry) => entry.id === "commitlint",
-    ) as (PreCommitHook & { entry?: string; stages?: string[] }) | undefined;
+    );
     assert.ok(hook, "commitlint hook missing");
     assert.match(hook.entry ?? "", /commitlint --edit/);
     assert.deepEqual(hook.stages, ["commit-msg"]);
