@@ -1,2 +1,70 @@
+# CI pipeline (SCF-US-5, documentation/concepts/scaffolding.md SCF-F-15).
+# One pipeline per change: a merge request pipeline while an MR is open, otherwise a branch
+# pipeline for every push (feature branches, dev, main) — SCF-AC-5.1.
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
 include:
   - local: .gitlab/ci/docs.yml
+
+stages:
+  - test
+
+# A run must finish in under 10 minutes (SCF-AC-5.4); a job that hangs fails instead of
+# blocking the merge request. A newer push cancels the older, now pointless run.
+default:
+  timeout: 10m
+  interruptible: true
+
+# Node.js as pinned in .tool-versions, pnpm as pinned in package.json (SCF-AC-1.4); a test
+# keeps the image tag and .tool-versions equal.
+.pnpm:
+  image: node:24.14.0-alpine
+  before_script:
+    - corepack enable
+    - pnpm config set store-dir .pnpm-store
+    - pnpm install --frozen-lockfile
+  # The pnpm store changes only with the lockfile. Turborepo entries are addressed by the hash
+  # of their inputs, so one cache per job can be shared by all branches; GitLab still keeps
+  # protected branches (dev, main) apart from the others.
+  cache:
+    - &pnpm-store
+      key:
+        files:
+          - pnpm-lock.yaml
+      paths:
+        - .pnpm-store
+    - key: turbo-$CI_JOB_NAME
+      paths:
+        - .turbo/cache
+
+lint:
+  extends: .pnpm
+  stage: test
+  script:
+    - pnpm run lint
+
+typecheck:
+  extends: .pnpm
+  stage: test
+  script:
+    - pnpm run typecheck
+
+# The acceptance tests run with node --test, not through Turborepo: no Turborepo cache.
+test:
+  extends: .pnpm
+  stage: test
+  cache:
+    - *pnpm-store
+  script:
+    - pnpm test
+
+build:
+  extends: .pnpm
+  stage: test
+  script:
+    - pnpm run build
