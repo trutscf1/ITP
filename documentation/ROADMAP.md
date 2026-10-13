@@ -25,7 +25,7 @@ Rough effort estimate (to be refined per concept): R1 61 h (issue breakdown in `
 | 0.1.0 | Scaffolding & shared contracts | G-1.S1 (self-hosting) | in progress | – | high | trutscf1 | R1 |
 | – | Observability baseline | G-1 (on their own server) | concept | R1 | medium | trutscf1 | R2 |
 | – | Identity: accounts, external login, MFA | G-1 (data under their control) | concept | R1 | high | tschudea07 | R3 |
-| – | Design system & accessibility modes | G-1.S2 (accessibility) | concept | R1 | medium | schwaigc | R4 |
+| – | Design system & accessibility modes | G-1.S2 (accessibility) | in progress | R1 | medium | schwaigc | R4 |
 | – | Storage core: folders, resumable upload, deduplication | G-1 (store and organize files) | concept | R3 | medium | schauby1 | R5 |
 | – | Web client: dashboard, file browser, preview | G-1 (organize and use files) | concept | R4, R5 | medium | schwaigc | R6 |
 | – | Teams, roles, inherited permissions, quotas, audit log | G-1 (share; data under their control) | concept | R3, R5 | medium | tschudea07 | R7 |
