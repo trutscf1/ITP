@@ -169,3 +169,25 @@ Fabian's reviews of !4 and !5 (not approved) are worked through under `/engineer
 ➡️ Pushen und posten
 
 > **Answer:** Pushen und posten (Recommended)
+
+## Round 8 — 2026-10-13 — delivery (`tschudea07`, issues of the CI track)
+
+`tschudea07` asked the agent to work through their open issues. Assumptions: A1 the developer handle is `tschudea07` (from the git user; `CLAUDE.local.md` is missing); A2 one branch and one MR per issue from `dev`, merge policy from `.claude/settings.json`.
+
+❓ **Q22** - **Umfang**: Welche Issues soll ich jetzt abarbeiten? Options: CI-Track #42→#104→#44 / CI-Track + geteilte / Nur #42
+
+➡️ CI-Track #42→#104→#44
+
+> **Answer:** CI-Track #42→#104→#44 (Recommended)
+
+❓ **Q23** - **Test-Seams für die CI-Issues (#42, #104, #44)**: Wo sollen die Akzeptanztests ansetzen? Options: Config + echter Lauf / Nur echter Lauf
+
+➡️ Config + echter Lauf
+
+> **Answer:** Config + echter Lauf (Recommended)
+
+❓ **Q24** - **YAML-Parser**: Soll ich das Paket `yaml` (ISC-Lizenz, ohne Abhängigkeiten) als devDependency im Root hinzufügen? Options: `yaml` hinzufügen / Ohne Paket, Regex
+
+➡️ `yaml` hinzufügen
+
+> **Answer:** `yaml` hinzufügen (Recommended)
