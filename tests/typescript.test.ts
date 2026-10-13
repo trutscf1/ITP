@@ -1,11 +1,17 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+
+/** Biome's start script, run with Node.js: a `.bin` shim does not start without a shell on Windows. */
+const biome = createRequire(join(root, "package.json")).resolve(
+  "@biomejs/biome/bin/biome",
+);
 
 /** Every folder of the workspace that has a `package.json`: `apps/*` and `packages/*`. */
 const workspaces = ["apps", "packages"].flatMap((group) =>
@@ -56,11 +62,10 @@ describe("SCF-AC-1.2 Strict TypeScript", () => {
       const probe = join(root, path, "any-probe.ts");
       writeFileSync(probe, "export const value: any = 1;\n");
       try {
-        const result = spawnSync(
-          join(root, "node_modules/.bin/biome"),
-          ["check", "."],
-          { cwd: join(root, path), encoding: "utf8" },
-        );
+        const result = spawnSync(process.execPath, [biome, "check", "."], {
+          cwd: join(root, path),
+          encoding: "utf8",
+        });
         assert.notEqual(result.status, 0, "biome check passed on any");
         assert.match(result.stdout + result.stderr, /noExplicitAny/);
       } finally {
