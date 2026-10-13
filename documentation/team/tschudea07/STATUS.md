@@ -13,7 +13,7 @@ Session positions of one developer (P-TEAM-3). Precise enough that a fresh sessi
 
 | Feature | Concept document | Phase | Branch | MR | Next step |
 | --- | --- | --- | --- | --- | --- |
-| Scaffolding & shared contracts (R1), track Identity & CI | [concepts/scaffolding.track-identity-ci.md](../../concepts/scaffolding.track-identity-ci.md) | 5, architecture | — | — | Write the "Plan" section of the track file before the first MR |
+| Scaffolding & shared contracts (R1), track Identity & CI | [concepts/scaffolding.track-identity-ci.md](../../concepts/scaffolding.track-identity-ci.md) | 7, delivery | — | — | SCF-US-5 slice 1 (#42, CI pipeline runs and shows its status) merged into `dev`; next: slice 2 (#104, check steps and failing conditions), then SCF-US-6 (#44) |
 | Identity: accounts, external login, MFA (R3) | [concepts/identity.md](../../concepts/identity.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human identity` |
 | Teams, roles, inherited permissions, quotas, audit log (R7) | [concepts/teams-permissions.md](../../concepts/teams-permissions.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human teams-permissions` |
 | Share links with password and expiry (R8) | [concepts/share-links.md](../../concepts/share-links.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human share-links` |

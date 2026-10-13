@@ -174,49 +174,72 @@ Fabian's reviews of !4 and !5 (not approved) are worked through under `/engineer
 
 Asked under `/engineering-human implement 68` (DSA-US-1, slice 1). The concept `concepts/design-system.md` is still a draft, so these answers close the documentation gaps the slice needs. Stated assumptions: A1 the package is `@stash/ui` (the criterion named `@nimbus/ui`); A2 slice 1 ships the theme switcher as its Radix component; A3 the acceptance tests run with `node --test`, browser end-to-end tests stay with WEB-US-4; A4 without `GITLAB_TOKEN` the work stays local until push and MR are confirmed.
 
-❓ **Q22** - **Themes**: Welche vier Themes soll DSA-AC-1.2 liefern (neben Hell und Dunkel)? Hoher Kontrast gehört zu DSA-US-2 und zählt hier nicht. Options: Hell, Dunkel, Sepia, Nacht / Hell, Dunkel, System, Sepia / Hell, Dunkel, Ozean, Wald
+## Round 8 — 2026-10-13 — delivery (`tschudea07`, issues of the CI track)
+
+`tschudea07` asked the agent to work through their open issues. Assumptions: A1 the developer handle is `tschudea07` (from the git user; `CLAUDE.local.md` is missing); A2 one branch and one MR per issue from `dev`, merge policy from `.claude/settings.json`.
+
+❓ **Q22** - **Umfang**: Welche Issues soll ich jetzt abarbeiten? Options: CI-Track #42→#104→#44 / CI-Track + geteilte / Nur #42
+
+➡️ CI-Track #42→#104→#44
+
+> **Answer:** CI-Track #42→#104→#44 (Recommended)
+
+❓ **Q23** - **Test-Seams für die CI-Issues (#42, #104, #44)**: Wo sollen die Akzeptanztests ansetzen? Options: Config + echter Lauf / Nur echter Lauf
+
+➡️ Config + echter Lauf
+
+> **Answer:** Config + echter Lauf (Recommended)
+
+❓ **Q24** - **YAML-Parser**: Soll ich das Paket `yaml` (ISC-Lizenz, ohne Abhängigkeiten) als devDependency im Root hinzufügen? Options: `yaml` hinzufügen / Ohne Paket, Regex
+
+➡️ `yaml` hinzufügen
+
+> **Answer:** `yaml` hinzufügen (Recommended)
+
+❓ **Q25** - **Themes**: Welche vier Themes soll DSA-AC-1.2 liefern (neben Hell und Dunkel)? Hoher Kontrast gehört zu DSA-US-2 und zählt hier nicht. Options: Hell, Dunkel, Sepia, Nacht / Hell, Dunkel, System, Sepia / Hell, Dunkel, Ozean, Wald
 
 ➡️ Hell, Dunkel, Sepia, Nacht
 
 > **Answer:** Hell, Dunkel, Sepia, Nacht (Recommended)
 
-❓ **Q23** - **Speichern**: DSA-AC-1.2 verlangt 'im Profil gespeichert', aber ein Benutzerprofil gibt es erst mit Identity (R3). Wie liefert Slice 1 das? Options: Cookie jetzt, Profil später / localStorage jetzt, Profil später / Auf Identity warten
+❓ **Q26** - **Speichern**: DSA-AC-1.2 verlangt 'im Profil gespeichert', aber ein Benutzerprofil gibt es erst mit Identity (R3). Wie liefert Slice 1 das? Options: Cookie jetzt, Profil später / localStorage jetzt, Profil später / Auf Identity warten
 
 ➡️ Cookie jetzt, Profil später
 
 > **Answer:** Cookie jetzt, Profil später (Recommended)
 
-❓ **Q24** - **Commits**: Du willst viele einzelne Commits. Wie fein? Options: Ein Commit pro Schritt / Ein Commit pro AC
+❓ **Q27** - **Commits**: Du willst viele einzelne Commits. Wie fein? Options: Ein Commit pro Schritt / Ein Commit pro AC
 
 ➡️ Ein Commit pro Schritt
 
 > **Answer:** Ein Commit pro Schritt (Recommended)
 
-❓ **Q25** - **Seams**: An welchen Schnittstellen teste ich #68 (node --test, Tests tragen die AC-ID)? (1) `tokens.css` in `@stash/ui`: jedes der vier Themes definiert denselben Token-Satz wie die Basis (AC-1.1/1.2); (2) `theme.ts` in `@stash/ui`: Theme-Namen, Cookie lesen/schreiben, `applyTheme` setzt `data-theme` am Wurzelelement (AC-1.2); (3) Struktur: `@stash/ui` hängt von Radix und Tailwind 4 ab, der ThemeSwitcher nutzt Radix, web lädt die Tokens (AC-1.3). Browser-Klicktest bleibt bei WEB-US-4. Options: Alle drei Seams / Nur (1) und (2) / Zusätzlich Render-Test
+❓ **Q28** - **Seams**: An welchen Schnittstellen teste ich #68 (node --test, Tests tragen die AC-ID)? (1) `tokens.css` in `@stash/ui`: jedes der vier Themes definiert denselben Token-Satz wie die Basis (AC-1.1/1.2); (2) `theme.ts` in `@stash/ui`: Theme-Namen, Cookie lesen/schreiben, `applyTheme` setzt `data-theme` am Wurzelelement (AC-1.2); (3) Struktur: `@stash/ui` hängt von Radix und Tailwind 4 ab, der ThemeSwitcher nutzt Radix, web lädt die Tokens (AC-1.3). Browser-Klicktest bleibt bei WEB-US-4. Options: Alle drei Seams / Nur (1) und (2) / Zusätzlich Render-Test
 
 ➡️ Alle drei Seams
 
 > **Answer:** Alle drei Seams (Recommended)
 
-❓ **Q26** - **Stufe R4**: Sobald R4 auf 'in progress' steht, verlangt doc-check in §17 des Konzepts einen Test für jedes der 16 Akzeptanzkriterien von DSA-US-1 bis -3 (sonst Fehler, die CI wird rot). Gebaut und getestet sind nur AC-1.1 bis 1.3; der Rest des Konzepts ist ungegrillt. Wie lösen wir das? Options: §17 jetzt schreiben / Stufe 'concept' lassen
+❓ **Q29** - **Stufe R4**: Sobald R4 auf 'in progress' steht, verlangt doc-check in §17 des Konzepts einen Test für jedes der 16 Akzeptanzkriterien von DSA-US-1 bis -3 (sonst Fehler, die CI wird rot). Gebaut und getestet sind nur AC-1.1 bis 1.3; der Rest des Konzepts ist ungegrillt. Wie lösen wir das? Options: §17 jetzt schreiben / Stufe 'concept' lassen
 
 ➡️ §17 jetzt schreiben
 
 > **Answer:** §17 jetzt schreiben (Recommended)
 
-❓ **Q27** - **Push & MR**: Branch feature/68-design-tokens-and-themes (22 Commits, alles grün) pushen und das MR nach dev öffnen? Ohne GITLAB_TOKEN nur per git-Push-Option; Label und Beschreibung folgen per API. Options: Pushen + MR per Push-Option / Erst Token setzen / Nur pushen / Noch nichts
+❓ **Q30** - **Push & MR**: Branch feature/68-design-tokens-and-themes (22 Commits, alles grün) pushen und das MR nach dev öffnen? Ohne GITLAB_TOKEN nur per git-Push-Option; Label und Beschreibung folgen per API. Options: Pushen + MR per Push-Option / Erst Token setzen / Nur pushen / Noch nichts
 
 ➡️ Pushen + MR per Push-Option
 
 > **Answer:** Pushen + MR per Push-Option (Recommended)
 
-❓ **Q28** - **Issues**: Darf ich ein neues Issue für DSA-US-1 Slice 3 anlegen, die Beschreibung von #68 an die Story-Datei angleichen und bei #102 die Zeile „Lint für Root-Dateien“ korrigieren? Options: Ja, alle drei / Nein
+❓ **Q31** - **Issues**: Darf ich ein neues Issue für DSA-US-1 Slice 3 anlegen, die Beschreibung von #68 an die Story-Datei angleichen und bei #102 die Zeile „Lint für Root-Dateien“ korrigieren? Options: Ja, alle drei / Nein
 
 ➡️ Ja, alle drei
 
 > **Answer:** Ja, alle drei (Recommended)
+||||||| 725d327c6
 
-❓ **Q29** - **Nächstes Issue**: An welchem deiner Sprint-1-Issues (status::ready) soll ich weiterarbeiten? Options: #106 DSA-US-1 Slice 2 / #102 SCF-US-1 Slice 2 / #103 SCF-US-2 Slice 2 / #39 oder #40 (Shared)
+❓ **Q32** - **Nächstes Issue**: An welchem deiner Sprint-1-Issues (status::ready) soll ich weiterarbeiten? Options: #106 DSA-US-1 Slice 2 / #102 SCF-US-1 Slice 2 / #103 SCF-US-2 Slice 2 / #39 oder #40 (Shared)
 
 ➡️ #106 DSA-US-1 Slice 2
 
