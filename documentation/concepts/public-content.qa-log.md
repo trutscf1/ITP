@@ -223,6 +223,26 @@ Result: the token was pasted into the answer instead of being set in the environ
 
 Follow-up in the same session: on the owner's instruction the token was saved as the user environment variable `GITLAB_TOKEN`, and the merge request was opened as !6 with the text of Q24 and `schwaigc` as reviewer.
 
+## Round 10 — 2026-10-13 — review gate, red pipeline (trutscf1)
+
+Notes: !6 is open without an approval or a comment of `schwaigc`. Its pipeline failed in the status check, because the position row in `team/trutscf1/STATUS.md` still named the work branch.
+
+Assumptions stated with the round, none rejected:
+
+- **A31**: The entry point is the Phase 4 gate of *Public content* (R11), because its position row is the only one with an open merge request.
+
+❓ **Q26** - **Push the status fix**: The pipeline of !6 is red because STATUS.md still named the work branch. I changed the position row and the status index to the state after the merge (Phase 5, architecture) and added a log entry; doc-check and markdown lint are clean locally. Commit this on concept/public-content and push it to !6? Options: Commit and push / Commit only / Leave uncommitted
+
+➡️ Commit and push
+
+> **Answer:** Commit and push (Recommended)
+
+❓ **Q27** - **Waiting for the review**: !6 has been open since 2026-10-06 with no approval and no comment from schwaigc, so it cannot be merged yet (P-MR-2). What should happen meanwhile? Options: Remind the reviewer / Stop here / Grill another draft
+
+➡️ Stop here
+
+> **Answer:** Stop here
+
 ## Open questions for the school management
 
 Legal questions the agent does not decide (grill flow, personal data). They are not answered in this log; the owner takes them to the data-protection contact of the school and records the answers here.
