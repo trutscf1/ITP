@@ -60,7 +60,7 @@ describe("SCF-AC-1.1 Workspace layout", () => {
 });
 
 describe("SCF-AC-1.3 Root tasks", () => {
-  for (const task of ["lint", "typecheck", "build"] as const) {
+  for (const task of ["dev", "lint", "typecheck", "test", "build"] as const) {
     it(`SCF-AC-1.3 runs ${task} through Turborepo`, () => {
       const scripts = readJson("package.json").scripts as Record<
         string,
@@ -69,6 +69,41 @@ describe("SCF-AC-1.3 Root tasks", () => {
       assert.equal(scripts[task], `turbo run ${task}`);
     });
   }
+});
+
+describe("SCF-AC-1.3 Tasks of every unit and package (SCF-F-12)", () => {
+  const folders = [
+    ...units.map((name) => `apps/${name}`),
+    ...packages.map((name) => `packages/${name}`),
+    "tests",
+  ];
+
+  for (const folder of folders) {
+    for (const task of ["dev", "build", "lint", "typecheck", "test"] as const) {
+      it(`SCF-AC-1.3 ${folder} provides the task ${task}`, () => {
+        const scripts = readJson(`${folder}/package.json`).scripts as Record<
+          string,
+          string
+        >;
+        assert.ok(scripts[task], `${folder} has no ${task} script`);
+      });
+    }
+  }
+
+  it("SCF-AC-1.3 the acceptance tests are a workspace package", () => {
+    const workspace = readFileSync(join(root, "pnpm-workspace.yaml"), "utf8");
+    assert.match(workspace, /^\s*- tests$/m);
+  });
+
+  it("SCF-AC-1.3 runs dev as a persistent Turborepo task", () => {
+    const tasks = readJson("turbo.json").tasks as Record<
+      string,
+      { persistent?: boolean; cache?: boolean }
+    >;
+    assert.equal(tasks.dev?.persistent, true);
+    assert.equal(tasks.dev?.cache, false);
+    assert.ok(tasks.test, "turbo.json has no test task");
+  });
 });
 
 describe("SCF-AC-1.4 Pinned versions", () => {
