@@ -1,0 +1,13 @@
+# Secret scan configuration (SCF-F-14, SCF-F-15), from docs/security_next_js.md: the default
+# rules, plus an allowlist for the example configuration with dummy values and generated code.
+title = "gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Example configuration and generated files"
+paths = [
+  '''\.env\.example$''',
+  '''src/generated/.*''',
+]
