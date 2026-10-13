@@ -14,3 +14,4 @@ dist/
 .next/
 *.tsbuildinfo
 .pnpm-store/
+.trivy-cache/
