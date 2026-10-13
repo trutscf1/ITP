@@ -69,7 +69,7 @@ These terms are also in the glossary `documentation/CONTEXT.md`.
 | SCF-F-12 | Every unit and package MUST provide the tasks `dev`, `build`, `lint`, `typecheck`, `test`. One root command per task MUST run it across all units and packages. |
 | SCF-F-13 | Commit messages MUST be checked against Conventional Commits 1.0.0 and the format in `documentation/WORKFLOW.md`, locally before the commit is created and again in CI (E-4). |
 | SCF-F-14 | Before every commit, local hooks MUST run the secret scan, code scan, and dependency audit prescribed in `docs/security_next_js.md` (E-6). |
-| SCF-F-15 | The CI pipeline MUST run on every MR into `dev` and every push to `dev` and `main`, with the jobs: lint, typecheck, test, build, commit-message check, secret scan, code scan, dependency audit, container image scan. An MR MUST NOT be mergeable unless all jobs pass (E-5). |
+| SCF-F-15 | The CI pipeline MUST run on every MR into `dev` and every push to `dev` and `main`, with the jobs: lint, typecheck, test, build, accessibility check, commit-message check, secret scan, code scan, dependency audit, container image scan. An MR MUST NOT be mergeable unless all jobs pass (E-5). |
 | SCF-F-16 | `CHANGELOG.md` MUST follow Keep a Changelog 1.1.0. One command MUST generate a draft section for the next release from the commits since the last release tag (mapping in §9, example 5); the release MR author edits the draft before merging. |
 | SCF-F-17 | Every unit MUST ship an example configuration file listing each of its configuration variables with a dummy value. |
 
@@ -90,7 +90,7 @@ These terms are also in the glossary `documentation/CONTEXT.md`.
 | SCF-NF-3 | A health endpoint MUST respond within the unit's health timeout (configuration `HEALTH_TIMEOUT_MS`, default 2000). Each dependency check MUST finish within `HEALTH_CHECK_TIMEOUT_MS` (default 1000) or count as `down` (E-2). |
 | SCF-NF-4 | Health reports and error responses MUST NOT contain hosts, ports, credentials, stack traces, or dependency versions. |
 | SCF-NF-5 | All code MUST be TypeScript with explicit types; `lint` MUST fail on unspecified types. |
-| SCF-NF-6 | The dependency audit and the container image scan MUST fail on any vulnerability of severity high or critical. |
+| SCF-NF-6 | The dependency audit of the production dependencies (`docs/security_next_js.md`) and the container image scan MUST fail on any vulnerability of severity high or critical that has a fix; an accepted exception needs a written reason and an expiry date (`../qa-log.md`, Q26, Q31). |
 | SCF-NF-7 | Internal APIs are not versioned: a contract change and every consumer's adaptation MUST be in the same MR. |
 | SCF-NF-8 | Configuration values MUST NOT be hard-coded (P-DES-6); secrets MUST NOT be committed. |
 
@@ -221,7 +221,7 @@ Draft:
 
 ## 11. Out of Scope
 
-Observability (R2), any feature logic, databases other than the relational one, deployment and TLS (R14), accessibility checks in CI (R4), who may see the status page (R3).
+Observability (R2), any feature logic, databases other than the relational one, deployment and TLS (R14), the pages the accessibility check covers (R4), who may see the status page (R3).
 
 ## 12. Resolved Questions & ADRs
 
@@ -237,7 +237,7 @@ Observability (R2), any feature logic, databases other than the relational one, 
 | Q8 | CC / Keep a Changelog scope | This project only, bound in `WORKFLOW.md` | User decision |
 | Q9 | Browser routing | Directly through the proxy by path prefix (§7) | Large uploads bypass `web`; one origin for the session cookie |
 | Q10 | Local development | Container stack (SCF-F-2) and native units (SCF-F-3) | School demands one-command start; native gives fast reload |
-| Q11 | CI scope in R1 | SCF-F-15; accessibility checks with R4 | School demands containers without vulnerabilities |
+| Q11 | CI scope in R1 | SCF-F-15; accessibility checks with R4 — superseded on 2026-10-13 (`../qa-log.md`, Q27): the axe job is part of the R1 pipeline, R4 adds its pages | School demands containers without vulnerabilities |
 | Q12 | How does the status page get `worker`'s health, given `worker` is not proxied (Q9)? | The status page's server side queries every unit's internal `/health`; the proxy routing test (#21) checks the proxied health paths | Keeps Q9; proves proxy routing in a test instead of on the page |
 | Q13 | How is the work split? | Complete separation per person: one track each with exclusive paths, own plan file, own issues; tracks meet only at interfaces fixed in this document; every issue merges feature → `dev`, releases `dev` → `main` (§15) | User decision: everyone plans and implements separately |
 
@@ -351,7 +351,7 @@ Load in Sprint 1 against 16 h capacity: Fabian 17 h, Andreas 15 h, Yannick 12 h,
 | SCF-F-10 | Contracts (#8) |
 | SCF-F-12 | Platform (#6); each owner provides the tasks in their units |
 | SCF-F-13, F-14, F-15, NF-6 | Identity & CI (#9, #11, #17) |
-| SCF-F-16 | Platform (#14, Sprint 2) |
+| SCF-F-16 | Identity & CI (#44, SCF-US-6; the first cut's #14 was deleted) |
 | SCF-NF-1 | Platform (#22) |
 | SCF-NF-2 | all later features |
 | SCF-NF-3, NF-4 | Contracts core (#7); each unit's owner |

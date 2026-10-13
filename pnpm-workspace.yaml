@@ -1,3 +1,11 @@
 packages:
   - apps/*
   - packages/*
+
+# Supply-chain hardening, required by the code scan (Semgrep p/nodejs, SCF-F-15):
+# no dependencies from git URLs or tarballs below the direct ones, no downgrade of a package's
+# trust level, and new versions only after seven days. An urgent security update younger than
+# that goes into minimumReleaseAgeExclude with a comment.
+blockExoticSubdeps: true
+trustPolicy: no-downgrade
+minimumReleaseAge: 10080
