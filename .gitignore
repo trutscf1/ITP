@@ -13,3 +13,5 @@ node_modules/
 dist/
 .next/
 *.tsbuildinfo
+.pnpm-store/
+.trivy-cache/

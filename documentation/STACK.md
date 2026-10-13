@@ -43,7 +43,7 @@ Every capability of `concepts/scaffolding.md` §7 and where its technology stand
 | SCF-C-17 | Object storage | _open_ — SeaweedFS per the project proposal | `schauby1` |
 | SCF-C-18 | Virus scanner | _open_ — ClamAV per `SCF-AC-2.1` | `schauby1` |
 | SCF-C-19 | Database access layer | section 3 (row "Database access layer") | `tschudea07` |
-| SCF-C-20 | Accessibility checker | _open_ — axe per `SCF-AC-5.2` | `schwaigc` |
+| SCF-C-20 | Accessibility checker | section 3 (row "Accessibility check in CI") | `tschudea07` |
 | SCF-C-21 | Data model diagram tool | _open_ — Vertabelo per `SCF-AC-4.1` | `tschudea07` |
 
 ## 1. Platform — `trutscf1`
@@ -87,9 +87,10 @@ Type mapping (neutral type → concrete type) and error mapping (`E-x` → concr
 | --- | --- | --- | --- |
 | SCF-C-4 HTTP server framework (`identity`) | _open_ | | |
 | Database access layer (`identity`) | _open_ | | |
-| SCF-C-9 CI service | GitLab CI | – | Q4 |
-| SCF-C-10 secret scanner, code scanner, dependency auditor, container image scanner | _open_ | | start from `docs/security_next_js.md` |
-| SCF-C-11 commit message linter | _open_ | | |
+| SCF-C-9 CI service | GitLab CI | – | Q4. `.gitlab-ci.yml`: one pipeline per change (merge request pipeline while an MR is open, otherwise branch pipeline); lint, typecheck, test, build in parallel on the `node` image of the version in `.tool-versions`; 10-minute job timeout; pnpm store cached by lockfile, Turborepo cache per job, shared by all branches (SCF-US-5) |
+| SCF-C-10 secret scanner, code scanner, dependency auditor, container image scanner | Gitleaks, Semgrep, `pnpm audit`, Trivy | Gitleaks 8.30.0, Semgrep 1.148.0, Trivy 0.69.3 | From `docs/security_next_js.md`: `.gitleaks.toml`, `.semgrep.yml` (registry rule sets passed with `--config`, `.claude/` ignored), `.pre-commit-config.yaml` locally and the same files in CI. `pnpm audit --prod --audit-level=high`. Trivy scans every image of `docker-compose.yml` with `--ignore-unfixed`; accepted upstream findings in `.trivyignore`, each with reason and expiry (SCF-US-5) |
+| Accessibility check in CI | axe with Playwright | Playwright 1.63.0 (pinned; equals the CI image tag), `@axe-core/playwright` | `tests/accessibility/axe-check.ts` against the built web client; fails on a critical violation. Pages are added there with R4 (`../qa-log.md`, Q27) |
+| SCF-C-11 commit message linter | commitlint | `@commitlint/cli` 21 | `commitlint.config.ts`: Conventional Commits, scope list and requirement ID of `WORKFLOW.md`; commit-msg hook through `.pre-commit-config.yaml`, CI job `commit-messages`. Changelog draft and release notes: `scripts/changelog.ts` (`pnpm run changelog:draft`); CI jobs `release-notes` and `release` (GitLab CLI image 1.74.0) publish the GitLab Release on a SemVer tag (SCF-US-6) |
 
 ## 4. Web — `schwaigc`
 

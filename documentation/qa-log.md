@@ -169,3 +169,83 @@ Fabian's reviews of !4 and !5 (not approved) are worked through under `/engineer
 ➡️ Pushen und posten
 
 > **Answer:** Pushen und posten (Recommended)
+
+## Round 8 — 2026-10-13 — delivery (`tschudea07`, issues of the CI track)
+
+`tschudea07` asked the agent to work through their open issues. Assumptions: A1 the developer handle is `tschudea07` (from the git user; `CLAUDE.local.md` is missing); A2 one branch and one MR per issue from `dev`, merge policy from `.claude/settings.json`.
+
+❓ **Q22** - **Umfang**: Welche Issues soll ich jetzt abarbeiten? Options: CI-Track #42→#104→#44 / CI-Track + geteilte / Nur #42
+
+➡️ CI-Track #42→#104→#44
+
+> **Answer:** CI-Track #42→#104→#44 (Recommended)
+
+❓ **Q23** - **Test-Seams für die CI-Issues (#42, #104, #44)**: Wo sollen die Akzeptanztests ansetzen? Options: Config + echter Lauf / Nur echter Lauf
+
+➡️ Config + echter Lauf
+
+> **Answer:** Config + echter Lauf (Recommended)
+
+❓ **Q24** - **YAML-Parser**: Soll ich das Paket `yaml` (ISC-Lizenz, ohne Abhängigkeiten) als devDependency im Root hinzufügen? Options: `yaml` hinzufügen / Ohne Paket, Regex
+
+➡️ `yaml` hinzufügen
+
+> **Answer:** `yaml` hinzufügen (Recommended)
+
+❓ **Q25** - **MR für #42**: Soll ich den MR „SCF-US-5 CI pipeline: checks run on every push and merge request“ (feature/42-ci-pipeline → dev) öffnen und #42 auf status::review setzen? Options: MR öffnen / Noch nicht
+
+➡️ MR öffnen
+
+> **Answer:** MR öffnen (Recommended)
+
+❓ **Q26** - **Trivy-Scan**: Alle Images aus docker-compose.yml haben high/critical CVEs (v.a. gosu in postgres und mongo, upstream). Wie soll der Container-Scan-Job sich verhalten? Options: Strikt, mit .trivyignore / Strikt ohne Ausnahmen / allow_failure bis #103
+
+➡️ Strikt, mit .trivyignore
+
+> **Answer:** Strikt, mit .trivyignore (Recommended)
+
+❓ **Q27** - **axe in CI**: SCF-AC-5.2 verlangt axe in der Pipeline, das Scaffolding-Konzept hat in Q11 entschieden: „accessibility checks with R4“. Was gilt? Options: Job jetzt, Seiten mit R4 / Q11 gilt, AC anpassen
+
+➡️ Job jetzt, Seiten mit R4
+
+> **Answer:** Job jetzt, Seiten mit R4 (Recommended)
+
+❓ **Q28** - **next-Update**: Der audit-Job wäre sofort rot wegen next 16.3.7 (High, SSRF, behoben ab 16.3.8). apps/web gehört zum Web-Track (schwaigc). Wie vorgehen? Options: Im #104-MR bumpen / Issue für schwaigc
+
+➡️ Im #104-MR bumpen
+
+> **Answer:** Im #104-MR bumpen (Recommended)
+
+❓ **Q29** - **!5 mit .next-Build**: Soll ich auf MR !5 einen Kommentar posten, dass der Branch Build-Output (`apps/web/.next/`) enthält, den Gitleaks meldet (DoD 12)? Options: Kommentar posten / Nur dir melden
+
+➡️ Kommentar posten
+
+> **Answer:** Kommentar posten (Recommended)
+
+❓ **Q30** - **pnpm-Härtung**: Semgrep (p/nodejs) verlangt `blockExoticSubdeps`, `trustPolicy: no-downgrade` und `minimumReleaseAge` in pnpm-workspace.yaml. Wie umgehen? Options: Alle drei, 7 Tage / Alle drei, 1 Tag / Regeln abschalten
+
+➡️ Alle drei, 7 Tage
+
+> **Answer:** Alle drei, 7 Tage (Recommended)
+
+❓ **Q31** - **Unbehebbare CVEs**: Der Trivy-Job nutzt `--ignore-unfixed`, `pnpm audit --prod` prüft laut docs/ nur Produktions-Abhängigkeiten; SCF-NF-6 sagt „any vulnerability“. Was gilt? Options: So lassen, NF-6 präzisieren / Auch ungefixte melden
+
+➡️ So lassen, NF-6 präzisieren
+
+> **Answer:** So lassen, NF-6 präzisieren (Recommended)
+
+❓ **Q32** - **MR für #104**: Soll ich den MR „SCF-US-5 CI pipeline: security, audit, image, and accessibility checks“ (nach !8 mergen) öffnen und #104 auf status::review setzen? Options: MR öffnen / Noch nicht
+
+➡️ MR öffnen
+
+> **Answer:** MR öffnen (Recommended)
+
+❓ **Q33** - **MR für #44**: Soll ich den MR „SCF-US-6 Commit check, changelog draft, and release on SemVer tags“ (nach !8 und !11 mergen) öffnen, #44 auf status::review setzen und den Log-Eintrag für diese Session mitschicken? Options: MR öffnen / Noch nicht
+
+➡️ MR öffnen
+
+> **Answer:** MR öffnen (Recommended)
+
+## Round 9 — 2026-10-13 — delivery (`tschudea07`, revise !11)
+
+Review of !11 by `schwaigc`, point 1: `SCF-AC-5.3` and `SCF-AC-2.5` were stricter than `SCF-NF-6` after Q31. On `tschudea07`'s instruction to resolve the review, both criteria now carry the wording of `SCF-NF-6` (fixable findings; accepted exceptions with reason and expiry), in the story files and in the issues #42, #104, #39, #103. The work items belong to `trutscf1`: the approval as PM is requested on !11 and still open.

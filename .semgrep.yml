@@ -1,0 +1,70 @@
+# Project rules from docs/security_next_js.md. The registry rule sets of that document
+# (p/javascript, p/typescript, p/react, p/nodejs, p/owasp-top-ten) are passed with --config by
+# .gitlab-ci.yml and .pre-commit-config.yaml, because Semgrep ignores a `configs` key here.
+
+rules:
+  # ========== NEXT.JS ==========
+
+  - id: react-dangerouslysetinnerhtml
+    message: 'Vermeide dangerouslySetInnerHTML oder sanitisiere den Input.'
+    severity: ERROR
+    languages: [javascript, typescript]
+    patterns:
+      - pattern: $X.dangerouslySetInnerHTML
+
+  - id: nextjs-ssrf-fetch
+    message: 'Unvalidierte URL in fetch/axios kann SSRF verursachen.'
+    severity: WARNING
+    languages: [javascript, typescript]
+    patterns:
+      - pattern-either:
+          - pattern: fetch($URL, ...)
+          - pattern: axios.get($URL, ...)
+          - pattern: axios.post($URL, ...)
+      - pattern-not: |
+          fetch("...", ...)
+      - pattern-not: |
+          axios.get("...", ...)
+
+  - id: nextjs-use-next-image
+    message: "Nutze <Image> aus 'next/image' statt <img>."
+    severity: INFO
+    languages: [javascript, typescript]
+    patterns:
+      - pattern: '<img src={...} ... />'
+
+  # ========== PRISMA ==========
+
+  - id: prisma-raw-sql-concat
+    message: 'Prisma.$queryRaw mit Template-String kann SQLi riskieren.'
+    severity: ERROR
+    languages: [javascript, typescript]
+    pattern: prisma.$queryRaw(`... ${...} ...`)
+
+  - id: prisma-raw-unsafe
+    message: 'queryRawUnsafe ist äußerst riskant.'
+    severity: ERROR
+    languages: [javascript, typescript]
+    pattern: prisma.$queryRawUnsafe(...)
+
+  # ========== NODE COMMAND EXECUTION ==========
+
+  - id: node-child-process-exec
+    message: 'exec()/spawn() können Command Injection ermöglichen.'
+    severity: ERROR
+    languages: [javascript, typescript]
+    pattern-either:
+      - pattern: require('child_process').exec(...)
+      - pattern: require('child_process').execSync(...)
+      - pattern: require('child_process').spawn(...)
+      - pattern: require('child_process').spawnSync(...)
+
+  # ========== UNSICHERE CRYPTO ==========
+
+  - id: insecure-hash-md5-sha1
+    message: 'MD5/SHA1 sind unsicher. Nutze SHA-256 oder besser.'
+    severity: ERROR
+    languages: [javascript, typescript]
+    pattern-either:
+      - pattern: crypto.createHash('md5')
+      - pattern: crypto.createHash('sha1')

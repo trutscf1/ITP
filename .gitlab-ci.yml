@@ -1,2 +1,194 @@
+# CI pipeline (SCF-US-5, documentation/concepts/scaffolding.md SCF-F-15).
+# One pipeline per change: a merge request pipeline while an MR is open, otherwise a branch
+# pipeline for every push (feature branches, dev, main) — SCF-AC-5.1.
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+    # A release tag runs the checks once more and publishes the GitLab Release (SCF-AC-6.3).
+    - if: $CI_COMMIT_TAG
+
 include:
   - local: .gitlab/ci/docs.yml
+
+stages:
+  - test
+  - release
+
+# A run must finish in under 10 minutes (SCF-AC-5.4); a job that hangs fails instead of
+# blocking the merge request. A newer push cancels the older, now pointless run.
+default:
+  timeout: 10m
+  interruptible: true
+
+# Node.js as pinned in .tool-versions, pnpm as pinned in package.json (SCF-AC-1.4); a test
+# keeps the image tag and .tool-versions equal.
+.pnpm:
+  image: node:24.14.0-alpine
+  before_script:
+    - corepack enable
+    - pnpm config set store-dir .pnpm-store
+    - pnpm install --frozen-lockfile
+  # The pnpm store changes only with the lockfile. Turborepo entries are addressed by the hash
+  # of their inputs, so one cache per job can be shared by all branches; GitLab still keeps
+  # protected branches (dev, main) apart from the others.
+  cache:
+    - &pnpm-store
+      key:
+        files:
+          - pnpm-lock.yaml
+      paths:
+        - .pnpm-store
+    - key: turbo-$CI_JOB_NAME
+      paths:
+        - .turbo/cache
+
+lint:
+  extends: .pnpm
+  stage: test
+  script:
+    - pnpm run lint
+    # The units' lint tasks cover only their own folders; this covers the root files as well.
+    - pnpm exec biome ci .
+
+typecheck:
+  extends: .pnpm
+  stage: test
+  script:
+    - pnpm run typecheck
+
+# The acceptance tests run with node --test, not through Turborepo: no Turborepo cache.
+test:
+  extends: .pnpm
+  stage: test
+  cache:
+    - *pnpm-store
+  script:
+    - pnpm test
+    # Unit tests of the units and packages that define a test task (SCF-F-12).
+    - pnpm exec turbo run test
+
+build:
+  extends: .pnpm
+  stage: test
+  script:
+    - pnpm run build
+
+# Accessibility check with axe on the built web client; fails on a critical violation
+# (SCF-AC-5.2, SCF-AC-5.3). The image tag equals the Playwright version in package.json.
+accessibility:
+  extends: .pnpm
+  image: mcr.microsoft.com/playwright:v1.63.0-noble
+  stage: test
+  variables:
+    PORT: "3000"
+    BASE_URL: http://localhost:$PORT
+  script:
+    # The Playwright image brings its own Node.js; it must have the major version of
+    # .tool-versions (SCF-AC-1.4).
+    - pinned=$(awk '/^nodejs/ {split($2, v, "."); print v[1]}' .tool-versions)
+    - test "$(node -p 'process.versions.node.split(".")[0]')" = "$pinned"
+    - pnpm exec turbo run build --filter=@stash/web
+    # The check waits for the server itself and fails if it does not come up.
+    - pnpm --filter @stash/web exec next start --port "$PORT" &
+    - pnpm run test:accessibility
+
+# Production dependencies with a known high or critical vulnerability fail the pipeline
+# (SCF-AC-5.2, SCF-AC-5.3, docs/security_next_js.md).
+dependency-audit:
+  extends: .pnpm
+  stage: test
+  cache:
+    - *pnpm-store
+  script:
+    - pnpm audit --prod --audit-level=high
+
+# Every image of docker-compose.yml, scanned for known high and critical vulnerabilities that
+# have a fix; accepted exceptions with reason and expiry live in .trivyignore (SCF-AC-5.2,
+# SCF-AC-5.3).
+container-scan:
+  stage: test
+  image:
+    name: aquasec/trivy:0.69.3
+    entrypoint: [""]
+  variables:
+    TRIVY_CACHE_DIR: .trivy-cache
+  cache:
+    - key: trivy
+      paths:
+        - .trivy-cache
+  script:
+    - images=$(awk '/^[[:space:]]*image:/ {print $2}' docker-compose.yml)
+    - |
+      for image in $images; do
+        trivy image --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --ignorefile .trivyignore --exit-code 1 "$image" || exit 1
+      done
+
+# Secrets in the history of the checked-out commit (SCF-F-15, docs/security_next_js.md).
+secret-scan:
+  stage: test
+  image:
+    name: zricethezav/gitleaks:v8.30.0
+    entrypoint: [""]
+  variables:
+    GIT_DEPTH: 0
+  script:
+    - git config --global --add safe.directory "$CI_PROJECT_DIR"
+    - gitleaks git --no-banner --redact --config .gitleaks.toml --log-opts="HEAD" .
+
+# Code scan with the rule sets of docs/security_next_js.md; any finding fails (SCF-F-15).
+code-scan:
+  stage: test
+  image: semgrep/semgrep:1.148.0
+  variables:
+    SEMGREP_SEND_METRICS: "off"
+  script:
+    # The image expects the code in /src unless SEMGREP_IN_DOCKER is unset; GitLab checks it out
+    # elsewhere.
+    - unset SEMGREP_IN_DOCKER
+    - semgrep scan --config p/javascript --config p/typescript --config p/react --config p/nodejs --config p/owasp-top-ten --config .semgrep.yml --error
+
+# The commit messages of the change, checked again (SCF-F-13): in a merge request every commit
+# since the merge base, on a branch every commit not yet on the default branch.
+commit-messages:
+  extends: .pnpm
+  stage: test
+  cache:
+    - *pnpm-store
+  variables:
+    GIT_DEPTH: 0
+  script:
+    - apk add --no-cache git
+    - git fetch --quiet origin "$CI_DEFAULT_BRANCH"
+    - base="${CI_MERGE_REQUEST_DIFF_BASE_SHA:-$(git merge-base HEAD "origin/$CI_DEFAULT_BRANCH")}"
+    - pnpm exec commitlint --from "$base" --to HEAD --verbose
+
+# Release notes for a pushed tag: the tag must be SemVer (v1.0.0) and CHANGELOG.md must have
+# its section, otherwise the job fails and no release is published (SCF-AC-6.3).
+release-notes:
+  stage: release
+  image: node:24.14.0-alpine
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - node scripts/changelog.ts notes "$CI_COMMIT_TAG" > release-notes.md
+  artifacts:
+    paths:
+      - release-notes.md
+
+# The GitLab Release for the tag, with the notes of its changelog section (SCF-AC-6.3).
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/cli:v1.74.0
+  rules:
+    - if: $CI_COMMIT_TAG
+  needs:
+    - release-notes
+  script:
+    - echo "Publishing the release $CI_COMMIT_TAG"
+  release:
+    tag_name: $CI_COMMIT_TAG
+    name: $CI_COMMIT_TAG
+    description: ./release-notes.md

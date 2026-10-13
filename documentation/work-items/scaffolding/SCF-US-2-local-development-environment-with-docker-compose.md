@@ -23,7 +23,7 @@ One user story of [Scaffolding & shared contracts](feature.md) and the acceptanc
 | SCF-AC-2.2 | Configuration by environment | The repository | A developer configures the stack | Every setting comes from `.env`, `.env.example` documents every variable, and the repository holds no secret |
 | SCF-AC-2.3 | Start without internet | A machine without internet access | The stack starts | The application starts completely, and the external services (OAuth, captcha, e-mail) are switched off by `.env` or replaced locally (for example Mailpit) |
 | SCF-AC-2.4 | Health checks | The running stack | A container starts | Every container has a health check and each app waits for the services it depends on |
-| SCF-AC-2.5 | Clean images | The images the stack uses | A Trivy scan runs on them | No image has a known vulnerability of severity high or critical |
+| SCF-AC-2.5 | Clean images | The images the stack uses | A Trivy scan runs on them | No image has a known vulnerability of severity high or critical that has a fix, except an accepted exception with a written reason and an expiry date |
 | SCF-AC-2.6 | Invalid configuration | A unit started with `PORT=abc` | It starts | It exits with a non-zero code and prints the name of the variable and the reason, never its value, and accepts no request |
 | SCF-AC-2.7 | Native start | The reverse proxy and the data services running in the local stack | A developer runs the second start command | All units start outside containers and reload when their code changes |
 

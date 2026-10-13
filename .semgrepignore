@@ -1,0 +1,6 @@
+# Paths the code scan skips (SCF-F-15). A .semgrepignore replaces Semgrep's defaults, so the
+# git-ignored paths are included explicitly.
+:include .gitignore
+
+# Vendored engineering-human skill: templates for other projects, not code of this project.
+.claude/

@@ -151,7 +151,7 @@ The user stories and their acceptance criteria are the work items in [work-items
 | SCF-NF-3 | Health timeouts | A health endpoint MUST respond within the unit's health timeout (configuration `HEALTH_TIMEOUT_MS`, default 2000). Each dependency check MUST finish within `HEALTH_CHECK_TIMEOUT_MS` (default 1000) or count as `down` ([SCF-E-2], dependency timeout). | SCF-AC-8.3 (Failed dependency) |
 | SCF-NF-4 | No internals in responses | Health reports and error responses MUST NOT contain hosts, ports, credentials, stack traces, database statements, or dependency versions. | SCF-AC-3.4 (Uniform error format), SCF-AC-8.2 (Health report) |
 | SCF-NF-5 | Explicit types | All code MUST be TypeScript in strict mode with explicit types; `lint` MUST fail on unspecified types. | SCF-AC-1.2 (Strict TypeScript) |
-| SCF-NF-6 | No high or critical vulnerability | The dependency audit and the container image scan MUST fail on any vulnerability of severity high or critical. | SCF-AC-2.5 (Clean images), SCF-AC-5.3 (Failing conditions) |
+| SCF-NF-6 | No high or critical vulnerability | The dependency audit of the production dependencies (`docs/security_next_js.md`) and the container image scan MUST fail on any vulnerability of severity high or critical that has a fix; an accepted exception needs a written reason and an expiry date (`../qa-log.md`, Q26, Q31). | SCF-AC-2.5 (Clean images), SCF-AC-5.3 (Failing conditions) |
 | SCF-NF-7 | Unversioned internal APIs | Internal APIs are not versioned: a contract change and every consumer's adaptation MUST be in the same merge request, and a change that breaks a consumer MUST fail the typecheck. | SCF-AC-3.5 (Breaking change fails) |
 | SCF-NF-8 | No hard-coded configuration | Configuration values MUST NOT be hard-coded (P-DES-6); every setting of the local stack comes from the environment file, and secrets MUST NOT be committed. | SCF-AC-2.2 (Configuration by environment) |
 | SCF-NF-9 | Pinned versions | The runtime version MUST be pinned in the repository in a version file and in the package manifest. The minimum versions of the runtime and the frameworks are in `STACK.md`. | SCF-AC-1.4 (Pinned versions) |
@@ -319,7 +319,7 @@ A failure inside the unit is answered with HTTP status 500 and `{ "code": "inter
 
 ## 12. Out of Scope
 
-Observability (R2), any feature logic — including the use of the data services beyond starting them —, deployment and TLS (R14), who may see the status page (R3), and the content of the relational data model beyond the `users` table (the diagram of [SCF-F-22] is its source).
+Observability (R2), any feature logic — including the use of the data services beyond starting them —, deployment and TLS (R14), the pages the accessibility check covers (R4), who may see the status page (R3), and the content of the relational data model beyond the `users` table (the diagram of [SCF-F-22] is its source).
 
 ## 13. Resolved Questions & ADRs
 
@@ -337,7 +337,7 @@ Verbatim rounds: [scaffolding.qa-log.md](scaffolding.qa-log.md). ADR: `documenta
 | Q8 | Scope of Conventional Commits and Keep a Changelog | This project only, bound in `WORKFLOW.md` | Owner's decision |
 | Q9 | Browser routing | Directly through the proxy by path prefix (§8) | Large uploads bypass `web`; one origin for the session cookie |
 | Q10 | Local development | Container stack ([SCF-F-2]) and native units ([SCF-F-3]) | The school demands a one-command start; native gives fast reload |
-| Q11 | CI scope in R1 | [SCF-F-15]; changed by A13: the accessibility check is a pipeline job from the start | [SCF-AC-5.2] (pipeline steps) names it |
+| Q11 | CI scope in R1 | [SCF-F-15]; superseded on 2026-10-13 (`../qa-log.md`, Q27; A13): the accessibility check is a job of the R1 pipeline, R4 adds its pages | [SCF-AC-5.2] (pipeline steps) names it |
 | Q12 | Health of `worker` on the status page | The status page's server side queries every unit's internal `/health`; a test checks the proxied health paths ([SCF-T-36]) | Keeps Q9; proves proxy routing in a test instead of on the page |
 | Q13 | Work split | Complete separation per person: one track each with exclusive paths, own plan file, own issues; tracks meet only at interfaces fixed in this document (§16) | Owner's decision: everyone plans and implements separately |
 | Q14 | Requirements without a story | New story [SCF-US-8] (units reachable and visible) with five acceptance criteria; [SCF-AC-2.6] (invalid configuration) and [SCF-AC-2.7] (native start) added to [SCF-US-2] | Status page, health reports, proxy routing, configuration validation, and native start had requirements but no story |
@@ -366,7 +366,7 @@ Changes decided in [public-content.md](public-content.md) (its Q17 and Q18) and 
 | Artifact | Interaction | Interference | Resolved by |
 | --- | --- | --- | --- |
 | `docs/security_next_js.md` | Its hook and scanner configuration is the starting point of [SCF-F-14]. | None. | §11 |
-| `documentation/WORKFLOW.md` | The commit format and the CI deviation from the proposal are bound there. | Its "CI/CD" section still names only merge requests and pushes to `dev` and `main`. | [SCF-F-15]; the sentence is corrected in the merge request of the pipeline (!8) |
+| `documentation/WORKFLOW.md` | The commit format, the pipeline triggers, and the CI deviation from the proposal are bound there. | None. | — |
 | Scaffold on `dev` (`docker-compose.yml`, `apps/`) | The local stack already holds a relational and a document database; four units are empty packages. | The stack has no health checks, no reverse proxy, and no unit container. | [SCF-F-2], [SCF-F-20]; slices of [SCF-US-2] and [SCF-US-8] |
 | Public content (R11) | Its concept relies on the status page and on the health report of `cms`. | A fresh `cms` is `degraded`, and the status page did not show why. | [SCF-NF-1], [SCF-F-8], [SCF-U-1] |
 
@@ -405,7 +405,7 @@ The slices and their issues stand in the story files (P-DOC-6); this table only 
 | SCF-US-3 Shared contracts with Zod and OpenAPI | Contracts, storage & worker |
 | SCF-US-4 Data model and Prisma schema | Identity & CI |
 | SCF-US-5 CI pipeline with quality and security checks | Identity & CI |
-| SCF-US-6 Conventional Commits and generated changelog | Identity & CI (hooks); Platform & cms (changelog draft, release) |
+| SCF-US-6 Conventional Commits and generated changelog | Identity & CI (hooks, changelog draft, release job; #44); Platform & cms merges the release |
 | SCF-US-7 Project documentation and Definition of Done | shared by all four |
 | SCF-US-8 Units reachable and visible | each owner for the health endpoint of their unit; Platform & cms (proxy routes); Web (status page) |
 
@@ -503,7 +503,7 @@ The seams at which the acceptance tests of §17 run (P-DES-2):
 | SCF-US-3 | SCF-F-9, F-10, F-21; SCF-NF-4, NF-7; SCF-C-2, C-4 | Contracts, storage & worker | SCF-T-13 to T-17 |
 | SCF-US-4 | SCF-F-22 to F-26; SCF-E-7; SCF-C-19, C-21 | Identity & CI | SCF-T-18 to T-22 |
 | SCF-US-5 | SCF-F-15; SCF-NF-6, NF-10; SCF-E-5; SCF-C-9, C-10, C-13, C-20 | Identity & CI | SCF-T-23 to T-27 |
-| SCF-US-6 | SCF-F-13, F-16, F-27; SCF-E-4; SCF-C-11, C-12 | Identity & CI; Platform & cms | SCF-T-28 to T-30 |
+| SCF-US-6 | SCF-F-13, F-16, F-27; SCF-E-4; SCF-C-11, C-12 | Identity & CI | SCF-T-28 to T-30 |
 | SCF-US-7 | SCF-F-22, F-28 | shared | SCF-T-31 to T-35 |
 | SCF-US-8 | SCF-F-4 to F-8; SCF-U-1 to U-3; SCF-NF-3, NF-4; SCF-E-2, E-3; SCF-C-3, C-6 | every owner; Platform & cms; Web | SCF-T-36 to T-40 |
 
@@ -528,7 +528,7 @@ One test per acceptance criterion; test names in code carry the `AC` ID. [SCF-T-
 | SCF-T-7 | Settings come from the environment | SCF-AC-2.2, SCF-F-14, SCF-F-17, SCF-NF-8, SCF-E-6 | the stack definition and the example configuration | every variable the stack definition reads is collected | each one is listed in the example configuration with a dummy value; the stack definition holds no credential; a staged file with a secret is rejected by the secret scan, which prints file, line, and rule |
 | SCF-T-8 | Stack starts without internet | SCF-AC-2.3, SCF-NF-1, SCF-NF-2 | a machine with the images present and the network disconnected, the example configuration unchanged | the local stack starts | no unit is `down`, and every service on the internet (external login, bot protection, e-mail delivery) is disabled or replaced by a local service |
 | SCF-T-9 | Containers have health checks | SCF-AC-2.4, SCF-F-20 | the resolved stack definition | its services are read | every service defines a health check, and every unit's service waits for each service it depends on to be healthy |
-| SCF-T-10 | Image scan passes | SCF-AC-2.5, SCF-NF-6 | the images the stack definition names | the container image scan runs on them | it reports no vulnerability of severity high or critical; an image with such a vulnerability makes it exit with a non-zero code |
+| SCF-T-10 | Image scan passes | SCF-AC-2.5, SCF-NF-6 | the images the stack definition names | the container image scan runs on them | it reports no vulnerability of severity high or critical that has a fix, apart from accepted exceptions with a written reason and an expiry date; an image with such a vulnerability makes it exit with a non-zero code |
 | SCF-T-11 | Invalid configuration stops a unit | SCF-AC-2.6, SCF-F-11, SCF-E-1 | a unit started with `PORT=abc` and without `HEALTH_TIMEOUT_MS` | it starts | it exits with a non-zero code and prints the output of §10, example 3, without the value `abc`; it accepts no request |
 | SCF-T-12 | Native start reloads | SCF-AC-2.7, SCF-F-3 | the reverse proxy and the data services running in containers | the second start command runs and a source file of a unit is changed | all units run outside containers, and the changed unit restarts without a new command |
 | SCF-T-13 | One file per contract | SCF-AC-3.1, SCF-F-9 | the contracts package | its files are listed | every HTTP request and response shape has a file of its own, and no unit folder defines a shape with the same name |
