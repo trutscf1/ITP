@@ -3,7 +3,6 @@ import { describe, it } from "node:test";
 import * as theme from "../packages/ui/src/theme.ts";
 
 describe("DSA-AC-1.2 Switching and remembering the theme", () => {
-
   it("DSA-AC-1.2 offers exactly the four themes, light first", () => {
     assert.deepEqual(theme.themes, ["light", "dark", "sepia", "night"]);
   });
