@@ -91,4 +91,10 @@ describe("SCF-AC-1.4 Pinned versions", () => {
     assert.ok(atLeast(dependencies.next as string, "16.3.0"));
     assert.ok(atLeast(dependencies.react as string, "19.2.0"));
   });
+
+  it("SCF-AC-1.4 types the web unit against Node.js 24", () => {
+    const devDependencies = readJson("apps/web/package.json")
+      .devDependencies as Record<string, string>;
+    assert.match(devDependencies["@types/node"] as string, /^\^?24/);
+  });
 });

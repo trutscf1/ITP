@@ -21,8 +21,9 @@
   },
   "devDependencies": {
     "@prisma/cli-engine": "0.6.2",
+    "@stash/config": "workspace:*",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "prisma": "8.0.0-rc.19",
