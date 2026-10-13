@@ -203,3 +203,9 @@ Asked under `/engineering-human implement 68` (DSA-US-1, slice 1). The concept `
 ➡️ §17 jetzt schreiben
 
 > **Answer:** §17 jetzt schreiben (Recommended)
+
+❓ **Q27** - **Push & MR**: Branch feature/68-design-tokens-and-themes (22 Commits, alles grün) pushen und das MR nach dev öffnen? Ohne GITLAB_TOKEN nur per git-Push-Option; Label und Beschreibung folgen per API. Options: Pushen + MR per Push-Option / Erst Token setzen / Nur pushen / Noch nichts
+
+➡️ Pushen + MR per Push-Option
+
+> **Answer:** Pushen + MR per Push-Option (Recommended)
