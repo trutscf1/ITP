@@ -14,9 +14,37 @@ The system is planned as one repository written in TypeScript, with five separat
 
 ## Sections per track
 
-The single place where technology and version constraints live (`MANIFEST.md`, "The Stack Document"). **Split into one section per track** (`concepts/scaffolding.md` §15, Q13): only the section's owner edits it. Minimum versions required by the school: `docs/anforderungen_software_projekte.md` ("Projektanforderungen für projekte"); technology agreed in the proposal: `docs/projektantrag.md`.
+The single place where technology and version constraints live (`MANIFEST.md`, "The Stack Document"). **Split into one section per track** (`concepts/scaffolding.md` §16, Q13): only the section's owner edits it. Minimum versions required by the school: `docs/anforderungen_software_projekte.md` ("Projektanforderungen für projekte"); technology agreed in the proposal: `docs/projektantrag.md`.
 
 Every row traces to the capability IDs (`SCF-C-x`, later other prefixes) that demand it.
+
+## Capability index
+
+Every capability of `concepts/scaffolding.md` §7 and where its technology stands. The index only points to the track sections; it holds no technology of its own, except the capabilities added on 2026-10-13 that no section maps yet. Their owner moves the row into the own section when the technology is chosen.
+
+| ID | Capability | Technology | Owner |
+| --- | --- | --- | --- |
+| SCF-C-1 | Workspace and task runner | section 1 | `trutscf1` |
+| SCF-C-2 | Schemas | section 2 | `schauby1` |
+| SCF-C-3 | Web application framework | section 4 | `schwaigc` |
+| SCF-C-4 | HTTP server framework | sections 2 and 3 | `schauby1`, `tschudea07` |
+| SCF-C-5 | Content management system | section 1 | `trutscf1` |
+| SCF-C-6 | Reverse proxy | section 1 | `trutscf1` |
+| SCF-C-7 | Container runtime | section 1 | `trutscf1` |
+| SCF-C-8 | Relational database | section 1 | `trutscf1` |
+| SCF-C-9 | CI service | section 3 | `tschudea07` |
+| SCF-C-10 | Scanners | section 3 | `tschudea07` |
+| SCF-C-11 | Commit message linter | section 3 | `tschudea07` |
+| SCF-C-12 | Changelog draft generator | section 1 | `trutscf1` |
+| SCF-C-13 | Test runners | sections 1 and 4 | `trutscf1`, `schwaigc` |
+| SCF-C-14 | Key-value store | _open_ — Redis per the project proposal | `schauby1` |
+| SCF-C-15 | Document database | _open_ — MongoDB per the project proposal | `schauby1` |
+| SCF-C-16 | Sync database | _open_ — CouchDB per the project proposal | `trutscf1` |
+| SCF-C-17 | Object storage | _open_ — SeaweedFS per the project proposal | `schauby1` |
+| SCF-C-18 | Virus scanner | _open_ — ClamAV per `SCF-AC-2.1` | `schauby1` |
+| SCF-C-19 | Database access layer | section 3 (row "Database access layer") | `tschudea07` |
+| SCF-C-20 | Accessibility checker | _open_ — axe per `SCF-AC-5.2` | `schwaigc` |
+| SCF-C-21 | Data model diagram tool | _open_ — Vertabelo per `SCF-AC-4.1` | `tschudea07` |
 
 ## 1. Platform — `trutscf1`
 

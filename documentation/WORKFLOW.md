@@ -18,7 +18,7 @@ How work moves through this repo — branches, labels, merge requests, the Defin
 
 ## Team
 
-Four developers (`team/TEAM.md`); each owns the areas assigned in `docs/projektantrag.md` ("Projektgruppe") and the roadmap features in the Owner column of [ROADMAP.md](ROADMAP.md). Work is split into **tracks**, one per person: each track owns exclusive paths, its own plan file, and its own issues; tracks meet only at interfaces fixed in the feature's concept document. A change in another track's paths is requested as an issue for that track's owner. Template: `documentation/concepts/scaffolding.md` §15.
+Four developers (`team/TEAM.md`); each owns the areas assigned in `docs/projektantrag.md` ("Projektgruppe") and the roadmap features in the Owner column of [ROADMAP.md](ROADMAP.md). Work is split into **tracks**, one per person: each track owns exclusive paths, its own plan file, and its own issues; tracks meet only at interfaces fixed in the feature's concept document. A change in another track's paths is requested as an issue for that track's owner. Template: `documentation/concepts/scaffolding.md` §16.
 
 ## Branches (P-GIT-1…3)
 
@@ -49,11 +49,11 @@ Refs: #<issue>
 - Requirement ID per P-GIT-4; `[no-req]` for pure chores.
 - Breaking change: `!` after the scope and a `BREAKING CHANGE: <what>` footer.
 - Description in English, lowercase start, about 50 characters, understandable without looking the ID up.
-- Checked by a commit-msg hook and in CI. Examples: `documentation/concepts/scaffolding.md` §9, example 4.
+- Checked by a commit-msg hook and in CI. Examples: `documentation/concepts/scaffolding.md` §10, example 4.
 
 ## Changelog
 
-`CHANGELOG.md` follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/). Feature MRs do not edit it. In the release MR, a command generates a draft for the new version from the commits since the last tag (`feat` → Added, `fix` → Fixed, breaking changes → Changed; other types omitted); the release MR author rewrites the entries for readers and uses `Deprecated`, `Removed`, `Security` where they fit. Example: `documentation/concepts/scaffolding.md` §9, example 5.
+`CHANGELOG.md` follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/). Feature MRs do not edit it. In the release MR, a command generates a draft for the new version from the commits since the last tag (`feat` → Added, `fix` → Fixed, breaking changes → Changed; other types omitted); the release MR author rewrites the entries for readers and uses `Deprecated`, `Removed`, `Security` where they fit. Example: `documentation/concepts/scaffolding.md` §10, example 5.
 
 ## CI/CD
 

@@ -7,7 +7,7 @@ id-prefix: "SCF"
 ---
 # R1 Track: Identity & CI — Andreas Tschuden
 
-Plan file of one track of `scaffolding.md` (§15, Q13). **Only Andreas edits this file.** Requirements, interfaces, and examples come from [scaffolding.md](scaffolding.md); this file never restates them, it references them by ID.
+Plan file of one track of `scaffolding.md` (§16, Q13). **Only Andreas edits this file.** Requirements, interfaces, and examples come from [scaffolding.md](scaffolding.md); this file never restates them, it references them by ID.
 
 ## Owned paths
 
@@ -54,4 +54,4 @@ Neutral pseudocode and types per `MANIFEST.md` Phase 5; each module lists `Trace
 
 ### Test cases
 
-Taken from `scaffolding.md` §9 and the acceptance criteria of the issues above.
+Taken from `scaffolding.md` §10 and the acceptance criteria of the issues above.

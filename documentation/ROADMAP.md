@@ -14,7 +14,7 @@ Versions are assigned at sprint planning: one sprint = one release `v0.<sprint>.
 
 4 people × 4 h per week × 27 weeks (2026-09-30 … 2027-04-06) = 432 h at most; minus about 5 holiday weeks ≈ **350 h**, which also covers reviews, concept work, documentation, and the presentation.
 
-Rough effort estimate (to be refined per concept): R1 61 h (issue breakdown in `concepts/scaffolding.md` §15), R2 30, R3 45, R4 40, R5 40, R6 40, R7 40, R8 15, R9 40, R10 25, R11 25, R12 60, R13 15, R14 15 — **≈ 490 h in total, about 1.4 × the capacity**. The team prioritizes the items (must / should / could) before Sprint 2 planning; items that do not fit become deviations from the proposal and are presented as such.
+Rough effort estimate (to be refined per concept): R1 61 h (issue breakdown in `concepts/scaffolding.md` §16), R2 30, R3 45, R4 40, R5 40, R6 40, R7 40, R8 15, R9 40, R10 25, R11 25, R12 60, R13 15, R14 15 — **≈ 490 h in total, about 1.4 × the capacity**. The team prioritizes the items (must / should / could) before Sprint 2 planning; items that do not fit become deviations from the proposal and are presented as such.
 
 ## Overview
 

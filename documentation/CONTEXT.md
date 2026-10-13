@@ -26,7 +26,7 @@ The response of a unit's health endpoint, with the unit's status and one depende
 One entry of a health report: the state of one thing the unit depends on.
 
 **Local stack**:
-All units plus reverse proxy and relational database, started by one command on a developer machine.
+All units plus the reverse proxy and the data services (databases, stores, virus scanner), started by one command on a developer machine.
 *Avoid*: dev environment
 
 **Track**:
