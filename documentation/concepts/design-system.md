@@ -51,7 +51,7 @@ Draft, derived one to one from the acceptance criteria.
 
 ## 17. Test Concept & TDD Contract
 
-Draft. DSA-T-1 to DSA-T-3 exist and run with `pnpm test` (`tests/design-system.test.ts`, `tests/theme.test.ts`; seams agreed in `qa-log.md`, Q25); every other row is a planned test that its slice writes first and that the grilling of this concept may sharpen. Each test name carries the `AC` ID it covers (`STACK.md` §6).
+Draft. DSA-T-1 to DSA-T-5 exist and run with `pnpm test` (`tests/design-system.test.ts`, `tests/theme.test.ts`, `tests/contrast.test.ts`, `tests/storybook.test.ts`; seams agreed in `qa-log.md`, Q25; Storybook itself is built with `pnpm --filter @stash/ui run build-storybook`); every other row is a planned test that its slice writes first and that the grilling of this concept may sharpen. Each test name carries the `AC` ID it covers (`STACK.md` §6).
 
 ### Acceptance Tests
 

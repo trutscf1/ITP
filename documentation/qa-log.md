@@ -215,3 +215,9 @@ Asked under `/engineering-human implement 68` (DSA-US-1, slice 1). The concept `
 ➡️ Ja, alle drei
 
 > **Answer:** Ja, alle drei (Recommended)
+
+❓ **Q29** - **Nächstes Issue**: An welchem deiner Sprint-1-Issues (status::ready) soll ich weiterarbeiten? Options: #106 DSA-US-1 Slice 2 / #102 SCF-US-1 Slice 2 / #103 SCF-US-2 Slice 2 / #39 oder #40 (Shared)
+
+➡️ #106 DSA-US-1 Slice 2
+
+> **Answer:** #106 DSA-US-1 Slice 2 (Recommended)
