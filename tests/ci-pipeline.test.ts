@@ -16,6 +16,7 @@ type Job = {
   rules?: unknown;
   only?: unknown;
   except?: unknown;
+  allow_failure?: unknown;
 };
 type CiConfig = {
   workflow?: { rules?: Rule[] };
@@ -23,9 +24,23 @@ type CiConfig = {
   stages?: string[];
 };
 type CiVariables = Record<string, string | undefined>;
+type PreCommitHook = { id: string; args?: string[] };
+type PreCommitConfig = {
+  repos: { repo: string; rev?: string; hooks: PreCommitHook[] }[];
+};
 
 function readCi(): CiConfig {
   return parse(readFileSync(join(root, ".gitlab-ci.yml"), "utf8")) as CiConfig;
+}
+
+function readJson<T>(path: string): T {
+  return JSON.parse(readFileSync(join(root, path), "utf8")) as T;
+}
+
+function readJob(name: string): Job {
+  const job = (readCi() as Record<string, Job | undefined>)[name];
+  assert.ok(job, `job ${name} missing`);
+  return job;
 }
 
 function imageOf(name: string): string {
@@ -33,10 +48,25 @@ function imageOf(name: string): string {
   return typeof image === "string" ? image : (image?.name ?? "");
 }
 
-function readJob(name: string): Job {
-  const job = (readCi() as Record<string, Job | undefined>)[name];
-  assert.ok(job, `job ${name} missing`);
-  return job;
+function scriptOf(name: string): string {
+  return (readJob(name).script ?? []).join("\n");
+}
+
+function jobNames(): string[] {
+  return Object.keys(readCi()).filter(
+    (key) =>
+      !key.startsWith(".") &&
+      !["workflow", "default", "stages", "include", "variables"].includes(key),
+  );
+}
+
+function readPreCommitRepo(url: string): PreCommitConfig["repos"][number] {
+  const config = parse(
+    readFileSync(join(root, ".pre-commit-config.yaml"), "utf8"),
+  ) as PreCommitConfig;
+  const repo = config.repos.find((entry) => entry.repo === url);
+  assert.ok(repo, `pre-commit repo ${url} missing`);
+  return repo;
 }
 
 // Evaluates the GitLab CI/CD rule expressions this repo uses: `$VAR` and `$VAR == "x"`,
@@ -150,21 +180,13 @@ describe("SCF-AC-1.4 Pinned versions in CI", () => {
   });
 });
 
-function scriptOf(name: string): string {
-  return (readJob(name).script ?? []).join("\n");
-}
-
-function jobNames(): string[] {
-  return Object.keys(readCi()).filter(
-    (key) =>
-      !key.startsWith(".") &&
-      !["workflow", "default", "stages", "include", "variables"].includes(key),
-  );
-}
-
 describe("SCF-AC-5.2 Pipeline steps", () => {
   it("SCF-AC-5.2 runs the Biome check over the whole repository", () => {
     assert.match(scriptOf("lint"), /pnpm exec biome ci \./);
+  });
+
+  it("SCF-AC-5.2 runs the unit tests of every unit and package", () => {
+    assert.match(scriptOf("test"), /pnpm exec turbo run test/);
   });
 
   it("SCF-AC-5.2 runs the accessibility check (axe) against the built web client", () => {
@@ -172,11 +194,9 @@ describe("SCF-AC-5.2 Pipeline steps", () => {
   });
 
   it("SCF-AC-5.2 runs the accessibility check on the Playwright image of the pinned version", () => {
-    const pkg = JSON.parse(
-      readFileSync(join(root, "package.json"), "utf8"),
-    ) as {
-      devDependencies: Record<string, string>;
-    };
+    const pkg = readJson<{ devDependencies: Record<string, string> }>(
+      "package.json",
+    );
     const version = pkg.devDependencies.playwright;
     assert.match(version ?? "", /^\d+\.\d+\.\d+$/, "Playwright not pinned");
     assert.equal(
@@ -209,8 +229,7 @@ describe("SCF-AC-5.2 Pipeline steps", () => {
 describe("SCF-AC-5.3 Failing conditions", () => {
   it("SCF-AC-5.3 lets no job fail without failing the pipeline", () => {
     for (const name of jobNames()) {
-      const job = readJob(name) as Job & { allow_failure?: unknown };
-      assert.notEqual(job.allow_failure, true, `${name} may fail`);
+      assert.notEqual(readJob(name).allow_failure, true, `${name} may fail`);
     }
   });
 
@@ -224,7 +243,7 @@ describe("SCF-AC-5.3 Failing conditions", () => {
     assert.match(script, /--exit-code 1/);
   });
 
-  it("SCF-AC-5.3 fails the code scan on any finding of severity error", () => {
+  it("SCF-AC-5.3 fails the code scan on any finding", () => {
     assert.match(scriptOf("code-scan"), /--error/);
   });
 
@@ -241,5 +260,27 @@ describe("SCF-AC-5.3 Failing conditions", () => {
         assert.ok(reason, `line ${index + 1} has no reason above it`);
       }
     });
+  });
+});
+
+describe("SCF-F-14 Same scanners before the commit and in the pipeline", () => {
+  it("SCF-F-14 uses the Gitleaks version of the pipeline in the pre-commit hook", () => {
+    const { rev } = readPreCommitRepo("https://github.com/gitleaks/gitleaks");
+    assert.equal(imageOf("secret-scan"), `zricethezav/gitleaks:${rev}`);
+  });
+
+  it("SCF-F-14 uses the Semgrep version and rule sets of the pipeline in the pre-commit hook", () => {
+    const repo = readPreCommitRepo("https://github.com/semgrep/semgrep");
+    assert.equal(
+      imageOf("code-scan"),
+      `semgrep/semgrep:${repo.rev?.replace(/^v/, "")}`,
+    );
+    const hookConfigs = (repo.hooks[0]?.args ?? [])
+      .filter((arg) => arg.startsWith("--config="))
+      .map((arg) => arg.slice("--config=".length));
+    const pipelineConfigs = [
+      ...scriptOf("code-scan").matchAll(/--config (\S+)/g),
+    ].map((match) => match[1]);
+    assert.deepEqual(hookConfigs, pipelineConfigs);
   });
 });
