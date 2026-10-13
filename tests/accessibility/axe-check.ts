@@ -14,7 +14,8 @@ async function waitForServer(): Promise<void> {
   const deadline: number = Date.now() + startTimeoutMs;
   while (Date.now() < deadline) {
     try {
-      await fetch(baseUrl);
+      // baseUrl comes from the pipeline configuration, never from user input.
+      await fetch(baseUrl); // nosemgrep: nextjs-ssrf-fetch
       return;
     } catch {
       await new Promise((resolve) => setTimeout(resolve, 1000));
