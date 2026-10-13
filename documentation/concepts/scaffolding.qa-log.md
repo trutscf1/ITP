@@ -175,3 +175,13 @@ Result: the three commits were pushed, merge request !13 was opened with `tschud
 > **Answer:** Nein, so lassen
 
 Result: the history of the branch is not rewritten. The job `commit-messages` stays red on !13, so the merge request cannot be merged until the owner decides how to handle the three commit messages.
+
+Later in the same session the owner asked to make the pipeline green again. Shown with the question: two commits fail (one line of more than 100 characters in each message body), the check reads every commit of the merge request, and the rule comes from the preset of the commit linter, not from `WORKFLOW.md`.
+
+❓ **Q20** - **Weg zur grünen Pipeline**: Wie soll ich den Commit-Check auf !13 grün bekommen? Options: Nachrichten umbrechen / Regel abschalten / Neuer Branch, neuer MR
+
+➡️ Nachrichten umbrechen
+
+> **Answer:** Nachrichten umbrechen (Recommended)
+
+Result: the message bodies of the commits on the branch were rewrapped at 100 characters, with unchanged content and unchanged files, and the branch was replaced with a forced push. This revises the answer to Q19.
