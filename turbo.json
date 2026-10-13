@@ -6,11 +6,11 @@
       "persistent": true
     },
     "lint": {},
-    "typecheck": {
-      "dependsOn": ["^build"]
-    },
     "test": {
       "cache": false
+    },
+    "typecheck": {
+      "dependsOn": ["^build"]
     },
     "build": {
       "dependsOn": ["^build"],

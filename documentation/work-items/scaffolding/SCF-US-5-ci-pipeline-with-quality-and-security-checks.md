@@ -21,7 +21,7 @@ One user story of [Scaffolding & shared contracts](feature.md) and the acceptanc
 | --- | --- | --- | --- | --- |
 | SCF-AC-5.1 | Pipeline triggers | A change on a feature branch, on `dev`, or on `main` | The change is pushed | The GitLab CI pipeline runs |
 | SCF-AC-5.2 | Pipeline steps | A pipeline run | It executes | It runs Biome check, typecheck, unit tests, accessibility checks (axe), `pnpm audit`, and a container scan (Trivy) |
-| SCF-AC-5.3 | Failing conditions | A pipeline run | A lint error, a failed test, or a vulnerability of severity high or critical occurs | The pipeline fails |
+| SCF-AC-5.3 | Failing conditions | A pipeline run | A lint error, a failed test, or a vulnerability of severity high or critical that has a fix occurs, unless it is an accepted exception with a written reason and an expiry date | The pipeline fails |
 | SCF-AC-5.4 | Run time | A pipeline run with the Turborepo cache | It finishes | It took less than 10 minutes |
 | SCF-AC-5.5 | Visible status | An open merge request | A reviewer opens it | The pipeline status is visible before the merge |
 

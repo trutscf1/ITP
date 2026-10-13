@@ -45,15 +45,15 @@ Refs: #<issue>
 ```
 
 - Types: `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `style`, `build`, `ci`, `chore`, `revert`.
-- Scopes: a unit (`web`, `identity`, `storage`, `worker`, `cms`), a shared package (`contracts`, `ui`, `config`), `deps`, `ci`, `repo`.
+- Scopes: a unit (`web`, `identity`, `storage`, `worker`, `cms`), a shared package (`contracts`, `ui`, `config`), `deps`, `ci`, `repo`. The scope may be left out when no single one fits (for example `ci: …` for a change to the pipeline itself).
 - Requirement ID per P-GIT-4; `[no-req]` for pure chores.
 - Breaking change: `!` after the scope and a `BREAKING CHANGE: <what>` footer.
 - Description in English, lowercase start, about 50 characters, understandable without looking the ID up.
-- Checked by a commit-msg hook and in CI. Examples: `documentation/concepts/scaffolding.md` §9, example 4.
+- Checked by commitlint (`commitlint.config.ts`) in the commit-msg hook and again in CI (job `commit-messages`). The hook is active after `pre-commit install` in each clone. Examples: `documentation/concepts/scaffolding.md` §9, example 4.
 
 ## Changelog
 
-`CHANGELOG.md` follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/). Feature MRs do not edit it. In the release MR, a command generates a draft for the new version from the commits since the last tag (`feat` → Added, `fix` → Fixed, breaking changes → Changed; other types omitted); the release MR author rewrites the entries for readers and uses `Deprecated`, `Removed`, `Security` where they fit. Example: `documentation/concepts/scaffolding.md` §9, example 5.
+`CHANGELOG.md` follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/). Feature MRs do not edit it. In the release MR, `pnpm run changelog:draft` generates a draft for the new version from the commits since the last tag (`feat` → Added, `fix` → Fixed, breaking changes → Changed; other types omitted); the release MR author rewrites the entries for readers and uses `Deprecated`, `Removed`, `Security` where they fit. Example: `documentation/concepts/scaffolding.md` §9, example 5.
 
 ## CI/CD
 
@@ -174,5 +174,5 @@ Run `/engineering-human release [<version>]`:
 
 1. Merge `dev` → `main` via a release MR (§15.1) that includes the curated `CHANGELOG.md` section, as the release merge key allows (P-MR-5).
 2. Create the annotated tag `v<version>` on `main` (§15.2).
-3. Publish a GitLab Release for the tag, linked to the sprint milestone (§15.4), with release notes listing the closed stories (`US-n`, with titles).
+3. Pushing the tag publishes the GitLab Release: the CI jobs `release-notes` and `release` take the tag's section of `CHANGELOG.md` as release notes and fail for a tag that is not SemVer or has no section (SCF-AC-6.3). The curated section therefore lists the closed stories (`US-n`, with titles); link the release to the sprint milestone afterwards (§15.4).
 4. Set the *Status* stage of every included feature in `ROADMAP.md` to `released` (P-ROAD-4).
