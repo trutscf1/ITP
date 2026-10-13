@@ -227,3 +227,9 @@ Fabian's reviews of !4 and !5 (not approved) are worked through under `/engineer
 ➡️ Alle drei, 7 Tage
 
 > **Answer:** Alle drei, 7 Tage (Recommended)
+
+❓ **Q31** - **Unbehebbare CVEs**: Der Trivy-Job nutzt `--ignore-unfixed`, `pnpm audit --prod` prüft laut docs/ nur Produktions-Abhängigkeiten; SCF-NF-6 sagt „any vulnerability“. Was gilt? Options: So lassen, NF-6 präzisieren / Auch ungefixte melden
+
+➡️ So lassen, NF-6 präzisieren
+
+> **Answer:** So lassen, NF-6 präzisieren (Recommended)

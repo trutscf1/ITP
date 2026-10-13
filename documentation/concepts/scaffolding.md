@@ -90,7 +90,7 @@ These terms are also in the glossary `documentation/CONTEXT.md`.
 | SCF-NF-3 | A health endpoint MUST respond within the unit's health timeout (configuration `HEALTH_TIMEOUT_MS`, default 2000). Each dependency check MUST finish within `HEALTH_CHECK_TIMEOUT_MS` (default 1000) or count as `down` (E-2). |
 | SCF-NF-4 | Health reports and error responses MUST NOT contain hosts, ports, credentials, stack traces, or dependency versions. |
 | SCF-NF-5 | All code MUST be TypeScript with explicit types; `lint` MUST fail on unspecified types. |
-| SCF-NF-6 | The dependency audit and the container image scan MUST fail on any vulnerability of severity high or critical. |
+| SCF-NF-6 | The dependency audit of the production dependencies (`docs/security_next_js.md`) and the container image scan MUST fail on any vulnerability of severity high or critical that has a fix; an accepted exception needs a written reason and an expiry date (`../qa-log.md`, Q26, Q31). |
 | SCF-NF-7 | Internal APIs are not versioned: a contract change and every consumer's adaptation MUST be in the same MR. |
 | SCF-NF-8 | Configuration values MUST NOT be hard-coded (P-DES-6); secrets MUST NOT be committed. |
 
