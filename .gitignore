@@ -6,3 +6,11 @@ CLAUDE.local.md
 .env*
 .env
 !.env.example
+
+# build output and caches (Turborepo, TypeScript, Next.js)
+node_modules/
+.turbo/
+dist/
+.next/
+*.tsbuildinfo
+.pnpm-store/

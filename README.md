@@ -8,7 +8,7 @@ The project goal, its target users, and its non-goals are in [documentation/GOAL
 
 Early scaffold. What exists today:
 
-- a Next.js application in `next/` (App Router, React, Tailwind CSS, Biome, Prisma)
+- a pnpm and Turborepo workspace with the five units in `apps/` and the shared packages in `packages/`; the Next.js application is the `web` unit in `apps/web/` (App Router, React, Tailwind CSS, Biome, Prisma), the other units are empty
 - a `docker-compose.yml` that starts PostgreSQL 18 and MongoDB 8
 - the project documentation in `documentation/`
 
@@ -26,17 +26,19 @@ cp .env.example .env
 docker compose up -d
 
 # 3. start the web application
-cd next
 pnpm install
-pnpm dev
+pnpm --filter @stash/web dev
 ```
 
-The web application then runs at <http://localhost:3000>. It reads the database connection from `DATABASE_URL`; put that variable into `next/.env`, matching the PostgreSQL values of step 1.
+The web application then runs at <http://localhost:3000>. It reads the database connection from `DATABASE_URL`; put that variable into `apps/web/.env`, matching the PostgreSQL values of step 1.
 
 Checks:
 
 ```bash
-cd next && pnpm lint                            # Biome check of the application
+pnpm run lint                                  # Biome check of every package, through Turborepo
+pnpm run typecheck                             # TypeScript check of every package
+pnpm run build                                 # build of every package
+pnpm test                                      # acceptance tests of the repository layout
 node tools/doc-check.mjs documentation          # consistency check of the documentation
 npx markdownlint-cli2 "documentation/**/*.md"   # markdown lint
 ```
@@ -154,6 +156,6 @@ The repository is public, so all content must be licence-free. Licences of what 
 | PostgreSQL 18 (Docker image) | PostgreSQL Licence | relational database, runs as a container |
 | MongoDB 8.0 (Docker image) | SSPL | metadata database, runs as a container; not part of the delivered source |
 | Geist and Geist Mono fonts | SIL Open Font Licence 1.1 | loaded by the starter layout |
-| Next.js starter images in `next/public/` | default assets of the starter | placeholders; to be replaced by own assets |
+| Next.js starter images in `apps/web/public/` | default assets of the starter | placeholders; to be replaced by own assets |
 
 Open points: MongoDB's SSPL is not an OSI-approved licence, so the team decides whether the proposal's choice stays; third-party content added later is entered here when it is added.

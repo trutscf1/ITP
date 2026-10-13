@@ -45,7 +45,7 @@ Refs: #<issue>
 ```
 
 - Types: `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `style`, `build`, `ci`, `chore`, `revert`.
-- Scopes: a unit (`web`, `identity`, `storage`, `worker`, `cms`), `contracts`, `deps`, `ci`, `repo`.
+- Scopes: a unit (`web`, `identity`, `storage`, `worker`, `cms`), a shared package (`contracts`, `ui`, `config`), `deps`, `ci`, `repo`.
 - Requirement ID per P-GIT-4; `[no-req]` for pure chores.
 - Breaking change: `!` after the scope and a `BREAKING CHANGE: <what>` footer.
 - Description in English, lowercase start, about 50 characters, understandable without looking the ID up.
@@ -57,7 +57,7 @@ Refs: #<issue>
 
 ## CI/CD
 
-GitLab CI runs on every MR into `dev` and every push to `dev` and `main`; the jobs are defined by `documentation/concepts/scaffolding.md` SCF-F-15, plus the documentation checks in `.gitlab/ci/docs.yml` (markdown lint and `tools/doc-check.mjs`). "Pipeline must succeed" is enabled as a merge check. Deployment on push to `main` follows with roadmap item R14.
+GitLab CI (`.gitlab-ci.yml`) runs one pipeline per change: a merge request pipeline while an MR is open, otherwise a branch pipeline on every push to a feature branch, `dev`, or `main`; the jobs are defined by `documentation/concepts/scaffolding.md` SCF-F-15, plus the documentation checks in `.gitlab/ci/docs.yml` (markdown lint and `tools/doc-check.mjs`). "Pipeline must succeed" is enabled as a merge check. Deployment on push to `main` follows with roadmap item R14.
 
 ## Deviations from the profile
 
