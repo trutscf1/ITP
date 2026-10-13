@@ -1,1 +1,2 @@
-export const name = "ui" as const;
+export * from "./theme.js";
+export * from "./theme-switcher.js";
