@@ -111,3 +111,57 @@ Phase 4 – Freigabe: 2026-09-29 durch Fabian Trutschnig (Projekt-Controlling), 
 **Q13 – Aufteilung der Arbeit**
 Anweisung: „Es soll eine klare abgrenzung geben, jeder macht einen eigenen abschnitt parallel, damit jeder einen plan machen kann um dann seperat implement machen kann, dann wird alles einzeln wieder von feature -> dev -> main alles gemerged, also grenze die personen komplett ab“
 Entscheidung: vier Tracks mit exklusiven Pfaden, eigener Plan-Datei und eigenen Issues; gemeinsame Slices (Foundation, Integration) aufgelöst; Tracks treffen sich nur an den im Konzept festgelegten Schnittstellen (§15).
+
+## Round 5 — 2026-10-13 — migration to the current format (trutscf1)
+
+Notes: the concept is migrated with `/engineering-human migrate scaffolding` on `concept/migrate-scaffolding`, because `SCF-F-2` and the old §11 contradicted `SCF-AC-2.1` (one start command) and stopped the work on #39 (`qa-log.md`, round 13, Q35–Q37). From this round on the log is written in English and in the current question format.
+
+Shown with the round: the three gaps between the concept of 2026-09-29 and the stories of the team — status page, health reports, and proxy routing (`SCF-F-4` to `SCF-F-8`, `SCF-U-1` to `SCF-U-3`) without a story; configuration validation (`SCF-F-11`) and native start (`SCF-F-3`) without a criterion; fourteen criteria without a requirement, among them all of `SCF-US-4` (data model) and `SCF-US-7` (project documentation).
+
+Assumptions stated with the round, none rejected. Where a story and the earlier concept disagree, the story decides (P-GOAL-3):
+
+- **A11**: `SCF-F-2` names all data services of `SCF-AC-2.1`; the old §11 no longer excludes them. A unit joins the stack when it becomes runnable (`qa-log.md`, Q35). `SCF-AC-2.1` moves into a new slice 3 "all units in the stack"; #39 delivers `SCF-AC-2.2` and `SCF-AC-2.4`. This withdraws A3.
+- **A12**: The relational database no longer starts empty (old §14): schema, migrations, own `users` table, and seed become requirements from `SCF-AC-4.1` to `SCF-AC-4.5`.
+- **A13**: The accessibility check is a job of the pipeline (`SCF-AC-5.2`), against the earlier decision Q11.
+- **A14**: `SCF-F-15` also covers pushes to feature branches (`SCF-AC-5.1`).
+- **A15**: The uniform error format (`SCF-AC-3.4`) enters the data model as `ErrorResponse { code, message }`; the owner of the contracts core refines it.
+- **A16**: The table "Issues per track" with the deleted issues #4–#22 is removed; slices and issue numbers stand in the work items.
+- **A17**: The section references in the four track files, `ROADMAP.md`, `STACK.md`, and `WORKFLOW.md` are updated (§15 → §16, §9 → §10, §7 → §8). In the track files of other owners only these references change.
+- **A18**: The branch is `concept/migrate-scaffolding`, created from `dev`.
+
+❓ **Q14** - **Neue Story und Kriterien**: Soll ich SCF-US-8 (Units erreichbar und sichtbar, fünf Kriterien) und die zwei neuen Kriterien SCF-AC-2.6 und SCF-AC-2.7 so anlegen? Options: Ja, so anlegen / Ohne neue Story / Als obsolet streichen
+
+➡️ Ja, so anlegen
+
+> **Answer:** Ja, so anlegen (Recommended)
+
+❓ **Q15** - **Testkonzept**: Die Migration verlangt für jedes Kriterium einen Abnahmetest in §17. Der Check kennt nur alles oder nichts. Wie weit soll ich gehen? Options: Abnahmetests jetzt / §17 bleibt offen
+
+➡️ Abnahmetests jetzt
+
+> **Answer:** Abnahmetests jetzt (Recommended)
+
+❓ **Q16** - **Tracking-Issue**: WORKFLOW.md verlangt für jeden concept-Branch ein Issue mit `type::concept`. Soll ich „Concept: migrate Scaffolding & shared contracts“ auf GitLab anlegen (dir zugewiesen, Sprint 1)? Options: Issue anlegen / Kein Issue
+
+➡️ Issue anlegen
+
+> **Answer:** Issue anlegen (Recommended)
+
+Result: tracking issue #111 created. Two further assumptions were made while writing and are shown with the merge request:
+
+- **A19**: `web` serves the generated API description, because `/api/docs` falls under the prefix `/` of the routing table (`SCF-F-10`).
+- **A20**: `STACK.md` gets one capability index instead of an ID column in every track table, so the open merge requests that edit those tables do not conflict.
+
+Shown with the next round: the list of what lies on the branch, the three commits, the title of the merge request, and the change to the description of #39.
+
+❓ **Q17** - **Veröffentlichen**: Soll ich die drei Commits pushen, den Merge Request nach dev öffnen und die Beschreibung von #39 an die Story-Datei angleichen? Options: Alles veröffentlichen / Nur Commit und Push / Erst ändern / Nur lokal committen
+
+➡️ Alles veröffentlichen
+
+> **Answer:** Alles veröffentlichen (Recommended)
+
+❓ **Q18** - **Reviewer**: Wer soll den Merge Request der Migration prüfen? Options: tschudea07 / schwaigc / schauby1 / Kein Reviewer
+
+➡️ tschudea07
+
+> **Answer:** tschudea07 (Recommended)
