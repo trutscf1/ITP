@@ -165,3 +165,13 @@ Shown with the next round: the list of what lies on the branch, the three commit
 ➡️ tschudea07
 
 > **Answer:** tschudea07 (Recommended)
+
+Result: the three commits were pushed, merge request !13 was opened with `tschudea07` as reviewer, and the description of #39 was aligned with its story file. `dev` had moved meanwhile (!8, #104, #44); it was merged into the branch and five conflicts were resolved. The pipeline of !13 then failed in the job `commit-messages` only: the body of each of the three commits has a line longer than 100 characters, a rule that came to `dev` with #44.
+
+❓ **Q19** - **Commit-Nachrichten**: Darf ich die Nachrichten der drei Commits auf concept/migrate-scaffolding neu umbrechen und den Branch per Force-Push ersetzen? Options: Ja, umbrechen und pushen / Nein, so lassen
+
+➡️ Ja, umbrechen und pushen
+
+> **Answer:** Nein, so lassen
+
+Result: the history of the branch is not rewritten. The job `commit-messages` stays red on !13, so the merge request cannot be merged until the owner decides how to handle the three commit messages.
