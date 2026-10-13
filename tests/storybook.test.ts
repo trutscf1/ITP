@@ -41,11 +41,14 @@ describe("DSA-AC-1.5 Storybook", () => {
     assert.ok(existsSync(join(ui, ".storybook/main.ts")), "main.ts missing");
   });
 
-  it("DSA-AC-1.5 Storybook shows the stories in all four themes", () => {
+  it("DSA-AC-1.5 Storybook shows the stories in every theme of the design system", () => {
     const preview = readFileSync(join(ui, ".storybook/preview.ts"), "utf8");
-    assert.match(preview, /tokens\.css/);
-    for (const theme of ["light", "dark", "sepia", "night"]) {
-      assert.match(preview, new RegExp(`"${theme}"`));
-    }
+    const styles = readFileSync(join(ui, ".storybook/storybook.css"), "utf8");
+    assert.match(
+      preview,
+      /import \{[^}]*\bthemes\b[^}]*\} from "\.\.\/src\/theme"/,
+    );
+    assert.match(preview, /applyTheme\(/);
+    assert.match(styles, /@import "\.\.\/src\/tokens\.css"/);
   });
 });
