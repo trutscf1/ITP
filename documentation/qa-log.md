@@ -197,3 +197,9 @@ Asked under `/engineering-human implement 68` (DSA-US-1, slice 1). The concept `
 ➡️ Alle drei Seams
 
 > **Answer:** Alle drei Seams (Recommended)
+
+❓ **Q26** - **Stufe R4**: Sobald R4 auf 'in progress' steht, verlangt doc-check in §17 des Konzepts einen Test für jedes der 16 Akzeptanzkriterien von DSA-US-1 bis -3 (sonst Fehler, die CI wird rot). Gebaut und getestet sind nur AC-1.1 bis 1.3; der Rest des Konzepts ist ungegrillt. Wie lösen wir das? Options: §17 jetzt schreiben / Stufe 'concept' lassen
+
+➡️ §17 jetzt schreiben
+
+> **Answer:** §17 jetzt schreiben (Recommended)
