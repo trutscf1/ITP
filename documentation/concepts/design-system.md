@@ -32,8 +32,8 @@ Draft, derived one to one from the acceptance criteria.
 
 | ID | Title | Requirement | Derives from |
 | --- | --- | --- | --- |
-| DSA-F-1 | Central tokens | Given the package `@nimbus/ui`, when a developer needs a colour, spacing, or type value, the system MUST ensure that the design tokens are defined centrally there. | DSA-AC-1.1 (Central tokens) |
-| DSA-F-2 | Four themes | Given a member, when they switch between the four themes including light and dark, the system MUST ensure that the theme changes without a reload and the choice is saved in the profile. | DSA-AC-1.2 (Four themes) |
+| DSA-F-1 | Central tokens | Given the package `@stash/ui`, when a developer needs a colour, spacing, or type value, the system MUST ensure that the design tokens are defined centrally there. | DSA-AC-1.1 (Central tokens) |
+| DSA-F-2 | Four themes | Given a member, when they switch between the four themes light, dark, sepia, and night, the system MUST ensure that the theme changes without a reload and that the browser remembers the choice for the next visit. | DSA-AC-1.2 (Four themes) |
 | DSA-F-3 | Component base | Given a component of the design system, when a developer builds it, the system MUST ensure that it is based on Radix UI and Tailwind CSS 4. | DSA-AC-1.3 (Component base) |
 | DSA-F-4 | Contrast | Given any of the four themes, when text is shown, the system MUST ensure that it meets the WCAG AA contrast of at least 4.5:1. | DSA-AC-1.4 (Contrast) |
 | DSA-F-5 | Storybook | Given a component of the design system, when a developer opens Storybook, the system MUST ensure that the component is documented there. | DSA-AC-1.5 (Storybook) |
@@ -47,3 +47,4 @@ Draft, derived one to one from the acceptance criteria.
 | DSA-F-13 | ARIA | Given a member using a screen reader, when they use the file browser, a dialog, or the upload progress, the system MUST ensure that ARIA roles and labels describe them, with live regions for the progress. | DSA-AC-3.3 (ARIA) |
 | DSA-F-14 | Manual tests | Given the project documentation, when a reader looks up the accessibility tests, the system MUST ensure that manual tests with NVDA and VoiceOver are documented. | DSA-AC-3.4 (Manual tests) |
 | DSA-F-15 | Automated check | Given the web client, when the automated axe check runs, the system MUST ensure that it reports no critical violation. | DSA-AC-3.5 (Automated check) |
+| DSA-F-16 | Theme in the profile | Given a signed-in member, when they choose a theme, the system MUST save the choice in their profile so that it applies on every device they sign in on. | DSA-AC-1.6 (Theme in the profile) |
