@@ -69,7 +69,7 @@ These terms are also in the glossary `documentation/CONTEXT.md`.
 | SCF-F-12 | Every unit and package MUST provide the tasks `dev`, `build`, `lint`, `typecheck`, `test`. One root command per task MUST run it across all units and packages. |
 | SCF-F-13 | Commit messages MUST be checked against Conventional Commits 1.0.0 and the format in `documentation/WORKFLOW.md`, locally before the commit is created and again in CI (E-4). |
 | SCF-F-14 | Before every commit, local hooks MUST run the secret scan, code scan, and dependency audit prescribed in `docs/security_next_js.md` (E-6). |
-| SCF-F-15 | The CI pipeline MUST run on every MR into `dev` and every push to `dev` and `main`, with the jobs: lint, typecheck, test, build, commit-message check, secret scan, code scan, dependency audit, container image scan. An MR MUST NOT be mergeable unless all jobs pass (E-5). |
+| SCF-F-15 | The CI pipeline MUST run on every MR into `dev` and every push to `dev` and `main`, with the jobs: lint, typecheck, test, build, accessibility check, commit-message check, secret scan, code scan, dependency audit, container image scan. An MR MUST NOT be mergeable unless all jobs pass (E-5). |
 | SCF-F-16 | `CHANGELOG.md` MUST follow Keep a Changelog 1.1.0. One command MUST generate a draft section for the next release from the commits since the last release tag (mapping in §9, example 5); the release MR author edits the draft before merging. |
 | SCF-F-17 | Every unit MUST ship an example configuration file listing each of its configuration variables with a dummy value. |
 
@@ -221,7 +221,7 @@ Draft:
 
 ## 11. Out of Scope
 
-Observability (R2), any feature logic, databases other than the relational one, deployment and TLS (R14), accessibility checks in CI (R4), who may see the status page (R3).
+Observability (R2), any feature logic, databases other than the relational one, deployment and TLS (R14), the pages the accessibility check covers (R4), who may see the status page (R3).
 
 ## 12. Resolved Questions & ADRs
 
@@ -237,7 +237,7 @@ Observability (R2), any feature logic, databases other than the relational one, 
 | Q8 | CC / Keep a Changelog scope | This project only, bound in `WORKFLOW.md` | User decision |
 | Q9 | Browser routing | Directly through the proxy by path prefix (§7) | Large uploads bypass `web`; one origin for the session cookie |
 | Q10 | Local development | Container stack (SCF-F-2) and native units (SCF-F-3) | School demands one-command start; native gives fast reload |
-| Q11 | CI scope in R1 | SCF-F-15; accessibility checks with R4 | School demands containers without vulnerabilities |
+| Q11 | CI scope in R1 | SCF-F-15; accessibility checks with R4 — superseded on 2026-10-13 (`../qa-log.md`, Q27): the axe job is part of the R1 pipeline, R4 adds its pages | School demands containers without vulnerabilities |
 | Q12 | How does the status page get `worker`'s health, given `worker` is not proxied (Q9)? | The status page's server side queries every unit's internal `/health`; the proxy routing test (#21) checks the proxied health paths | Keeps Q9; proves proxy routing in a test instead of on the page |
 | Q13 | How is the work split? | Complete separation per person: one track each with exclusive paths, own plan file, own issues; tracks meet only at interfaces fixed in this document; every issue merges feature → `dev`, releases `dev` → `main` (§15) | User decision: everyone plans and implements separately |
 
