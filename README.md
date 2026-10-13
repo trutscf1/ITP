@@ -115,7 +115,7 @@ What exists today and what is planned (`documentation/ROADMAP.md`, R14 *Deployme
 | --- | --- | --- |
 | Start | `docker compose up -d` starts PostgreSQL and MongoDB; the web application is started by hand | One command starts every unit, the reverse proxy, and the databases |
 | Configuration | Variables in `.env` (copy of `.env.example`, never committed) | The same, for every unit |
-| Data | Named Docker volumes `postgres-data` and `mongo-data` | Backup and restore notes with the deployment |
+| Data | Named Docker volumes `postgres-data`, `postgres-etc`, `mongo-data`, and `mongo-config` | Backup and restore notes with the deployment |
 | Deployment | None | The GitLab CI pipeline deploys the whole stack to the team's own server when `main` is updated, TLS terminated by the reverse proxy |
 | Monitoring | None | Metrics, logs, and traces in Prometheus, Loki, Tempo, and Grafana (R2) |
 
@@ -148,7 +148,8 @@ The repository is public, so all content must be licence-free. Licences of what 
 
 | Component | Licence | Use |
 | --- | --- | --- |
-| Next.js, React, Tailwind CSS | MIT | web application |
+| Next.js, React, Tailwind CSS (`@tailwindcss/postcss`) | MIT | web application |
+| dotenv | BSD-2-Clause | reads the `.env` file in the web application |
 | Prisma | Apache-2.0 | database access |
 | TypeScript | Apache-2.0 | language |
 | Biome | MIT or Apache-2.0 | lint and format |
@@ -156,6 +157,6 @@ The repository is public, so all content must be licence-free. Licences of what 
 | PostgreSQL 18 (Docker image) | PostgreSQL Licence | relational database, runs as a container |
 | MongoDB 8.0 (Docker image) | SSPL | metadata database, runs as a container; not part of the delivered source |
 | Geist and Geist Mono fonts | SIL Open Font Licence 1.1 | loaded by the starter layout |
-| Next.js starter images in `apps/web/public/` | default assets of the starter | placeholders; to be replaced by own assets |
+| `next.svg` and `vercel.svg` in `apps/web/public/` | logos of Vercel (third party), shipped with the Next.js starter | **to be replaced** by own assets before the final submission; `file.svg`, `globe.svg`, and `window.svg` of the starter are unused and to be deleted |
 
-Open points: MongoDB's SSPL is not an OSI-approved licence, so the team decides whether the proposal's choice stays; third-party content added later is entered here when it is added.
+Open points: MongoDB's SSPL is not an OSI-approved licence, so the team decides whether the proposal's choice stays (issue #110); third-party content added later is entered here when it is added.
