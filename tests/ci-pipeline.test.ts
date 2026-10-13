@@ -178,6 +178,11 @@ describe("SCF-AC-1.4 Pinned versions in CI", () => {
     assert.ok(pinned, "nodejs entry missing");
     assert.equal(imageOf(".pnpm"), `node:${pinned}-alpine`);
   });
+
+  it("SCF-AC-1.4 checks the Node.js major version inside the Playwright image", () => {
+    assert.match(scriptOf("accessibility"), /\.tool-versions/);
+    assert.match(scriptOf("accessibility"), /process\.versions\.node/);
+  });
 });
 
 describe("SCF-AC-5.2 Pipeline steps", () => {

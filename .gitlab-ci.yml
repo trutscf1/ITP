@@ -83,6 +83,10 @@ accessibility:
     PORT: "3000"
     BASE_URL: http://localhost:$PORT
   script:
+    # The Playwright image brings its own Node.js; it must have the major version of
+    # .tool-versions (SCF-AC-1.4).
+    - pinned=$(awk '/^nodejs/ {split($2, v, "."); print v[1]}' .tool-versions)
+    - test "$(node -p 'process.versions.node.split(".")[0]')" = "$pinned"
     - pnpm exec turbo run build --filter=@stash/web
     # The check waits for the server itself and fails if it does not come up.
     - pnpm --filter @stash/web exec next start --port "$PORT" &
