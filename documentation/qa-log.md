@@ -191,3 +191,9 @@ Asked under `/engineering-human implement 68` (DSA-US-1, slice 1). The concept `
 ➡️ Ein Commit pro Schritt
 
 > **Answer:** Ein Commit pro Schritt (Recommended)
+
+❓ **Q25** - **Seams**: An welchen Schnittstellen teste ich #68 (node --test, Tests tragen die AC-ID)? (1) `tokens.css` in `@stash/ui`: jedes der vier Themes definiert denselben Token-Satz wie die Basis (AC-1.1/1.2); (2) `theme.ts` in `@stash/ui`: Theme-Namen, Cookie lesen/schreiben, `applyTheme` setzt `data-theme` am Wurzelelement (AC-1.2); (3) Struktur: `@stash/ui` hängt von Radix und Tailwind 4 ab, der ThemeSwitcher nutzt Radix, web lädt die Tokens (AC-1.3). Browser-Klicktest bleibt bei WEB-US-4. Options: Alle drei Seams / Nur (1) und (2) / Zusätzlich Render-Test
+
+➡️ Alle drei Seams
+
+> **Answer:** Alle drei Seams (Recommended)
