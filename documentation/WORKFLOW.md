@@ -181,6 +181,8 @@ An issue is done, and its MR may be merged, only when every item holds:
 15. Test first (ADR-0005): on the story's branch, a `test(<scope>): … [AC-ID]` commit with the failing tests of the story's acceptance criteria comes before the first `feat` or `fix` commit that touches production code; the MR checklist confirms it.
 16. Every acceptance criterion of the story is covered by a test whose name carries its `AC` ID (check: `tools/doc-check.mjs` rule `AC-TEST`, once built; until then the reviewer checks it by hand).
 
+Items 15 and 16 apply from the day the sprint plan is merged into `dev`, to work that begins after that day. Merge requests that are already open on that day (`!5`, `!7`, `!9`, `!14`) were written before the rule and are not blocked on these two items; their reviewers check items 1 to 14.
+
 ## Releases (P-VER-1…3)
 
 Run `/engineering-human release [<version>]`:
