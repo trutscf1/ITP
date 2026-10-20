@@ -551,3 +551,15 @@ Issues #108 (concept Public content), #111 (concept R1), #39/#103, #40, #126, #1
 ➡️ Tickets für Public Content (Recommended)
 
 > **Answer:** Tickets für Public Content (Recommended)
+
+❓ **Q64** - **Ticketbaum Public Content (R11)**: Passen Granularität, Gewichte, Abhängigkeiten und Meilensteine des Entwurfs (Feature #97; PUB-US-1 in drei Slices Sprint 3, PUB-US-4 Sprint 3, PUB-US-2 und -3 Sprint 4, PUB-US-5 Sprint 6)? Options: Musts zuerst (Recommended) / Alles in Sprint 2/3 / Baum ja, Meilensteine später
+
+➡️ Musts zuerst (Recommended)
+
+> **Answer:** Musts zuerst (Recommended)
+
+❓ **Q65** - **Gate**: Die Phasen 5/6 sind nur auf concept/public-content. Wie weiter, bevor Issues entstehen? Options: MR öffnen, danach Issues (Recommended) / Issues sofort, MR parallel / Erst Konzept nochmal prüfen
+
+➡️ MR öffnen, danach Issues (Recommended)
+
+> **Answer:** MR öffnen, danach Issues (Recommended). MR !18 opened (Closes #108); the issues of the tree are published after its review and merge.
