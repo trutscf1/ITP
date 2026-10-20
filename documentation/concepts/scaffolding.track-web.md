@@ -204,7 +204,7 @@ Traces to: SCF-F-11, SCF-E-1, SCF-AC-2.6. Requires: M1.
 
 #### M8 — Page frame
 
-The starter files of create-next-app are replaced in slice 1: the layout loads Geist from the package `geist` as local font files (no request to the internet at build or run time, [SCF-NF-1]; Q55), the title is the project name instead of "Create Next App", `page.tsx` is a plain placeholder with a link to `/status`, and `public/next.svg` and `public/vercel.svg` are deleted (third-party logos, licence notes). The README's licence notes get the row for `geist`.
+The starter files of create-next-app are replaced in slice 1: the layout loads Geist from the package `geist` as local font files (no request to the internet at build or run time, [SCF-NF-1]; Q55), the title is the project name instead of "Create Next App", `page.tsx` is a plain placeholder with a link to `/status`, and all template artwork is deleted: `public/next.svg`, `vercel.svg`, `file.svg`, `globe.svg`, `window.svg`, and `src/app/favicon.ico` (third-party logos, licence notes; a project icon follows with the design system, R4; A4). The template `apps/web/README.md` is replaced by a short one (unit, commands, link to this plan). The README's licence notes get the row for `geist`.
 Traces to: SCF-NF-1, SCF-F-28 (licence notes). Requires: —
 
 #### M9 — Container build
@@ -218,7 +218,7 @@ apps/web/Dockerfile
   CMD:           node scripts/start.ts start
 ```
 
-`next.config.ts` sets the standalone output. The image needs no internet at start ([SCF-NF-1]). The service in `docker-compose.yml` and its proxy route are requested from the Platform track.
+`next.config.ts` sets the standalone output and `outputFileTracingRoot` to the repository root, so that `server.js` and the workspace packages are traced in a monorepo. The runtime stage sets `HOSTNAME=0.0.0.0` (the standalone server otherwise binds to the container host name, and the health check at `127.0.0.1` and the proxy would not reach it), `NODE_ENV=production`, `NEXT_TELEMETRY_DISABLED=1`, and `OPENAPI_FILE` to the copy of the generated file in the image (A5). The image needs no internet at start ([SCF-NF-1]). The service in `docker-compose.yml` and its proxy route are requested from the Platform track.
 Traces to: SCF-F-1, SCF-F-20, SCF-NF-1, SCF-AC-2.1, SCF-AC-2.4. Requires: workspace root (Platform track).
 
 ### Rendering rule
@@ -271,4 +271,4 @@ Taken from `scaffolding.md` §10 and the acceptance criteria of SCF-US-8. These 
 | W-17 | M3 | SCF-AC-8.4, SCF-E-3 | a stub that answers with a redirect to a healthy stub | the unit is queried | the row is `down` and the second stub got no request |
 | W-18 | M3 | SCF-AC-8.4, SCF-E-3 | a stub that answers with a body of 100 KiB | the unit is queried | the row is `down` |
 | W-19 | Rendering rule | SCF-AC-8.4, SCF-U-3 | the output of `next build` with every unit address pointing to a closed port | the prerender manifest is read | it lists none of `/health`, `/status`, `/api/docs`, and the build made no request to a unit |
-| W-20 | M8 | SCF-NF-1 | the source of the layout | it is read | it imports no font from `next/font/google`, and `public/` holds no `next.svg` or `vercel.svg` |
+| W-20 | M8 | SCF-NF-1 | the source of the layout | it is read | it imports no font from `next/font/google`, and neither `public/` nor `src/app/` holds a file of the create-next-app template (the five `.svg` files, `favicon.ico`) |
