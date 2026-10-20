@@ -483,3 +483,9 @@ The job `commit-messages` failed on !14 (body line over 100 characters in `45963
 ➡️ Switcher nur für Mitglieder — a person without a session sees the default theme and gets no cookie
 
 > **Answer:** Switcher nur für Mitglieder (Recommended)
+
+❓ **Q66** - **Nächster Schritt**: Womit weitermachen, während die MRs auf Reviews warten? Options: R4 grillen (#116) / R6 grillen (#118) / Reviewer anschreiben / Session beenden
+
+➡️ Reviewer anschreiben — reminders posted on !7 (`tschudea07`: !5, !7, !9, merge order) and !14 (`trutscf1`: re-review of !14, revision of !18)
+
+> **Answer:** Reviewer anschreiben
