@@ -48,7 +48,7 @@ The system consists of five separately running units — `web`, `identity`, `sto
 
 ## H6. How we know it works
 
-Every acceptance criterion has one acceptance test in §17 ([SCF-T-1] to [SCF-T-40]). Most of them read the repository or the definition of the stack and the pipeline; the tests of the health reports, the proxy, and the status page run against the started stack. Three tests exist already from the first merged story ([SCF-T-1], [SCF-T-3], [SCF-T-4]).
+Every acceptance criterion has one acceptance test in §17 ([SCF-T-1] to [SCF-T-40]). Most of them read the repository or the definition of the stack and the pipeline; the tests of the health reports, the proxy, and the status page run against the started stack. Tests for the criteria of [SCF-US-1], [SCF-US-5], and [SCF-US-6] exist already in `tests/` and carry the `AC` ID in their names; the others follow with their stories.
 
 ## H7. Key decisions
 
@@ -515,7 +515,7 @@ n/a — unit tests are specified per track in the plan files, from the worked ex
 
 ### Acceptance Tests
 
-One test per acceptance criterion; test names in code carry the `AC` ID. [SCF-T-1], [SCF-T-3], and [SCF-T-4] exist in `tests/monorepo.test.ts` since the first slice of [SCF-US-1].
+One test per acceptance criterion; test names in code carry the `AC` ID. On `dev`, `tests/` already holds tests for `SCF-AC-1.1` to `SCF-AC-1.5` (`monorepo.test.ts`, `typescript.test.ts`), `SCF-AC-5.1` to `SCF-AC-5.5` (`ci-pipeline.test.ts`, `ci-docs-job.test.ts`, `accessibility/`), and `SCF-AC-6.1` to `SCF-AC-6.3` (`commit-format.test.ts`, `changelog.test.ts`). They read the repository and the pipeline definition, so the parts of [SCF-T-25], [SCF-T-27], and [SCF-T-30] that need the git host are not covered by them yet.
 
 | ID | Title | Covers | Given | When | Then |
 | --- | --- | --- | --- | --- | --- |
