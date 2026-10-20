@@ -11,8 +11,6 @@ New tasks and ideas for this developer land here first, before anyone plans them
 
 ## Open
 
-- [2026-10-06] Add `Developer handle: schwaigc` to your own gitignored `CLAUDE.local.md` and read `team/TEAM.md`.
 - [2026-10-06] Review the drafts that concern your features: the roles and success signals in `GOAL.md`, the *Serves* column in `ROADMAP.md`, and the concept drafts and work items of your features.
-- [2026-10-06] From `trutscf1`, *Public content* (R11): the status page (#16) should also show, as text, the names of the dependency checks that are `down` in the row of a unit that is not `ok`, so the operator sees why `cms` is `degraded` on a fresh installation. Details: `concepts/public-content.md` §15 (Q18); the requirement enters `concepts/scaffolding.md` with its migration.
 - [2026-10-07] From `trutscf1`: !4 is merged. Record your implementation time for #38 with `/spend` (Definition of Done 14; none was recorded at the merge), add the points deferred from the review to #102, and rebase !5 on `dev`.
-- [2026-10-13] From `trutscf1`, migration of `concepts/scaffolding.md`: please check what concerns your track — the new story `SCF-US-8` (units reachable and visible) with the status page (`SCF-F-8`, `SCF-U-1`: the row of a unit that is not `ok` also names its failed checks), the API description served by `web` at `/api/docs` (`SCF-F-10`, assumption A19), and the acceptance tests `SCF-T-36` to `SCF-T-40`. `SCF-AC-1.2` and `SCF-AC-1.5` now have requirements (`SCF-NF-5`, `SCF-F-19`), which closes the note of !10. Section numbers of the concept moved up by one from §3 on.
+- [2026-10-20] R4 (`design-system.md`): state that the theme switcher is shown only to signed-in members and that a person without a session gets the default theme and no cookie (Q65, PUB-NF-3 of `public-content.md`, review of !18).

@@ -13,7 +13,7 @@ Session positions of one developer (P-TEAM-3). Precise enough that a fresh sessi
 
 | Feature | Concept document | Phase | Branch | MR | Next step |
 | --- | --- | --- | --- | --- | --- |
-| Scaffolding & shared contracts (R1), track Web | [concepts/scaffolding.track-web.md](../../concepts/scaffolding.track-web.md) | 7, implement (slices 1 and 2 of SCF-US-1 in `dev`; track plan still to write) | — | — | Write the "Plan" section of the track file before the first MR |
+| Scaffolding & shared contracts (R1), track Web | [concepts/scaffolding.track-web.md](../../concepts/scaffolding.track-web.md) | 7, implement (slices 1 and 2 of SCF-US-1 in `dev`; track plan in `dev`) | — | — | Slice 1 of SCF-US-8 for `web` (M1, M2, M7, M8, M9) once its issues are cut, together with the five requests of the plan |
 | Design system & accessibility modes (R4) | [concepts/design-system.md](../../concepts/design-system.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human design-system` |
 | Web client: dashboard, file browser, preview (R6) | [concepts/web-client.md](../../concepts/web-client.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human web-client` |
 
