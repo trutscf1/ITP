@@ -25,10 +25,15 @@ function readCompose(): Compose {
   return parse(readText("docker-compose.yml")) as Compose;
 }
 
-/** The names `${NAME}`, `${NAME:-default}`, and `${NAME:?message}` refer to. */
+/**
+ * The names `${NAME}` and `${NAME:?message}` refer to; `$${NAME}` is an escape for the shell
+ * inside the container and no variable of the stack.
+ */
 function referencedVariables(compose: string): string[] {
   const names = new Set<string>();
-  for (const match of compose.matchAll(/\$\{([A-Z][A-Z0-9_]*)[^}]*\}/g)) {
+  for (const match of compose.matchAll(
+    /(?<!\$)\$\{([A-Z][A-Z0-9_]*)[^}]*\}/g,
+  )) {
     names.add(match[1] as string);
   }
   return [...names].sort();
