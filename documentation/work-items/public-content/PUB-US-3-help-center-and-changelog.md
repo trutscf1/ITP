@@ -20,8 +20,8 @@ One user story of [Public content: landing page, help center, changelog, legal p
 | ID | Title | Given | When | Then |
 | --- | --- | --- | --- | --- |
 | PUB-AC-3.1 | Help articles | The help center | A member opens it | The help articles are grouped by category and can be searched |
-| PUB-AC-3.2 | Changelog page | The changelog page | A member opens it | The releases are shown in chronological order |
-| PUB-AC-3.3 | Contextual help | A member inside the app | They follow a help link | It leads to the article that fits the place they came from |
+| PUB-AC-3.2 | Changelog page | The changelog page | A member opens it | The releases are shown newest first, each with version, date, title, and text |
+| PUB-AC-3.3 | Contextual help | A member inside the app | They follow a help link | It leads to the article assigned to the place they came from; if no article is assigned, to the start page of the help center |
 | PUB-AC-3.4 | Public | A person without an account | They open the help center or the changelog | Both are reachable |
 
 ## Slices
