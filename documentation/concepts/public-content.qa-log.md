@@ -269,6 +269,28 @@ Shown with the next question: the two fix commits (the concept changes with requ
 
 > **Answer:** Commit, push, reply (Recommended)
 
+## Round 12 — 2026-10-20 — Phases 5 and 6, review findings of the agent review of !6 (agent, on request of trutscf1)
+
+Notes: no question was asked in this round. The owner asked the agent to apply the recommended default for the open points of the agent review (findings 3, 5, 6, 7) and to leave the school questions Q12 to Q14 open. Every assumption below is reviewed by `trutscf1`; a rejected one becomes a `Q<n>` of the next round. Question numbers continue from Q29, so the next free one is Q30 (process questions Q15, Q21 to Q27, and Q29 are not listed in §13 of the concept).
+
+Assumptions stated with the round, none rejected yet:
+
+- **A37**: `CONTENT_REFRESH_SECONDS` is an integer from 1 to 60, default 60, because `PUB-AC-1.4` promises that a change is public within 60 seconds and a larger value would break it.
+- **A38**: `CONTENT_TIMEOUT_MS` is an integer from 100 to 30000, default 2000, the same default as the health timeouts of the scaffolding concept.
+- **A39**: The access token of the `web` unit is the secret `CONTENT_ACCESS_TOKEN`, a string of at least 32 characters without a default, equal in `cms` and `web`; a missing or short value stops the unit like any invalid configuration (`SCF-E-1`).
+- **A40**: Allowed image types are PNG, JPEG, and WebP, recognized by their content, up to 2 097 152 bytes (2 MiB); SVG is excluded because it can carry scripts. New `PUB-F-35` and `PUB-E-8`.
+- **A41**: The rich text format is a small fixed markup (paragraphs, headings of level 2 to 4, bold, italic, two list kinds, links to `http`, `https`, `mailto`, or an own address); everything else is shown as plain text. New `PUB-F-36`.
+- **A42**: The record types of §8 use the neutral types of the manifest: `identifier` is `uuid`, `text(a..b)` is a `string` of a to b characters, `date` is a `string` of the form `YYYY-MM-DD`, and `rich text` is a `string` in the markup of A41; they are declared once as named types.
+- **A43**: Six further configuration values get their defaults until the Identity and web client concepts define them: `CMS_INTERNAL_URL`, `PUBLIC_BASE_URL`, `SESSION_CHECK_TIMEOUT_MS` (500, range 50 to 5000), `DASHBOARD_PATH`, `REGISTRATION_PATH`, `LOGIN_PATH`.
+- **A44**: Editor data rules: name 1 to 100 characters, e-mail address unique, password 12 to 128 characters; the panel creates and deletes only accounts of the role `editor`, and the administrator account cannot be deleted there (recovery is an operator task outside this concept). New `PUB-F-37`, `PUB-E-9`, `PUB-E-10`.
+- **A45**: The description of a page without its own description is the plain text of the body of the first `hero` section, cut after 160 characters; if there is none, the page title. The start pages of help center and changelog have the fixed titles of §8.
+- **A46**: The capabilities `PUB-C-1` to `PUB-C-4` of §7 are the ones the review named (content management with languages, password hashing, safe rich text, accessibility check); `STACK.md` gets capability-index rows only and the text "to be chosen by the owner".
+- **A47**: Work-item titles and issue #78 stay as they are, although "Strapi" is in the title of `PUB-US-1` and in `PUB-AC-1.1`; the finding is reported to the owner, who decides on a rename.
+- **A48**: Slices: `PUB-US-1` is cut into three slices (the cms unit, editor accounts, delivery by `web`); the other stories keep their one slice. Weights are re-estimated and proposed, the tracker is not changed by this round.
+- **A49**: The translation note is shown once at the top of a page that shows any German text under `/en`; each German passage is marked as German.
+- **A50**: `web` refreshes a content group when a request arrives and the last attempt is at least `CONTENT_REFRESH_SECONDS` old; one attempt per group runs at a time; a refresh succeeds only if all image files of the group were fetched too.
+- **A51**: The stage of the feature in `ROADMAP.md` stays `concept` until the issues are cut (`ready` means issues cut) and the reviewer accepted §16 and §17.
+
 ## Open questions for the school management
 
 Legal questions the agent does not decide (grill flow, personal data). They are not answered in this log; the owner takes them to the data-protection contact of the school and records the answers here.
