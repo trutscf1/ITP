@@ -523,4 +523,3 @@ Planning of the sprints and milestones on the dates set by the team: Sprint 1 20
 ➡️ Nur Begonnenes + R1-Kern (Recommended)
 
 > **Answer:** Nur Begonnenes + R1-Kern (Recommended); the user's remark before: "heute werden niemals die restlichen 25 issues fertig". Moved to Sprint 2: #56, #105, #78, #81, #107, #109, #112, #2, #3, #116, #117.
-
