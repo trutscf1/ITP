@@ -341,3 +341,9 @@ Provisional numbers (P-TEAM-5): Q44 to Q66 of this day are on `concept/scaffoldi
 ➡️ Als Übergang ok — replaced by M9 (`apps/web/Dockerfile`) in SCF-US-8 slice 1
 
 > **Answer:** Als Übergang ok (Recommended)
+
+❓ **Q71** - **Merge !14**: concept/scaffolding-track-web → dev, Head 0818a6c, approved by trutscf1; the author merging is against `docs/` §4. Options: Merge now / No / Later / I merge myself
+
+➡️ Merge now — merged as `ab985fa` by `schwaigc` (the author), branch kept; #113 closed and set to `status::done`. Deviation from `docs/anforderungen_software_projekte.md` §4, decided by `schwaigc`
+
+> **Answer:** Merge now
