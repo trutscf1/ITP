@@ -78,7 +78,7 @@ apps/web/
 ├── src/status/collect.ts            M4
 ├── src/status/table.ts              M5  table component without JSX (React createElement)
 ├── src/health.ts                    M2  ownReport(config)
-└── src/**/*.test.ts                 unit tests W-1 to W-20
+└── src/**/*.test.ts                 unit tests W-1 to W-21
 packages/contracts/src/web/config.ts M1  WebConfig and loadWebConfig
 ```
 
@@ -185,7 +185,7 @@ GET /api/docs
 GET|POST|… /api/<any other path> -> 404, ErrorResponse { code: "not-found", message: "The requested resource does not exist." }
 ```
 
-The path to the file is `config.OPENAPI_FILE`, read per request, so a test points it at the fixture or at a missing file and the image points it at its own copy (M9). `web` never edits or rebuilds the file; it serves what the generation command of the contracts core wrote ([SCF-F-10]). The error message names no path ([SCF-NF-4]); the cause goes to the log. HTML pages keep the normal not-found page; [SCF-F-21] applies to the HTTP endpoints under `/api` (Q59). Until the generation command exists, the route is tested against the fixture `apps/web/src/api-docs/fixture.openapi.json`.
+The path to the file is `config.OPENAPI_FILE`, read per request, so a test points it at the fixture or at a missing file and the image points it at its own copy (M9). `web` never edits or rebuilds the file; it serves what the generation command of the contracts core wrote ([SCF-F-10]). The error message names no path ([SCF-NF-4]); the cause goes to the log. HTML pages keep the normal not-found page; [SCF-F-21] applies to the HTTP endpoints under `/api` (Q59). `/health` is an HTTP endpoint as well: it builds the report from the configuration only, so it has no failure of its own, but an unexpected exception is caught in the handler and answered with the 500 above, and `/health` and `/api/docs` answer a method other than GET and HEAD with 405, `{ code: "method-not-allowed", message: "The method is not allowed for this path." }`, and the header `Allow: GET, HEAD` (A6, W-21). Until the generation command exists, the route is tested against the fixture `apps/web/src/api-docs/fixture.openapi.json`.
 Traces to: SCF-F-10, SCF-F-21, SCF-NF-4, SCF-AC-3.3, SCF-AC-3.4. Requires: generation command and its output path (contracts core), ErrorResponse.
 
 #### M7 — Start command
@@ -272,3 +272,4 @@ Taken from `scaffolding.md` §10 and the acceptance criteria of SCF-US-8. These 
 | W-18 | M3 | SCF-AC-8.4, SCF-E-3 | a stub that answers with a body of 100 KiB | the unit is queried | the row is `down` |
 | W-19 | Rendering rule | SCF-AC-8.4, SCF-U-3 | the output of `next build` with every unit address pointing to a closed port | the prerender manifest is read | it lists none of `/health`, `/status`, `/api/docs`, and the build made no request to a unit |
 | W-20 | M8 | SCF-NF-1 | the source of the layout | it is read | it imports no font from `next/font/google`, and neither `public/` nor `src/app/` holds a file of the create-next-app template (the five `.svg` files, `favicon.ico`) |
+| W-21 | M2, M6 | SCF-AC-3.4, SCF-F-21 | `/health` | it is requested with POST | the response is 405 with `{ code: "method-not-allowed", message: "The method is not allowed for this path." }` and the header `Allow: GET, HEAD` |
