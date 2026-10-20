@@ -249,3 +249,25 @@ Fabian's reviews of !4 and !5 (not approved) are worked through under `/engineer
 ## Round 9 — 2026-10-13 — delivery (`tschudea07`, revise !11)
 
 Review of !11 by `schwaigc`, point 1: `SCF-AC-5.3` and `SCF-AC-2.5` were stricter than `SCF-NF-6` after Q31. On `tschudea07`'s instruction to resolve the review, both criteria now carry the wording of `SCF-NF-6` (fixable findings; accepted exceptions with reason and expiry), in the story files and in the issues #42, #104, #39, #103. The work items belong to `trutscf1`: the approval as PM is requested on !11 and still open.
+
+## Round 11 — 2026-10-20 — delivery (`schwaigc`, plan of the R1 track Web)
+
+The MRs of round 10 wait for reviews; the next task of `schwaigc` is chosen. Q42 and Q43 of round 10 are on `feature/106-contrast-and-storybook` (!9).
+
+❓ **Q44** - **Nächster Task**: Die MRs sind merge-fertig und warten auf Reviews. Womit soll ich bei deinen Tasks anfangen? Options: R1 Track-Web-Plan / R6 Web-Client grillen / R4 Rest grillen / Shared #39/#40/#103
+
+➡️ R1 Track-Web-Plan
+
+> **Answer:** R1 Track-Web-Plan (Recommended)
+
+❓ **Q45** - **Issue und Branch**: Issue „R1 track Web: plan of the web unit“ (type::concept, schwaigc, Sprint 1, Gewicht 1) und Branch `concept/scaffolding-track-web`, gestapelt auf !13 (Merge-Reihenfolge !13 → dieser MR)? Options: Ja, so anlegen / Ohne neues Issue / Auf dev statt auf !13
+
+➡️ Ja, so anlegen — issue #113
+
+> **Answer:** Ja, so anlegen (Recommended)
+
+❓ **Q46** - **Annahmen für den Plan**: A1 Statusseite unter `/status` (Server-Seite, ohne Cache, U-3). A2 Abfrage pro Unit mit Timeout `HEALTH_TIMEOUT_MS` (2000); ein Body, der kein HealthReport der richtigen Unit ist, gilt als down (E-3), egal welcher HTTP-Status. A3 Health-URLs der Units als Konfiguration im Web-Config-Contract (contracts/web), Defaults aus der Routing-Tabelle §8. A4 STACK.md §4: SCF-C-3 = Next.js 16.3 (App Router), SCF-C-13 = Playwright 1.63. A5 `apps/web/src/prisma` bleibt unberührt, offener Punkt für SCF-US-4. Options: Alle ok / Einzelne ändern
+
+➡️ Alle ok
+
+> **Answer:** Alle ok (Recommended)
