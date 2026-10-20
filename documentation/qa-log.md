@@ -399,3 +399,43 @@ The MRs !5, !7, !9 wait for reviews; the next task of `schwaigc` is chosen. The 
 ➡️ Merge now — merged as `8786ed1`, branch kept; #111 closed and set to `status::done`
 
 > **Answer:** Merge now
+
+## Round 17 — 2026-10-20 — delivery (`schwaigc`, revise !14 after the review of `trutscf1`)
+
+The review of !14 (F1–F18) left six questions to the owner. Checked before asking: `next start` rejects `PORT=abc` with its own message, and the standalone `server.js` of the image falls back to port 3000 (`parseInt(process.env.PORT, 10) || 3000`).
+
+❓ **Q54** - **Start-Check (F1)**: Wie wird die Konfiguration von web vor der ersten Anfrage geprüft, sodass der Prozess bei einem Fehler wie in Beispiel 3 mit Exit-Code ≠ 0 endet? Options: Wrapper-Startskript / instrumentation.ts
+
+➡️ Wrapper-Startskript — M7 `apps/web/scripts/start.ts`
+
+> **Answer:** Wrapper-Startskript (Recommended)
+
+❓ **Q55** - **Schrift (F6)**: Das Layout lädt Geist über next/font/google (Internet beim Build, SCF-NF-1). Was stattdessen? Options: System-Schrift / Lokale Font-Dateien
+
+➡️ Lokale Font-Dateien — Geist from the package `geist` (SIL OFL 1.1) through `next/font/local`, licence row in the README
+
+> **Answer:** Lokale Font-Dateien
+
+❓ **Q56** - **Statusfarbe (F13)**: Bekommt die Statusseite schon in R1 eine Farbe zusätzlich zum Text? Options: Nein, nur Text / Ja, mit Tokens
+
+➡️ Nein, nur Text
+
+> **Answer:** Nein, nur Text (Recommended)
+
+❓ **Q57** - **Tests (F4c, F12)**: Wer schreibt welche Tests? Options: Web: T-39, T-40 / Alles Web / Gemeinsamer axe-Check
+
+➡️ Web: T-39, T-40 — in `tests/status-page.test.ts`; T-40 runs axe on `/status` with 0 violations of any impact; SCF-T-36 stays with the Platform track
+
+> **Answer:** Web: T-39, T-40 (Recommended)
+
+❓ **Q58** - **Health-Adressen (F8)**: Container-Hostnamen in den Defaults, localhost für den nativen Start? Options: Service = Unit-Name / Defaults = localhost
+
+➡️ Service = Unit-Name — interface with the Platform track; `.env.example` carries the container values and a comment with the native ones
+
+> **Answer:** Service = Unit-Name (Recommended)
+
+❓ **Q59** - **Fehlerantworten (F7)**: Antwortet web bei Fehlern mit ErrorResponse? Options: Ja, für /api/* / Auch für Seiten
+
+➡️ Ja, für /api/* — `/api/docs` without file: 500 `internal-error`; unknown `/api/*`: 404 `not-found`; HTML pages keep the normal not-found page
+
+> **Answer:** Ja, für /api/* (Recommended)
