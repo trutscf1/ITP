@@ -428,6 +428,8 @@ Assumptions of the review follow-up, stated on 2026-10-20 for the owner `trutscf
 | A23 | Error code catalogue | The first nine codes of `ErrorResponse.code` with HTTP status and message (§8) are proposed; this refines A15. Later concepts append codes. |
 | A24 | Seed records | The minimum seed is one user, one team with that user as member, and one folder of that team (§8); the identity track decides the tables' columns. |
 | A25 | Scans before a commit | [SCF-F-14] and [SCF-E-6] derive from [SCF-AC-5.2] (the same scans as in the pipeline, run earlier) and [SCF-AC-2.2] (no secret in the repository), not from [SCF-AC-2.2] alone; they move to the story [SCF-US-5] and its test [SCF-T-24]. No criterion names the local hooks; the owner decides whether [SCF-US-5] gets one. |
+| A26 | CI constraints and skip rule | Tests that need the container runtime or the git host are marked in §17 and are skipped, never passed, in the `test` job; the result of the skipped tests is stated by hand in the merge request (§17, "CI Test Constraints"). [SCF-T-26] and [SCF-T-10] join the lists. |
+| A27 | Paths of [SCF-T-36] | The paths that must not return a report of `worker` are `/worker/health`, `/api/worker/health`, and `/health/worker`, each with status 404, and the stack publishes no port of `worker`. |
 
 Changes decided in [public-content.md](public-content.md) (its Q17 and Q18) and carried out here: [SCF-NF-1] allows `degraded` because of a non-essential check, and [SCF-F-8] and [SCF-U-1] show the names of the failed checks.
 
@@ -637,7 +639,7 @@ n/a — unit tests are specified per track in the plan files, from the worked ex
 
 ### Acceptance Tests
 
-One test per acceptance criterion; test names in code carry the `AC` ID. On `dev`, `tests/` already holds tests for `SCF-AC-1.1` to `SCF-AC-1.5` (`monorepo.test.ts`, `typescript.test.ts`), `SCF-AC-5.1` to `SCF-AC-5.5` (`ci-pipeline.test.ts`, `ci-docs-job.test.ts`, `accessibility/`), and `SCF-AC-6.1` to `SCF-AC-6.3` (`commit-format.test.ts`, `changelog.test.ts`). They read the repository and the pipeline definition, so the parts of [SCF-T-25], [SCF-T-27], and [SCF-T-30] that need the git host are not covered by them yet.
+One test per acceptance criterion; test names in code carry the `AC` ID. On `dev`, `tests/` already holds tests for `SCF-AC-1.1` to `SCF-AC-1.5` (`monorepo.test.ts`, `typescript.test.ts`), `SCF-AC-5.1` to `SCF-AC-5.5` (`ci-pipeline.test.ts`, `ci-docs-job.test.ts`, `accessibility/`), and `SCF-AC-6.1` to `SCF-AC-6.3` (`commit-format.test.ts`, `changelog.test.ts`). They read the repository and the pipeline definition, so the parts of [SCF-T-25], [SCF-T-26], [SCF-T-27], and [SCF-T-30] that need the git host are not covered by them yet.
 
 | ID | Title | Covers | Given | When | Then |
 | --- | --- | --- | --- | --- | --- |
@@ -665,18 +667,18 @@ One test per acceptance criterion; test names in code carry the `AC` ID. On `dev
 | SCF-T-22 | Migrations run at the start | SCF-AC-4.5, SCF-F-26, SCF-E-7 | the local stack with an empty relational database, and once more with a migration that cannot be applied | the stack starts | first run: all migrations are applied before `identity` reports `ok`; second run: the migrating container exits with a non-zero code and names the migration, and `identity` does not start |
 | SCF-T-23 | Pipeline runs on every change | SCF-AC-5.1, SCF-F-15 | the pipeline definition | its rules are evaluated for a push to a feature branch, to `dev`, to `main`, a merge request, and a push with an open merge request | each case starts exactly one pipeline |
 | SCF-T-24 | Pipeline holds all jobs | SCF-AC-5.2, SCF-F-14, SCF-F-15, SCF-E-6 | the pipeline definition, the hook configuration, and a staged file with a secret | the jobs are listed and the secret scan runs on the staged file | the pipeline holds lint, typecheck, test, build, commit-message check, accessibility check, secret scan, code scan, dependency audit, and container image scan; the hook configuration runs the secret scan, the code scan, and the dependency audit before a commit; the commit with the secret is rejected and the output names file, line, and rule |
-| SCF-T-25 | Failing job blocks the merge | SCF-AC-5.3, SCF-NF-6, SCF-E-5 | a merge request with a lint error, one with a failing test, and one with a dependency of severity high | their pipelines run | each pipeline fails, and none of the merge requests can be merged |
-| SCF-T-26 | Pipeline is fast enough | SCF-AC-5.4, SCF-NF-10 | a pipeline run with a warm task cache | it finishes | it took less than 10 minutes, and every job has a time limit of 10 minutes |
-| SCF-T-27 | Status is visible on the merge request | SCF-AC-5.5, SCF-F-15 | an open merge request | a reviewer opens it | it shows the status of its pipeline |
+| SCF-T-25 | Failing job blocks the merge (needs the git host) | SCF-AC-5.3, SCF-NF-6, SCF-E-5 | a merge request with a lint error, one with a failing test, and one with a dependency of severity high | their pipelines run | each pipeline fails, and none of the merge requests can be merged |
+| SCF-T-26 | Pipeline is fast enough (needs the git host) | SCF-AC-5.4, SCF-NF-10 | a pipeline run with a warm task cache | it finishes | it took less than 10 minutes, and every job has a time limit of 10 minutes |
+| SCF-T-27 | Status is visible on the merge request (needs the git host) | SCF-AC-5.5, SCF-F-15 | an open merge request | a reviewer opens it | it shows the status of its pipeline |
 | SCF-T-28 | Commit messages are checked | SCF-AC-6.1, SCF-F-13, SCF-E-4 | the four messages of §10, example 4 | the commit check runs on each | the first two are accepted, the last two are rejected with the reason of the example |
 | SCF-T-29 | Changelog draft from commits | SCF-AC-6.2, SCF-F-16 | the four commits of §10, example 5, since the last release tag | the draft command runs | it prints the draft of the example |
-| SCF-T-30 | Release has tag and release | SCF-AC-6.3, SCF-F-27 | a published release | its tag and its release on the git host are read | the tag is annotated, matches `v<MAJOR>.<MINOR>.<PATCH>`, points to `main`, and the release holds the changelog section of that version |
+| SCF-T-30 | Release has tag and release (needs the git host) | SCF-AC-6.3, SCF-F-27 | a published release | its tag and its release on the git host are read | the tag is annotated, matches `v<MAJOR>.<MINOR>.<PATCH>`, points to `main`, and the release holds the changelog section of that version |
 | SCF-T-31 | Architecture overview with diagram | SCF-AC-7.1, SCF-F-28 | the README | its architecture overview is read | it holds a diagram that shows the four areas and every database of the local stack |
 | SCF-T-32 | Setup guide with and without internet | SCF-AC-7.2, SCF-F-28 | the README | its setup sections are read | it describes the start with internet, the start without internet, and operation and deployment |
 | SCF-T-33 | Definition of Done is linked | SCF-AC-7.3, SCF-F-28 | the README | its section on the Definition of Done is read | it links `documentation/WORKFLOW.md`, calls the Definition of Done binding, and the linked section exists |
 | SCF-T-34 | Data model diagram is embedded | SCF-AC-7.4, SCF-F-22 | the README | its data model section is read | it embeds the entity-relationship diagram of [SCF-F-22] |
 | SCF-T-35 | Licence notes are complete | SCF-AC-7.5, SCF-F-28 | the README and the manifests of all units and packages | the direct dependencies and the committed images, fonts, and icons are compared with the licence notes | each one is listed with its licence |
-| SCF-T-36 | Proxy routes every health path | SCF-AC-8.1, SCF-F-4, SCF-F-5 | the started local stack | `/health`, `/api/identity/health`, `/api/storage/health`, and `/cms/health` are requested at the one origin, and then every path of the routing table with the name of `worker` | the four requests return the health report of `web`, `identity`, `storage`, and `cms`; no request returns a report of `worker` |
+| SCF-T-36 | Proxy routes every health path | SCF-AC-8.1, SCF-F-4, SCF-F-5 | the started local stack | `/health`, `/api/identity/health`, `/api/storage/health`, and `/cms/health` are requested at the one origin, and then `/worker/health`, `/api/worker/health`, and `/health/worker` | the first four requests return the health report of `web`, `identity`, `storage`, and `cms`; each of the other three answers with status 404, and none returns a report with the unit `worker`; the stack definition publishes no port of `worker` |
 | SCF-T-37 | Healthy unit reports ok | SCF-AC-8.2, SCF-F-5, SCF-F-6, SCF-NF-4 | `identity` whose database stub answers in 40 ms | its health endpoint is requested | the response is the report of §10, example 1, and holds no host, port, credential, or version of a dependency |
 | SCF-T-38 | Timed-out dependency reports down | SCF-AC-8.3, SCF-F-6, SCF-F-7, SCF-NF-3, SCF-E-2 | `identity` whose database stub does not answer within 1000 ms | its health endpoint is requested | the response arrives within 2000 ms and is the report of §10, example 2 |
 | SCF-T-39 | Status page shows every unit | SCF-AC-8.4, SCF-F-8, SCF-U-1, SCF-U-3, SCF-E-3 | the health endpoints stubbed as in §10, example 7 | the status page is loaded, and loaded again after `storage` answers `ok` | the first page shows the five rows of the example; the second shows `storage` as `ok` |
@@ -692,7 +694,13 @@ The values of §10 are the test data: the two health reports, the configuration 
 
 ### CI Test Constraints
 
-Tests that read the repository run in the `test` job without network. Tests that need the started local stack ([SCF-T-8], [SCF-T-12], [SCF-T-22], [SCF-T-36]) run where a container runtime is available; until the pipeline offers one, they are run locally and their result is stated in the merge request. No test calls a service on the internet.
+Tests that read the repository run in the `test` job without network. Three groups need more, and each test of them checks its precondition first (assumption A26):
+
+- **Needs the container runtime** ([SCF-T-8], [SCF-T-10], [SCF-T-12], [SCF-T-22], [SCF-T-36]): they start the local stack or scan its images. [SCF-T-10] also needs a vulnerability database that is already present locally.
+- **Needs the git host** ([SCF-T-25], [SCF-T-26], [SCF-T-27], [SCF-T-30]): they read real pipelines, merge requests, and releases through the host's interface.
+- **Everything else** runs in the `test` job.
+
+A test whose precondition is missing is reported as skipped with its ID and the missing precondition, never as passed. The `test` job has neither a container runtime nor access to the host's interface, so it skips the first two groups and prints the skipped IDs. Until the pipeline offers a container runtime, the author runs the first group locally; the reviewer of the release merge request runs the second group against the host. Both results are stated in the merge request. A skipped test of a criterion is the reason that criterion is not yet accepted. No test calls a service on the internet, apart from the host's interface in the second group, which is the project's own git host.
 
 ### Test Coverage Matrix & Untested Justifications
 
