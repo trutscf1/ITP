@@ -185,3 +185,9 @@ Later in the same session the owner asked to make the pipeline green again. Show
 > **Answer:** Nachrichten umbrechen (Recommended)
 
 Result: the message bodies of the commits on the branch were rewrapped at 100 characters, with unchanged content and unchanged files, and the branch was replaced with a forced push. This revises the answer to Q19.
+
+## Round 6 — 2026-10-20 — follow-up of the review of !13 (trutscf1, with an agent)
+
+Notes: the review of !13 (findings 2, 3, 5 to 9) asks for decisions that no one has made yet. The agent applied the recommended default for each and states it as an assumption instead of asking; the owner `trutscf1` reviews them and may overturn any of them. The assumptions are also listed in the concept (§13).
+
+- **A21**: The configuration table (§8) sets ranges, defaults, and the exit code 1 for `PORT`, `HEALTH_TIMEOUT_MS`, `HEALTH_CHECK_TIMEOUT_MS`, and the variables of the example configuration, and adds `APP_VERSION`, `DATABASE_URL`, `HEALTH_URL_*`, and `STATUS_UNIT_TIMEOUT_MS`. Reason: the review demanded a complete table and no number was set before.

@@ -219,13 +219,53 @@ Unit routing table (defaults; every value is configuration, [SCF-NF-8]):
 
 Every unit serves its health endpoint internally at `/health` on its internal port.
 
+### Configuration parameters
+
+Configuration comes from the environment as text; the configuration helper (§16, "Interface Signatures") converts it to the neutral type. Each unit has one configuration contract in the contracts package ([SCF-F-9]) that lists the parameters below which apply to it; a later concept adds its parameters to the contract of its unit and to this table ([SCF-F-17]). Variable names are those of the example configuration, or are fixed here where the example configuration does not hold the variable yet (it gains them with the unit, [SCF-F-17]); `STACK.md` maps them to the stack.
+
+Rules for every parameter (they decide the boundary behavior of the table):
+
+- A value that is missing or empty counts as not set. A parameter that is not set and has a default takes the default and is not reported; a parameter that is not set and has no default is invalid with the reason `is required and missing`.
+- An `integer` is one or more decimal digits with an optional leading minus sign, no spaces, no fraction, no exponent. The range is inclusive: the minimum and the maximum are valid, one below the minimum and one above the maximum are invalid.
+- A `string` is taken as it is; its length range is counted in characters and inclusive.
+- Invalid values are never replaced by the default and are never printed ([SCF-NF-4]).
+
+Parameters of every unit ([SCF-F-11]):
+
+| Variable | Type | Default | Valid range | Boundary behavior | Reason printed by [SCF-E-1] |
+| --- | --- | --- | --- | --- | --- |
+| `PORT` | integer | the internal port of the unit (routing table) | 1 to 65535 | 0 and 65536 invalid; 1 and 65535 valid | `expected an integer between 1 and 65535` |
+| `HEALTH_TIMEOUT_MS` | integer (milliseconds) | 2000 | 100 to 60000 | 99 and 60001 invalid | `expected an integer between 100 and 60000` |
+| `HEALTH_CHECK_TIMEOUT_MS` | integer (milliseconds) | 1000 | 50 to 30000, and less than `HEALTH_TIMEOUT_MS` | 49, 30001, and a value equal to or above `HEALTH_TIMEOUT_MS` invalid | `expected an integer between 50 and 30000` or `expected an integer less than HEALTH_TIMEOUT_MS` |
+| `APP_VERSION` | string | `0.0.0-dev` | a version in the form `<MAJOR>.<MINOR>.<PATCH>` with an optional suffix, 5 to 64 characters | 4 and 65 characters invalid | `expected a version such as 1.2.3` |
+
+Parameters of single units:
+
+| Variable | Unit | Type | Default | Valid range | Boundary behavior | Reason printed by [SCF-E-1] |
+| --- | --- | --- | --- | --- | --- | --- |
+| `DATABASE_URL` | `identity` | string (secret) | none, required | 1 to 2048 characters | an empty value counts as missing | `is required and missing` |
+| `HEALTH_URL_IDENTITY`, `HEALTH_URL_STORAGE`, `HEALTH_URL_WORKER`, `HEALTH_URL_CMS` | `web` | string, an absolute URL with the scheme `http` or `https` | `http://<unit>:<internal port>/health` | 1 to 2048 characters | any other scheme invalid | `expected an absolute http or https URL` |
+| `STATUS_UNIT_TIMEOUT_MS` | `web` | integer (milliseconds) | 3000 | 100 to 60000, and at least `HEALTH_TIMEOUT_MS` | 99, 60001, and a value below `HEALTH_TIMEOUT_MS` invalid | `expected an integer between 100 and 60000` |
+
+Parameters of the local stack, read by the container runtime from the example configuration, not by a unit:
+
+| Variable | Type | Default | Valid range | Boundary behavior | Behavior when invalid or missing |
+| --- | --- | --- | --- | --- | --- |
+| `POSTGRES_USER` | string | none (dummy value in the example configuration) | 1 to 63 characters | an empty value counts as missing | the start command stops before it creates a container and names the variable |
+| `POSTGRES_PASSWORD` | string (secret) | none (dummy value in the example configuration) | 8 to 128 characters | fewer than 8 characters invalid | as above |
+| `POSTGRES_PORT` | integer | 5432 | 1 to 65535 | 0 and 65536 invalid | as above; a port already taken makes only that container fail |
+| `MONGO_USER` | string | none (dummy value in the example configuration) | 1 to 63 characters | an empty value counts as missing | as above |
+| `MONGO_PASSWORD` | string (secret) | none (dummy value in the example configuration) | 8 to 128 characters | fewer than 8 characters invalid | as above |
+
+The switch of each feature that uses a service on the internet ([SCF-NF-2]) is a parameter of type `enum(disabled|local|external)` with the default `disabled`, or `local` where a local replacement exists; any other value is invalid with the reason `expected one of disabled, local, external`. The concept of the feature that uses the service names the variable and adds it to this table. `DATABASE_URL`, the credentials, and every other secret appear in the example configuration only as dummy values and never in a log line, a health report, or an error response.
+
 The relational data model itself (tables for users, teams, permissions, folders) is the entity-relationship diagram of [SCF-F-22]; this document fixes only the `users` table of [SCF-F-24].
 
 ## 9. Error Conditions
 
 | ID | Title | Trigger | Required behavior | Fallback | Derives from |
 | --- | --- | --- | --- | --- | --- |
-| SCF-E-1 | Invalid configuration | A unit starts with a missing or invalid configuration variable. | The unit MUST NOT accept requests; it exits with a non-zero code and prints one line per invalid variable: name and reason, never the value. | None. | SCF-AC-2.6 (Invalid configuration) |
+| SCF-E-1 | Invalid configuration | A unit starts with a missing or invalid configuration variable. | The unit MUST NOT accept requests; it exits with code 1 and prints the line `Invalid configuration for unit "<unit>":` and then, indented by two spaces, one line `<NAME>: <reason>` per invalid variable, sorted by name, with the reason texts of §8, never the value. | None. | SCF-AC-2.6 (Invalid configuration) |
 | SCF-E-2 | Dependency timeout | A dependency check does not complete within `HEALTH_CHECK_TIMEOUT_MS`. | The check is reported `down`; the report's status follows [SCF-F-6]. | None. | SCF-AC-8.3 (Failed dependency) |
 | SCF-E-3 | Unit unreachable | The status page cannot reach a unit, or the response does not match the HealthReport contract. | That unit's row shows `down`; all other rows render normally. | None. | SCF-AC-8.4 (Status page) |
 | SCF-E-4 | Commit message rejected | A commit message violates the commit format. | Locally the commit is rejected with the linter's reason; in CI the commit-message job fails and names the commit. | None. | SCF-AC-6.1 (Commit check) |
@@ -258,7 +298,7 @@ Invalid configuration for unit "storage":
   PORT: expected an integer between 1 and 65535
 ```
 
-Exit code non-zero. `HEALTH_TIMEOUT_MS` falls back to its default 2000 and is not reported.
+Exit code 1. `HEALTH_TIMEOUT_MS` falls back to its default 2000 and is not reported.
 
 **Example 4 — commit messages ([SCF-F-13]).**
 
@@ -358,6 +398,12 @@ Assumptions A1–A10: see the question log. Assumptions of the migration, stated
 | A18 | Branch | `concept/migrate-scaffolding`. |
 | A19 | Address of the API description | `web` serves it, because `/api/docs` falls under the prefix `/` of the routing table. |
 | A20 | Capability index | `STACK.md` gets one index table of all capabilities; the tables of the track sections stay unchanged, so open merge requests on them do not conflict. |
+
+Assumptions of the review follow-up, stated on 2026-10-20 for the owner `trutscf1` to review (`scaffolding.qa-log.md`, round 6):
+
+| A | Title | Assumption |
+| --- | --- | --- |
+| A21 | Configuration parameters | The ranges, defaults, and the exit code 1 of the table "Configuration parameters" (§8) are proposals of the review follow-up; the variables `APP_VERSION`, `DATABASE_URL`, `HEALTH_URL_*`, and `STATUS_UNIT_TIMEOUT_MS` are new and enter the example configuration with their unit. Reason: the review demanded a complete table and no number was set before. |
 
 Changes decided in [public-content.md](public-content.md) (its Q17 and Q18) and carried out here: [SCF-NF-1] allows `degraded` because of a non-essential check, and [SCF-F-8] and [SCF-U-1] show the names of the failed checks.
 
@@ -529,7 +575,7 @@ One test per acceptance criterion; test names in code carry the `AC` ID. On `dev
 | SCF-T-8 | Stack starts without internet | SCF-AC-2.3, SCF-NF-1, SCF-NF-2 | a machine with the images present and the network disconnected, the example configuration unchanged | the local stack starts | no unit is `down`, and every service on the internet (external login, bot protection, e-mail delivery) is disabled or replaced by a local service |
 | SCF-T-9 | Containers have health checks | SCF-AC-2.4, SCF-F-20 | the resolved stack definition | its services are read | every service defines a health check, and every unit's service waits for each service it depends on to be healthy |
 | SCF-T-10 | Image scan passes | SCF-AC-2.5, SCF-NF-6 | the images the stack definition names | the container image scan runs on them | it reports no vulnerability of severity high or critical that has a fix, apart from accepted exceptions with a written reason and an expiry date; an image with such a vulnerability makes it exit with a non-zero code |
-| SCF-T-11 | Invalid configuration stops a unit | SCF-AC-2.6, SCF-F-11, SCF-E-1 | a unit started with `PORT=abc` and without `HEALTH_TIMEOUT_MS` | it starts | it exits with a non-zero code and prints the output of §10, example 3, without the value `abc`; it accepts no request |
+| SCF-T-11 | Invalid configuration stops a unit | SCF-AC-2.6, SCF-F-11, SCF-E-1 | a unit started with `PORT=abc` and without `HEALTH_TIMEOUT_MS` | it starts | it exits with code 1 and prints the output of §10, example 3, without the value `abc`; it accepts no request |
 | SCF-T-12 | Native start reloads | SCF-AC-2.7, SCF-F-3 | the reverse proxy and the data services running in containers | the second start command runs and a source file of a unit is changed | all units run outside containers, and the changed unit restarts without a new command |
 | SCF-T-13 | One file per contract | SCF-AC-3.1, SCF-F-9 | the contracts package | its files are listed | every HTTP request and response shape has a file of its own, and no unit folder defines a shape with the same name |
 | SCF-T-14 | Client and server share a schema | SCF-AC-3.2, SCF-F-9 | a form in `web` and its endpoint in a unit | their imports are read | both import the same schema from the contracts package |
