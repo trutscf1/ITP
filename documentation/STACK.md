@@ -51,9 +51,9 @@ Every capability of `concepts/scaffolding.md` §7 and where its technology stand
 | Capability | Technology | Version constraint | Notes |
 | --- | --- | --- | --- |
 | Runtime & language | Node.js, TypeScript (strict, no `any`) | Node.js 24 LTS ≥ 24.14.0 (`.tool-versions`, `engines`); TypeScript 5 | School minimum (`docs/anforderungen_software_projekte.md`). Set by #38 (SCF-US-1). |
-| SCF-C-1 workspace & task runner | pnpm workspaces, Turborepo | pnpm 10 (`packageManager`); Turborepo 2 | One lockfile at the root; tasks `lint`, `typecheck`, `build` run through `turbo run`. Set by #38. |
-| Shared lint / format / type configuration | Biome (lint, format); shared TypeScript base config | Biome 2.4; `@stash/config` | `biome.json` at the root, generated Prisma files excluded; `packages/config/tsconfig.base.json` with `strict`. Set by #38. |
-| SCF-C-13 unit test runner (shared) | Node.js test runner (`node --test`), TypeScript by type stripping | Node.js 24 | Provisional, for the acceptance tests of #38 (`tests/`); the owner may replace it. Browser end-to-end runner: section 4. |
+| SCF-C-1 workspace & task runner | pnpm workspaces, Turborepo | pnpm 10 (`packageManager`); Turborepo 2 | One lockfile at the root; every unit and package provides the tasks `dev`, `build`, `lint`, `typecheck`, `test` (SCF-F-12), and each runs across the workspace through `turbo run`. Set by #38 and #102. |
+| Shared lint / format / type configuration | Biome (lint, format); shared TypeScript base config | Biome 2.4; `@stash/config` | `biome.json` at the root, generated Prisma files excluded, `noExplicitAny` set to `error`; `packages/config/tsconfig.base.json` with `strict`, extended by every unit including `web`. Set by #38 and #102. |
+| SCF-C-13 unit test runner (shared) | Node.js test runner (`node --test`), TypeScript by type stripping | Node.js 24 | Provisional, for the acceptance tests (`tests/`, the workspace package `@stash/tests`) and the unit tests of every package; the owner may replace it. Browser end-to-end runner: section 4. |
 | SCF-C-7 container runtime & stack | _open_ | | |
 | SCF-C-6 reverse proxy | _open_ | | |
 | SCF-C-8 relational database | _open_ | | |
@@ -67,9 +67,9 @@ Module mapping (folder layout), set by #38:
 | `apps/web` | `@stash/web` | Unit `web` (Next.js app) |
 | `apps/identity`, `apps/storage`, `apps/worker`, `apps/cms` | `@stash/<unit>` | The other four units; empty until their issues |
 | `packages/contracts`, `packages/ui`, `packages/config` | `@stash/<name>` | Shared packages; `config` holds the TypeScript base config |
-| `tests/` | – | Acceptance tests that run at the repository root |
+| `tests/` | `@stash/tests` | Acceptance tests that run at the repository root |
 
-Build/run commands (root): `pnpm install`, `pnpm run lint`, `pnpm run typecheck`, `pnpm run build`, `pnpm test`. Configuration & secrets: _open_.
+Build/run commands (root): `pnpm install`, `pnpm dev`, `pnpm run lint`, `pnpm run typecheck`, `pnpm run build`, `pnpm test`. Configuration & secrets: _open_.
 
 ## 2. Contracts, storage & worker — `schauby1`
 

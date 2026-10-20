@@ -11,6 +11,7 @@ New tasks and ideas for this developer land here first, before anyone plans them
 
 ## Open
 
+- [2026-10-13] From `schwaigc`, #102 (SCF-US-1 slice 2): `concepts/scaffolding.md` holds no requirement that derives from `SCF-AC-1.2` (strict TypeScript, `any` is a lint error) or `SCF-AC-1.5` (quick start in the README). Add both with the migration of the concept; the tests in `tests/typescript.test.ts` and `tests/monorepo.test.ts` already carry the AC IDs.
 - [2026-10-06] Revoke the two project access tokens used until 2026-10-06 (Project → Settings → Access tokens). The other three team members each create an own personal access token (`docs/agents/issue-tracker.md`, "Access").
 - [2026-10-06] Review and merge the migration MR !1 `concept/migrate-engineering-human` → `dev` (issue #86); a person other than the author reviews it.
 - [2026-10-06] Team review of the drafts in `GOAL.md` (roles R-1…R-3, success signals G-1.S1…S3) and of the *Serves* column in `ROADMAP.md`; only the wording of G-1 is confirmed.

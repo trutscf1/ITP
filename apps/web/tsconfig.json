@@ -1,12 +1,9 @@
 {
+  "extends": "@stash/config/tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
     "noEmit": true,
-    "esModuleInterop": true,
     "module": "preserve",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
@@ -21,7 +18,8 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "types": ["node"]
+    "types": ["node"],
+    "declaration": false
   },
   "include": [
     "next-env.d.ts",

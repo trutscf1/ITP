@@ -205,8 +205,10 @@ describe("SCF-AC-5.2 Pipeline steps", () => {
     assert.match(scriptOf("lint"), /pnpm exec biome ci \./);
   });
 
-  it("SCF-AC-5.2 runs the unit tests of every unit and package", () => {
-    assert.match(scriptOf("test"), /pnpm exec turbo run test/);
+  it("SCF-AC-5.2 runs the unit tests of every unit and package once, through the root task", () => {
+    // `pnpm test` is `turbo run test` (SCF-F-12), so it also runs the acceptance tests.
+    assert.match(scriptOf("test"), /^pnpm test$/m);
+    assert.doesNotMatch(scriptOf("test"), /turbo run test/);
   });
 
   it("SCF-AC-5.2 runs the accessibility check (axe) against the built web client", () => {
