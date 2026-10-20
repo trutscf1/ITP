@@ -290,6 +290,9 @@ Assumptions stated with the round, none rejected yet:
 - **A49**: The translation note is shown once at the top of a page that shows any German text under `/en`; each German passage is marked as German.
 - **A50**: `web` refreshes a content group when a request arrives and the last attempt is at least `CONTENT_REFRESH_SECONDS` old; one attempt per group runs at a time; a refresh succeeds only if all image files of the group were fetched too.
 - **A51**: The stage of the feature in `ROADMAP.md` stays `concept` until the issues are cut (`ready` means issues cut) and the reviewer accepted §16 and §17.
+- **A52**: Articles inside a help category are ordered alphabetically by title, because the data model has no position for articles; `PUB-F-16` says so.
+- **A53**: The legal templates follow the heading outline in §8 (headings and placeholders only); the wording below the headings is written by the author of the templates and is not legal advice (open question Q14).
+- **A54**: Two named error conditions were added so that no failure is left to guesswork: `PUB-E-11` (invalid content value) and `PUB-E-12` (action not permitted, including the failed sign-in).
 
 ## Open questions for the school management
 

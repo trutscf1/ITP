@@ -45,7 +45,7 @@ Visitors and members read the landing page, the help center, the changelog, and 
 
 ## H5. How it is built, in plain words
 
-The content lives in the `cms` unit as content entries: landing-page sections, help categories and articles, changelog entries, three legal pages, and images with their source and licence (§8). The `web` unit reads published entries, keeps the last version of every page with its images, and renders the public pages. The feature touches ten existing parts of the system (§14); four of them need a change in another document (§15): a fresh installation may start as `degraded`, the status page names failed checks, the Identity concept supplies the captcha notice, and each release gets a step for the changelog entry. The architecture is written in Phase 5.
+The content lives in the `cms` unit as content entries: landing-page sections, help categories and articles, changelog entries, three legal pages, and images with their source and licence (§8). The `web` unit reads published entries, keeps the last version of every page with its images, and renders the public pages. The feature touches ten existing parts of the system (§14); four of them need a change in another document (§15): a fresh installation may start as `degraded`, the status page names failed checks, the Identity concept supplies the captcha notice, and each release gets a step for the changelog entry. The code is split into two units and one shared package (§16). In the `cms` unit, five modules keep the content and its rules (`content-model`, `editor-accounts`, `content-interface`, `content-seed`, `cms-health`). In the `web` unit, five modules read, route, render, and frame the pages (`content-client`, `address-routing`, `rich-text`, `page-resolution`, `page-frame`). `content-client` asks the `cms` unit again whenever the last attempt is at least `CONTENT_REFRESH_SECONDS` old (at most 60 seconds), and it keeps the last good version of every group and all images, which is why the pages survive a stopped `cms` unit. Two things keep state: each language version of an entry is a draft or published (a German legal page can never go back to draft), and an installation is unclaimed until the first administrator registers ([PUB-F-6] refresh interval, [PUB-F-8] last version, [PUB-F-24] fixed legal pages, [PUB-F-10] first administrator). The work is cut into seven slices of about 3 hours each; the first three build the `cms` unit and the delivery by `web`, the other four add one story each.
 
 ## H6. How we know it works
 
@@ -72,7 +72,7 @@ n/a — the test concept (§17) is written in Phase 6; until then every acceptan
 
 ### Development Path
 
-Path A (frontloaded). Phase 1 (grill) and Phase 3 (artifact interactions) were completed on 2026-10-06. From Phase 2, the legal questions Q12–Q14 are still open with the school management (§13); they concern the content of the team's own installation, not the behavior specified here. Next is the Phase 4 review gate. Not written yet: §16, §17.
+Path A (frontloaded). Phase 1 (grill) and Phase 3 (artifact interactions) were completed on 2026-10-06. From Phase 2, the legal questions Q12–Q14 are still open with the school management (§13); they concern the content of the team's own installation, not the behavior specified here. The Phase 4 gate was passed with the approval of `schwaigc`; §16 (Phase 5) and §17 (Phase 6) were written on 2026-10-20 with the assumptions A37 to A54 of the question log, which the owner reviews.
 
 ### Synthesis Dependencies
 
@@ -82,7 +82,7 @@ Path A (frontloaded). Phase 1 (grill) and Phase 3 (artifact interactions) were c
 
 ### Synthesis Scope
 
-Nothing can be synthesized from this document yet: architecture (§16) and test concept (§17) are missing.
+The `cms` and `web` parts of this feature, the content contracts, and the setup guide step can be synthesized from this document, the work items, `STACK.md`, and the dependencies above: the modules and slices are in §16, the tests in §17. Not specified here, and stubbed in the tests: the session check and the bot protection notice (Identity concept), the address of the dashboard, the registration page, and the login page (configuration values with placeholder defaults, §8).
 
 ### Owner
 
@@ -104,6 +104,9 @@ Used only in this document:
 - **Content interface**: the part of the `cms` unit from which the `web` unit reads published content entries.
 - **Publish**: to change a content entry from draft to published in one content language.
 - **Content store**: the database of the `cms` unit that holds the content entries and the editor accounts ([PUB-F-1]).
+- **Content group**: one of four sets of published content entries that the `web` unit loads and holds together: `landing` (sections and their images), `help` (categories and articles), `changelog`, `legal` (§16).
+- **Held content**: the last successfully loaded version of a content group and its image files in the `web` unit; the "last version" of [PUB-F-8].
+- **Fixed text**: a text of the public pages that belongs to the web client and not to a content entry (§8).
 
 ## 3. User Stories & Acceptance Criteria
 
@@ -128,7 +131,7 @@ The user stories and their acceptance criteria are the work items in [work-items
 | PUB-F-13 | Source and licence | The `cms` unit MUST refuse to save an image without a source and a licence with [PUB-E-4] (image without licence). It does not judge the licence itself: using only licence-free images is the duty of the content editor. Every image of the seed content MUST be licence-free. Icons that are part of the web client MUST be listed with source and licence in the licence notes of the README ([SCF-F-28] of [scaffolding.md](scaffolding.md)). | PUB-AC-2.3 (Licence-free media) |
 | PUB-F-14 | Call to action | A landing section of kind `call-to-action` MUST show one link to the registration page and one to the login page. The seed content MUST contain one such section. | PUB-AC-2.4 (Call to action) |
 | PUB-F-15 | Meta tags | Every public page MUST carry a title, a description, and the Open Graph properties title, description, type, and address. Title and description come from the content entry; if a description is empty, the description of the first landing section of kind `hero` is used. | PUB-AC-2.5 (Meta tags) |
-| PUB-F-16 | Help by category | The start page of the help center MUST list every help category that has at least one published article, in the editor's order, each with the titles of its published articles. Each title MUST link to the article's page. | PUB-AC-3.1 (Help articles) |
+| PUB-F-16 | Help by category | The start page of the help center MUST list every help category that has at least one published article, in the editor's order, each with the titles of its published articles, ordered alphabetically by title in the content language shown, ignoring upper and lower case. A help article counts as published only if its German version is published ([PUB-F-29]). Each title MUST link to the article's page. | PUB-AC-3.1 (Help articles) |
 | PUB-F-17 | Help search | The help center MUST offer a search field. A search term of at least 2 characters MUST return every published help article of the current content language whose title or text contains the term, ignoring upper and lower case, titles matching first. | PUB-AC-3.1 (Help articles) |
 | PUB-F-18 | Changelog order | The changelog page MUST show every published changelog entry with version, release date, title, and text, ordered by release date, newest first; entries with the same date are ordered by version, highest first. | PUB-AC-3.2 (Changelog page) |
 | PUB-F-19 | Contextual help | The address `/<language>/help/context/<help context>` MUST redirect to the published help article assigned to that help context. If none is assigned, it MUST redirect to the start page of the help center ([PUB-E-6], unknown help context). A help context MUST be assigned to at most one help article. | PUB-AC-3.3 (Contextual help) |
@@ -307,6 +310,18 @@ The paths and the session check time are placeholders until the Identity and web
 | Title of the help center start page | Hilfe | Help |
 | Title of the changelog page | Änderungsprotokoll | Changelog |
 | Page not found ([PUB-E-5]), title and text | Seite nicht gefunden | Page not found |
+| Call to action, link to registration | Registrieren | Register |
+| Call to action, link to login | Anmelden | Log in |
+
+**Legal template outline.** The legal templates are one set of text files, held once in the shared contracts and read by the `cms` unit (seed) and the `web` unit (built-in legal text), so that [PUB-F-26] holds. Each template starts with the template notice, then has these headings in this order; the wording under them is written by the author of the templates and is not legal advice (open question Q14). Every value the operator has to supply is written `[[name of the value]]`.
+
+| Kind | Headings (German / English) | Placeholders |
+| --- | --- | --- |
+| `imprint` | Betreiber / Operator; Kontakt / Contact | `[[name of the operator]]`, `[[street and number]]`, `[[postcode and city]]`, `[[e-mail address]]`, `[[telephone number]]` |
+| `terms` | Geltungsbereich / Scope; Nutzung / Use; Konten / Accounts; Haftung / Liability; Änderungen / Changes; Anwendbares Recht / Applicable law | `[[name of the operator]]`, `[[date of the terms]]`, `[[country of the applicable law]]` |
+| `privacy` | Verantwortlicher / Controller; Mitgliedskonten / Member accounts; Konten der Redakteure / Editor accounts; Hochgeladene Dateien / Uploaded files; Protokoll / Audit log; IP-Adressen bei der Anmelde-Begrenzung / IP addresses for the login rate limit; Bot-Schutz / Bot protection; Externe Anmeldung / External login providers; E-Mail-Versand / E-mail delivery; Ihre Rechte / Your rights | `[[name of the operator]]`, `[[e-mail address of the data protection contact]]`, `[[retention period of the audit log]]` |
+
+Under each heading of the privacy template from "Mitgliedskonten" to "E-Mail-Versand", the first sentence names the data concerned and the second names the purpose ([PUB-F-22]). The last three services are named even when switched off, with the sentence that they apply only when switched on.
 
 **Addresses of the public pages** (`<l>` is `de` or `en`):
 
@@ -314,6 +329,7 @@ The paths and the session check time are placeholders until the Identity and web
 | --- | --- |
 | Landing page | `/<l>` |
 | Help center start | `/<l>/help` |
+| Help search | `/<l>/help?q=<search term>` |
 | Help article | `/<l>/help/<id of the help article>` |
 | Help by context | `/<l>/help/context/<help context>` |
 | Changelog | `/<l>/changelog` |
@@ -334,6 +350,8 @@ The paths and the session check time are placeholders until the Identity and web
 | PUB-E-8 | Image not allowed | An editor saves an image file whose content is not PNG, JPEG, or WebP, or that is larger than 2 097 152 bytes. | The `cms` unit refuses to save and says which of the two limits was broken. | None. | PUB-AC-2.3 (Licence-free media) |
 | PUB-E-9 | Registration closed | Someone submits the registration form of the admin panel while a CMS administrator exists, including the second of two submissions that arrive at the same time. | The `cms` unit refuses, creates no account, and says that registration is closed. | None. | PUB-AC-1.7 (Unclaimed administrator) |
 | PUB-E-10 | Invalid editor data | An editor account is saved with a name, e-mail address, or password that breaks [PUB-F-37], or with an e-mail address another account uses. | The `cms` unit refuses to save and names the field. | None. | PUB-AC-1.3 (Editor roles) |
+| PUB-E-11 | Invalid content value | A content entry is saved with a value that breaks §8: a length outside its range, a wrong format, a `position`, `version`, or `helpContext` that another entry of the same type already uses, an image on a section of kind `call-to-action`, a missing category, or a help category without both names. | The `cms` unit refuses to save, keeps the stored entry unchanged, and names the field. | None. | PUB-AC-1.2 (Content types), PUB-AC-3.3 (Contextual help) |
+| PUB-E-12 | Action not permitted | A person without an editor session asks for anything but the login form, signs in with data that does not match an account, or a signed-in person asks for an action beyond the role: an editor creates or deletes an editor account, anyone deletes the CMS administrator account or a legal page or creates a fourth legal page, or an editor changes the account of someone else. | The `cms` unit refuses and changes nothing; a failed sign-in gets the one message "E-mail address or password is wrong." whichever part is wrong. | None. | PUB-AC-1.3 (Editor roles), PUB-AC-4.1 (Footer links) |
 
 ## 10. Worked Examples
 
@@ -487,7 +505,7 @@ Verbatim rounds: [public-content.qa-log.md](public-content.qa-log.md). No ADR wa
 | Q20 | Shared understanding | Confirmed; Phase 3 written | — |
 | Q28 | Unpublished legal page | The German version of a legal page cannot be unpublished ([PUB-F-24], [PUB-E-7]) | Legal pages must always be reachable (Q3); found in the review of the Phase 4 gate |
 
-Process questions that changed no behavior (Q15, Q21 to Q27, Q29) are only in the question log. The assumptions A37 to A51 of Phases 5 and 6 (configuration ranges, image limits, rich text markup, editor data rules, capabilities, slices) are in round 12 of the question log; the owner reviews them, and a rejected one becomes a numbered question.
+Process questions that changed no behavior (Q15, Q21 to Q27, Q29) are only in the question log. The assumptions A37 to A54 of Phases 5 and 6 (configuration ranges, image limits, rich text markup, editor data rules, capabilities, slices) are in round 12 of the question log; the owner reviews them, and a rejected one becomes a numbered question.
 
 Accepted risk of Q8: between the first start and the first registration, anyone who reaches the admin panel can become CMS administrator. [PUB-F-9] (administrator check) shows this state; it does not prevent it.
 
@@ -528,3 +546,499 @@ The existing parts of the system this feature touches, checked on 2026-10-06 (Ph
 | [scaffolding.md](scaffolding.md), [SCF-F-8] and [SCF-U-1] | The row of a unit whose status is not `ok` MUST also show, as text, the names of its dependency checks that are `down`. | Q18, [PUB-AC-1.7] | `trutscf1` in the concept (same migration); `schwaigc` in the status page (#16) |
 | [identity.md](identity.md) | Specify the notice text the provider of the bot protection prescribes, in German and English, and the configuration value that hides the badge. | [PUB-F-23] | `tschudea07` |
 | `WORKFLOW.md`, "Releases" | New step: a content editor writes and publishes the changelog entry of the release in the team's installation. | Q19 | `trutscf1`, in the MR that delivers [PUB-US-3] (help center and changelog) |
+
+## 16. Architecture & Vertical Slices
+
+The feature lives in two units, `cms` and `web`, plus the shared contracts. The unit split and routing are fixed by [scaffolding.md](scaffolding.md) §16 and its ADR; this chapter adds the modules inside them. A module is named by its job; `STACK.md` decides how a module becomes files and packages (P-DES-3). Every module hides much behavior behind a small interface (P-DES-1): the `web` side has one operation to read content, one to decide an address, one to build a page, and one to wrap it.
+
+### Module Overview & Tree
+
+```text
+apps/cms                    unit cms
+├── content-model           content types, language versions, states, validation, legal page rules, images
+├── editor-accounts         roles, accounts, first administrator, sign-in, password storage
+├── content-interface       the read interface for the web unit: token check, published versions only, image files
+├── content-seed            example content on the first start
+└── cms-health              health report with the checks content-store and administrator-account
+apps/web                    unit web
+├── content-client          reads the content interface, keeps the last version of every group and its images
+├── address-routing         language of the address, first visit, signed-in redirect, unknown addresses
+├── rich-text               rich text markup to a safe structure
+├── page-resolution         content group + route + language to a page, a redirect, or an error page
+└── page-frame              footer, language switch, meta tags, notices, layout, no tracking
+packages/contracts          shared by both units
+└── content-contracts       shapes of the content interface, legal templates, fixed texts, configuration shapes
+README.md                   setup-guide: the registration step of the quick start
+```
+
+### Vertical Slices Breakdown
+
+The slices and their issues stand in the story files (P-DOC-6); this table says which modules each slice builds or extends. Each slice is demoable on its own and fits into 4 h (`WORKFLOW.md`, "Issues and weight"); weights are the proposal of assumption A48.
+
+| Story | Slice | Weight | Modules built or extended | Demo |
+| --- | --- | --- | --- | --- |
+| PUB-US-1 | 1 — CMS runs with its content types | 3 | `content-contracts` (shapes, legal templates), `content-model`, `content-seed`, `cms-health` (check `content-store`) | `docker compose up`: the `cms` container reports `ok` and holds the seed content |
+| PUB-US-1 | 2 — Editor roles and first administrator | 2 | `editor-accounts`, `content-interface`, `cms-health` (check `administrator-account`), `setup-guide` | the status data of `cms` is `degraded` with `administrator-account` until the first registration; content requests without the token are refused |
+| PUB-US-1 | 3 — Delivery by `web` | 3 | `content-client`, `address-routing`, `rich-text`, `page-resolution` (legal pages, unavailable page), `page-frame` (frame, meta tags, no tracking), fixed texts | a legal page at `/de/legal/privacy` shows the published text, changes after 60 s, and survives a stopped `cms` with its images |
+| PUB-US-2 | 1 — whole story | 3 | `page-resolution` (landing page), `address-routing` (signed-in redirect), `page-frame` (layout, accessibility check) | `/de` shows the landing page; a signed-in member lands on the dashboard |
+| PUB-US-3 | 1 — whole story | 3 | `page-resolution` (help center, search, contextual help, changelog) | the help center with search, an article, a help context link, and the changelog |
+| PUB-US-4 | 1 — whole story | 3 | `page-frame` (footer, notice slot), `content-contracts` (completed legal templates), `page-resolution` (built-in legal text) | the three legal pages from the footer, also with a never-reached `cms` |
+| PUB-US-5 | 1 — whole story | 3 | `address-routing` (first visit), `page-frame` (language switch, translation note), `page-resolution` (missing translation), `content-model` (language versions checked) | `/` leads to `/en` for an English browser; an article without English shows German with the note |
+
+Order: US-1 slice 1, then 2, then 3; US-2 to US-5 each depend only on US-1 (slice 3 supplies the web foundation they extend).
+
+### Module Specifications
+
+All records use the neutral types and the named types of §8. `Language` and `ContentState` are those of §8. A module's *Traces to* line lists the requirements it implements; *Requires* lists the capabilities (§7) and the other modules it calls.
+
+**Shared records (`content-contracts`).** Everything that crosses the content interface; a version map holds only the languages whose version is `published`.
+
+```text
+ContentGroup = enum(landing|help|changelog|legal)
+RouteKind    = enum(landing|help-start|help-article|help-context|changelog|legal)
+LegalKind    = enum(imprint|terms|privacy)
+
+LandingText   { heading: string, body: string }
+HelpText      { title: string, body: string, description: string }
+ChangelogText { title: string, body: string }
+LegalText     { title: string, body: string }
+
+PublishedLandingSection { id: uuid, kind: enum(hero|feature|text-with-image|call-to-action),
+                          position: integer, imageId: optional<uuid>, text: map<Language, LandingText> }
+PublishedImage          { id: uuid, mediaType: string, alternativeText: map<Language, string> }
+PublishedHelpCategory   { id: uuid, position: integer, name: map<Language, string> }
+PublishedHelpArticle    { id: uuid, categoryId: uuid, helpContext: optional<string>, text: map<Language, HelpText> }
+PublishedChangelogEntry { id: uuid, version: string, releaseDate: string, text: map<Language, ChangelogText> }
+PublishedLegalPage      { id: uuid, kind: LegalKind, text: map<Language, LegalText> }
+
+ContentGroupData {
+  group: ContentGroup,
+  landingSections: list<PublishedLandingSection>,   // group landing, else empty
+  images: list<PublishedImage>,                     // group landing, else empty
+  helpCategories: list<PublishedHelpCategory>,      // group help, else empty
+  helpArticles: list<PublishedHelpArticle>,         // group help, else empty
+  changelogEntries: list<PublishedChangelogEntry>,  // group changelog, else empty
+  legalPages: list<PublishedLegalPage>              // group legal, else empty
+}
+
+ImageFile { mediaType: string, bytes: binary }
+
+legalTemplate(kind: LegalKind, language: Language) -> string   // template notice first, outline of §8
+fixedText(key: string, language: Language) -> string           // the fixed texts of §8
+```
+
+Traces to: [PUB-F-22], [PUB-F-26], [PUB-F-25]. Requires: the shared contracts package of [SCF-F-9].
+
+**`content-model`** (unit `cms`)
+
+```text
+save(actor: Actor, type: ContentType, entry: map<string,string>, language: Language) -> Entry
+publish(actor: Actor, type: ContentType, id: uuid, language: Language) -> Entry
+unpublish(actor: Actor, type: ContentType, id: uuid, language: Language) -> Entry   // may fail with PUB-E-7
+delete(actor: Actor, type: ContentType, id: uuid) -> nothing
+saveImage(actor: Actor, file: binary, source: string, licence: string,
+          alternativeText: map<Language,string>) -> Image
+  errors: PUB-E-4, PUB-E-7, PUB-E-8, PUB-E-11, PUB-E-12
+
+rules:
+  1. The only content types are those of §8 and they live in the cms unit's own content store.
+  2. Before any change, ask editor-accounts.canDo(actor.role, action); on false raise PUB-E-12.
+  3. save validates every field against §8 and raises PUB-E-11 with the first broken field;
+     a stored entry is never changed by a refused save.
+  4. A language version saved for the first time has state draft. publish and unpublish change
+     the state of the named language only (PUB-F-30).
+  5. LegalPage: exactly three records exist, one per kind. create of a fourth and delete of any raise
+     PUB-E-12. unpublish of language de raises PUB-E-7 for both roles; language en may be unpublished.
+  6. saveImage checks in this order: media type from the file content (png, jpeg, webp) and size
+     (at most 2097152 bytes) -> PUB-E-8; source non-empty, then licence non-empty -> PUB-E-4.
+  7. No stored record names or references the actor (PUB-NF-6).
+```
+
+Traces to: [PUB-F-1], [PUB-F-2], [PUB-F-5], [PUB-F-13], [PUB-F-24], [PUB-F-30], [PUB-F-35], [PUB-NF-6], [PUB-E-4], [PUB-E-7], [PUB-E-8], [PUB-E-11]. Requires: [PUB-C-1]; `editor-accounts`.
+
+**`editor-accounts`** (unit `cms`)
+
+```text
+hasAdministrator() -> boolean
+registerFirstAdministrator(name: string, email: string, password: string) -> EditorAccount
+createEditor(actor: Actor, name: string, email: string, password: string) -> EditorAccount
+deleteEditor(actor: Actor, id: uuid) -> nothing
+changeOwn(actor: Actor, name: optional<string>, email: optional<string>, password: optional<string>) -> EditorAccount
+signIn(email: string, password: string) -> Session
+canDo(role: enum(administrator|editor), action: enum(content.write|content.publish|account.create|account.delete)) -> boolean
+  errors: PUB-E-9, PUB-E-10, PUB-E-12
+
+rules:
+  1. registerFirstAdministrator runs as one atomic step: if hasAdministrator() is true it raises PUB-E-9;
+     of two simultaneous calls exactly one succeeds. The account gets role administrator.
+  2. Data rules of PUB-F-37 (name, e-mail address unique, password 12 to 128 characters) raise PUB-E-10 naming the field.
+  3. The password is stored only as the hash of PUB-C-2 (PUB-NF-5). An account holds id, name, email,
+     passwordHash, role and nothing else (PUB-NF-4).
+  4. canDo: role editor -> content.write and content.publish true, account.create and account.delete false;
+     role administrator -> all four true.
+  5. createEditor creates role editor only. deleteEditor deletes accounts of role editor only and removes
+     name, e-mail address, and hash in the same step; content entries are untouched (PUB-NF-7).
+     Deleting the administrator account raises PUB-E-12.
+  6. changeOwn changes the actor's own account only; another account raises PUB-E-12 (PUB-NF-8).
+  7. signIn failure, whatever part is wrong, raises PUB-E-12 with the one message of §9.
+  8. The admin panel shows a person without session only the login form, or the registration form while
+     hasAdministrator() is false (PUB-F-4, PUB-F-10).
+```
+
+Traces to: [PUB-F-3], [PUB-F-4], [PUB-F-10], [PUB-F-37], [PUB-NF-4], [PUB-NF-5], [PUB-NF-7], [PUB-NF-8], [PUB-E-9], [PUB-E-10], [PUB-E-12]. Requires: [PUB-C-1], [PUB-C-2].
+
+**`content-interface`** (unit `cms`)
+
+```text
+getGroup(token: optional<string>, group: ContentGroup) -> ContentGroupData
+getImageFile(token: optional<string>, session: optional<Session>, id: uuid) -> ImageFile
+  errors: PUB-E-2
+
+rules:
+  1. A missing token, or one different from CONTENT_ACCESS_TOKEN, raises PUB-E-2 and returns nothing.
+     getImageFile also accepts an editor session.
+  2. getGroup returns, per entry, only language versions whose state is published; an entry without any
+     published version is left out; images are those of the returned landing sections.
+  3. No result holds an editor account, an author, or the source or licence of an image (PUB-NF-6).
+  4. The interface is reachable on the internal address of cms and, like the admin panel, under the proxy
+     prefix; the token check applies to both.
+```
+
+Traces to: [PUB-F-4], [PUB-F-5], [PUB-F-32], [PUB-NF-6], [PUB-E-2]. Requires: [PUB-C-1]; `content-model`.
+
+**`content-seed`** (unit `cms`)
+
+```text
+seedIfEmpty() -> nothing
+
+rules:
+  1. Called at every start of cms after the content store answers.
+  2. If the number of content entries of all types is 0: create the seed content of §8 in German and
+     English, all published; legal pages from legalTemplate(kind, language); the seed images are simple
+     generated graphics with source "created for this project" and licence "CC0-1.0".
+  3. If it is at least 1: create, change, and delete nothing (PUB-F-7).
+  4. The step is all-or-nothing; if it fails, the unit exits with a non-zero code and keeps no entry.
+```
+
+Traces to: [PUB-F-7], [PUB-F-13], [PUB-F-14], [PUB-F-26]. Requires: `content-model`, `content-contracts`.
+
+**`cms-health`** (unit `cms`)
+
+```text
+health() -> HealthReport      // HealthReport and DependencyCheck of scaffolding.md §8
+
+rules:
+  1. unit = cms; check content-store (essential): ok if a read of the content store answers within
+     HEALTH_CHECK_TIMEOUT_MS, else down.
+  2. check administrator-account (essential: false): ok if editor-accounts.hasAdministrator() is true;
+     down otherwise, and also down while content-store is down.
+  3. status by SCF-F-6: ok, degraded (only the non-essential check is down), or down.
+  4. No host, port, credential, or version of a dependency appears (SCF-NF-4).
+```
+
+Traces to: [PUB-F-9], [PUB-F-31]. Requires: `editor-accounts`; [SCF-F-5], [SCF-F-6].
+
+**`content-client`** (unit `web`)
+
+```text
+get(group: ContentGroup) -> LoadResult     // LoadResult { data: optional<ContentGroupData>, loadedAt: optional<timestamp> }
+image(id: uuid) -> optional<ImageFile>
+held(group: ContentGroup) -> optional<ContentGroupData>   // what is held now; never starts an attempt
+  errors: PUB-E-1 (never raised to the caller; the caller sees held or absent data)
+
+state per group: data, loadedAt, lastAttemptAt, attemptInFlight
+rules:
+  1. get(group) starts an attempt when the group was never attempted, or now - lastAttemptAt >= CONTENT_REFRESH_SECONDS,
+     and none is in flight. A caller that arrives while an attempt is in flight waits for it and uses its result.
+  2. An attempt requests getGroup with CONTENT_ACCESS_TOKEN at CMS_INTERNAL_URL within CONTENT_TIMEOUT_MS. For
+     the group landing it then requests every image file it does not hold, each within the same timeout.
+  3. On success: replace data and loadedAt; hold the new image files and drop those the data no longer refers to.
+     On any failure, or a timeout, of the group or one image: PUB-E-1; keep all held data and images.
+  4. lastAttemptAt is set to the time the attempt started, success or not.
+  5. If nothing is held after an attempt, get returns data absent; the caller decides (page-resolution).
+  6. image(id) returns only a held file; it never asks the content interface. held(group) returns the held data.
+```
+
+Traces to: [PUB-F-6], [PUB-F-8], [PUB-F-32], [PUB-E-1], [PUB-E-3]. Requires: `content-contracts`; the clock seam (§16, design for testability).
+
+**`address-routing`** (unit `web`)
+
+```text
+decide(request: RequestInfo) -> RouteDecision
+  RequestInfo   { path: string, acceptLanguage: optional<string>, hasSessionCookie: boolean, cookies: string }
+  RouteDecision { kind: enum(redirect|render|notFound), status: integer, redirectTo: optional<string>,
+                  language: Language, routeKind: optional<RouteKind>, articleId: optional<string>,
+                  context: optional<string>, legalKind: optional<LegalKind>, query: optional<string> }
+  errors: PUB-E-5
+
+SessionState = enum(valid|none|unknown)    // answered by the session check of the Identity concept
+
+rules (first match wins; a single trailing slash is ignored):
+  1. path "/": state = sessionState(request). valid -> redirect DASHBOARD_PATH. Otherwise redirect to /en if
+     preferredLanguage(acceptLanguage) is en, else /de.
+  2. path /de or /en: state valid -> redirect DASHBOARD_PATH; otherwise render routeKind landing.
+  3. /<l>/help (query q optional) -> help-start; /<l>/help/context/<c> -> help-context with context c;
+     /<l>/help/<id> -> help-article with articleId id; /<l>/changelog -> changelog;
+     /<l>/legal/<kind> with kind in imprint, terms, privacy -> legal. l is de or en.
+  4. Any other path, any other language, or an unknown legal kind: notFound, status 404, language de if the
+     first path part is not de or en (PUB-E-5).
+  5. sessionState: no session cookie -> none without a call. Otherwise ask the session check; no answer within
+     SESSION_CHECK_TIMEOUT_MS, an error, or a missing Identity unit -> unknown, treated as none (PUB-F-33).
+  6. preferredLanguage: split acceptLanguage at commas; each entry has a tag and a quality (default 1; entries with
+     quality 0 are ignored); order by quality, highest first, ties in written order; the first entry whose primary
+     subtag, ignoring case, is "de" or "en" decides; none -> de.
+```
+
+Traces to: [PUB-F-12], [PUB-F-27], [PUB-F-28], [PUB-F-33], [PUB-E-5]. Requires: the session check of [identity.md](identity.md) (seam).
+
+**`rich-text`** (unit `web`)
+
+```text
+render(source: string) -> list<RichBlock>
+  RichBlock  { kind: enum(paragraph|heading|unordered-list|ordered-list), level: optional<integer>,
+               inlines: list<RichInline>, items: list<list<RichInline>> }   // inlines for paragraph and heading, items for lists
+  RichInline { kind: enum(text|bold|italic|link), text: string, address: optional<string> }
+
+rules:
+  1. Split the source into lines; blank lines end a paragraph or list. Line starts decide the block (§8 table);
+     a line start that is not in the table is a paragraph line.
+  2. Inside a line, scan left to right: **x** is bold, *x* is italic, [x](a) is a link when a starts with
+     http://, https://, mailto:, or "/" and x and a are non-empty and a holds no space; anything unmatched is text.
+     Bold, italic, and link text do not nest.
+  3. The result carries no raw markup element and no address with another scheme (PUB-C-3).
+```
+
+Traces to: [PUB-F-36]. Requires: [PUB-C-3].
+
+**`page-resolution`** (unit `web`)
+
+```text
+resolve(decision: RouteDecision, content: content-client) -> PageResult
+  PageResult { status: integer, language: Language, redirectTo: optional<string>, page: optional<PageModel> }
+  PageModel  { routeKind: RouteKind, title: string, description: string, ogType: enum(website|article),
+               blocks: list<PageBlock>, translationNote: boolean }
+  PageBlock  { kind: enum(section|category|article|changelog-entry|legal|search-results|message),
+               heading: optional<string>, body: list<RichBlock>, imageId: optional<uuid>, imageAlt: optional<string>,
+               links: list<PageLink>, contentLanguage: Language }
+  PageLink   { text: string, address: string }
+  errors: PUB-E-3, PUB-E-5, PUB-E-6
+
+rules:
+  1. pick(textMap, language): if language is en and en is present -> en; else if de is present -> de; else none.
+     A result of de under an en request sets translationNote and marks that block contentLanguage de.
+  2. visible(entry): the entry has a de version. Landing sections and changelog entries that are not visible are left
+     out in both languages; a help article that is not visible, or unknown, is PUB-E-5 and does not count as
+     published for lists, search, or help contexts. Legal pages are always visible (PUB-F-24).
+  3. A route needs one group: landing -> landing; help-* -> help; changelog -> changelog; legal -> legal.
+     get(group) returns no data and the route is not legal: status 503, message block with the fixed text of PUB-E-3.
+  4. landing: sections ordered by position, each with its heading and body (rich-text.render), its image, and for kind
+     call-to-action two links: REGISTRATION_PATH and LOGIN_PATH with the fixed texts of §8.
+  5. help-start: categories in position order that hold at least one visible article, each with its visible articles
+     ordered by title in the shown language, ignoring case. With query q: q trimmed; fewer than 2 characters -> normal
+     start page; else search results: articles with a version in the shown language whose title or plain text of the
+     body contains q, ignoring case; title matches first, then text-only matches, each group ordered by title; no
+     match -> the empty-search text of PUB-U-3.
+  6. help-article: visible -> the picked version; else PUB-E-5 (status 404). help-context: c matching [a-z0-9-]{1,64}
+     and a visible article with that helpContext -> redirect /<l>/help/<id>; otherwise redirect /<l>/help (PUB-E-6).
+  7. changelog: visible entries ordered by releaseDate descending, then version descending compared number by number.
+  8. legal: group loaded -> the picked version (translation note when de is shown under en). Group never loaded
+     -> legalTemplate(kind, language) as the page text, status 200 (PUB-F-25).
+  9. Page meta: title and description per §10 example 13 (title of the entry; description of the entry, else the plain
+     text of the body of the first hero section cut after 160 characters, else the title). ogType article for a help
+     article, else website. The hero text is taken from content.held(landing); if the landing group is not held, the fallback is the title.
+```
+
+Traces to: [PUB-F-11], [PUB-F-14], [PUB-F-15], [PUB-F-16], [PUB-F-17], [PUB-F-18], [PUB-F-19], [PUB-F-20], [PUB-F-24], [PUB-F-25], [PUB-F-29], [PUB-U-3], [PUB-E-3], [PUB-E-5], [PUB-E-6]. Requires: `content-client`, `rich-text`, `content-contracts`.
+
+**`page-frame`** (unit `web`)
+
+```text
+frame(result: PageResult, route: RouteDecision, notice: optional<string>) -> HtmlResponse
+notice: optional<string>      // the notice text from the Identity concept; present only when bot protection is on and its badge hidden
+
+rules:
+  1. Every page, including not found, unavailable, login, registration, share-link, and status pages built by other
+     features, is drawn by this one frame: header with the language switch, main content, footer (PUB-F-21).
+  2. Footer: links to /<l>/legal/imprint, /terms, /privacy with the fixed texts of §8, in the page language.
+  3. Language switch (PUB-U-2): "Deutsch" and "English" as text; it links to the same route in the other language,
+     for an error page to /<other>.
+  4. Head: title, description, og:title, og:description, og:type, og:url = PUBLIC_BASE_URL + the path of the page
+     (PUB-F-15). The document language is the page language; German passages under /en carry lang de.
+  5. translationNote true: the text "This page is not available in English." above the content (PUB-U-4).
+  6. notice present: show it as text directly below the form it protects; absent: nothing (PUB-F-23, PUB-U-5).
+  7. Exactly one level-1 heading; one column up to 320 pixels, content width up to 1280 pixels (PUB-U-1, PUB-NF-1).
+  8. The response sets no cookie, and the page holds no analytics; every resource address is on the own origin;
+     images are /media/<id> (PUB-NF-2, PUB-NF-3, PUB-F-32).
+  9. GET /media/<id>: content-client.image(id) -> the file with its media type, else "not found" without a page.
+```
+
+Traces to: [PUB-F-15], [PUB-F-21], [PUB-F-23], [PUB-F-32], [PUB-U-1], [PUB-U-2], [PUB-U-4], [PUB-U-5], [PUB-NF-1], [PUB-NF-2], [PUB-NF-3]. Requires: [PUB-C-4]; design tokens of [design-system.md](design-system.md); `content-client` (images).
+
+**`setup-guide`** (`README.md`): the quick start of [SCF-F-19] holds, directly after the start command, the numbered step "Open `<origin>/cms` and register the CMS administrator", and the sentence that until then anyone who reaches the admin panel can do so. Traces to: [PUB-F-34].
+
+### Pipeline Flow
+
+Request paths (solid), the refresh of held content (dotted), and the editor's path.
+
+```mermaid
+flowchart LR
+    visitor([Visitor browser])
+    editor([Editor browser])
+    proxy{{Reverse proxy<br/>one origin}}
+
+    subgraph webunit["unit web"]
+        routing["address-routing"]
+        resolution["page-resolution"]
+        richtext["rich-text"]
+        frame["page-frame"]
+        client["content-client<br/>held groups and images"]
+    end
+
+    subgraph cmsunit["unit cms"]
+        panel["admin panel:<br/>content-model, editor-accounts"]
+        iface["content-interface"]
+        health["cms-health"]
+        seed["content-seed"]
+        store[(content store)]
+    end
+
+    identity["unit identity<br/>session check"]
+    contracts["content-contracts<br/>shapes, templates, texts"]
+
+    visitor --> proxy
+    editor --> proxy
+    proxy -- "/ , /de , /en , /media" --> routing
+    proxy -- "/cms" --> panel
+    routing -. "session state" .-> identity
+    routing --> resolution
+    resolution --> richtext
+    resolution --> client
+    resolution --> frame
+    client -. "every refresh interval,<br/>with access token" .-> iface
+    iface --> store
+    panel --> store
+    seed --> store
+    health --> store
+    contracts -. "templates" .-> seed
+    contracts -. "built-in legal text" .-> resolution
+```
+
+Handling of one page request in `web`, in order:
+
+1. The proxy passes the request to `web`. A path `/media/<id>` is answered by `page-frame` rule 9 and ends there.
+2. `address-routing.decide` classifies the path; for `/`, `/de`, `/en` it asks the session check only if a session cookie is present.
+3. A `redirect` or `notFound` decision is answered at once (a not-found page is drawn by `page-frame`).
+4. For `render`, `page-resolution.resolve` asks `content-client.get(group)`, which refreshes the group first if the last attempt is at least `CONTENT_REFRESH_SECONDS` old.
+5. `page-resolution` renders rich text through `rich-text`, picks language versions, and returns a `PageResult` (page, redirect, 404, or 503).
+6. `page-frame.frame` wraps the page and sends it without a cookie.
+
+### Inter-Module Interfaces
+
+| Interface | Provided by | Used by | Inputs and outputs | Error conditions |
+| --- | --- | --- | --- | --- |
+| Content interface | `content-interface` (`cms`) | `content-client` | `getGroup(token, group)` → ContentGroupData; `getImageFile(token, session, id)` → ImageFile | [PUB-E-2] |
+| Content client | `content-client` (`web`) | `page-resolution`, `page-frame` | `get(group)` → LoadResult; `image(id)` → optional ImageFile; `held(group)` → optional ContentGroupData | [PUB-E-1] (inside), [PUB-E-3] (caller) |
+| Address decision | `address-routing` | request handler of `web` | RequestInfo → RouteDecision | [PUB-E-5] |
+| Session check | Identity concept ([identity.md](identity.md)) | `address-routing` | cookies → SessionState (`valid`, `none`, `unknown`) | none; no answer counts as `unknown` ([PUB-F-33]) |
+| Page resolution | `page-resolution` | request handler | RouteDecision + `content-client` → PageResult | [PUB-E-3], [PUB-E-5], [PUB-E-6] |
+| Rich text | `rich-text` | `page-resolution` | string → list of RichBlock | none |
+| Page frame | `page-frame` | request handler, other features' pages | PageResult + RouteDecision + optional notice → HtmlResponse | none |
+| Bot protection notice | Identity concept | `page-frame` | language → optional string | none |
+| Content operations | `content-model` | admin panel | `save`, `publish`, `unpublish`, `delete`, `saveImage` | [PUB-E-4], [PUB-E-7], [PUB-E-8], [PUB-E-11], [PUB-E-12] |
+| Account operations | `editor-accounts` | admin panel, `content-model` | `registerFirstAdministrator`, `createEditor`, `deleteEditor`, `changeOwn`, `signIn`, `canDo`, `hasAdministrator` | [PUB-E-9], [PUB-E-10], [PUB-E-12] |
+| Health endpoint | `cms-health` | status page, proxy, container health check | `GET /health` → HealthReport | [SCF-E-2] |
+| Seed | `content-seed` | start of `cms` | `seedIfEmpty()` | none |
+| Contracts | `content-contracts` | `cms` units and `web` | records, `legalTemplate`, `fixedText` | none |
+
+### State Machine Diagram
+
+Three things keep state: the language version of a content entry, the claim of the administrator account, and the held content of `web`.
+
+```mermaid
+stateDiagram-v2
+    [*] --> draft: first save of a language version
+    draft --> published: publish
+    published --> draft: unpublish
+    published --> published: save (new text, same state)
+    note right of published
+      Guard on unpublish: refused with PUB-E-7 when the entry
+      is a legal page and the language is German.
+      Each language of an entry has its own state.
+    end note
+```
+
+```mermaid
+stateDiagram-v2
+    [*] --> unclaimed: fresh installation
+    unclaimed --> claimed: registerFirstAdministrator succeeds
+    unclaimed --> unclaimed: second simultaneous submission loses (PUB-E-9)
+    claimed --> claimed: registration refused (PUB-E-9)
+    note right of unclaimed
+      administrator-account is down, cms is degraded,
+      the admin panel offers the registration form.
+    end note
+    note right of claimed
+      administrator-account is ok. There is no way back
+      in this feature: the account cannot be deleted.
+    end note
+```
+
+```mermaid
+stateDiagram-v2
+    [*] --> empty: web starts (per content group)
+    empty --> held: attempt succeeds
+    empty --> empty: attempt fails (PUB-E-1)
+    held --> held: refresh succeeds (new data replaces old)
+    held --> held: refresh fails (old data kept, PUB-E-1)
+    note right of empty
+      Legal pages: built-in legal text.
+      Other pages: PUB-E-3, status 503.
+    end note
+    note right of held
+      An attempt starts when the last attempt is at least
+      CONTENT_REFRESH_SECONDS old.
+    end note
+```
+
+### Design for Testability
+
+The seams at which tests run (P-DES-2); everything behind a seam is exercised through it, and each seam can be replaced by a stub with fixed answers:
+
+- **Content interface** (HTTP, token): the `web` tests replace it by a stub that answers per ContentGroupData, delays, or stays silent; the `cms` tests call the real one with the real content store (a database of the test run).
+- **Content and account operations**: the admin panel is the product named by [PUB-C-1]; tests call the operations of `content-model` and `editor-accounts` as the panel does, with an `Actor` of either role.
+- **Clock**: `content-client` reads the time from an injected clock, so the 60 s rule is tested without waiting.
+- **Session check** and **bot protection notice**: replaced by stubs that answer `valid`, `none`, `unknown`, a delay, or a notice text.
+- **Health endpoint**: HTTP request to `/health` of `cms`, with the content store stopped or slowed for the negative cases.
+- **Page requests to `web`**: HTTP requests to the unit with all stubs above; assertions read status, redirect target, headers (cookies), and the document (text, headings, links, meta tags, resource addresses).
+- **Repository files**: the README quick start, the licence notes, the example configuration, the seed data, and the legal templates are read as data.
+- **Configuration**: a unit is started with environment values as in §10 example 11 and its output and exit code are read.
+- **Accessibility checker** and **viewport**: the accessibility checker ([PUB-C-4]) and a browser at 320 and 1280 pixels run against the started `web` unit with the stubs.
+
+### Requirement Traceability Matrix
+
+`G-1.S3` → story → acceptance criteria → requirements → modules → tests. All stories serve `G-1.S3`; the requirements `PUB-NF-1` to `PUB-NF-3` also derive from `G-1.S2`, `G-1.S1`, and the story `PUB-US-2`. The tests column lists the acceptance and integration tests of §17; the unit tests of each module are in the second table.
+
+| Story | Acceptance criteria | Requirements | Modules | Tests |
+| --- | --- | --- | --- | --- |
+| PUB-US-1 | PUB-AC-1.1 to PUB-AC-1.7 | PUB-F-1 to PUB-F-10, PUB-F-31, PUB-F-32, PUB-F-34, PUB-F-37; PUB-NF-4 to PUB-NF-8; PUB-E-1, PUB-E-2, PUB-E-7, PUB-E-9 to PUB-E-12; PUB-C-1, PUB-C-2 | `content-model`, `editor-accounts`, `content-interface`, `content-seed`, `cms-health`, `content-client`, `content-contracts`, `setup-guide` | PUB-T-1 to PUB-T-7, PUB-T-28, PUB-T-29, PUB-T-32, PUB-T-34, PUB-T-35 |
+| PUB-US-2 | PUB-AC-2.1 to PUB-AC-2.6 | PUB-F-11 to PUB-F-15, PUB-F-33, PUB-F-35, PUB-F-36; PUB-U-1; PUB-NF-1 to PUB-NF-3; PUB-E-4, PUB-E-8; PUB-C-3, PUB-C-4 | `page-resolution`, `address-routing`, `page-frame`, `rich-text`, `content-model` | PUB-T-8 to PUB-T-13, PUB-T-31, PUB-T-33 |
+| PUB-US-3 | PUB-AC-3.1 to PUB-AC-3.4 | PUB-F-16 to PUB-F-20; PUB-U-3; PUB-E-6 | `page-resolution`, `content-model` | PUB-T-14 to PUB-T-17, PUB-T-33 |
+| PUB-US-4 | PUB-AC-4.1 to PUB-AC-4.6 | PUB-F-21 to PUB-F-26; PUB-U-5; PUB-E-3 | `page-frame`, `page-resolution`, `content-contracts`, `content-seed` | PUB-T-18 to PUB-T-23, PUB-T-29 |
+| PUB-US-5 | PUB-AC-5.1 to PUB-AC-5.4 | PUB-F-27 to PUB-F-30; PUB-U-2, PUB-U-4; PUB-E-5 | `address-routing`, `page-frame`, `page-resolution`, `content-model` | PUB-T-24 to PUB-T-27, PUB-T-30 |
+
+| Module | Unit tests |
+| --- | --- |
+| `content-model` | PUB-T-36 to PUB-T-50 |
+| `editor-accounts` | PUB-T-51 to PUB-T-64 |
+| `content-interface` | PUB-T-65 to PUB-T-69 |
+| `content-seed` | PUB-T-70 to PUB-T-73 |
+| `cms-health` | PUB-T-74 to PUB-T-77 |
+| `content-client` | PUB-T-78 to PUB-T-88 |
+| `address-routing` | PUB-T-89 to PUB-T-104 |
+| `rich-text` | PUB-T-105 to PUB-T-112 |
+| `page-resolution` | PUB-T-113 to PUB-T-137 |
+| `page-frame` | PUB-T-138 to PUB-T-150 |
+| `content-contracts` | PUB-T-151 to PUB-T-157 |
+| `setup-guide` | PUB-T-7 (acceptance test, README read as data) |
+
+Every module traces to at least one requirement (the *Traces to* lines above), every requirement of §4 to §6 and §9 is named by at least one module, and every module has tests in §17. The per-requirement view is the *Covers* columns of §17.
