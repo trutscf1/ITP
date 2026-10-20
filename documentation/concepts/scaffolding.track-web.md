@@ -142,20 +142,20 @@ Not in this track: `apps/web/src/prisma` from the first scaffold of `dev` stays 
 
 ### Test cases
 
-Taken from `scaffolding.md` §10 and the acceptance criteria of SCF-US-8. These are the unit tests of the track, run with `node --test` in `apps/web`; the acceptance tests SCF-T-36 (the `web` row), SCF-T-39, and SCF-T-40 in `tests/` build on them. The health reports of §10 are kept as data next to the tests.
+Taken from `scaffolding.md` §10 and the acceptance criteria of SCF-US-8. These are the unit tests of the track, run with `node --test` in `apps/web`; the acceptance tests SCF-T-36 (the `web` row), SCF-T-39, and SCF-T-40 in `tests/` build on them. The health reports of §10 are kept as data next to the tests. A test name starts with the case ID and the acceptance criterion it covers, for example `W-5 SCF-AC-8.4: a down report with HTTP status 503 gives a down row` (`scaffolding.md` §17: test names carry the `AC` ID). A case whose *Covers* column names no acceptance criterion covers requirements only.
 
-| Case | Module | Given | When | Then |
-| --- | --- | --- | --- | --- |
-| W-1 | M1 | an environment without any of the variables of M1 | the configuration is loaded | every value is its default |
-| W-2 | M1 | `PORT=abc` | the configuration is loaded | it fails as §10, example 3, and the output does not hold `abc` |
-| W-3 | M2 | `APP_VERSION=0.1.0` | `/health` of `web` is requested | the report is `{ unit: "web", version: "0.1.0", status: "ok", checks: [] }` and holds no host or port |
-| W-4 | M3 | a stub that answers with §10, example 1 | `identity` is queried | the row is `identity`, `ok`, no failed checks |
-| W-5 | M3 | a stub that answers with §10, example 2, with HTTP status 503 | `identity` is queried | the row is `identity`, `down`, failed check `relational-database` |
-| W-6 | M3 | a stub that reports `degraded` with one non-essential check `down` | the unit is queried | the row is `degraded` and names that check |
-| W-7 | M3 | a stub that does not answer | the unit is queried with a timeout of 200 ms | the row is `down` within 400 ms |
-| W-8 | M3 | no process at the address (connection refused) | `storage` is queried | the row is `storage`, `down`, no failed checks |
-| W-9 | M3 | a stub that answers with a body that is not a HealthReport, and one that answers with the report of another unit | the unit is queried | both rows are `down` |
-| W-10 | M4 | the stubs of §10, example 7 | the status is collected | the five rows of example 7 come back in the order `web`, `identity`, `storage`, `worker`, `cms` |
-| W-11 | M4 | the stubs of W-10, then `storage` answering `ok` | the status is collected twice | the second result shows `storage` as `ok` |
-| W-12 | M5 | the rows of example 7 | the page is rendered on the server | it holds one table with a caption, three column header cells, one row header cell per unit, and every status as text |
-| W-13 | M6 | a fixture file in place of the generated description | `/api/docs` is requested | the response equals the file byte for byte, with the type `application/json` |
+| Case | Module | Covers | Given | When | Then |
+| --- | --- | --- | --- | --- | --- |
+| W-1 | M1 | SCF-AC-2.6, SCF-F-11, SCF-F-17 | an environment without any of the variables of M1 | the configuration is loaded | every value is its default |
+| W-2 | M1 | SCF-AC-2.6, SCF-E-1 | `PORT=abc` | the configuration is loaded | it fails with the output of §10, example 3, for the unit `web`: `Invalid configuration for unit "web":` and `  PORT: expected an integer between 1 and 65535`; the output does not hold `abc` |
+| W-3 | M2 | SCF-AC-8.1, SCF-AC-8.2, SCF-NF-4 | `APP_VERSION=0.1.0` | `/health` of `web` is requested | the report is `{ unit: "web", version: "0.1.0", status: "ok", checks: [] }` and holds no host or port |
+| W-4 | M3 | SCF-AC-8.4, SCF-F-8 | a stub that answers with §10, example 1 | `identity` is queried | the row is `identity`, `ok`, no failed checks |
+| W-5 | M3 | SCF-AC-8.4, SCF-F-8, SCF-U-1 | a stub that answers with §10, example 2, with HTTP status 503 | `identity` is queried | the row is `identity`, `down`, failed check `relational-database` |
+| W-6 | M3 | SCF-AC-8.4, SCF-F-8, SCF-U-1 | a stub that reports `degraded` with one non-essential check `down` | the unit is queried | the row is `degraded` and names that check |
+| W-7 | M3 | SCF-AC-8.4, SCF-E-3, SCF-NF-3 | a stub that does not answer | the unit is queried with a timeout of 200 ms | the row is `down` within 400 ms |
+| W-8 | M3 | SCF-AC-8.4, SCF-E-3 | no process at the address (connection refused) | `storage` is queried | the row is `storage`, `down`, no failed checks |
+| W-9 | M3 | SCF-AC-8.4, SCF-E-3 | a stub that answers with a body that is not a HealthReport, and one that answers with the report of another unit | the unit is queried | both rows are `down` |
+| W-10 | M4 | SCF-AC-8.4, SCF-F-8, SCF-E-3 | the stubs of §10, example 7 | the status is collected | the five rows of example 7 come back in the order `web`, `identity`, `storage`, `worker`, `cms` |
+| W-11 | M4 | SCF-AC-8.4, SCF-U-3 | the stubs of W-10, then `storage` answering `ok` | the status is collected twice | the second result shows `storage` as `ok` |
+| W-12 | M5 | SCF-AC-8.4, SCF-AC-8.5, SCF-U-1, SCF-U-2 | the rows of example 7 | the page is rendered on the server | it holds one table with a caption, three column header cells, one row header cell per unit, and every status as text |
+| W-13 | M6 | SCF-AC-3.3, SCF-F-10 | a fixture file in place of the generated description | `/api/docs` is requested | the response equals the file byte for byte, with the type `application/json` |
