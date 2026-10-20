@@ -21,7 +21,7 @@ Every developer starts the whole system with one command and builds their own ar
 ## H2. Who benefits and how
 
 - **Operator (`R-2`)**: starts everything with one command, also without internet, and sees on a status page whether every unit is reachable and healthy ([SCF-US-8] units reachable and visible).
-- **Developers of the team** (not a role of `GOAL.md`; the stories of this feature are written for them): get a repository in which lint, typecheck, build, and test work the same way everywhere ([SCF-US-1] set up the monorepo), a local stack ([SCF-US-2] local development environment), contracts that are defined once ([SCF-US-3] shared contracts), a documented data model ([SCF-US-4] data model), a pipeline that stops faulty changes ([SCF-US-5] CI pipeline), and uniform commits with a changelog ([SCF-US-6] Conventional Commits).
+- **Developers of the team** (not a role of `GOAL.md`; the stories [SCF-US-1] to [SCF-US-4] are written for the operator `R-2`, who runs what they build): get a repository in which lint, typecheck, build, and test work the same way everywhere ([SCF-US-1] set up the monorepo), a local stack ([SCF-US-2] local development environment), contracts that are defined once ([SCF-US-3] shared contracts), a documented data model ([SCF-US-4] data model), a pipeline that stops faulty changes ([SCF-US-5] CI pipeline), and uniform commits with a changelog ([SCF-US-6] Conventional Commits).
 - **Teacher or new team member**: finds architecture, setup, Definition of Done, data model, and licences in one place ([SCF-US-7] project documentation).
 
 ## H3. How it works, step by step
@@ -430,6 +430,7 @@ Assumptions of the review follow-up, stated on 2026-10-20 for the owner `trutscf
 | A25 | Scans before a commit | [SCF-F-14] and [SCF-E-6] derive from [SCF-AC-5.2] (the same scans as in the pipeline, run earlier) and [SCF-AC-2.2] (no secret in the repository), not from [SCF-AC-2.2] alone; they move to the story [SCF-US-5] and its test [SCF-T-24]. No criterion names the local hooks; the owner decides whether [SCF-US-5] gets one. |
 | A26 | CI constraints and skip rule | Tests that need the container runtime or the git host are marked in §17 and are skipped, never passed, in the `test` job; the result of the skipped tests is stated by hand in the merge request (§17, "CI Test Constraints"). [SCF-T-26] and [SCF-T-10] join the lists. |
 | A27 | Paths of [SCF-T-36] | The paths that must not return a report of `worker` are `/worker/health`, `/api/worker/health`, and `/health/worker`, each with status 404, and the stack publishes no port of `worker`. |
+| A28 | Role of the infrastructure stories | The stories [SCF-US-1] to [SCF-US-4] are reworded from "developer" to the operator `R-2`, as ADR-0004 did for `STO-US-1` and `BGP-US-1`; no role is added to `GOAL.md`. The story issues #38, #39, #40, and #41 still carry the old wording until their owners copy the files (P-DOC-6). |
 
 Changes decided in [public-content.md](public-content.md) (its Q17 and Q18) and carried out here: [SCF-NF-1] allows `degraded` because of a non-essential check, and [SCF-F-8] and [SCF-U-1] show the names of the failed checks.
 
