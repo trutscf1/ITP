@@ -49,7 +49,7 @@ The content lives in the `cms` unit as content entries: landing-page sections, h
 
 ## H6. How we know it works
 
-n/a — the test concept (§17) is written in Phase 6; until then every acceptance criterion has at least one requirement in §4–§6.
+Every one of the 27 acceptance criteria of the five stories has its own acceptance test (`PUB-T-1` to `PUB-T-27`), written as a scenario with concrete values: for example, the change an editor publishes at 10:00:00 is visible at 10:01:00 ([PUB-T-4]), a stopped content unit still lets visitors read every page they read before ([PUB-T-6]), and the German imprint cannot be unpublished ([PUB-T-18]). Eight end-to-end scenarios (`PUB-T-28` to `PUB-T-35`) run the journeys through both units: a fresh installation up to the first edit, an outage and recovery, German-only content, an unavailable login unit, the life cycle of an editor account, a check of every public page for cookies, outside requests, and accessibility, an invalid configuration, and images. 122 unit tests check the modules one by one with the values of the worked examples (§10). No test calls the internet or a language model, and no test waits for a minute: the clock is set by the test. One property cannot be tested at all, the memory-hard storage of passwords; the test checks what can be seen (§17, *Test Coverage Matrix & Untested Justifications*).
 
 ## H7. Key decisions
 
@@ -577,7 +577,7 @@ The slices and their issues stand in the story files (P-DOC-6); this table says 
 
 | Story | Slice | Weight | Modules built or extended | Demo |
 | --- | --- | --- | --- | --- |
-| PUB-US-1 | 1 — CMS runs with its content types | 3 | `content-contracts` (shapes, legal templates), `content-model`, `content-seed`, `cms-health` (check `content-store`) | `docker compose up`: the `cms` container reports `ok` and holds the seed content |
+| PUB-US-1 | 1 — CMS runs with its content types | 3 | `content-contracts` (shapes, legal templates), `content-model`, `content-seed`, `cms-health` (check `content-store`) | the start command of the local stack: the `cms` container reports `ok` and holds the seed content |
 | PUB-US-1 | 2 — Editor roles and first administrator | 2 | `editor-accounts`, `content-interface`, `cms-health` (check `administrator-account`), `setup-guide` | the status data of `cms` is `degraded` with `administrator-account` until the first registration; content requests without the token are refused |
 | PUB-US-1 | 3 — Delivery by `web` | 3 | `content-client`, `address-routing`, `rich-text`, `page-resolution` (legal pages, unavailable page), `page-frame` (frame, meta tags, no tracking), fixed texts | a legal page at `/de/legal/privacy` shows the published text, changes after 60 s, and survives a stopped `cms` with its images |
 | PUB-US-2 | 1 — whole story | 3 | `page-resolution` (landing page), `address-routing` (signed-in redirect), `page-frame` (layout, accessibility check) | `/de` shows the landing page; a signed-in member lands on the dashboard |
@@ -1042,3 +1042,217 @@ The seams at which tests run (P-DES-2); everything behind a seam is exercised th
 | `setup-guide` | PUB-T-7 (acceptance test, README read as data) |
 
 Every module traces to at least one requirement (the *Traces to* lines above), every requirement of §4 to §6 and §9 is named by at least one module, and every module has tests in §17. The per-requirement view is the *Covers* columns of §17.
+
+## 17. Test Concept & TDD Contract
+
+Tests are tables of given, when, then with concrete values (P-DES-2); `STACK.md` section 6 names the runner and how a row becomes a test. A test in code carries its ID, and an acceptance test also carries its acceptance criterion ID in its name. The red-green loop runs one slice at a time (§16, *Vertical Slices Breakdown*): the acceptance tests of the slice's criteria first, then the unit tests of the modules it builds.
+
+### Unit Tests & Test Case Tables
+
+Per module, in the order of §16; values come from the worked examples of §10. The ranges per module are in the second table of the traceability matrix.
+
+| ID | Module | Input | Expected | Covers |
+| --- | --- | --- | --- | --- |
+| PUB-T-36 | `content-model` | A landing section saved with a heading of 120 characters, and one with 121 characters | The first is saved; the second is refused with PUB-E-11 naming `heading`, and the stored section is unchanged | PUB-F-2, PUB-E-11 |
+| PUB-T-37 | `content-model` | A section of kind `call-to-action` saved with an `imageId` | Refused with PUB-E-11 naming `imageId` | PUB-F-2, PUB-E-11 |
+| PUB-T-38 | `content-model` | A help category saved with a German name only | Refused with PUB-E-11 naming `name` (both names are required) | PUB-F-2, PUB-E-11 |
+| PUB-T-39 | `content-model` | A changelog entry saved with version `0.1.0` while another entry has `0.1.0` | Refused with PUB-E-11 naming `version` | PUB-F-18, PUB-E-11 |
+| PUB-T-40 | `content-model` | A help article saved with help context `upload-files` while another article has it, and one saved with `Upload Files` | Both refused with PUB-E-11 naming `helpContext` | PUB-F-19, PUB-E-11 |
+| PUB-T-41 | `content-model` | A German version saved for a new changelog entry | The version has state `draft`; no English version exists | PUB-F-5, PUB-F-30 |
+| PUB-T-42 | `content-model` | An entry with German `draft` and English `draft`; the editor publishes English | English is `published`, German stays `draft` (publishing one does not change the other) | PUB-F-5, PUB-F-30 |
+| PUB-T-43 | `content-model` | An editor unpublishes the English version of the imprint, then the German version (§10, example 7) | English becomes `draft`; the German unpublish is refused with PUB-E-7 and German stays `published` | PUB-F-24, PUB-E-7 |
+| PUB-T-44 | `content-model` | A CMS administrator unpublishes the German version of the imprint | Refused with PUB-E-7 | PUB-F-3, PUB-F-24, PUB-E-7 |
+| PUB-T-45 | `content-model` | An administrator deletes a legal page; an editor creates a fourth legal page | Both refused with PUB-E-12; the three legal pages remain | PUB-F-24, PUB-E-12 |
+| PUB-T-46 | `content-model` | An editor creates, edits, publishes, and unpublishes a help article | Every action is allowed | PUB-F-3 |
+| PUB-T-47 | `content-model` | An image: PNG of 1 048 576 bytes; WebP of 2 097 152 bytes (§10, example 10) | Both saved | PUB-F-35, PUB-F-13 |
+| PUB-T-48 | `content-model` | An image: JPEG of 2 097 153 bytes; an SVG file; a file named `logo.png` whose content is a PDF | All three refused with PUB-E-8, the first for size, the other two for type | PUB-F-35, PUB-E-8 |
+| PUB-T-49 | `content-model` | An image: PNG of 1 024 bytes with an empty source; the same with an empty licence | Both refused with PUB-E-4 naming `source` and `licence` | PUB-F-13, PUB-E-4 |
+| PUB-T-50 | `content-model` | The field names of every stored entry type | They are exactly those of §8; none names or references an editor account | PUB-NF-6, PUB-F-1 |
+| PUB-T-51 | `editor-accounts` | `hasAdministrator()` on an empty store, then `registerFirstAdministrator("Ada Admin", "ada@example.org", a password of 12 characters)` (§10, example 6) | false; then an account with role `administrator`; `hasAdministrator()` is true | PUB-F-10, PUB-F-9 |
+| PUB-T-52 | `editor-accounts` | A second registration after the first | Refused with PUB-E-9; no account is created; the panel offers no registration form | PUB-F-10, PUB-E-9 |
+| PUB-T-53 | `editor-accounts` | Two registrations that arrive at the same time on an empty store | Exactly one account is created; the other is refused with PUB-E-9 | PUB-F-10, PUB-E-9 |
+| PUB-T-54 | `editor-accounts` | Passwords of 11, 12, 128, and 129 characters | 11 and 129 are refused with PUB-E-10 naming `password`; 12 and 128 are accepted | PUB-F-37, PUB-E-10 |
+| PUB-T-55 | `editor-accounts` | A name of 0 characters, of 100, and of 101 characters | 0 and 101 are refused with PUB-E-10 naming `name`; 100 is accepted | PUB-F-37, PUB-E-10 |
+| PUB-T-56 | `editor-accounts` | An account saved with an e-mail address that another account uses | Refused with PUB-E-10 naming `email` | PUB-F-37, PUB-E-10 |
+| PUB-T-57 | `editor-accounts` | Two accounts created with the same password | Each stores the fields `id`, `name`, `email`, `passwordHash`, `role` and nothing else; the two hashes differ; neither hash contains the password | PUB-NF-4, PUB-NF-5 |
+| PUB-T-58 | `editor-accounts` | An editor calls `createEditor`; an administrator calls it | The editor is refused with PUB-E-12; the administrator gets an account with role `editor` | PUB-F-3, PUB-E-12 |
+| PUB-T-59 | `editor-accounts` | An administrator deletes an editor account that wrote entries | Name, e-mail address, and hash are gone; the entries are unchanged and refer to no person | PUB-NF-7, PUB-F-3 |
+| PUB-T-60 | `editor-accounts` | An administrator deletes the administrator account | Refused with PUB-E-12; the account remains | PUB-F-37, PUB-E-12 |
+| PUB-T-61 | `editor-accounts` | An editor changes the name, e-mail address, and password of their own account; an editor changes another account | The first is saved and the role is unchanged; the second is refused with PUB-E-12 | PUB-NF-8, PUB-E-12 |
+| PUB-T-62 | `editor-accounts` | `canDo` for the roles `editor` and `administrator` and the actions `content.write`, `content.publish`, `account.create`, `account.delete` | The editor may do the first two only; the administrator may do all four | PUB-F-3 |
+| PUB-T-63 | `editor-accounts` | A sign-in with a wrong password and one with an unknown e-mail address | Both refused with the message "E-mail address or password is wrong." (PUB-E-12) | PUB-F-4, PUB-E-12 |
+| PUB-T-64 | `editor-accounts` | A request for the admin panel without a session | Only the login form is returned; a request for content or accounts is refused with PUB-E-12 | PUB-F-4, PUB-E-12 |
+| PUB-T-65 | `content-interface` | `getGroup(legal)` without a token, and with a wrong token | Both refused with PUB-E-2; no content is returned | PUB-F-4, PUB-E-2 |
+| PUB-T-66 | `content-interface` | `getGroup(legal)` with the token; the privacy policy is published in German and draft in English | The privacy policy holds the German version only | PUB-F-5 |
+| PUB-T-67 | `content-interface` | `getGroup(changelog)` with an entry whose German and English versions are drafts | The entry is not in the result | PUB-F-5 |
+| PUB-T-68 | `content-interface` | Any result of `getGroup` | It holds no editor account, no author, and no source or licence of an image | PUB-NF-6 |
+| PUB-T-69 | `content-interface` | `getImageFile` without token and session; with the token; with an editor session | Refused with PUB-E-2; the file; the file | PUB-F-32, PUB-E-2 |
+| PUB-T-70 | `content-seed` | `seedIfEmpty()` on an empty store | One landing section of each of the 4 kinds, 2 help categories with 2 articles each, 1 changelog entry `0.1.0`, 3 legal pages, all versions in German and English `published` | PUB-F-7 |
+| PUB-T-71 | `content-seed` | `seedIfEmpty()` on a store with one help category | No entry is created, changed, or deleted | PUB-F-7 |
+| PUB-T-72 | `content-seed` | The seed images | Each has a non-empty source, the licence `CC0-1.0`, and is PNG, JPEG, or WebP of at most 2 097 152 bytes | PUB-F-13, PUB-F-35 |
+| PUB-T-73 | `content-seed` | The seed section of kind `call-to-action`, and the three seed legal pages | One such section exists; each legal page equals the legal template of its kind and starts with the template notice of its language | PUB-F-14, PUB-F-26 |
+| PUB-T-74 | `cms-health` | `health()` on a fresh installation (§10, example 6) | `content-store` essential `ok`, `administrator-account` non-essential `down`, status `degraded` | PUB-F-9, PUB-F-31 |
+| PUB-T-75 | `cms-health` | `health()` after the registration of the administrator | Both checks `ok`, status `ok` | PUB-F-9 |
+| PUB-T-76 | `cms-health` | `health()` with a content store that does not answer within `HEALTH_CHECK_TIMEOUT_MS` | `content-store` `down`, `administrator-account` `down`, status `down` | PUB-F-31 |
+| PUB-T-77 | `cms-health` | Any health report | It holds no host, port, credential, or version of a dependency | PUB-F-31, PUB-F-9 |
+| PUB-T-78 | `content-client` | `get(landing)` on a fresh client, content interface answers | The data is returned and held, with the time of the attempt | PUB-F-6 |
+| PUB-T-79 | `content-client` | Refresh interval 60 s; `get` 59 s after the last attempt | No request to the content interface; the held data is returned | PUB-F-6 |
+| PUB-T-80 | `content-client` | Refresh interval 60 s; the editor publishes text B at 10:00:00 over held text A; `get` at 10:01:00 | A request is made and B is returned (§10, example 2) | PUB-F-6 |
+| PUB-T-81 | `content-client` | The same; `get` at 10:00:20 (attempt at 10:00:00 or earlier) | A or B is returned, either is correct (§10, example 2) | PUB-F-6 |
+| PUB-T-82 | `content-client` | The content interface answers after 2500 ms with `CONTENT_TIMEOUT_MS` = 2000 while data is held | The held data is returned, the failure is PUB-E-1, and the next request is made only after 60 s from this attempt | PUB-F-8, PUB-E-1 |
+| PUB-T-83 | `content-client` | The content interface is down and nothing was ever loaded | `get` returns no data (the caller applies PUB-E-3 or the built-in legal text) | PUB-F-8, PUB-E-1, PUB-E-3 |
+| PUB-T-84 | `content-client` | Ten `get` calls arrive while one refresh is running | One request goes to the content interface, and all ten receive its result | PUB-F-6 |
+| PUB-T-85 | `content-client` | `get(landing)` loads the group with two images; then the content interface goes down | `image(id)` returns both files (§10, example 4, last row) | PUB-F-32, PUB-F-8 |
+| PUB-T-86 | `content-client` | A refresh where the group arrives but the second image file fails | The refresh counts as failed: old data and old images stay, PUB-E-1 applies | PUB-F-8, PUB-E-1 |
+| PUB-T-87 | `content-client` | A refresh whose data no longer refers to an image | The image file is no longer held; `image(id)` returns nothing | PUB-F-32 |
+| PUB-T-88 | `content-client` | Every request to the content interface | It carries `CONTENT_ACCESS_TOKEN` | PUB-F-4 |
+| PUB-T-89 | `address-routing` | No session, `Accept-Language` `de-AT, en`, path `/` (§10, example 1) | Redirect to `/de` | PUB-F-28 |
+| PUB-T-90 | `address-routing` | No session, `en-US, de`, path `/` | Redirect to `/en` | PUB-F-28 |
+| PUB-T-91 | `address-routing` | No session, `fr, en, de`, path `/` | Redirect to `/en` | PUB-F-28 |
+| PUB-T-92 | `address-routing` | No session, `fr, it`, path `/` | Redirect to `/de` | PUB-F-28 |
+| PUB-T-93 | `address-routing` | No session, no `Accept-Language`, path `/` | Redirect to `/de` | PUB-F-28 |
+| PUB-T-94 | `address-routing` | Valid member session, `en-US`, path `/` | Redirect to `DASHBOARD_PATH` | PUB-F-12 |
+| PUB-T-95 | `address-routing` | Valid member session, any language, path `/en` | Redirect to `DASHBOARD_PATH` | PUB-F-12 |
+| PUB-T-96 | `address-routing` | A session cookie is sent, the session check does not answer, `de-AT`, path `/` | Redirect to `/de` | PUB-F-33, PUB-F-28 |
+| PUB-T-97 | `address-routing` | The session check answers after 600 ms with `SESSION_CHECK_TIMEOUT_MS` = 500; and answers with an error | Both count as "unknown" and the person is treated as without a session | PUB-F-33 |
+| PUB-T-98 | `address-routing` | A request without a session cookie | The session check is not called; the state is `none` | PUB-F-12 |
+| PUB-T-99 | `address-routing` | `Accept-Language` `en;q=0.5, de;q=0.9`; and `de;q=0, en` | `/de`; `/en` | PUB-F-28 |
+| PUB-T-100 | `address-routing` | `Accept-Language` `EN-us` | `/en` (case is ignored) | PUB-F-28 |
+| PUB-T-101 | `address-routing` | Path `/fr` | Not found, in German (PUB-E-5) | PUB-F-27, PUB-E-5 |
+| PUB-T-102 | `address-routing` | Path `/en/legal/cookies` | Not found, in English (PUB-E-5) | PUB-F-27, PUB-E-5 |
+| PUB-T-103 | `address-routing` | Path `/de/` with a trailing slash | Route landing page, language `de` | PUB-F-27 |
+| PUB-T-104 | `address-routing` | Paths `/en/help`, `/de/changelog`, `/de/legal/terms`, `/en/help/context/upload-files` | Routes help start, changelog, legal `terms`, help context `upload-files`, each with the language of the address | PUB-F-27 |
+| PUB-T-105 | `rich-text` | `## Ordner teilen` and `# Titel` (§10, example 8) | A heading of level 2; a paragraph "# Titel" | PUB-F-36, PUB-C-3 |
+| PUB-T-106 | `rich-text` | `Ein **wichtiger** Hinweis` | A paragraph with bold "wichtiger" | PUB-F-36 |
+| PUB-T-107 | `rich-text` | `<b>x</b>` | A paragraph with the characters `<b>x</b>` and no bold text | PUB-F-36, PUB-C-3 |
+| PUB-T-108 | `rich-text` | `[Start](/de/help)` | A link "Start" to `/de/help` | PUB-F-36 |
+| PUB-T-109 | `rich-text` | `[Hilfe](javascript:alert(1))` | A paragraph with those characters and no link | PUB-F-36, PUB-C-3 |
+| PUB-T-110 | `rich-text` | `![Bild](/media/1)` | A paragraph with those characters and no image | PUB-F-36, PUB-C-3 |
+| PUB-T-111 | `rich-text` | The lines `- a` and `- b`; the lines `1. a` and `2. b` | An unordered list of 2 items; an ordered list of 2 items | PUB-F-36 |
+| PUB-T-112 | `rich-text` | `**offen` (no closing marks) and `##### zu tief` | Paragraphs with those characters | PUB-F-36 |
+| PUB-T-113 | `page-resolution` | The landing group holds sections at positions 2 and 1 | The page shows position 1, then position 2 | PUB-F-11 |
+| PUB-T-114 | `page-resolution` | A section with only a German version, route `/en` (§10, example 3) | Shown with German text, and the page has the translation note | PUB-F-29, PUB-U-4 |
+| PUB-T-115 | `page-resolution` | A section with German `draft` and English `published` | Left out under `/de` and under `/en` | PUB-F-29 |
+| PUB-T-116 | `page-resolution` | The seed `call-to-action` section, `REGISTRATION_PATH` `/register`, `LOGIN_PATH` `/login` | The section shows one link to `/register` and one to `/login`, labelled "Registrieren" and "Anmelden" under `/de` | PUB-F-14 |
+| PUB-T-117 | `page-resolution` | Categories at positions 2 and 1, a category without a published article, articles "Ordner teilen" and "Dateien hochladen" in one category | The empty category is not listed; categories in position order; the articles in the order "Dateien hochladen", "Ordner teilen" | PUB-F-16 |
+| PUB-T-118 | `page-resolution` | An article with a draft German version and a published English version, listed under `/en` | It is not listed (it counts as unpublished without German) | PUB-F-16, PUB-F-29 |
+| PUB-T-119 | `page-resolution` | Search `ordner` (§10, example 5) | "Ordner teilen" first (title), then "Dateien hochladen" (text) | PUB-F-17 |
+| PUB-T-120 | `page-resolution` | Search `ORDNER` | The same result as `ordner` | PUB-F-17 |
+| PUB-T-121 | `page-resolution` | Search `o` | No search is made; the normal start page is returned | PUB-F-17, PUB-U-3 |
+| PUB-T-122 | `page-resolution` | Search `xyz` under `/de`, and under `/en` | "Keine Hilfeartikel gefunden."; "No help articles found." | PUB-U-3 |
+| PUB-T-123 | `page-resolution` | Search under `/en` where an article exists only in German | That article is not found (only versions in the language shown are searched) | PUB-F-17 |
+| PUB-T-124 | `page-resolution` | Article published in German and English (§10, example 3, row 1) | `/de` shows German text, `/en` shows English text, no note | PUB-F-29, PUB-U-4 |
+| PUB-T-125 | `page-resolution` | Article with German published and English `draft`, and one with English `none` | `/en` shows the German text with the note, `/de` the German text | PUB-F-29, PUB-U-4 |
+| PUB-T-126 | `page-resolution` | Article with German `draft` and English published | "Not found" (PUB-E-5) under `/de` and `/en` | PUB-F-29, PUB-E-5 |
+| PUB-T-127 | `page-resolution` | An article address with an id that is not a known article | "Not found" (PUB-E-5) with status 404 | PUB-E-5 |
+| PUB-T-128 | `page-resolution` | Context `upload-files` assigned to published article `a1` (§10, example 12) | Redirect to `/en/help/a1` under `/en` | PUB-F-19 |
+| PUB-T-129 | `page-resolution` | Context `old-place` (assigned to an article without published German version), `unknown-place`, and `Upload Files` | Each redirects to `/<l>/help` (PUB-E-6) | PUB-F-19, PUB-E-6 |
+| PUB-T-130 | `page-resolution` | Changelog entries as in §10, example 9 | Order `0.10.0`, `0.9.0`, `0.2.0`, `0.1.0`; each with version, date, title, text | PUB-F-18 |
+| PUB-T-131 | `page-resolution` | A changelog entry without a published German version | Left out under `/de` and `/en` | PUB-F-18, PUB-F-29 |
+| PUB-T-132 | `page-resolution` | The legal group is loaded; the privacy text B is published | `/de/legal/privacy` shows text B | PUB-F-21, PUB-F-24 |
+| PUB-T-133 | `page-resolution` | The legal group was never loaded and the content interface is down, `/en/legal/imprint` (§10, example 4) | The built-in English legal text, status 200 | PUB-F-25 |
+| PUB-T-134 | `page-resolution` | The imprint has English `draft` (§10, example 7), `/en/legal/imprint` | The German text with the translation note | PUB-F-24, PUB-F-29, PUB-U-4 |
+| PUB-T-135 | `page-resolution` | The changelog group was never loaded and the content interface is down | Status 503 with "Inhalt derzeit nicht verfügbar." under `/de` and "Content is currently unavailable." under `/en` (PUB-E-3) | PUB-E-3 |
+| PUB-T-136 | `page-resolution` | Page meta of the four rows of §10, example 13 | Titles, descriptions, `og:type`, and addresses as in the example | PUB-F-15 |
+| PUB-T-137 | `page-resolution` | A page route while the landing group is not held | The description falls back to the page title; the page is not unavailable because of it | PUB-F-15 |
+| PUB-T-138 | `page-frame` | Any page under `/de`, and under `/en` | A footer with links to `/<l>/legal/imprint`, `/<l>/legal/terms`, `/<l>/legal/privacy`, labelled as in §8 | PUB-F-21 |
+| PUB-T-139 | `page-frame` | The not-found page and the unavailable page | Both have the footer | PUB-F-21, PUB-E-3, PUB-E-5 |
+| PUB-T-140 | `page-frame` | The login page and the registration page, drawn by a stand-in page built with the frame | Both have the footer | PUB-F-21 |
+| PUB-T-141 | `page-frame` | `/de/help/a1` and `/en/changelog` | The switch links to `/en/help/a1` and `/de/changelog`, labelled "Deutsch" and "English" | PUB-U-2, PUB-F-27 |
+| PUB-T-142 | `page-frame` | The not-found page under `/fr` and under `/en/legal/cookies` | The switch links to `/en` and `/de` | PUB-U-2 |
+| PUB-T-143 | `page-frame` | A result with the translation note and a German passage under `/en` | The text "This page is not available in English." is above the content, and the German passage is marked as German | PUB-U-4 |
+| PUB-T-144 | `page-frame` | A form page, bot protection on with a hidden badge, notice "Geschützt durch den Bot-Schutz" | The notice is text, directly below the form, visible without scrolling past the form | PUB-F-23, PUB-U-5 |
+| PUB-T-145 | `page-frame` | The same page with bot protection off, and with the badge visible | No notice is shown | PUB-F-23 |
+| PUB-T-146 | `page-frame` | A response for a person without a session | It sets no cookie and holds no analytics code | PUB-NF-3 |
+| PUB-T-147 | `page-frame` | Every address in `src`, `href` of resources, and style references of any page | Each starts with `/` or with `PUBLIC_BASE_URL`; none points to another host | PUB-NF-2 |
+| PUB-T-148 | `page-frame` | Any page | Exactly one heading of level 1; the document language equals the page language | PUB-NF-1 |
+| PUB-T-149 | `page-frame` | The landing page at a width of 320 pixels, and of 1280 pixels | No horizontal scrolling at 320; the content uses the width up to 1280 | PUB-U-1 |
+| PUB-T-150 | `page-frame` | Images of a page | Each image address is `/media/<id>` on the own origin, with its alternative text in the language shown | PUB-F-32, PUB-NF-1 |
+| PUB-T-151 | `content-contracts` | The configuration of §10, example 11 | The output of the example, a non-zero exit code, and neither value printed; `CONTENT_TIMEOUT_MS` falls back to 2000 | PUB-F-6 |
+| PUB-T-152 | `content-contracts` | `CONTENT_REFRESH_SECONDS` 1, 60, 0, 61 | 1 and 60 are accepted; 0 and 61 stop the unit | PUB-F-6 |
+| PUB-T-153 | `content-contracts` | `CONTENT_TIMEOUT_MS` 100, 30000, 99, 30001; `SESSION_CHECK_TIMEOUT_MS` 50, 5000, 49, 5001 | The first two of each are accepted; the last two of each stop the unit | PUB-E-1, PUB-F-33 |
+| PUB-T-154 | `content-contracts` | `CONTENT_ACCESS_TOKEN` of 32 characters, of 31 characters, and not set; `DASHBOARD_PATH` `/debug`, `/de/home`, `dashboard` | 32 and `/debug` accepted; the other four stop the unit | PUB-F-4, PUB-F-12 |
+| PUB-T-155 | `content-contracts` | The legal templates of the three kinds in both languages | Each starts with the template notice, has the headings of the outline of §8 in order, and holds at least one `[[...]]` placeholder | PUB-F-26 |
+| PUB-T-156 | `content-contracts` | The privacy template | It has a paragraph under each of the 8 headings from "Mitgliedskonten" to "E-Mail-Versand", naming data and purpose | PUB-F-22 |
+| PUB-T-157 | `content-contracts` | Every fixed text of §8 | It exists in German and in English and is not empty | PUB-F-21, PUB-U-2 |
+
+### Acceptance Tests
+
+One test per acceptance criterion; `PUB-T-1` to `PUB-T-27` follow the order of the criteria in the story files.
+
+| ID | Title | Covers | Given | When | Then |
+| --- | --- | --- | --- | --- | --- |
+| PUB-T-1 | CMS runs on its own store | PUB-AC-1.1 (CMS container), PUB-F-1, PUB-F-31 | the resolved stack definition and the example configuration | the local stack starts and `/cms/health` is requested through the proxy | the service `cms` is its own container with a content store that no other unit's configuration names, and the report holds `content-store` with `essential: true` and `status: ok` |
+| PUB-T-2 | Exactly six content types | PUB-AC-1.2 (Content types), PUB-F-2, PUB-E-11 | the content operations with an editor, and valid values for every type of §8 | one entry of each type is saved, and then a seventh type is asked for | the six saves succeed; the available types are exactly landing section, help category, help article, changelog entry, legal page, image; a value outside §8 is refused with PUB-E-11 |
+| PUB-T-3 | Editor roles and closed interface | PUB-AC-1.3 (Editor roles), PUB-F-3, PUB-F-4, PUB-F-32, PUB-F-37, PUB-E-2, PUB-E-12 | an installation with one administrator, one editor, and one image | a person without session opens the admin panel; `getGroup(legal)` is requested with no token and with a wrong token; the image file is requested without token; the editor creates an account; the administrator creates and deletes an editor account | the panel shows only the login form; the three content requests are refused with PUB-E-2 and return no content; the editor is refused with PUB-E-12; the administrator succeeds |
+| PUB-T-4 | Change is public within 60 s | PUB-AC-1.4 (Cached delivery), PUB-F-5, PUB-F-6 | `CONTENT_REFRESH_SECONDS` = 60, the privacy page shows text A, and an editor publishes text B at 10:00:00 (injected clock) | a visitor opens `/de/legal/privacy` at 10:00:20 and again at 10:01:00 | the first visit shows A or B; the second shows B (§10, example 2) |
+| PUB-T-5 | Seed content once | PUB-AC-1.5 (Seed content), PUB-F-7, PUB-F-13, PUB-F-14, PUB-F-26 | an empty content store | `cms` starts, an editor changes one heading, and `cms` starts again | after the first start: 4 landing sections (one per kind), 2 categories with 2 articles each, changelog entry `0.1.0`, 3 legal pages, all published in German and English, every image with source and licence; after the second start: the changed heading is unchanged and no entry was added or deleted |
+| PUB-T-6 | Pages survive a stopped CMS | PUB-AC-1.6 (CMS unavailable), PUB-F-8, PUB-F-32, PUB-E-1 | the landing page and `/de/legal/privacy` loaded at 09:00 with two images, then `cms` stopped | a visitor opens both pages and requests the images at 10:00 | both pages show their versions of 09:00, and the images are delivered by `web` (§10, example 4, rows 1, 3, 5) |
+| PUB-T-7 | Unclaimed administrator is visible | PUB-AC-1.7 (Unclaimed administrator), PUB-F-9, PUB-F-10, PUB-F-31, PUB-F-34, PUB-E-9 | a fresh installation and the README | the health report and the status page are read, a person registers as "Ada Admin" with `ada@example.org`, and the report is read again | before: the report is `degraded` with `administrator-account` `down` and `content-store` `ok`, the status page row shows `cms`, `degraded`, `administrator-account`; after: `ok` and the row `ok`, and a second registration is refused with PUB-E-9; the quick start of the README has the registration step as a numbered step directly after the start command, with the sentence that anyone who reaches the admin panel can register until then |
+| PUB-T-8 | Landing page is public and from the CMS | PUB-AC-2.1 (Public and from the CMS), PUB-F-11, PUB-F-6 | three published landing sections, a visitor without session | the visitor opens `/de`, an editor changes the heading of section 1, and 60 s later the visitor opens `/de` again | the first answer is 200 without login and shows the three sections in position order with the CMS text; the second shows the changed heading |
+| PUB-T-9 | Landing page is responsive and accessible | PUB-AC-2.2 (Responsive and accessible), PUB-U-1, PUB-NF-1, PUB-C-4 | the seeded landing page | it is opened at 320 pixels and at 1280 pixels, in `/de` and `/en`, and checked with the accessibility checker | no horizontal scrolling at 320, content uses the width up to 1280, and the checker reports 0 violations in both languages |
+| PUB-T-10 | Media are licence-free and documented | PUB-AC-2.3 (Licence-free media), PUB-F-13, PUB-F-35, PUB-E-4, PUB-E-8 | the seeded landing page, the README licence notes, an editor | the images and icons of the page are listed, and the editor saves an image with an empty licence and an SVG file | every image has a source and the licence `CC0-1.0` in the CMS; every icon is listed with source and licence in the licence notes; the empty licence is refused with PUB-E-4 naming `licence`; the SVG is refused with PUB-E-8 |
+| PUB-T-11 | Call to action leads to registration and login | PUB-AC-2.4 (Call to action), PUB-F-14 | the seed landing page, `REGISTRATION_PATH` `/register`, `LOGIN_PATH` `/login` | a visitor opens `/de` and `/en` | the call-to-action section links "Registrieren" to `/register` and "Anmelden" to `/login`; in English "Register" and "Log in" |
+| PUB-T-12 | Meta tags are set | PUB-AC-2.5 (Meta tags), PUB-F-15 | the four pages of §10, example 13, `PUBLIC_BASE_URL` `https://nimbus.example` | a crawler stub reads each page | title, description, `og:title`, `og:description`, `og:type`, and `og:url` are those of the example |
+| PUB-T-13 | Signed-in member sees the dashboard | PUB-AC-2.6 (Signed-in member), PUB-F-12, PUB-F-33 | the session check answers `valid` for one person and does not answer for another | the first person opens `/` and `/en`, the second sends a session cookie and opens `/` with `de-AT` | the first is redirected to `DASHBOARD_PATH` both times; the second to `/de` (§10, example 1, rows 6 to 8) |
+| PUB-T-14 | Help articles by category and search | PUB-AC-3.1 (Help articles), PUB-F-16, PUB-F-17, PUB-U-3 | the articles "Dateien hochladen" and "Ordner teilen" (§10, example 5) in two categories | a visitor opens `/de/help` and searches `ordner`, `o`, and `xyz` | the start page lists the categories with article titles as links; `ordner` returns "Ordner teilen" first, then "Dateien hochladen"; `o` starts no search; `xyz` shows "Keine Hilfeartikel gefunden." |
+| PUB-T-15 | Changelog newest first | PUB-AC-3.2 (Changelog page), PUB-F-18 | the four entries of §10, example 9 | a visitor opens `/de/changelog` | the order is `0.10.0`, `0.9.0`, `0.2.0`, `0.1.0`, each with version, date, title, and text |
+| PUB-T-16 | Help links lead to the right article | PUB-AC-3.3 (Contextual help), PUB-F-19, PUB-E-6, PUB-E-11 | the articles `a1` and `a2` of §10, example 12 | a visitor follows the five help-context addresses of the example, and an editor assigns `upload-files` to a second article | the redirects are those of the example; the second assignment is refused with PUB-E-11 |
+| PUB-T-17 | Help and changelog need no account | PUB-AC-3.4 (Public), PUB-F-20 | a person without session | they open the help start page, a help article, and the changelog | all three answer 200 and none redirects to a login |
+| PUB-T-18 | Legal pages from every footer | PUB-AC-4.1 (Footer links), PUB-F-21, PUB-F-24, PUB-E-7 | a person without session; the imprint published in German and English (§10, example 7) | they open the landing page, a help page, the changelog, the not-found page, the unavailable page, and the stand-in login and registration page, and follow the three footer links; an editor unpublishes the English and then the German imprint | every page has the three footer links and each legal page answers 200; the English unpublish works and `/en/legal/imprint` shows German with the note; the German unpublish is refused with PUB-E-7 for the editor and for the administrator |
+| PUB-T-19 | Privacy policy names all data and services | PUB-AC-4.2 (Privacy content), PUB-F-22 | a fresh installation | a reader opens `/de/legal/privacy` and `/en/legal/privacy` | the page has the headings of the outline of §8 in order, and under each of the 8 headings from "Mitgliedskonten" to "E-Mail-Versand" a paragraph that names the data and the purpose |
+| PUB-T-20 | Captcha notice only where it applies | PUB-AC-4.3 (Captcha notice), PUB-F-23, PUB-U-5 | a form page drawn with the page frame, and the notice stub in three states: bot protection on with hidden badge, off, and on with visible badge | a person opens the page in each state | in the first state the notice is text directly below the form; in the other two no notice is shown |
+| PUB-T-21 | Legal page maintained in the CMS | PUB-AC-4.4 (Maintained in the CMS), PUB-F-24, PUB-F-6, PUB-E-12 | the imprint, and an editor | the editor changes the German text and publishes at 10:00:00, a visitor opens `/de/legal/imprint` at 10:01:00, and the editor creates a fourth legal page | the visitor sees the new text; the creation is refused with PUB-E-12 |
+| PUB-T-22 | Built-in legal text | PUB-AC-4.5 (Built-in legal text), PUB-F-25, PUB-E-1, PUB-E-3 | a fresh installation whose `cms` was never reachable | a person opens `/de/legal/imprint`, `/en/legal/terms`, `/en/legal/privacy`, and `/de/changelog` | the three legal pages answer 200 with the built-in legal text of their language; the changelog answers 503 with "Inhalt derzeit nicht verfügbar." |
+| PUB-T-23 | Legal templates are marked | PUB-AC-4.6 (Legal templates), PUB-F-26 | the seed content, no legal page changed | a person opens each legal page in both languages | the first sentence is the template notice of the language, the text holds at least one `[[...]]` placeholder, and the text equals the built-in legal text |
+| PUB-T-24 | Language follows the address | PUB-AC-5.1 (Language in the address), PUB-F-27, PUB-U-2, PUB-E-5 | the landing page in German and English | a visitor opens `/de`, uses the language switch, then opens `/fr` | `/de` is German and the switch, labelled "English", leads to `/en`, which is English with the switch "Deutsch" leading back to `/de`; `/fr` answers 404 with the German page "Seite nicht gefunden" and the footer |
+| PUB-T-25 | First visit picks the language | PUB-AC-5.2 (First visit), PUB-F-28 | the five browser settings of §10, example 1, rows 1 to 5 | a visitor without session opens `/` | the redirects are those of the example: `/de`, `/en`, `/en`, `/de`, `/de` |
+| PUB-T-26 | Missing English shows German with a note | PUB-AC-5.3 (Missing translation), PUB-F-29, PUB-U-4, PUB-E-5 | the four states of §10, example 3 | a visitor opens `/de/help/<id>` and `/en/help/<id>` for each state | the results are those of the example; the note "This page is not available in English." stands above German text under `/en`, and the German text is marked as German |
+| PUB-T-27 | English edited without touching German | PUB-AC-5.4 (Maintained per language), PUB-F-30, PUB-F-5 | a help article published in German and English | the editor changes the English text and publishes it, and 60 s pass | `/en/help/<id>` shows the change; `/de/help/<id>` shows the old German text and the German state is still `published` |
+
+### Integration Tests
+
+End-to-end scenarios on the started `cms` and `web` units with a real content store and the stubs of §16 (session check, bot protection notice, clock).
+
+| ID | Title | Covers | Given | When | Then |
+| --- | --- | --- | --- | --- | --- |
+| PUB-T-28 | Fresh installation to first edit | PUB-AC-1.1, PUB-AC-1.4, PUB-AC-1.5, PUB-AC-1.7, PUB-F-6, PUB-F-7, PUB-F-10 | an empty database and an empty cache | the stack starts, the status page is read, Ada registers, she creates the editor "Eli Editor", and Eli changes and publishes the English text of one help article | the pages show the seed content in both languages; the status page shows `cms` `degraded` until the registration and `ok` after; the change is public within 60 s |
+| PUB-T-29 | Outage and recovery | PUB-AC-1.6, PUB-AC-4.5, PUB-F-8, PUB-F-25, PUB-F-32, PUB-E-1, PUB-E-3 | a `web` unit that loaded the landing page and the privacy policy, and another `web` unit that loaded nothing, `cms` stopped for both | visitors open the loaded pages and images, then the never-loaded changelog and privacy policy, and then `cms` is started again | loaded pages and images are served from held content; the never-loaded changelog is 503, the never-loaded privacy policy is the built-in legal text; within `CONTENT_REFRESH_SECONDS` after the restart the pages show the content of `cms` |
+| PUB-T-30 | German-only content and legal rules | PUB-AC-5.3, PUB-AC-4.1, PUB-F-24, PUB-F-29, PUB-U-4, PUB-E-5, PUB-E-7 | a help article with German only, one with German draft and English published, and the legal pages | a visitor opens both articles in both languages, and editors try to unpublish German legal pages | the first is German with the note under `/en`, the second is 404 in both languages; every German unpublish of a legal page is refused with PUB-E-7 |
+| PUB-T-31 | Identity unavailable | PUB-AC-2.6, PUB-F-12, PUB-F-33 | no `identity` unit started, a session cookie sent | a person opens `/`, `/de`, and `/en` | all three work as for a person without session: `/` redirects by browser language, `/de` and `/en` show the landing page, within `SESSION_CHECK_TIMEOUT_MS` plus the page time |
+| PUB-T-32 | Editor life cycle and personal data | PUB-AC-1.3, PUB-NF-4, PUB-NF-5, PUB-NF-6, PUB-NF-7, PUB-NF-8, PUB-F-37, PUB-E-10, PUB-E-12 | an administrator and an editor who published two entries | the editor changes their own name, e-mail address, and password, tries to change another account, the administrator deletes the editor, and every public page and content response is read | the own change is saved; the other is refused with PUB-E-12; after the deletion the account has no name, e-mail address, or hash left, the two entries remain; no public page and no response of the content interface names an editor |
+| PUB-T-33 | All public pages are clean | PUB-AC-2.2, PUB-NF-1, PUB-NF-2, PUB-NF-3, PUB-NF-6, PUB-U-1 | the seeded installation | every public page of §8 in both languages is requested without session, drawn in a browser at 320 pixels, checked with the accessibility checker, and its requests are recorded | no response sets a cookie; no request goes to another host than the own origin; no horizontal scrolling; 0 accessibility violations per page |
+| PUB-T-34 | Invalid configuration | PUB-F-4, PUB-F-6 | `web` started with `CONTENT_REFRESH_SECONDS` 61 and a token of 31 characters, then with valid values | the unit starts | the first start prints the output of §10, example 11 and exits non-zero; the second accepts requests |
+| PUB-T-35 | Images only through `web` | PUB-F-32, PUB-F-13, PUB-NF-2 | the seeded landing page | a visitor requests `/media/<id>` for each image of the page, and `cms` is asked for the same file directly without token | `web` answers with the file and its media type; `cms` refuses with PUB-E-2; an unknown id answers 404 without a page |
+
+### Synthetic Test Data Strategy
+
+All test data is synthetic; no real person, address, or text from a real installation is used (`G-1.N3` and the public repository).
+
+- **Templates and variations.** One baseline per content type is the seed content of §8. A test varies one field of the baseline (a heading of 120 and 121 characters, a state, a missing language version, a position, a version number, a help context) and names the varied field. Entry texts are plain synthetic strings such as "Beispieltext 1" and "Sample text 1"; the strings that decide a result (search terms, the privacy text A and B, rich text lines) are those of §10.
+- **Golden data files.** The tables of §10 are kept as stack-neutral data files next to the tests, one file per example: the first-visit table (example 1), the missing-translation table (example 3), the changelog entries and their order (example 9), the rich text lines and their structures (example 8), the help-context table (example 12), the meta table (example 13), and the configuration output (example 11). A test reads its file; the file is not duplicated inside test code. Expected structures of pages are stored as the list of blocks (kind, text, language), not as markup.
+- **Binary files.** Images are generated in memory: a minimal valid PNG, JPEG, or WebP, padded to the exact byte count of the case (1 024; 1 048 576; 2 097 152; 2 097 153 bytes); the SVG and the PDF named `logo.png` are generated the same way. The seed images are generated graphics released under `CC0-1.0`.
+- **Stubs with scripted answers.** The content interface stub answers a given `ContentGroupData`, a delay, or nothing; the session check stub answers `valid`, `none`, `unknown`, or a delay; the bot protection stub answers a notice text or none; the clock is set by the test.
+- **Accounts.** Test accounts use the domain `example.org` ("Ada Admin", "Eli Editor") and passwords generated per test; no password is committed.
+
+### CI Test Constraints
+
+Mirrors [scaffolding.md](scaffolding.md) §17. No test calls a service on the internet or a language model; the tests read no clock but the injected one, so no test waits for 60 seconds. The unit tests of `web` and the module tests of `cms` that use no database run in the `test` job of the pipeline without network. Tests that need the started `cms` unit with its content store ([PUB-T-1], [PUB-T-3], [PUB-T-5], [PUB-T-7], [PUB-T-28], [PUB-T-29], [PUB-T-32], [PUB-T-35]) run where a container runtime is available; until the pipeline offers one they are run locally and their result is stated in the merge request. The accessibility checker and the viewport tests ([PUB-T-9], [PUB-T-33]) use the browser runner of [SCF-C-13]. The status-page half of [PUB-T-7] runs as soon as the status page shows the names of failed checks ([SCF-F-8] as changed in §15); until then only the health report half runs. The whole suite of the slice runs in less than 5 minutes.
+
+### Test Coverage Matrix & Untested Justifications
+
+Every acceptance criterion has its acceptance test, and the integration tests add end-to-end coverage:
+
+| Story | Acceptance criterion | Acceptance test | Integration tests |
+| --- | --- | --- | --- |
+| PUB-US-1 | PUB-AC-1.1 to PUB-AC-1.7 | PUB-T-1 to PUB-T-7 | PUB-T-28, PUB-T-29, PUB-T-32, PUB-T-34, PUB-T-35 |
+| PUB-US-2 | PUB-AC-2.1 to PUB-AC-2.6 | PUB-T-8 to PUB-T-13 | PUB-T-31, PUB-T-33 |
+| PUB-US-3 | PUB-AC-3.1 to PUB-AC-3.4 | PUB-T-14 to PUB-T-17 | PUB-T-33 |
+| PUB-US-4 | PUB-AC-4.1 to PUB-AC-4.6 | PUB-T-18 to PUB-T-23 | PUB-T-29, PUB-T-30 |
+| PUB-US-5 | PUB-AC-5.1 to PUB-AC-5.4 | PUB-T-24 to PUB-T-27 | PUB-T-30 |
+
+Every requirement of §4 to §6 and §9 is named in the *Covers* column of at least one test above (the check script reports a requirement that is not). Worked examples 1 to 13 each appear as a test: example 1 in [PUB-T-13] and [PUB-T-25]; 2 in [PUB-T-4]; 3 in [PUB-T-26]; 4 in [PUB-T-6]; 5 in [PUB-T-14]; 6 in [PUB-T-7]; 7 in [PUB-T-18]; 8 in the unit tests of `rich-text`; 9 in [PUB-T-15]; 10 in [PUB-T-10] and the unit tests of `content-model`; 11 in [PUB-T-34]; 12 in [PUB-T-16]; 13 in [PUB-T-12]. The capabilities of §7 are not tested by themselves; they are covered through the requirements that use them, except the checks written into their acceptance sentences, which the unit tests of `editor-accounts`, `rich-text`, and `page-frame` carry out.
+
+| ID | Reason |
+| --- | --- |
+| PUB-NF-5 | The memory-hard property of the hashing function cannot be observed in a unit test; the tests check what can be observed (two hashes of one password differ, the hash does not contain the password), and the function itself is named and justified in `STACK.md` |
