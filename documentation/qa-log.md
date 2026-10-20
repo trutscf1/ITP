@@ -271,3 +271,13 @@ The MRs of round 10 wait for reviews; the next task of `schwaigc` is chosen. Q42
 ➡️ Alle ok
 
 > **Answer:** Alle ok (Recommended)
+
+## Round 12 — 2026-10-20 — check (`schwaigc`, workflow documents against `docs/`)
+
+`WORKFLOW.md`, the MR and issue templates, `CLAUDE.md`, `README.md`, and the GitLab settings were compared with `docs/anforderungen_software_projekte.md` and `docs/git_workflow_commands.md`. Findings are in the log of `ROADMAP-DETAILS.md` (2026-10-20).
+
+❓ **Q47** - **Workflow-Fixes**: Welche der gefundenen Punkte soll ich jetzt beheben? Options: Issue-Labels aufräumen / Kommentar auf !15 / Doku-Fix-MR / Settings-Bitte an trutscf1
+
+➡️ Issue-Labels aufräumen, Kommentar auf !15
+
+> **Answer:** Issue-Labels aufräumen (Recommended), Kommentar auf !15 (Recommended)
