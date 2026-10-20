@@ -38,7 +38,8 @@ Checks:
 pnpm run lint                                  # Biome check of every package, through Turborepo
 pnpm run typecheck                             # TypeScript check of every package
 pnpm run build                                 # build of every package
-pnpm test                                      # acceptance tests of the repository layout
+pnpm test                                      # tests of every package, including the acceptance tests of the repository
+pnpm dev                                       # the dev task of every package (watch mode), through Turborepo
 node tools/doc-check.mjs documentation          # consistency check of the documentation
 npx markdownlint-cli2 "documentation/**/*.md"   # markdown lint
 ```

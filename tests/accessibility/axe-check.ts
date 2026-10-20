@@ -3,7 +3,7 @@
 // if the server does not come up, a page does not load, or a page has a violation of impact
 // "critical". The pages of the design system (R4, DSA-AC-3.5) are added to `pages`.
 // Usage: BASE_URL=http://localhost:3000 node tests/accessibility/axe-check.ts
-import AxeBuilder from "@axe-core/playwright";
+import { AxeBuilder } from "@axe-core/playwright";
 import { type Browser, chromium } from "playwright";
 
 const pages: string[] = ["/"];
