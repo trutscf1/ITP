@@ -439,3 +439,9 @@ The review of !14 (F1–F18) left six questions to the owner. Checked before ask
 ➡️ Ja, für /api/* — `/api/docs` without file: 500 `internal-error`; unknown `/api/*`: 404 `not-found`; HTML pages keep the normal not-found page
 
 > **Answer:** Ja, für /api/* (Recommended)
+
+❓ **Q60** - **Antwort auf das Review von !14**: Tabelle F1–F18 mit Erledigt und Ort, Entscheidungen Q54–Q59, Hinweis zu F18, Bitte um Re-Review posten? Options: Posten / Nicht posten
+
+➡️ Posten — answer posted on !14
+
+> **Answer:** Posten (Recommended)
