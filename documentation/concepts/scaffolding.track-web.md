@@ -84,7 +84,7 @@ packages/contracts/src/web/config.ts M1  WebConfig and loadWebConfig
 
 The route files are thin: they call the module and turn its result into a response. Logic lives in `.ts` files without JSX, so the unit tests import it with `node --test` and type stripping, which compiles no JSX (F3 of the review). Imports between these files are relative with the `.ts` extension, as in `tests/`; the `@/` alias is used only in route files.
 
-Dependencies of `apps/web/package.json` to add: `@stash/contracts` (`workspace:*`), `geist` (exact version, the newest one older than the 7-day minimum release age, today 1.7.2; licence SIL OFL 1.1). The existing tasks `dev`, `build`, `lint`, `typecheck`, `test` stay ([SCF-F-12]); `start` becomes `node scripts/start.ts start`, `dev` becomes `node scripts/start.ts dev`.
+Dependencies of `apps/web/package.json` to add: `@stash/contracts` (`workspace:*`), `geist` (exact version, the newest one older than the 7-day minimum release age, today 1.7.2; licence SIL OFL 1.1). The existing tasks `dev`, `build`, `lint`, `typecheck`, `test` stay ([SCF-F-12]); `start` becomes `node scripts/start.ts start`, `dev` becomes `node scripts/start.ts dev`. `apps/web/tsconfig.json` adds `"allowImportingTsExtensions": true` and `"erasableSyntaxOnly": true`, so that `tsc` accepts the `.ts` imports and rejects syntax that type stripping cannot run (A1); the `test` script becomes `node --test "src/**/*.test.ts"` (A2).
 
 #### M1 — Configuration of `web` (contracts folder `web`)
 
