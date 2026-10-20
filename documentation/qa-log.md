@@ -365,3 +365,37 @@ The MRs !5, !7, !9 wait for reviews; the next task of `schwaigc` is chosen. The 
 ➡️ Issue-Labels aufräumen, Kommentar auf !15
 
 > **Answer:** Issue-Labels aufräumen (Recommended), Kommentar auf !15 (Recommended)
+
+## Round 16 — 2026-10-20 — delivery (`schwaigc`, merge !6 and !13)
+
+`schwaigc` is not the author of !6 and !13, so these two may be merged by them. Both heads were checked in clean worktrees: doc-check and `--status` 0 errors, markdown lint clean, pipeline green, no conflict with `dev`; the concept text of !6 is unchanged since the approval on `c76350a`.
+
+❓ **Q49** - **Review-Freigabe**: Welche MRs approvst du (Kommentar und Approval unter deinem Namen)? Options: !6 approven / !13 approven / Keinen
+
+➡️ !6 und !13
+
+> **Answer:** !6 approven (Recommended), !13 approven
+
+❓ **Q50** - **Merge !6**: concept/public-content → dev, Head 6263c25. Options: Merge now / No / Later / I merge myself
+
+➡️ Merge now — merged as `2d7a6e0`, branch kept
+
+> **Answer:** Merge now
+
+❓ **Q51** - **Merge !13**: concept/migrate-scaffolding → dev, Head af3fc53. Options: Merge now / No / Later / I merge myself
+
+➡️ Merge now — after !6 the inbox files conflicted; `dev` merged in (`bd5e2d2`, both sides kept), which reset the approval
+
+> **Answer:** Merge now
+
+❓ **Q52** - **Re-Approval !13**: Approval auf bd5e2d2 erneuern? Options: Ja, erneuern / Nein
+
+➡️ Ja, erneuern
+
+> **Answer:** Ja, erneuern (Recommended)
+
+❓ **Q53** - **Merge !13**: Head bd5e2d2. Options: Merge now / No / Later / I merge myself
+
+➡️ Merge now — merged as `8786ed1`, branch kept; #111 closed and set to `status::done`
+
+> **Answer:** Merge now
