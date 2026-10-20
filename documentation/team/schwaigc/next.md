@@ -13,3 +13,4 @@ New tasks and ideas for this developer land here first, before anyone plans them
 
 - [2026-10-06] Add `Developer handle: schwaigc` to your own gitignored `CLAUDE.local.md` and read `team/TEAM.md`.
 - [2026-10-06] Review the drafts that concern your features: the roles and success signals in `GOAL.md`, the *Serves* column in `ROADMAP.md`, and the concept drafts and work items of your features.
+- [2026-10-20] Track plan Web, M6: after !14 is merged, change `/api/docs` to the description generated on request from the contracts (as in !16), drop `OPENAPI_FILE` (A3), the fixture, and W-15 (Q69); M9 replaces the stop-gap `docker/web.Dockerfile` of !17 (Q70).

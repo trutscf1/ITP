@@ -313,3 +313,31 @@ Open MRs of `schwaigc` (author: !5, !7, !9; reviewer: !6) checked against P-MR-2
 ➡️ Nur Kommentar
 
 > **Answer:** Nur Kommentar (Recommended)
+
+## Round 20 — 2026-10-20 — review (`schwaigc`, !14 approved; reviews of !15, !16, !17)
+
+Provisional numbers (P-TEAM-5): Q44 to Q66 of this day are on `concept/scaffolding-track-web` (!14); these follow them. `trutscf1` approved !14 at `0818a6c`. !15, !16, and !17 of `trutscf1` had no reviewer and red pipelines; each was checked in a clean worktree.
+
+❓ **Q67** - **Merge !14**: Der Autor darf seinen MR nicht selbst mergen (`docs/` §4). Wie vorgehen? Options: trutscf1 mergen lassen / Trotzdem selbst mergen / Later
+
+➡️ trutscf1 mergen lassen — request posted on !14
+
+> **Answer:** trutscf1 mergen lassen (Recommended)
+
+❓ **Q68** - **Reviews**: Welche MRs von trutscf1 reviewen? Options: !16 Shared Contracts / !17 Docker Compose / !15 Meilensteinplan
+
+➡️ alle drei — changes requested on each (commit messages or image scan, conflicts with `dev`; !16 also `ErrorResponse` against `scaffolding.md` §8 and example 6)
+
+> **Answer:** !16 Shared Contracts (Recommended), !17 Docker Compose, !15 Meilensteinplan
+
+❓ **Q69** - **/api/docs**: Bei jeder Anfrage aus den Contracts erzeugen (!16) oder die generierte Datei ausliefern (Plan M6)? Options: !16 übernehmen, Plan anpassen / Plan M6 beibehalten
+
+➡️ !16 übernehmen, Plan anpassen — M6 of the track plan Web changes after !14 is merged; !16 adds the test of SCF-T-15
+
+> **Answer:** !16 übernehmen, Plan anpassen (Recommended)
+
+❓ **Q70** - **web-Image**: `docker/web.Dockerfile` aus !17 als Übergang oder ohne web mergen? Options: Als Übergang ok / Ohne web mergen
+
+➡️ Als Übergang ok — replaced by M9 (`apps/web/Dockerfile`) in SCF-US-8 slice 1
+
+> **Answer:** Als Übergang ok (Recommended)
