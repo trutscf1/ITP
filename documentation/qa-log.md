@@ -445,3 +445,19 @@ The review of !14 (F1–F18) left six questions to the owner. Checked before ask
 ➡️ Posten — answer posted on !14
 
 > **Answer:** Posten (Recommended)
+
+## Round 18 — 2026-10-20 — delivery (`schwaigc`, pipelines of !14 and !7)
+
+The job `commit-messages` failed on !14 (body line over 100 characters in `4596372`, by `schwaigc`) and on !7 (the same in `84508ee`, by `trutscf1`); the job `docs` failed on !14 because the position row named the MR's own branch, which the check reads as merged. `trutscf1` had added the assumptions A1–A6 to the plan.
+
+❓ **Q61** - **Commit-Nachrichten fixen**: Umschreiben und Force-Push mit `--force-with-lease` auf !14 (4596372 neu formuliert, die sieben folgenden Commits unverändert neu aufgesetzt) und !7 (84508ee mit kürzerer Body-Zeile), dazu ein Kommentar an trutscf1? Options: Ja, beide / Nur !14 / Keinen Force-Push
+
+➡️ Ja, beide — tree of each branch unchanged, commitlint clean
+
+> **Answer:** Ja, beide (Recommended)
+
+❓ **Q62** - **Annahmen A1–A6 von trutscf1**: tsconfig-Optionen, expliziter Test-Glob, `OPENAPI_FILE`, Template-Grafik löschen, Umgebung des Images, 405 mit ErrorResponse. Übernehmen? Options: Alle übernehmen / Einzelne ändern
+
+➡️ Alle übernehmen
+
+> **Answer:** Alle übernehmen (Recommended)

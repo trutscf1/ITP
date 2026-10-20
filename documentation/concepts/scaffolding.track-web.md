@@ -276,7 +276,7 @@ Taken from `scaffolding.md` §10 and the acceptance criteria of SCF-US-8. These 
 
 ## Assumptions
 
-The owner decisions of the review are in `../qa-log.md`, Q54 to Q59, and need no assumption. The points below were still open when the plan was checked for generation; each takes the recommended default, and `schwaigc` reviews them.
+The owner decisions of the review are in `../qa-log.md`, Q54 to Q59, and need no assumption. The points below were still open when the plan was checked for generation; each takes the recommended default; `schwaigc` accepted all six (`../qa-log.md`, Q62).
 
 - A1: `apps/web/tsconfig.json` sets `allowImportingTsExtensions` and `erasableSyntaxOnly`. Reason: the plan prescribes `.ts` imports for type stripping, which `tsc` rejects without the first option, and the second keeps enums and namespaces out of the tested files.
 - A2: The `test` script lists its glob, `src/**/*.test.ts`. Reason: the generator should not depend on the default file patterns of `node --test`, and `.next/` must not be searched.
