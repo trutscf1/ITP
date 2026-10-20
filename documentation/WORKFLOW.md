@@ -113,27 +113,38 @@ GitLab — issues: `.gitlab/issue_templates/feature.md`, `.gitlab/issue_template
 
 Every roadmap feature has one **concept issue** (`type::concept`, assignee = feature owner); its owner starts the concept with `/engineering-human <feature>`. Story and slice issues are cut from the approved concept with `/engineering-human tickets <feature>`, one track per person.
 
-Weight is the relative effort on the scale 1, 2, 3, 5, 8 (P-TRK-3). The expected hours are the issue's time estimate. A slice issue is cut so that it fits into 4 h, one person's weekly project time; a story that needs more gets several slices.
+Weight is the relative effort on the scale 1, 2, 3, 5, 8 (P-TRK-3). The expected hours are the issue's time estimate. A slice issue is cut so that it fits into one project lesson of 200 minutes; a story that needs more gets several slices.
 
 ### Sprints and time budget
 
-- Project time: **4 h per person per week**, during school hours only.
-- One milestone per sprint: `Sprint <n>`. A sprint ends on the **last Tuesday of the month** with the sprint review. If that lesson is cancelled, the review is in the next project lesson.
-- The release MR `dev` → `main` is merged **by the Monday before** the sprint review; feature MRs for the sprint are merged into `dev` before the release MR is opened.
-- One sprint = one GitLab milestone = one release `v0.<sprint>.0` (P-VER-2).
+- Project time: **Tuesday, 200 minutes per person**, during school hours only and not in school holidays. On a review Tuesday only about half of it is working time.
+- One milestone per sprint: `Sprint <n>`, plus `Final`. The **sprint review is on the dates in the table** (the Tuesdays set by the team); the milestone ends the **day before**, on the Monday that is also the last merge to `main`.
+- The release MR `dev` → `main` is merged by that Monday; feature MRs for the sprint are merged into `dev` before the release MR is opened.
+- One sprint = one GitLab milestone = one release `v0.<sprint>.0` (P-VER-2); the final release is `v1.0.0`, a MAJOR bump that is confirmed as a question (P-VER-2).
 - Final submission: **2027-04-06** (Tuesday); last merge to `main` on 2027-04-05.
+- What each milestone must contain when it ends is defined in [ROADMAP.md](ROADMAP.md), chapter "Milestones", and copied into the description of the GitLab milestone.
 
-| Sprint | Start | Last merge to `main` | Review |
-| --- | --- | --- | --- |
-| Sprint 1 | 2026-09-30 | 2026-10-26 | 2026-10-27 |
-| Sprint 2 | 2026-10-28 | 2026-11-23 | 2026-11-24 |
-| Sprint 3 | 2026-11-25 | 2026-12-28 | 2026-12-29 |
-| Sprint 4 | 2026-12-30 | 2027-01-25 | 2027-01-26 |
-| Sprint 5 | 2027-01-27 | 2027-02-22 | 2027-02-23 |
-| Sprint 6 | 2027-02-24 | 2027-03-29 | 2027-03-30 |
-| Final | 2027-03-31 | 2027-04-05 | 2027-04-06 (submission) |
+| Sprint | Start | Last merge to `main` (milestone due) | Review | Release |
+| --- | --- | --- | --- | --- |
+| Sprint 1 | 2026-09-30 | 2026-11-02 | 2026-11-03 | `v0.1.0` |
+| Sprint 2 | 2026-11-03 | 2026-11-23 | 2026-11-24 | `v0.2.0` |
+| Sprint 3 | 2026-11-24 | 2027-01-11 | 2027-01-12 | `v0.3.0` |
+| Sprint 4 | 2027-01-12 | 2027-01-25 | 2027-01-26 | `v0.4.0` |
+| Sprint 5 | 2027-01-26 | 2027-02-22 | 2027-02-23 | `v0.5.0` |
+| Sprint 6 | 2027-02-23 | 2027-03-15 | 2027-03-16 | `v0.6.0` |
+| Final | 2027-03-16 | 2027-04-05 | 2027-04-06 (submission) | `v1.0.0` |
 
-Reviews that fall into school holidays move to the next project lesson; the team enters the holiday weeks per sprint at sprint planning, because they reduce that sprint's capacity.
+School holidays (assumed: Christmas 2026-12-24 … 2027-01-06, 2026-12-08, semester break 2027-02-08 … 02-13, Easter 2027-03-22 … 03-29) are corrected at sprint planning, because they reduce that sprint's capacity. Capacity and the planned load per person and sprint are in [ROADMAP.md](ROADMAP.md), chapter "Capacity".
+
+### Sprint cycle: documents first, code generated, tests first (ADR-0005)
+
+Every sprint runs the same five steps; the exit criteria of each milestone are in [ROADMAP.md](ROADMAP.md).
+
+1. **Concept.** The concept documents of the sprint's features reach `ready`: phases 1–6 including §17 (tests carrying the `AC` IDs), work items, issues cut.
+2. **Generate, tests first.** From the ready documents the code is generated per story: first a `test(<scope>): … [AC-ID]` commit with failing tests, then `feat`/`fix` commits until they pass. One MR per story.
+3. **Review** by another person in the last working lesson; fixes with `/engineering-human revise`.
+4. **Release.** Release MR by the milestone due date, tag `v0.<sprint>.0`, `CHANGELOG.md`, status current (P-ROAD-4).
+5. **Regeneration probe.** One feature of the sprint is regenerated in an empty worktree from its concept document and tests alone; its acceptance tests must pass. The result (feature, passed or not, what was missing from the documents) is logged in `ROADMAP-DETAILS.md`; every gap found is fixed in the documents first.
 
 ## Merge requests (P-MR-1…6)
 
@@ -167,6 +178,8 @@ An issue is done, and its MR may be merged, only when every item holds:
 12. No `.env`, secrets, or build output are committed; new environment variables are in `.env.example`.
 13. The MR was merged without squash; the branch still exists.
 14. Time is recorded per "Time tracking", including the review.
+15. Test first (ADR-0005): on the story's branch, a `test(<scope>): … [AC-ID]` commit with the failing tests of the story's acceptance criteria comes before the first `feat` or `fix` commit that touches production code; the MR checklist confirms it.
+16. Every acceptance criterion of the story is covered by a test whose name carries its `AC` ID (check: `tools/doc-check.mjs` rule `AC-TEST`, once built; until then the reviewer checks it by hand).
 
 ## Releases (P-VER-1…3)
 

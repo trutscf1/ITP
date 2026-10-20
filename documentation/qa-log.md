@@ -489,3 +489,25 @@ The job `commit-messages` failed on !14 (body line over 100 characters in `45963
 ➡️ Reviewer anschreiben — reminders posted on !7 (`tschudea07`: !5, !7, !9, merge order) and !14 (`trutscf1`: re-review of !14, revision of !18)
 
 > **Answer:** Reviewer anschreiben
+
+## Round 10 — 2026-10-20 — milestone plan (`trutscf1`)
+
+Planning of the sprints and milestones on the dates set by the team: Sprint 1 2026-11-03, Sprint 2 2026-11-24, Sprint 3 2027-01-12, Sprint 4 2027-01-26, Sprint 5 2027-02-23, Sprint 6 2027-03-16, final presentation 2027-04-06; each milestone ends one day earlier. Assumptions: A21 the dates are the review Tuesdays and the milestone due date is the Monday before; A22 school holidays as in `WORKFLOW.md` (to be corrected at sprint planning); A23 one story point is 0.75 h of human work.
+
+❓ **Q34** - **Konzept-Takt**: Wann entstehen die Konzepte (Phase 1–6, inkl. Test-Konzept §17) im Verhältnis zur Umsetzung? Options: Einen Sprint voraus (Recommended) / Alle Konzepte zuerst / Parallel pro Feature
+
+➡️ Also immer konzept und dann wenn ein sprint (=milestone) abgeschlossen ist wird daraus der komplette code generiert. Bedenke dass wir schüler sind und nur jeden sienstafg 200min arbeiten können und wenn ferien sind nicht. also heute am ende soll der erste milestone zum großteil abgeschlossen sein, damit wir den code generieren können
+
+> **Answer:** Other (free text, quoted above)
+
+❓ **Q35** - **TDD-Durchsetzung**: Wie streng wird 'erst Tests, dann Code' im Prozess verankert? Options: DoD + MR + ID-Check (Recommended) / Nur DoD + MR-Template / Zusätzlich CI-Reihenfolgeprüfung
+
+➡️ DoD + MR + ID-Check (Recommended)
+
+> **Answer:** DoD + MR + ID-Check (Recommended)
+
+❓ **Q36** - **Nachweis 'aus Markdown generierbar'**: Wie wird das Ziel am Ende belegt? Options: Regenerations-Probe (Recommended) / Nur Rückverfolgbarkeit / Probe nur im Sprint 6
+
+➡️ Regenerations-Probe (Recommended)
+
+> **Answer:** Regenerations-Probe (Recommended)

@@ -19,7 +19,7 @@ Session positions of one developer (P-TEAM-3). Precise enough that a fresh sessi
 | Share links with password and expiry (R8) | [concepts/share-links.md](../../concepts/share-links.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human share-links` |
 | Deployment: automatic deploy on push to `main`, TLS (R14) | [concepts/deployment.md](../../concepts/deployment.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human deployment` |
 
-Sprint 1 (until 2026-10-26), GitLab issues: #42, #44 (shared: #38, #39, #40, #85); #2 Corporate Identity.
+Sprint 1 (until 2026-11-02): #41 (shared: #38, #39, #40, #85). Next: Sprint 2 IDN-US-1, -2, -6 (#45, #46, #50); plan in `ROADMAP.md`, chapter "Milestones".
 
 ## Open questions waiting for others
 

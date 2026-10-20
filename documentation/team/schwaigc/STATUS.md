@@ -17,7 +17,7 @@ Session positions of one developer (P-TEAM-3). Precise enough that a fresh sessi
 | Design system & accessibility modes (R4) | [concepts/design-system.md](../../concepts/design-system.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human design-system` |
 | Web client: dashboard, file browser, preview (R6) | [concepts/web-client.md](../../concepts/web-client.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human web-client` |
 
-Sprint 1 (until 2026-10-26), GitLab issues: #68 and #102 done (shared: #38, #39, #40, #85); #2 Corporate Identity.
+Sprint 1 (until 2026-11-02): #68, #106, #112, #109 (shared: #38, #39, #40, #85). Next: Sprint 2 DSA-US-2, -3 (#71, #72); plan in `ROADMAP.md`, chapter "Milestones".
 
 ## Open questions waiting for others
 

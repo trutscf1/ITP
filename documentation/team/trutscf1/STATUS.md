@@ -20,7 +20,7 @@ Session positions of one developer (P-TEAM-3). Precise enough that a fresh sessi
 | Offline mode: installable web app with sync and conflict handling (R12) | [concepts/offline-mode.md](../../concepts/offline-mode.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human offline-mode` |
 | Load tests & operations dashboards (R13) | [concepts/load-tests.md](../../concepts/load-tests.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human load-tests` |
 
-Sprint 1 (until 2026-10-26), GitLab issues: #78, #81 (shared: #38, #39, #40, #85).
+Sprint 1 (until 2026-11-02): #78, #81, #107 (shared: #38, #39, #40, #85). Next: Sprint 2 OBS-US-1/-2 (#82, #83) and the `AC-TEST` rule; plan in `ROADMAP.md`, chapter "Milestones".
 
 ## Project-wide notes
 
