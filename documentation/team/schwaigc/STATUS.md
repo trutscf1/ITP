@@ -23,4 +23,7 @@ Sprint 1 (until 2026-10-26), GitLab issues: #68, #102, and #106 done (shared: #3
 
 | Question | Waiting for (handle) | Since |
 | --- | --- | --- |
-| — | — | — |
+| Review thread resolved and approval of !5 (SCF-US-7 slice 1, #85); `dev` merged in at `374a99d` | tschudea07 | 2026-10-13 |
+| Review thread resolved and approval of !7 (DSA-US-1 slice 1, #68); `dev` merged in at `f52b672` | tschudea07 | 2026-10-13 |
+| Approval of !9 (DSA-US-1 slice 2, #106), after !7; conflict with `dev` resolved at `c6325ed` | tschudea07 | 2026-10-13 |
+| Conflict markers removed and `dev` merged into !6 (R11 concept), then my re-approval | trutscf1 | 2026-10-13 |
