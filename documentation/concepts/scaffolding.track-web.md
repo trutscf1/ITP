@@ -97,6 +97,7 @@ WebConfig {
   STORAGE_HEALTH_URL: http(s) url,    default "http://storage:3002/health"
   WORKER_HEALTH_URL: http(s) url,     default "http://worker:3003/health"
   CMS_HEALTH_URL: http(s) url,        default "http://cms:1337/health"
+  OPENAPI_FILE: path, 1..512 chars,   default "../../packages/contracts/dist/openapi.json"   // relative to the working directory apps/web (A3)
 }
 
 ConfigProblem { name: string, reason: string }        // never the value
@@ -105,7 +106,7 @@ loadWebConfig(environment: map<string, string>) -> ok(WebConfig) | failed(list<C
   return configurationHelper(WebConfig, environment)
 ```
 
-A variable that is missing or empty takes its default. A value outside its range is a problem with the reasons `expected an integer between 1 and 65535`, `expected an integer between 1 and 60000`, `expected 1 to 64 characters`, `expected an http or https URL`. The defaults are the container addresses (service name = unit name, Q58); the native start ([SCF-F-3]) sets the four URLs to `http://localhost:<port>/health` with the ports of §8. `loadWebConfig` only returns; printing and exiting are M7's job.
+A variable that is missing or empty takes its default. A value outside its range is a problem with the reasons `expected an integer between 1 and 65535`, `expected an integer between 1 and 60000`, `expected 1 to 64 characters`, `expected 1 to 512 characters`, `expected an http or https URL`. `OPENAPI_FILE` names the generated API description (M6); its default is the assumed output path of the generation command and is corrected when the contracts core (#8) fixes the path. The defaults of the four URLs are the container addresses (service name = unit name, Q58); the native start ([SCF-F-3]) sets the four URLs to `http://localhost:<port>/health` with the ports of §8. `loadWebConfig` only returns; printing and exiting are M7's job.
 
 Until the configuration helper of the contracts core exists, `config.ts` holds a local function with the same signature; it is replaced, not kept, when the helper is merged.
 Traces to: SCF-F-11, SCF-F-17, SCF-NF-8, SCF-E-1. Requires: configuration helper (contracts core), export path `@stash/contracts/web`.
@@ -184,7 +185,7 @@ GET /api/docs
 GET|POST|… /api/<any other path> -> 404, ErrorResponse { code: "not-found", message: "The requested resource does not exist." }
 ```
 
-`web` never edits or rebuilds the file; it serves what the generation command of the contracts core wrote ([SCF-F-10]). The error message names no path ([SCF-NF-4]); the cause goes to the log. HTML pages keep the normal not-found page; [SCF-F-21] applies to the HTTP endpoints under `/api` (Q59). Until the generation command exists, the route is tested against the fixture `apps/web/src/api-docs/fixture.openapi.json`.
+The path to the file is `config.OPENAPI_FILE`, read per request, so a test points it at the fixture or at a missing file and the image points it at its own copy (M9). `web` never edits or rebuilds the file; it serves what the generation command of the contracts core wrote ([SCF-F-10]). The error message names no path ([SCF-NF-4]); the cause goes to the log. HTML pages keep the normal not-found page; [SCF-F-21] applies to the HTTP endpoints under `/api` (Q59). Until the generation command exists, the route is tested against the fixture `apps/web/src/api-docs/fixture.openapi.json`.
 Traces to: SCF-F-10, SCF-F-21, SCF-NF-4, SCF-AC-3.3, SCF-AC-3.4. Requires: generation command and its output path (contracts core), ErrorResponse.
 
 #### M7 — Start command
