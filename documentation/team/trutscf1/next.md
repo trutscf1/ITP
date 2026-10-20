@@ -23,3 +23,5 @@ New tasks and ideas for this developer land here first, before anyone plans them
 - [2026-10-06] In the MR that delivers PUB-US-3 (help center and changelog): add the release step "a content editor writes and publishes the changelog entry in the team's installation" to `WORKFLOW.md`, "Releases" (`concepts/public-content.md` §15, Q19).
 - [2026-09-29] Prioritize R2–R14 as must / should / could before Sprint 2 planning (capacity ≈ 350 h vs. ≈ 490 h estimated, `ROADMAP.md` "Capacity").
 - [2026-09-29] R1: each owner writes the "Plan" section of their track file (`concepts/scaffolding.track-*.md`) before their first MR.
+- [2026-10-13] After !6 (public content) is merged: update its references to `scaffolding.md` §7 to §8, and mark the two changes of its §15 that the migration carried out (`SCF-NF-1`, `SCF-F-8`, `SCF-U-1`) as done.
+- [2026-10-13] The stories `SCF-US-1` to `SCF-US-4` are written for "a developer", which is no role of `GOAL.md`; `doc-check` warns about it since the migration. Decide with the team whether the stories name the operator or a role is added by ADR.
