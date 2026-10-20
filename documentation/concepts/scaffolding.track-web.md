@@ -273,3 +273,23 @@ Taken from `scaffolding.md` §10 and the acceptance criteria of SCF-US-8. These 
 | W-19 | Rendering rule | SCF-AC-8.4, SCF-U-3 | the output of `next build` with every unit address pointing to a closed port | the prerender manifest is read | it lists none of `/health`, `/status`, `/api/docs`, and the build made no request to a unit |
 | W-20 | M8 | SCF-NF-1 | the source of the layout | it is read | it imports no font from `next/font/google`, and neither `public/` nor `src/app/` holds a file of the create-next-app template (the five `.svg` files, `favicon.ico`) |
 | W-21 | M2, M6 | SCF-AC-3.4, SCF-F-21 | `/health` | it is requested with POST | the response is 405 with `{ code: "method-not-allowed", message: "The method is not allowed for this path." }` and the header `Allow: GET, HEAD` |
+
+## Assumptions
+
+The owner decisions of the review are in `../qa-log.md`, Q54 to Q59, and need no assumption. The points below were still open when the plan was checked for generation; each takes the recommended default, and `schwaigc` reviews them.
+
+- A1: `apps/web/tsconfig.json` sets `allowImportingTsExtensions` and `erasableSyntaxOnly`. Reason: the plan prescribes `.ts` imports for type stripping, which `tsc` rejects without the first option, and the second keeps enums and namespaces out of the tested files.
+- A2: The `test` script lists its glob, `src/**/*.test.ts`. Reason: the generator should not depend on the default file patterns of `node --test`, and `.next/` must not be searched.
+- A3: The API description is found through the variable `OPENAPI_FILE` (M1), default `../../packages/contracts/dist/openapi.json`. Reason: a test, the native start, and the image need three different paths, and [SCF-NF-8] forbids a hard-coded one; the contracts core (#8) corrects the default.
+- A4: All template artwork and the template README are deleted, and no project icon is added in R1. Reason: only `next.svg` and `vercel.svg` were named, but the other files are template artwork as well and would need licence notes; the icon follows with the design system (R4).
+- A5: The runtime stage of the image sets `HOSTNAME=0.0.0.0`, `NODE_ENV=production`, `NEXT_TELEMETRY_DISABLED=1`, and `OPENAPI_FILE`; `outputFileTracingRoot` is the repository root. Reason: the standalone server binds to the container host name by default, so the health check at `127.0.0.1` would fail, and a monorepo needs the tracing root.
+- A6: `/health` and `/api/docs` answer other methods with 405 and an unexpected exception with 500, both as `ErrorResponse` (W-21). Reason: [SCF-F-21] speaks of every HTTP endpoint; Q59 decided `/api/*` only, so this is the literal reading for `/health`.
+
+## Changes to the main concept (listed, not made)
+
+For `trutscf1`, the owner of `scaffolding.md`:
+
+- §8 or §16: state the rule that the service name of a unit in the stack definition equals the unit name (Q58 agreed it with the Platform track as an interface; the main concept does not say it).
+- §16: `tests/` is in no track's owned paths; name an owner or state that the author of a story's track writes the story's test files (Q57).
+- SCF-T-40 asks for 0 violations while `axe-check.ts` fails only on `critical`: say that SCF-T-40 is its own run (Q57).
+- `SCF-AC-3.1` (`documentation/work-items/scaffolding/SCF-US-3-…`) and `DSA-AC-1.1` name `@nimbus/contracts` and `@nimbus/ui`; the packages are `@stash/contracts` and `@stash/ui` (F18).
