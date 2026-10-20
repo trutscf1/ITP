@@ -31,8 +31,9 @@ The vertical slices that deliver this story. One slice is delivered by the story
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
-| 1 — Stack starts with one command | SCF-AC-2.1, SCF-AC-2.2, SCF-AC-2.4 | — | #39 |
+| 1 — Data services, reverse proxy, and `web` start with one command | SCF-AC-2.2, SCF-AC-2.4 (SCF-AC-2.1 for the services that run today) | — | #39 |
 | 2 — Offline start and image scan | SCF-AC-2.3, SCF-AC-2.5 | 1 | #103 |
+| 3 — All units in the stack | SCF-AC-2.1 (complete) | 1, and the units of the other tracks | — |
 
 - **Story issue:** #39
 - **Weight:** 5 (slice 1: 3, slice 2: 2)

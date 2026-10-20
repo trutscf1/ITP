@@ -9,7 +9,7 @@ The project goal, its target users, and its non-goals are in [documentation/GOAL
 Early scaffold. What exists today:
 
 - a pnpm and Turborepo workspace with the five units in `apps/` and the shared packages in `packages/`; the Next.js application is the `web` unit in `apps/web/` (App Router, React, Tailwind CSS, Biome, Prisma), the other units are empty
-- a `docker-compose.yml` that starts PostgreSQL 18 and MongoDB 8
+- a `docker-compose.yml` that starts PostgreSQL 18, Redis, MongoDB, CouchDB, SeaweedFS, ClamAV, Mailpit, a Caddy reverse proxy, and the `web` unit; the other four units join when their code runs
 - the project documentation in `documentation/`
 
 Everything else in the architecture below is planned. The current state of every feature is in [documentation/ROADMAP.md](documentation/ROADMAP.md) and [documentation/ROADMAP-DETAILS.md](documentation/ROADMAP-DETAILS.md).
@@ -22,7 +22,7 @@ Requirements: Docker with Docker Compose, Node.js 24 LTS, and pnpm.
 # 1. configuration: copy the example and set your own values
 cp .env.example .env
 
-# 2. start the databases (PostgreSQL 18, MongoDB 8)
+# 2. start the stack (data services, mail catcher, reverse proxy, web)
 docker compose up -d
 
 # 3. start the web application
@@ -30,7 +30,7 @@ pnpm install
 pnpm --filter @stash/web dev
 ```
 
-The web application then runs at <http://localhost:3000>. It reads the database connection from `DATABASE_URL`; put that variable into `apps/web/.env`, matching the PostgreSQL values of step 1.
+The stack serves the web application at <http://localhost:8080> (`PROXY_PORT`) and catches all e-mail in Mailpit at <http://localhost:8025>. The first start takes a few minutes. All settings come from `.env`; OAuth and captcha are off there, so the stack starts offline once the images are present. For hot reload, run step 3 against `docker compose up -d postgres` and put `DATABASE_URL` (host `localhost`) into `apps/web/.env`.
 
 Checks:
 
