@@ -142,12 +142,12 @@ Not in this track: `apps/web/src/prisma` from the first scaffold of `dev` stays 
 
 ### Test cases
 
-Taken from `scaffolding.md` §10 and the acceptance criteria of SCF-US-8. These are the unit tests of the track, run with `node --test` in `apps/web`; the acceptance tests SCF-T-36 (the `web` row), SCF-T-39, and SCF-T-40 in `tests/` build on them. The health reports of §10 are kept as data next to the tests. A test name starts with the case ID and the acceptance criterion it covers, for example `W-5 SCF-AC-8.4: a down report with HTTP status 503 gives a down row` (`scaffolding.md` §17: test names carry the `AC` ID). A case whose *Covers* column names no acceptance criterion covers requirements only.
+Taken from `scaffolding.md` §10 and the acceptance criteria of SCF-US-8. These are the unit tests of the track, run with `node --test` in `apps/web`; the acceptance tests SCF-T-36 (the `web` row), SCF-T-39, and SCF-T-40 in `tests/` build on them. The health reports of §10 are kept as data next to the tests. A test name starts with the case ID and the acceptance criterion it covers, for example `W-5 SCF-AC-8.4: a down report with HTTP status 503 gives a down row` (`scaffolding.md` §17: test names carry the `AC` ID). A case whose _Covers_ column names no acceptance criterion covers requirements only.
 
 | Case | Module | Covers | Given | When | Then |
 | --- | --- | --- | --- | --- | --- |
 | W-1 | M1 | SCF-AC-2.6, SCF-F-11, SCF-F-17 | an environment without any of the variables of M1 | the configuration is loaded | every value is its default |
-| W-2 | M1 | SCF-AC-2.6, SCF-E-1 | `PORT=abc` | the configuration is loaded | it fails with the output of §10, example 3, for the unit `web`: `Invalid configuration for unit "web":` and `  PORT: expected an integer between 1 and 65535`; the output does not hold `abc` |
+| W-2 | M1 | SCF-AC-2.6, SCF-E-1 | `PORT=abc` | the configuration is loaded | it fails with the output of §10, example 3, for the unit `web`: `Invalid configuration for unit "web":` and, indented by two spaces, `PORT: expected an integer between 1 and 65535`; the output does not hold `abc` |
 | W-3 | M2 | SCF-AC-8.1, SCF-AC-8.2, SCF-NF-4 | `APP_VERSION=0.1.0` | `/health` of `web` is requested | the report is `{ unit: "web", version: "0.1.0", status: "ok", checks: [] }` and holds no host or port |
 | W-4 | M3 | SCF-AC-8.4, SCF-F-8 | a stub that answers with §10, example 1 | `identity` is queried | the row is `identity`, `ok`, no failed checks |
 | W-5 | M3 | SCF-AC-8.4, SCF-F-8, SCF-U-1 | a stub that answers with §10, example 2, with HTTP status 503 | `identity` is queried | the row is `identity`, `down`, failed check `relational-database` |
