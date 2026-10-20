@@ -297,3 +297,19 @@ Review of !11 by `schwaigc`, point 1: `SCF-AC-5.3` and `SCF-AC-2.5` were stricte
 ➡️ #106 DSA-US-1 Slice 2
 
 > **Answer:** #106 DSA-US-1 Slice 2 (Recommended)
+
+## Round 10 — 2026-10-20 — delivery (`schwaigc`, merge the assigned MRs)
+
+Open MRs of `schwaigc` (author: !5, !7, !9; reviewer: !6) checked against P-MR-2/3: none is approved, !5 and !7 have an unresolved review thread of `tschudea07`, !9 has a conflict with `dev`, the pipeline of !6 fails on conflict markers in its branch. The author does not merge their own MR (P-MR-2), so nothing was merged in this round.
+
+❓ **Q42** - **Eigene MRs (!5, !7, !9)**: Merge-fertig machen (dev einarbeiten, Konflikte lösen, Checks frisch laufen lassen, pushen, Kommentar an tschudea07), gemergt wird erst nach dem Approval? Options: Merge-fertig machen / Nur einarbeiten, kein Kommentar / Nichts anfassen
+
+➡️ Merge-fertig machen
+
+> **Answer:** Merge-fertig machen (Recommended)
+
+❓ **Q43** - **MR !6 public-content**: Die Pipeline schlägt wegen Konfliktmarkern fehl (ROADMAP-DETAILS.md, qa-log.md), dazu ein neuer Konflikt mit dev. Wie umgehen? Options: Nur Kommentar / Ich fixe den Branch / Nichts tun
+
+➡️ Nur Kommentar
+
+> **Answer:** Nur Kommentar (Recommended)
