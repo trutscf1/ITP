@@ -202,10 +202,30 @@ DependencyCheck {
 }
 
 ErrorResponse {
-  code: string,                     // stable, machine-readable, e.g. "validation-failed"
-  message: string                   // one plain sentence for the caller; no internals (SCF-NF-4)
+  code: string,                     // stable, machine-readable; one entry of the catalogue below; 1 to 64 characters, lower-case letters and hyphens
+  message: string                   // one plain sentence for the caller, 1 to 200 characters; no internals (SCF-NF-4)
 }
+
+SeedUser   { email: string, displayName: string }
+SeedTeam   { name: string, members: list<string> }      // members: e-mail addresses of seed users
+SeedFolder { name: string, team: string }               // team: name of a seed team
 ```
+
+Catalogue of `ErrorResponse.code` (assumption A23). A unit MUST NOT send a code that is not in the catalogue; a later concept appends codes with their HTTP status and message, and a code is never reused for another meaning or removed. The contracts core holds the catalogue ([SCF-F-9]).
+
+| code | HTTP status | Message | Used when |
+| --- | --- | --- | --- |
+| `validation-failed` | 400 | The request is not valid. | The body, a parameter, or a header does not match its contract; the message never contains the offending value |
+| `unauthenticated` | 401 | Authentication is required. | The caller is not signed in and the endpoint requires it |
+| `forbidden` | 403 | You are not allowed to do this. | The caller is signed in and lacks the right |
+| `not-found` | 404 | The resource does not exist. | The path or the addressed resource does not exist; also used where revealing existence would leak information |
+| `method-not-allowed` | 405 | This method is not supported here. | The path exists but not for this HTTP method |
+| `conflict` | 409 | The request conflicts with the current state. | The state of the resource forbids the change |
+| `payload-too-large` | 413 | The request is too large. | The body exceeds the limit of the endpoint |
+| `internal-error` | 500 | The request could not be processed. | Any failure inside the unit; the cause goes to the unit's log only |
+| `unavailable` | 503 | The service is temporarily unavailable. | An essential dependency is `down` |
+
+The seed records are the minimum of [SCF-F-25] (assumption A24): the seed command creates at least one `SeedUser`, one `SeedTeam` that has that user as member, and one `SeedFolder` of that team. The columns of the tables are fixed by the entity-relationship diagram ([SCF-F-22]), not here.
 
 Unit routing table (defaults; every value is configuration, [SCF-NF-8]):
 
@@ -336,7 +356,7 @@ Draft:
 **Example 6 — error response ([SCF-F-21], [SCF-NF-4]).** A request to `storage` with an invalid body is answered with HTTP status 400 and:
 
 ```json
-{ "code": "validation-failed", "message": "The request body is not valid." }
+{ "code": "validation-failed", "message": "The request is not valid." }
 ```
 
 A failure inside the unit is answered with HTTP status 500 and `{ "code": "internal-error", "message": "The request could not be processed." }`; the cause goes to the unit's log, never into the response.
@@ -404,6 +424,9 @@ Assumptions of the review follow-up, stated on 2026-10-20 for the owner `trutscf
 | A | Title | Assumption |
 | --- | --- | --- |
 | A21 | Configuration parameters | The ranges, defaults, and the exit code 1 of the table "Configuration parameters" (§8) are proposals of the review follow-up; the variables `APP_VERSION`, `DATABASE_URL`, `HEALTH_URL_*`, and `STATUS_UNIT_TIMEOUT_MS` are new and enter the example configuration with their unit. Reason: the review demanded a complete table and no number was set before. |
+| A22 | Interface signatures | The names `validateConfiguration`, `loadConfiguration`, `deriveStatus`, `buildHealthReport`, `errorResponse`, `errorStatus`, and `runRootTask` and their neutral signatures (§16, "Interface Signatures") are proposed so that the tracks cannot diverge; the track owners may rename them in their plan before the first merge request. |
+| A23 | Error code catalogue | The first nine codes of `ErrorResponse.code` with HTTP status and message (§8) are proposed; this refines A15. Later concepts append codes. |
+| A24 | Seed records | The minimum seed is one user, one team with that user as member, and one folder of that team (§8); the identity track decides the tables' columns. |
 
 Changes decided in [public-content.md](public-content.md) (its Q17 and Q18) and carried out here: [SCF-NF-1] allows `degraded` because of a non-essential check, and [SCF-F-8] and [SCF-U-1] show the names of the failed checks.
 
@@ -517,12 +540,64 @@ flowchart LR
 
 | Interface | Provided by | Used by | Inputs and outputs | Error conditions |
 | --- | --- | --- | --- | --- |
-| Root tasks | Platform & cms | every unit and package | The task names `dev`, `build`, `lint`, `typecheck`, `test` ([SCF-F-12]) | — |
+| Root tasks | Platform & cms | every unit and package | Task name (`dev`, `build`, `lint`, `typecheck`, `test`) → exit code of the run across all units and packages: `runRootTask` ([SCF-F-12]) | — |
 | Health endpoint | every unit | status page, reverse proxy, container health checks | `GET /health` on the internal port → HealthReport (§8) | [SCF-E-2] |
 | Routing table | Platform & cms | browser, status page | Path prefixes and internal ports of §8 | [SCF-E-3] |
-| Configuration helper | contracts core | every unit | Configuration contract + environment → validated configuration, or the output of §10, example 3 | [SCF-E-1] |
-| Error response | contracts core | every HTTP endpoint | ErrorResponse (§8) | — |
+| Configuration helper | contracts core | every unit | ConfigurationContract + environment (`map<string, string>`) → ValidatedConfiguration, or the output of §10, example 3: `validateConfiguration`, `loadConfiguration` | [SCF-E-1] |
+| Error response | contracts core | every HTTP endpoint | `code` of the catalogue (§8) → ErrorResponse and HTTP status: `errorResponse`, `errorStatus` | — |
 | Commit format | `WORKFLOW.md` | hooks, CI | Message → accepted or rejected (§10, example 4) | [SCF-E-4] |
+
+### Interface Signatures
+
+Signatures of the interfaces above in the neutral type system. The record types are those of §8 plus the ones below. Behavior is normative; the function names are the names in the contracts core and in the root tasks (assumption A22).
+
+```text
+ConfigurationParameter {
+  name: string,                      // the variable name, e.g. "PORT"
+  kind: enum(integer|string|boolean|url|enum),
+  required: boolean,
+  default: optional<string>,         // text form; absent when required
+  min: optional<integer>,            // integer: value; string and url: length in characters
+  max: optional<integer>,
+  allowed: optional<list<string>>,   // for kind enum
+  secret: boolean                    // true: never logged, never printed
+}
+
+ConfigurationContract { unit: enum(web|identity|storage|worker|cms), parameters: list<ConfigurationParameter> }
+
+ConfigurationIssue { name: string, reason: string }   // reason: one of the texts of §8
+
+ValidatedConfiguration {
+  unit: enum(web|identity|storage|worker|cms),
+  integers: map<string, integer>, strings: map<string, string>, booleans: map<string, boolean>
+}
+
+validateConfiguration(contract: ConfigurationContract, environment: map<string, string>) -> list<ConfigurationIssue>
+  // Pure. Applies the rules of §8, including the cross-parameter rules of HEALTH_CHECK_TIMEOUT_MS
+  // and STATUS_UNIT_TIMEOUT_MS; the list is sorted by name; an empty list means valid.
+
+loadConfiguration(contract: ConfigurationContract, environment: map<string, string>) -> ValidatedConfiguration
+  // Calls validateConfiguration. Without issues it returns the values, defaults applied.
+  // With issues it behaves as SCF-E-1: prints the output of §10, example 3, and ends the process with code 1.
+
+deriveStatus(checks: list<DependencyCheck>) -> enum(ok|degraded|down)
+  // SCF-F-6: ok for an empty list or all ok; degraded if only non-essential checks are down; else down.
+
+buildHealthReport(unit: enum(web|identity|storage|worker|cms), version: string, checks: list<DependencyCheck>) -> HealthReport
+  // status = deriveStatus(checks); a check that exceeds HEALTH_CHECK_TIMEOUT_MS is passed in as down (SCF-E-2).
+
+errorResponse(code: string) -> ErrorResponse
+  // Message from the catalogue of §8. Precondition: code is in the catalogue.
+errorStatus(code: string) -> integer
+  // HTTP status from the catalogue of §8. Precondition: code is in the catalogue.
+
+runRootTask(task: enum(dev|build|lint|typecheck|test)) -> integer
+  // Runs the task in every unit and package that defines it, a package before the packages that depend on it.
+  // Returns 0 if every run finished with 0, otherwise 1; the output names each failed unit or package.
+  // dev does not finish by itself and returns only when stopped.
+```
+
+A violated precondition (a code outside the catalogue, a parameter that is `required` and has a `default`) is a programming error: the function raises an error that the unit's log records; it is not a case of [SCF-E-1].
 
 ### State Machine Diagram
 
