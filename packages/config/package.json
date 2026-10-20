@@ -7,6 +7,10 @@
     "tsconfig.base.json"
   ],
   "scripts": {
-    "lint": "biome check ."
+    "dev": "node -e \"console.log('nothing to watch')\"",
+    "build": "node -e \"console.log('nothing to build')\"",
+    "lint": "biome check .",
+    "typecheck": "node -e \"console.log('nothing to check')\"",
+    "test": "node -e \"console.log('nothing to test')\""
   }
 }

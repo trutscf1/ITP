@@ -8,7 +8,9 @@
   "scripts": {
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "tsc --watch --preserveWatchOutput",
+    "test": "node --test"
   },
   "devDependencies": {
     "@stash/config": "workspace:*"
