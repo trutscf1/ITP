@@ -44,7 +44,7 @@ node tools/doc-check.mjs documentation          # consistency check of the docum
 npx markdownlint-cli2 "documentation/**/*.md"   # markdown lint
 ```
 
-### Start without internet access
+## Start without internet access
 
 The school requires that the application starts locally without internet access. What that needs today:
 
