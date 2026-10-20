@@ -155,6 +155,10 @@ The repository is public, so all content must be licence-free. Licences of what 
 | TypeScript | Apache-2.0 | language |
 | Biome | MIT or Apache-2.0 | lint and format |
 | pnpm, Turborepo | MIT | package manager and task runner |
+| commitlint | MIT | checks commit messages |
+| yaml | ISC | reads the CI configuration in tests and scripts |
+| Playwright | Apache-2.0 | browser tests |
+| `@axe-core/playwright` | MPL-2.0 | accessibility tests |
 | PostgreSQL 18 (Docker image) | PostgreSQL Licence | relational database, runs as a container |
 | MongoDB 8.0 (Docker image) | SSPL | metadata database, runs as a container; not part of the delivered source |
 | Geist and Geist Mono fonts | SIL Open Font Licence 1.1 | loaded by the starter layout |
