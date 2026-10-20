@@ -112,6 +112,10 @@ services:
   clamav:
     image: clamav/clamav:1.5
     restart: unless-stopped
+    environment:
+      # "true" keeps the scanner from downloading definitions, so it starts offline with the
+      # ones in the image (SCF-AC-2.3); set "false" to update them while online.
+      CLAMAV_NO_FRESHCLAMD: ${CLAMAV_NO_FRESHCLAMD:?set CLAMAV_NO_FRESHCLAMD in .env}
     networks:
       - backend
     volumes:
@@ -123,6 +127,22 @@ services:
       retries: 5
       start_period: 180s
 
+  # Local replacement for outgoing e-mail (SCF-AC-2.3): catches every message; the inbox is
+  # at http://localhost:${MAILPIT_UI_PORT}.
+  mailpit:
+    image: axllent/mailpit:v1.27
+    restart: unless-stopped
+    networks:
+      - backend
+    ports:
+      - "127.0.0.1:${MAILPIT_UI_PORT:?set MAILPIT_UI_PORT in .env}:8025"
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
   # The `web` unit (Next.js), built from the repository.
   web:
     build:
@@ -133,6 +153,11 @@ services:
       PORT: ${WEB_PORT:?set WEB_PORT in .env}
       HOSTNAME: 0.0.0.0
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      # External services are switched off by default; e-mail goes to mailpit (SCF-AC-2.3).
+      OAUTH_ENABLED: ${OAUTH_ENABLED:?set OAUTH_ENABLED in .env}
+      CAPTCHA_ENABLED: ${CAPTCHA_ENABLED:?set CAPTCHA_ENABLED in .env}
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
     depends_on:
       postgres:
         condition: service_healthy
