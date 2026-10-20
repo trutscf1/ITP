@@ -461,3 +461,25 @@ The job `commit-messages` failed on !14 (body line over 100 characters in `45963
 ➡️ Alle übernehmen
 
 > **Answer:** Alle übernehmen (Recommended)
+
+## Round 19 — 2026-10-20 — review (`schwaigc`, !18 of `trutscf1`)
+
+!18 (R11 public content, §16 and §17, #108) was checked at `2a6af46`: doc-check, markdown lint, commitlint, and pipeline clean; findings at the boundary to the `web` unit and to R4.
+
+❓ **Q63** - **Review !18**: Wie soll das Review aussehen? Options: Changes requested / Approve mit Hinweisen / Nicht posten
+
+➡️ Changes requested — review with findings 1–7 posted, no approval; `schwaigc` set as reviewer
+
+> **Answer:** Changes requested (Recommended)
+
+❓ **Q64** - **Wer baut die web-Module von R11?** Options: trutscf1 baut, ich reviewe / Ich baue die web-Seite / Offen lassen
+
+➡️ trutscf1 baut, ich reviewe — every MR that changes `apps/web` gets the review of `schwaigc`
+
+> **Answer:** trutscf1 baut, ich reviewe (Recommended)
+
+❓ **Q65** - **Theme-Cookie gegen PUB-NF-3**: Options: Switcher nur für Mitglieder / Besucher ohne Speichern / Offen lassen
+
+➡️ Switcher nur für Mitglieder — a person without a session sees the default theme and gets no cookie
+
+> **Answer:** Switcher nur für Mitglieder (Recommended)
