@@ -30,7 +30,7 @@ pnpm install
 pnpm --filter @stash/web dev
 ```
 
-The web application then runs at <http://localhost:3000>. It reads the database connection from `DATABASE_URL`; put that variable into `apps/web/.env`, matching the PostgreSQL values of step 1.
+The web application then runs at <http://localhost:3000>. It reads the database connection from `DATABASE_URL`; copy the `DATABASE_URL` line of `.env.example` into `apps/web/.env` and make it match the PostgreSQL values of step 1.
 
 Checks:
 
