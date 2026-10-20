@@ -265,7 +265,7 @@ A help context names a place in the web client, not an article: it is declared i
 | Element | Written as | Result |
 | --- | --- | --- |
 | Paragraph | text lines; a blank line ends the paragraph | one paragraph |
-| Heading | a line starting with `## `, `### `, or `#### ` | a heading of level 2, 3, or 4; a line starting with `# ` is a paragraph |
+| Heading | a line that starts with two, three, or four `#` characters and a space | a heading of level 2, 3, or 4; a line that starts with one `#` and a space is a paragraph |
 | Bold | `**text**` | bold text |
 | Italic | `*text*` | italic text |
 | Unordered list | consecutive lines that start with a hyphen and a space | one list, one item per line |
