@@ -187,75 +187,106 @@ Mapped to technology in `documentation/STACK.md`; its capability index lists eve
 
 ## 8. Data Model
 
-Neutral record types. Every record has a surrogate `id`; references use it (P-DES-5). A field marked *per language* exists once for `de` and once for `en`; each language version has its own `state`.
+Neutral record types. Every record has a surrogate `id`; references use it (P-DES-5). A field marked *per language* exists once for `de` and once for `en`; each language version has its own `state` and exists only if an editor created it. The named types below are built from the neutral types of the manifest (assumption A42); a length range counts characters.
 
 ```text
-ContentState = enum(draft|published)
-Language     = enum(de|en)
+ContentState   = enum(draft|published)
+Language       = enum(de|en)
+Text(a..b)     = string of at least a and at most b characters
+RichText(a..b) = Text(a..b) in the rich text markup defined below
+CalendarDate   = string of the form YYYY-MM-DD that names a real date
+EmailAddress   = string of the form local@domain without spaces
+HelpContext    = string matching [a-z0-9-]{1,64}
 
 LandingSection {
-  id: identifier,
+  id: uuid,
   kind: enum(hero|feature|text-with-image|call-to-action),
   position: integer >= 1,            // unique; order on the landing page
-  heading: text(1..120),             // per language
-  body: rich text(0..2000),          // per language
-  image: reference<Image>?,          // not allowed for kind call-to-action
+  heading: Text(1..120),             // per language
+  body: RichText(0..2000),           // per language
+  imageId: optional<uuid>,           // the id of an Image; not allowed for kind call-to-action
   state: ContentState                // per language
 }
 
 HelpCategory {
-  id: identifier,
+  id: uuid,
   position: integer >= 1,            // unique
-  name: text(1..60)                  // per language
+  name: Text(1..60)                  // per language; both languages are required
 }
 
 HelpArticle {
-  id: identifier,
-  category: reference<HelpCategory>, // exactly one
-  helpContext: HelpContext?,         // unique among help articles
-  title: text(1..120),               // per language
-  body: rich text(1..20000),         // per language
-  description: text(0..160),         // per language; meta description
+  id: uuid,
+  categoryId: uuid,                  // the id of a HelpCategory; exactly one
+  helpContext: optional<HelpContext>,   // unique among help articles
+  title: Text(1..120),               // per language
+  body: RichText(1..20000),          // per language
+  description: Text(0..160),         // per language; meta description
   state: ContentState                // per language
 }
 
 ChangelogEntry {
-  id: identifier,
-  version: text matching MAJOR.MINOR.PATCH,   // unique
-  releaseDate: date,
-  title: text(1..120),               // per language
-  body: rich text(1..5000),          // per language
+  id: uuid,
+  version: string matching <integer>.<integer>.<integer>,   // unique
+  releaseDate: CalendarDate,
+  title: Text(1..120),               // per language
+  body: RichText(1..5000),           // per language
   state: ContentState                // per language
 }
 
 LegalPage {
-  id: identifier,
+  id: uuid,
   kind: enum(imprint|terms|privacy), // unique; exactly three records exist
-  title: text(1..120),               // per language
-  body: rich text(1..50000),         // per language
+  title: Text(1..120),               // per language
+  body: RichText(1..50000),          // per language
   state: ContentState                // per language
 }
 
 Image {
-  id: identifier,
-  file: binary,
-  alternativeText: text(0..200),     // per language; empty only for decorative images
-  source: text(1..300),              // where the image comes from; required
-  licence: text(1..100)              // name of the licence; required
+  id: uuid,
+  file: binary,                      // PNG, JPEG, or WebP by content, at most 2 097 152 bytes ([PUB-F-35])
+  alternativeText: Text(0..200),     // per language; empty only for decorative images
+  source: Text(1..300),              // where the image comes from; required
+  licence: Text(1..100)              // name of the licence; required
 }
 
 EditorAccount {
-  id: identifier,
-  name: text(1..100),
-  email: e-mail address,             // unique
-  passwordHash: text,
+  id: uuid,
+  name: Text(1..100),
+  email: EmailAddress,               // unique
+  passwordHash: string,
   role: enum(administrator|editor)
 }
-
-HelpContext = text matching [a-z0-9-]{1,64}
 ```
 
 A help context names a place in the web client, not an article: it is declared in the shared contracts by the feature that places the help link, and a help article points to it. This concept declares none; the features of the web client add theirs.
+
+**Rich text markup.** A rich text field holds lines of text. The following, and nothing else, has a meaning ([PUB-F-36]); every other character sequence, including `<`, `>`, and `![`, is plain text.
+
+| Element | Written as | Result |
+| --- | --- | --- |
+| Paragraph | text lines; a blank line ends the paragraph | one paragraph |
+| Heading | a line starting with `## `, `### `, or `#### ` | a heading of level 2, 3, or 4; a line starting with `# ` is a paragraph |
+| Bold | `**text**` | bold text |
+| Italic | `*text*` | italic text |
+| Unordered list | consecutive lines that start with a hyphen and a space | one list, one item per line |
+| Ordered list | consecutive lines that start with a number, a full stop, and a space (`1.`, `2.`, and so on) | one numbered list, one item per line |
+| Link | `[text](address)` where the address starts with `http://`, `https://`, `mailto:`, or `/` | a link; with any other start the whole sequence is plain text |
+
+**Configuration.** Every value comes from the environment (P-DES-6, [SCF-NF-8]); a missing required value or one outside its range stops the unit as [SCF-E-1] (invalid configuration) of [scaffolding.md](scaffolding.md), naming the variable and the reason and never the value. The names are those of the example configuration ([SCF-F-17]).
+
+| Name | Used by | Type | Default | Valid range | Boundary behavior |
+| --- | --- | --- | --- | --- | --- |
+| `CONTENT_REFRESH_SECONDS` | `web` | integer | 60 | 1 to 60 | 1 and 60 are accepted; 0 and 61 stop the unit |
+| `CONTENT_TIMEOUT_MS` | `web` | integer | 2000 | 100 to 30000 | 100 and 30000 are accepted; 99 and 30001 stop the unit |
+| `CONTENT_ACCESS_TOKEN` | `cms`, `web` | string, secret | none; the example configuration holds a dummy value | at least 32 characters, no spaces | 32 characters are accepted, 31 or none stop the unit; the value never appears in a log, a response, or a health report |
+| `CMS_INTERNAL_URL` | `web` | string, address | the internal address of `cms` (port in [scaffolding.md](scaffolding.md) §8) | starts with `http://` or `https://` | anything else stops the unit |
+| `PUBLIC_BASE_URL` | `web` | string, address | the origin of the local stack | starts with `http://` or `https://`, no trailing `/` | anything else stops the unit |
+| `SESSION_CHECK_TIMEOUT_MS` | `web` | integer | 500 | 50 to 5000 | 50 and 5000 are accepted; 49 and 5001 stop the unit |
+| `DASHBOARD_PATH` | `web` | string, path | `/dashboard` | starts with `/`; is not `/de` or `/en` and does not start with `/de/` or `/en/` | anything else stops the unit |
+| `REGISTRATION_PATH` | `web` | string, path | `/register` | as `DASHBOARD_PATH` | as `DASHBOARD_PATH` |
+| `LOGIN_PATH` | `web` | string, path | `/login` | as `DASHBOARD_PATH` | as `DASHBOARD_PATH` |
+
+The paths and the session check time are placeholders until the Identity and web client concepts set theirs (assumption A43). `HEALTH_CHECK_TIMEOUT_MS` is that of [SCF-NF-3].
 
 **Template notice** (first sentence of every legal template):
 
@@ -263,6 +294,19 @@ A help context names a place in the web client, not an article: it is declared i
 - English: "This page is a template. The operator of this installation has not filled it in yet."
 
 **Seed content** (all published in both content languages): one landing section of each kind; two help categories with two articles each; one changelog entry for version `0.1.0`; the three legal pages with their legal templates; every image used, with source and licence.
+
+**Fixed texts of the public pages.** Texts that belong to the web client and not to a content entry. The note of [PUB-U-4], the empty search of [PUB-U-3], and the unavailable page of [PUB-E-3] are fixed in their requirements.
+
+| Place | German | English |
+| --- | --- | --- |
+| Footer link to the imprint | Impressum | Imprint |
+| Footer link to the terms | AGB | Terms |
+| Footer link to the privacy policy | Datenschutz | Privacy policy |
+| Language switch | Deutsch / English | Deutsch / English |
+| Label of the help search field | Hilfe durchsuchen | Search help |
+| Title of the help center start page | Hilfe | Help |
+| Title of the changelog page | Änderungsprotokoll | Changelog |
+| Page not found ([PUB-E-5]), title and text | Seite nicht gefunden | Page not found |
 
 **Addresses of the public pages** (`<l>` is `de` or `en`):
 
@@ -274,6 +318,7 @@ A help context names a place in the web client, not an article: it is declared i
 | Help by context | `/<l>/help/context/<help context>` |
 | Changelog | `/<l>/changelog` |
 | Legal page | `/<l>/legal/<kind>` |
+| Image (no page, no language) | `/media/<id of the image>` |
 
 ## 9. Error Conditions
 
@@ -334,6 +379,65 @@ A landing section or a changelog entry in the state of the last row is left out 
 
 **Example 7 — legal page stays published ([PUB-F-24], [PUB-E-7]).** The imprint is published in German and English. An editor unpublishes the English version: `/en/legal/imprint` shows the German text with the note of [PUB-U-4]. The editor then tries to unpublish the German version: the `cms` unit refuses with [PUB-E-7], and `/de/legal/imprint` keeps showing the imprint. A CMS administrator who tries the same gets the same refusal.
 
+**Example 8 — rich text ([PUB-F-36]).**
+
+| Input (one line or block) | Result on the public page |
+| --- | --- |
+| `## Ordner teilen` | a heading of level 2 with the text "Ordner teilen" |
+| `# Titel` | a paragraph with the text "# Titel" |
+| `Ein **wichtiger** Hinweis` | a paragraph: "Ein ", bold "wichtiger", " Hinweis" |
+| `<b>x</b>` | a paragraph with the characters `<b>x</b>`; no bold text |
+| `[Start](/de/help)` | a link with the text "Start" to `/de/help` |
+| `[Hilfe](javascript:alert(1))` | a paragraph with the characters `[Hilfe](javascript:alert(1))`; no link |
+| `![Bild](/media/1)` | a paragraph with the characters `![Bild](/media/1)`; no image |
+| `- a` and `- b` on two lines | one list with the items "a" and "b" |
+
+**Example 9 — changelog order ([PUB-F-18]).** Published entries: `0.9.0` of 2026-11-02, `0.1.0` of 2026-10-05, `0.10.0` of 2026-11-02, `0.2.0` of 2026-10-26. The page shows them in this order: `0.10.0`, `0.9.0` (same date, the higher version first, compared number by number: 10 is higher than 9), `0.2.0`, `0.1.0`.
+
+**Example 10 — images ([PUB-F-35], [PUB-F-13], [PUB-E-4], [PUB-E-8]).**
+
+| File | Source | Licence | Result |
+| --- | --- | --- | --- |
+| PNG, 1 048 576 bytes | "own work" | "CC0-1.0" | saved |
+| WebP, 2 097 152 bytes | "own work" | "CC0-1.0" | saved (the limit itself is allowed) |
+| JPEG, 2 097 153 bytes | "own work" | "CC0-1.0" | refused with [PUB-E-8], size |
+| SVG | "own work" | "CC0-1.0" | refused with [PUB-E-8], type |
+| named `logo.png`, content is a PDF | "own work" | "CC0-1.0" | refused with [PUB-E-8], type |
+| PNG, 1 024 bytes | empty | "CC0-1.0" | refused with [PUB-E-4], names the field source |
+
+**Example 11 — configuration (§8).** `web` started with `CONTENT_REFRESH_SECONDS=61`, a `CONTENT_ACCESS_TOKEN` of 31 characters, and `CONTENT_TIMEOUT_MS` not set:
+
+```text
+Invalid configuration for unit "web":
+  CONTENT_REFRESH_SECONDS: expected an integer from 1 to 60
+  CONTENT_ACCESS_TOKEN: expected at least 32 characters
+```
+
+The exit code is non-zero, no request is accepted, and neither value is printed. `CONTENT_TIMEOUT_MS` falls back to 2000 and is not reported. With `CONTENT_REFRESH_SECONDS=60` and a token of 32 characters, nothing is printed and the unit starts.
+
+**Example 12 — addresses and help contexts ([PUB-F-27], [PUB-F-19], [PUB-E-5], [PUB-E-6]).** Help article `a1` is published in German and English and assigned to the help context `upload-files`; article `a2` has only a draft in German and is assigned to `old-place`.
+
+| Request | Result |
+| --- | --- |
+| `/fr` | "not found" (404), German page "Seite nicht gefunden" with footer |
+| `/en/legal/cookies` | "not found" (404), English page "Page not found" with footer |
+| `/de/help/a2` | "not found" (404), German page |
+| `/en/help/context/upload-files` | redirect to `/en/help/a1` |
+| `/de/help/context/old-place` | redirect to `/de/help` (the article has no published German version) |
+| `/en/help/context/unknown-place` | redirect to `/en/help` |
+| `/en/help/context/Upload Files` | redirect to `/en/help` (not a valid help context) |
+| `/media/<id of an image web holds>` | the image file, status 200 |
+| `/media/<unknown id>` | "not found" (404) without a page |
+
+**Example 13 — meta tags ([PUB-F-15]).** `PUBLIC_BASE_URL` is `https://nimbus.example`; the first hero section has the German body "Nimbus speichert **Ihre** Dateien auf Ihrem eigenen Server."
+
+| Page | Title | Description | `og:type` | `og:url` |
+| --- | --- | --- | --- | --- |
+| `/de/help/a1`, description "Wie Sie Dateien hochladen." | the article title | "Wie Sie Dateien hochladen." | `article` | `https://nimbus.example/de/help/a1` |
+| `/de/help/a3`, empty description | the article title | "Nimbus speichert Ihre Dateien auf Ihrem eigenen Server." (plain text of the hero body) | `article` | `https://nimbus.example/de/help/a3` |
+| `/de/changelog`, no hero section exists | "Änderungsprotokoll" | "Änderungsprotokoll" (the title) | `website` | `https://nimbus.example/de/changelog` |
+| `/de`, hero body of 200 characters | the heading of the first hero section | its first 160 characters | `website` | `https://nimbus.example/de` |
+
 ## 11. Integration Points
 
 Where this feature meets other parts of the system. The interferences behind each point are in §14.
@@ -382,6 +486,8 @@ Verbatim rounds: [public-content.qa-log.md](public-content.qa-log.md). No ADR wa
 | Q19 | Changelog at a release | The release steps get a step for writing the changelog entry; the seed content keeps the one entry for `0.1.0` (§15) | Follows Q2; a growing seed would be a second source next to the hand-written entries |
 | Q20 | Shared understanding | Confirmed; Phase 3 written | — |
 | Q28 | Unpublished legal page | The German version of a legal page cannot be unpublished ([PUB-F-24], [PUB-E-7]) | Legal pages must always be reachable (Q3); found in the review of the Phase 4 gate |
+
+Process questions that changed no behavior (Q15, Q21 to Q27, Q29) are only in the question log. The assumptions A37 to A51 of Phases 5 and 6 (configuration ranges, image limits, rich text markup, editor data rules, capabilities, slices) are in round 12 of the question log; the owner reviews them, and a rejected one becomes a numbered question.
 
 Accepted risk of Q8: between the first start and the first registration, anyone who reaches the admin panel can become CMS administrator. [PUB-F-9] (administrator check) shows this state; it does not prevent it.
 
