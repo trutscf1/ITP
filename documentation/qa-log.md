@@ -511,3 +511,16 @@ Planning of the sprints and milestones on the dates set by the team: Sprint 1 20
 ➡️ Regenerations-Probe (Recommended)
 
 > **Answer:** Regenerations-Probe (Recommended)
+
+❓ **Q37** - **GitLab veröffentlichen**: Meilensteine, Zuordnung von 76 Issues und 34 neue Issues auf GitLab anlegen? Options: Alles ausführen (Recommended) / Nur Meilensteine + Zuordnung / Noch nicht
+
+➡️ Alles ausführen (Recommended)
+
+> **Answer:** Alles ausführen (Recommended)
+
+❓ **Q38** - **Sprint 1 verkleinern**: 25 offene Issues, 5 MRs warten auf Review, etwa 13 Stories sind nicht begonnen; was bleibt in Sprint 1? Options: Nur Begonnenes + R1-Kern (Recommended) / Noch kleiner: nur Reviews / Wie geplant lassen
+
+➡️ Nur Begonnenes + R1-Kern (Recommended)
+
+> **Answer:** Nur Begonnenes + R1-Kern (Recommended); the user's remark before: "heute werden niemals die restlichen 25 issues fertig". Moved to Sprint 2: #56, #105, #78, #81, #107, #109, #112, #2, #3, #116, #117.
+
