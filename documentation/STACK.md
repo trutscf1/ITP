@@ -96,8 +96,8 @@ Type mapping (neutral type → concrete type) and error mapping (`E-x` → concr
 
 | Capability | Technology | Version constraint | Notes |
 | --- | --- | --- | --- |
-| SCF-C-3 web application framework | _open_ | | |
-| SCF-C-13 browser end-to-end test runner | _open_ | | |
+| SCF-C-3 web application framework | Next.js with the App Router and React; server-side route handlers for `/health` and `/api/docs`, the status page rendered on the server for every request | Next.js ≥ 16.3 (pinned 16.3.8), React ≥ 19.2 (pinned 19.2.8) | Minimum versions by the school (`docs/anforderungen_software_projekte.md`), checked by SCF-T-4. Plan: `concepts/scaffolding.track-web.md`. Set by #113. |
+| SCF-C-13 browser end-to-end test runner | Playwright (Chromium) | `playwright` 1.63.0, exact; the CI image tag `mcr.microsoft.com/playwright:v1.63.0-noble` matches it | Already used at the root by the accessibility check (`tests/accessibility/axe-check.ts`, with `@axe-core/playwright`); the end-to-end tests of R6 (WEB-US-4) use the same version. Set by #113. |
 
 ## 5. Stack ADRs
 
