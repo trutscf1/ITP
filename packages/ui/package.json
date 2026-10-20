@@ -16,6 +16,8 @@
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
     "build": "tsc",
+    "dev": "tsc --watch --preserveWatchOutput",
+    "test": "node --test",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },

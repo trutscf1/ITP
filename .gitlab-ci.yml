@@ -59,7 +59,8 @@ typecheck:
   script:
     - pnpm run typecheck
 
-# The acceptance tests run with node --test, not through Turborepo: no Turborepo cache.
+# `pnpm test` is `turbo run test` (SCF-F-12): the unit tests of every unit and package and the
+# acceptance tests of the repository. The task is never cached (turbo.json).
 test:
   extends: .pnpm
   stage: test
@@ -67,8 +68,6 @@ test:
     - *pnpm-store
   script:
     - pnpm test
-    # Unit tests of the units and packages that define a test task (SCF-F-12).
-    - pnpm exec turbo run test
 
 build:
   extends: .pnpm
