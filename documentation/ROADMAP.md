@@ -24,7 +24,7 @@ Project time is **Tuesday, 200 minutes per person**, not in school holidays (`WO
 | 6 | 03-02, 03-09 (+ 02-23) | 8.3 | 11 |
 | Final | 03-30 (+ 03-16) | 5.0 | 6 (closing tasks only) |
 
-About 53 h per person, about 213 h for the team in total; this replaces the earlier estimate of 350 h, which assumed 4 h per week. The planned load stays within the points per sprint (chapter "Milestones"); if it does not fit, the cut order below applies and every cut is a deviation from the proposal that the final presentation reports.
+About 53 h per person, about 213 h for the team in total; this replaces the earlier estimate of 350 h, which assumed 4 h per week. Points are hours divided by 0.75, rounded down (Sprint 1: 8.9, taken as 9), so the 69 points per person are slightly less than the 71 that 53 h would give. The planned load does **not** stay within these points: it is 21 points too high in total and much too high in Sprint 2 (chapter "Milestones", "Load per person"). The cut order below and the decisions at sprint planning have to close that gap, and every cut is a deviation from the proposal that the final presentation reports.
 
 ## Overview
 
@@ -119,8 +119,17 @@ Order of the stories: the code of a sprint is generated at its end, so a story t
 
 Sprint 4 has one working Tuesday (2027-01-19, 5 h, 6 points per person, 24 for the team) and the row above lists what fits: release and probe (4 points) and the concepts R9 and R14 take 10 of the 24 before any story starts. **DEP-US-1 (#43, 5 points) is blocked** until the team has a server and a domain (R14); it stays in Sprint 4 only if both exist at Sprint 4 planning. Fallback: TPM-US-3 quotas (#54, 3 points, builds on TPM-US-1 of Sprint 3) is done in its place, and DEP-US-1 moves to the first sprint after the server exists. If the server exists, `tschudea07` has 8 of 6 points. Even with the fallback `schauby1` (8 of 6) and `schwaigc` (7 of 6) are over capacity in Sprint 4; STO-US-4 and WEB-US-2 are sliced to what fits at sprint planning.
 
-Load per person in points (planned / capacity): `trutscf1` 7 / 9, 11 / 11, 9 / 15, 5 / 6, 8 / 11, 11 / 11; `tschudea07` 5 / 9, 10 / 11, 14 / 15, 5 / 6, 11 / 11, 8 / 11; `schauby1` 5 / 9, 10 / 11, 14 / 15, 5 / 6, 10 / 11, 11 / 11; `schwaigc` 7 / 9, 10 / 11, 13 / 15, 5 / 6, 10 / 11, 8 / 11 (Sprint 1 to 6, in order).
+Concept, release, and probe issues of every sprint (#114–#125 concepts, #126–#137 releases and probes) are not listed in the rows above, except where a concept moved; they are planned in the sprint of their GitLab milestone and count in the load below.
 
-Since Q71 (2026-10-20) Sprint 1 keeps only what is begun or under review plus the R1 core; the carried-over stories put Sprint 2 about 16 points over its capacity, so the cut order below applies from Sprint 2 on.
+**Load per person** in points (planned / capacity), Sprint 1 to 6 and Final, as of 2026-10-20 with the order of the rows above. Counted are the weights of all open GitLab issues of the milestone, including concept, release, probe, and closing issues; an issue with several assignees (the shared stories #39, #40, #85, #103 and #146) is split evenly; unweighted issues (#2, #3, epics) and closed issues are not counted. A story that is only waiting for review still counts in full, so Sprint 1 is slightly overstated.
+
+| Person | Sprint 1 | Sprint 2 | Sprint 3 | Sprint 4 | Sprint 5 | Sprint 6 | Final | Total |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `trutscf1` | 10.5 / 9 | 21 / 11 | 9 / 15 | 5 / 6 | 11 / 11 | 13 / 11 | 3.5 / 6 | 73 / 69 |
+| `tschudea07` | 7.5 / 9 | 15 / 11 | 19 / 15 | 6 / 6 | 13 / 11 | 8 / 11 | 3.5 / 6 | 72 / 69 |
+| `schauby1` | 4.5 / 9 | 18 / 11 | 16 / 15 | 8 / 6 | 15 / 11 | 11 / 11 | 5.5 / 6 | 78 / 69 |
+| `schwaigc` | 8.5 / 9 | 16 / 11 | 16 / 15 | 7 / 6 | 11 / 11 | 10 / 11 | 5.5 / 6 | 74 / 69 |
+
+**The plan is over capacity.** The team plans 297 points against 276 (4 × 69), 21 points or 8 % too much. Sprint 2 is the worst: 70 points against 44, so every person is over (`trutscf1` by 10, `schauby1` by 7, `schwaigc` by 5, `tschudea07` by 4), mostly because the stories carried over from Sprint 1 (Q71) and the four concepts R2 to R5 land there. Also over: Sprint 1 (`trutscf1` by 1.5), Sprint 3 (`tschudea07` by 4, `schauby1` and `schwaigc` by 1), Sprint 4 (`schauby1` by 2, `schwaigc` by 1), Sprint 5 (`schauby1` by 4, `tschudea07` by 2), and Sprint 6 (`trutscf1` by 2). The cut order below removes 19 points at most (LDT-US-1, BGP-US-3, OFF-US-3, WEB-US-3) and helps only Sprints 3 and 6; the overload of Sprints 2 and 5 has to be decided at sprint planning, by moving a story to a later sprint or by cutting its slices, and every such cut is reported as a deviation from the proposal.
 
 **Cut order** if capacity runs out: LDT-US-1 → BGP-US-3 → OFF-US-3 → WEB-US-3. Dependencies are respected: R3, R4 → R5 → R6; R3, R5 → R7 → R8; R5 → R9; R7, R9 → R10; R6, R7 → R12; R2, R5, R9 → R13.
