@@ -21,9 +21,11 @@ One user story of [Public content: landing page, help center, changelog, legal p
 | --- | --- | --- | --- | --- |
 | PUB-AC-1.1 | CMS container | The running stack | It starts | Strapi runs as a container with its own PostgreSQL database |
 | PUB-AC-1.2 | Content types | A content editor in Strapi | They create content | The content types landing-page sections, help articles with categories, changelog entries, and legal pages exist |
-| PUB-AC-1.3 | Editor roles | Strapi | It runs | Editor roles exist and the admin panel is not reachable publicly |
-| PUB-AC-1.4 | Cached delivery | A public page | The frontend loads its content | It comes from the Strapi API with caching (ISR) |
-| PUB-AC-1.5 | Seed content | A fresh local environment | The seed runs | Example content exists for local development |
+| PUB-AC-1.3 | Editor roles | The admin panel under `/cms` with the roles administrator and editor | A person without an editor login opens the admin panel or requests content from the CMS directly | They see only the login form, and the content request is refused |
+| PUB-AC-1.4 | Cached delivery | A public page whose content an editor published at 10:00:00 | A visitor opens the page at 10:01:00 or later | The page shows the published change |
+| PUB-AC-1.5 | Seed content | A fresh installation whose CMS holds no content | The stack starts for the first time | Example content exists for every content type in German and English; a CMS that already holds content is not changed |
+| PUB-AC-1.6 | CMS unavailable | A public page that was loaded at least once, and the `cms` unit stopped | A visitor opens the page | The page shows its last loaded version |
+| PUB-AC-1.7 | Unclaimed administrator | A fresh installation in which nobody registered as administrator yet | The operator opens the status page | The row of `cms` shows `degraded` and names the check `administrator-account`; after the first administrator registered it shows `ok` |
 
 ## Slices
 
@@ -32,8 +34,8 @@ The vertical slices that deliver this story. One slice is delivered by the story
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
 | 1 — CMS runs with its content types | PUB-AC-1.1, PUB-AC-1.2, PUB-AC-1.5 | — | #78 |
-| 2 — Editor roles and cached delivery | PUB-AC-1.3, PUB-AC-1.4 | 1 | #107 |
+| 2 — Editor roles and cached delivery | PUB-AC-1.3, PUB-AC-1.4, PUB-AC-1.6, PUB-AC-1.7 | 1 | #107 |
 
 - **Story issue:** #78
-- **Weight:** 5 (slice 1: 3, slice 2: 2)
+- **Weight:** 5 (slice 1: 3, slice 2: 2), estimated before PUB-AC-1.6 and PUB-AC-1.7 were added on 2026-10-06; re-estimated with the architecture chapter
 - **Depends on:** SCF-US-2 (Local development environment with Docker Compose, #39)

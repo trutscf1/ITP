@@ -43,7 +43,7 @@ Every issue: feature branch → MR into `dev`, reviewed by another person (`docu
 
 ## Plan
 
-_Written by Christopher before the first MR; decided in `../qa-log.md`, Q45 and Q46._
+_Written by Christopher before the first MR; decided in `../qa-log.md`, Q46 and Q47._
 
 ### Module specification
 
@@ -95,7 +95,7 @@ queryUnit(unit, url, timeoutMs) -> UnitRow
 down(unit) = { unit, status: "down", failedChecks: [] }
 ```
 
-A unit answers a `down` report with an error status as well, so the body decides, not the HTTP status (A2 of Q46). The timeout of one query is `HEALTH_TIMEOUT_MS`, the time a unit has for its whole report ([SCF-NF-3]).
+A unit answers a `down` report with an error status as well, so the body decides, not the HTTP status (A2 of Q47). The timeout of one query is `HEALTH_TIMEOUT_MS`, the time a unit has for its whole report ([SCF-NF-3]).
 Traces to: SCF-F-8, SCF-E-3, SCF-NF-3, SCF-AC-8.4. Requires: HealthReport.
 
 #### M4 — Status of all units
@@ -110,7 +110,7 @@ collectStatus(config) -> list<UnitRow>          // order: web, identity, storage
 One failed query changes only its own row. Nothing is cached: every call queries anew ([SCF-U-3]). `worker` is queried at its internal address like the others (Q12).
 Traces to: SCF-F-8, SCF-U-3, SCF-E-3. Requires: M1, M2, M3.
 
-#### M5 — Status page (`/status`, A1 of Q46)
+#### M5 — Status page (`/status`, A1 of Q47)
 
 ```text
 GET /status -> page, rendered on the server for every request
@@ -138,7 +138,7 @@ Traces to: SCF-F-10, SCF-AC-3.3. Requires: generation command and its output pat
 2. **M3, M4, M5** — slice 2 of SCF-US-8: query and status page. The page list of the accessibility check (`tests/accessibility/axe-check.ts`, Identity & CI track) gets `/status`; that change is requested from `tschudea07` as an issue.
 3. **M6** — once the generation command of SCF-US-3 (#40) is merged.
 
-Not in this track: `apps/web/src/prisma` from the first scaffold of `dev` stays untouched; it belongs to the relational schema of SCF-US-4 (Identity & CI track), which decides where it moves (A5 of Q46).
+Not in this track: `apps/web/src/prisma` from the first scaffold of `dev` stays untouched; it belongs to the relational schema of SCF-US-4 (Identity & CI track), which decides where it moves (A5 of Q47).
 
 ### Test cases
 
