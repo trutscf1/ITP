@@ -175,3 +175,41 @@ describe("SCF-AC-2.4 Health checks", () => {
     assert.deepEqual(weak, []);
   });
 });
+
+describe("SCF-AC-2.3 Start without internet", () => {
+  const services = readCompose().services;
+  const documented = documentedVariables();
+
+  it("SCF-AC-2.3 replaces outgoing e-mail with the local service mailpit", () => {
+    assert.match(services.mailpit?.image ?? "", /^axllent\/mailpit:/);
+    assert.ok(services.mailpit?.healthcheck?.test);
+    assert.equal(environmentOf(services.web ?? {}).SMTP_HOST, "mailpit");
+  });
+
+  it("SCF-AC-2.3 switches the external services off in .env.example", () => {
+    assert.equal(documented.get("OAUTH_ENABLED"), "false");
+    assert.equal(documented.get("CAPTCHA_ENABLED"), "false");
+  });
+
+  it("SCF-AC-2.3 hands the switches to web", () => {
+    const env = environmentOf(services.web ?? {});
+    assert.match(env.OAUTH_ENABLED ?? "", /\$\{OAUTH_ENABLED/);
+    assert.match(env.CAPTCHA_ENABLED ?? "", /\$\{CAPTCHA_ENABLED/);
+  });
+
+  it("SCF-AC-2.3 lets the virus scanner start with the definitions of its image", () => {
+    assert.equal(documented.get("CLAMAV_NO_FRESHCLAMD"), "true");
+    assert.match(
+      environmentOf(services.clamav ?? {}).CLAMAV_NO_FRESHCLAMD ?? "",
+      /\$\{CLAMAV_NO_FRESHCLAMD/,
+    );
+  });
+
+  it("SCF-AC-2.3 never makes a service pull its image at start", () => {
+    const pulling = Object.entries(services).filter(
+      ([, service]) =>
+        (service as { pull_policy?: string }).pull_policy === "always",
+    );
+    assert.deepEqual(pulling, []);
+  });
+});
