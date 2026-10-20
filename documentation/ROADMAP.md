@@ -119,4 +119,4 @@ Load per person in points (planned / capacity): `trutscf1` 7 / 9, 11 / 11, 9 / 1
 
 Since Q38 (2026-10-20) Sprint 1 keeps only what is begun or under review plus the R1 core; the carried-over stories put Sprint 2 about 16 points over its capacity, so the cut order below applies from Sprint 2 on.
 
-**Cut order** if capacity runs out: LDT-US-1 → BGP-US-3 → OFF-US-3 → WEB-US-3. Dependencies are respected: R3, R4 → R5 → R6, R7 → R8, R9 → R10, R12 → R13.
+**Cut order** if capacity runs out: LDT-US-1 → BGP-US-3 → OFF-US-3 → WEB-US-3. Dependencies are respected: R3, R4 → R5 → R6; R3, R5 → R7 → R8; R5 → R9; R7, R9 → R10; R6, R7 → R12; R2, R5, R9 → R13.
