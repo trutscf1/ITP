@@ -739,3 +739,9 @@ After the merges of !24 and !5 by `trutscf1`: `dev` merged into !7 (`qa-log.md` 
 ➡️ Kommentar + Approve — posted and approved; not merged
 
 > **Answer:** Kommentar + Approve (Recommended)
+
+❓ **Q161** - **Re-Approve !7 und !9**: Die Pushes haben die Approvals von `trutscf1` zurückgesetzt (bei !9 auch seinen Auto-Merge). Kommentar mit der Bitte um Re-Approve? Options: Ja, auf beiden posten / Nein
+
+➡️ Ja — notes posted on !7 and !9 with what changed and the request to approve again
+
+> **Answer:** Ja, auf beiden posten (Recommended)
