@@ -25,3 +25,4 @@ In dependency order; each file holds the story, its acceptance criteria, and its
 5. [SCF-US-5 CI pipeline with quality and security checks](SCF-US-5-ci-pipeline-with-quality-and-security-checks.md)
 6. [SCF-US-6 Conventional Commits and generated changelog](SCF-US-6-conventional-commits-and-generated-changelog.md)
 7. [SCF-US-7 Project documentation and Definition of Done](SCF-US-7-project-documentation-and-definition-of-done.md)
+8. [SCF-US-8 Units reachable and visible](SCF-US-8-units-reachable-and-visible.md)

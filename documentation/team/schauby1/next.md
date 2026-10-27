@@ -13,3 +13,4 @@ New tasks and ideas for this developer land here first, before anyone plans them
 
 - [2026-10-06] Add `Developer handle: schauby1` to your own gitignored `CLAUDE.local.md` and read `team/TEAM.md`.
 - [2026-10-06] Review the drafts that concern your features: the roles and success signals in `GOAL.md`, the *Serves* column in `ROADMAP.md`, and the concept drafts and work items of your features.
+- [2026-10-13] From `trutscf1`, migration of `concepts/scaffolding.md`: please check what concerns your track — the error response `ErrorResponse { code, message }` (§8, `SCF-F-21`, assumption A15), the data services key-value store, document database, object storage, and virus scanner (`SCF-C-14`, `SCF-C-15`, `SCF-C-17`, `SCF-C-18`; move their rows from the capability index of `STACK.md` into your section when you choose the versions), and the acceptance tests `SCF-T-13` to `SCF-T-17`. Section numbers of the concept moved up by one from §3 on.

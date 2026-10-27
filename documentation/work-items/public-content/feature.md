@@ -22,3 +22,4 @@ In dependency order; each file holds the story, its acceptance criteria, and its
 2. [PUB-US-2 Public landing page](PUB-US-2-public-landing-page.md)
 3. [PUB-US-3 Help center and changelog](PUB-US-3-help-center-and-changelog.md)
 4. [PUB-US-4 Legal pages (imprint, terms, privacy)](PUB-US-4-legal-pages-imprint-terms-privacy.md)
+5. [PUB-US-5 Public pages in German and English](PUB-US-5-public-pages-in-german-and-english.md)
