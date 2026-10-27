@@ -23,8 +23,7 @@ Sprint 1 (until 2026-10-26), GitLab issues: #68, #102, and #106 done (shared: #3
 
 | Question | Waiting for (handle) | Since |
 | --- | --- | --- |
-| Review thread resolved and approval of !5 (SCF-US-7 slice 1, #85); `dev` merged in at `374a99d` | tschudea07 | 2026-10-13 |
-| Review thread resolved and approval of !7 (DSA-US-1 slice 1, #68); content ready per the review of `trutscf1` (2026-10-27), `dev` merged in at `18df998` | tschudea07 | 2026-10-13 |
-| Approval of !9 (DSA-US-1 slice 2, #106), after !7; the current head of !7 merged in on 2026-10-27 | tschudea07 | 2026-10-13 |
-| Security fix for `next` and the images on `dev` (`fix/next-and-image-security-2026-10-27`); until then every pipeline fails in `dependency-audit` | trutscf1 | 2026-10-27 |
-| !17: job `test` green again (quick start at most 30 lines), then my approval | trutscf1 | 2026-10-27 |
+| Review thread of !7 (DSA-US-1 slice 1, #68) resolved; approved by `trutscf1`, `dev` merged in after !24 and !5 at `0ba25f7`, pipeline green; then the merge of !7 by another person (the author does not merge, `docs/` §4) | tschudea07 | 2026-10-13 |
+| Merge of !9 (DSA-US-1 slice 2, #106) after !7; approved by `trutscf1`, current head of !7 merged in at `2dacaf7`, pipeline green | tschudea07 | 2026-10-13 |
+| !23: rewrap the body line of `c8f327e` (`commit-messages` red), then my approval again | trutscf1 | 2026-10-27 |
+| !21: Sprint 2 row and this file against the GitLab milestones of #109, #2, #112 (changes requested) | trutscf1 | 2026-10-27 |

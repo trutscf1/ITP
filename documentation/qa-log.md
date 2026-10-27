@@ -723,3 +723,19 @@ New since round 25: !21, !23, !24 of `trutscf1` with `schwaigc` as reviewer; rev
 ➡️ Changes requested — posted, not approved; GitLab milestones are the reference
 
 > **Answer:** Changes requested (Recommended)
+
+## Round 28 — 2026-10-27 — delivery (`schwaigc`, third review round of the day)
+
+After the merges of !24 and !5 by `trutscf1`: `dev` merged into !7 (`qa-log.md` conflict, the round of #68 moved to 22 behind round 21 of !24) and !7 into !9 (the merge of `dev` into !9 made on GitLab had dropped round 21 of !24; the file is rebuilt from !7 plus the rounds of !9, now 23 to 28). The licence test of !5 (SCF-AC-7.5) required Radix UI on !7 and Storybook, Vite, and `@tailwindcss/vite` on !9; added to the README and the label map. Pipelines of !7 and !9 green.
+
+❓ **Q159** - **!23**: Approve durch Merge von `dev` und Lizenzzeilen weg; `c8f327e` hat eine Body-Zeile über 100 Zeichen (`commit-messages` rot). Wie vorgehen? Options: Kommentar, kein Re-Approve / Kommentar + Re-Approve / Nichts tun
+
+➡️ Kommentar, kein Re-Approve — note posted on !23
+
+> **Answer:** Kommentar, kein Re-Approve (Recommended)
+
+❓ **Q160** - **!25 Regeneration-Probe**: fünf Lücken sauber übernommen; Hinweise zu `toErrorResponse` und zu Q155–Q159. Posten? Options: Kommentar + Approve / Nur Kommentar / Nichts tun
+
+➡️ Kommentar + Approve — posted and approved; not merged
+
+> **Answer:** Kommentar + Approve (Recommended)
