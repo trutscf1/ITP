@@ -489,3 +489,37 @@ The job `commit-messages` failed on !14 (body line over 100 characters in `45963
 ➡️ Reviewer anschreiben — reminders posted on !7 (`tschudea07`: !5, !7, !9, merge order) and !14 (`trutscf1`: re-review of !14, revision of !18)
 
 > **Answer:** Reviewer anschreiben
+
+## Round 20 — 2026-10-27 — delivery (`trutscf1` (agent), revise !17 after the review of `schwaigc`)
+
+`schwaigc` requested changes on !17 (SCF-US-2 slice 1, #39) on 2026-10-20: the container scan fails, conflicts with `dev`, the `web` image must be marked as a stop-gap, the health check of `web`, and the image pins. No question was asked: each one below was decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions); the answer is the recommended option.
+
+❓ **Q90** - **Image findings without a fixed image**: After moving every image to the newest tag of a pinned minor version, findings remain that no published image fixes yet (Go standard library in gosu and caddy, brotli and curl packages released after the images were built, Jackson and Jetty in the unused Nouveau server of couchdb). How to handle them? Options: `.trivyignore` with reason and expiry 2026-11-23 / Drop the affected services / Let the container scan fail
+
+➡️ `.trivyignore` with reason and expiry 2026-11-23 — same expiry as the existing entries (end of Sprint 2); this delivers SCF-AC-2.5
+
+> **Answer:** `.trivyignore` with reason and expiry 2026-11-23 (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q91** - **Container scan stops at the first image**: The job ended at couchdb and never scanned the images after it. Change the job? Options: Scan every image, then fail / Keep it
+
+➡️ Scan every image, then fail — one run lists all findings
+
+> **Answer:** Scan every image, then fail (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q92** - **Dependency audit fails on next 16.3.8**: Bump Next.js in !17? Options: No, the separate security MR does it / Yes, in !17
+
+➡️ No, the separate security MR does it — the coordinator assigned the Next.js update and the gosu tag of `postgres` to the branch `fix/next-and-image-security-2026-10-27`; !17 gets it with `dev`
+
+> **Answer:** No, the separate security MR does it (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q93** - **Close #103 with !17?** SCF-AC-2.5 is met by the green container scan (SCF-T-10); SCF-AC-2.3 is met by the configuration tests, but SCF-T-8 (start with the network disconnected) has not run. Options: Keep #103 open until SCF-T-8 has run / Close #103 now
+
+➡️ Keep #103 open until SCF-T-8 has run — the MR delivers SCF-AC-2.5 and names SCF-T-8 as the one open check
+
+> **Answer:** Keep #103 open until SCF-T-8 has run (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q94** - **Example for `DATABASE_URL`** (inbox, review of !1 to !3): where? Options: Commented line in `.env.example` and one line in the README quick start / Own `apps/web/.env.example`
+
+➡️ Commented line in `.env.example` and one line in the README quick start — the quick start stays within 30 lines (SCF-AC-1.5)
+
+> **Answer:** Commented line in `.env.example` and one line in the README quick start (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
