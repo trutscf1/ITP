@@ -490,6 +490,16 @@ The job `commit-messages` failed on !14 (body line over 100 characters in `45963
 
 > **Answer:** Reviewer anschreiben
 
+## Round 20 — 2026-10-27 — delivery (`trutscf1`, agent: revise !18)
+
+The review of !18 by `schwaigc` (findings 1 to 7) was worked in on `concept/public-content`; the concept decisions are the assumptions A55 to A61 in round 13 of `concepts/public-content.qa-log.md`. No question was shown: the point below was decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions), with the recommended option.
+
+❓ **Q100** - **Answer to the review of !18**: Push the revision (`dev` merged in), post one reply per finding 1 to 7 with the place of the fix, and request the re-review of `schwaigc`? Options: Post and request re-review / Push only / Do not publish
+
+➡️ Post and request re-review — reply posted on !18, `schwaigc` requested as reviewer again; no thread resolved, no merge (author `trutscf1`)
+
+> **Answer:** decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions): Post and request re-review (Recommended)
+
 ## Round 21 — 2026-10-13 — delivery (`schwaigc`, implement #68)
 
 Renumbered at the merge of `dev` into `feature/68-design-tokens-and-themes` on 2026-10-27 (P-TEAM-5): these questions were asked as Q34 to Q40 on 2026-10-13, and `dev` had used those numbers since.
