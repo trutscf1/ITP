@@ -190,20 +190,20 @@ Mapped to technology in `documentation/STACK.md`, one section per track (§16); 
 ```text
 HealthReport {
   unit: enum(web|identity|storage|worker|cms),
-  version: string,                  // release version of the build; "0.0.0-dev" for local builds
+  version: string (non-empty),      // release version of the build; "0.0.0-dev" for local builds
   status: enum(ok|degraded|down),
   checks: list<DependencyCheck>
 }
 
 DependencyCheck {
-  name: string,                     // logical name, e.g. "relational-database"
+  name: string (non-empty),         // logical name, e.g. "relational-database"
   essential: boolean,
   status: enum(ok|down)
 }
 
 ErrorResponse {
   code: enum(validation-failed|not-found|method-not-allowed|internal-error),  // stable, machine-readable
-  message: string                   // one plain sentence for the caller; no internals (SCF-NF-4)
+  message: string (non-empty)       // one plain sentence for the caller; no internals (SCF-NF-4)
 }
 ```
 
