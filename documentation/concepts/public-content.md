@@ -530,7 +530,7 @@ The existing parts of the system this feature touches, checked on 2026-10-06 (Ph
 | Status page of `web` ([SCF-F-8]) | The operator reads the state of `cms` there ([PUB-AC-1.7]). | The page shows only `degraded`, not the reason. | [SCF-F-8] and [SCF-U-1] extended (§15, Q18) |
 | Reverse proxy ([SCF-F-4]) | The admin panel is served under the prefix of `cms`; the public pages under `/de` and `/en` belong to `web`. | No address of a public page (§8) starts with the prefix of another unit. Image files requested from `cms` directly would be refused by [PUB-F-4]. | [PUB-F-32] |
 | Routes of `web` outside the public pages (`/health`, `/status`, `/api/docs`, `/api/*` of [scaffolding.track-web.md](scaffolding.track-web.md); later the dashboard, login, and registration) | The proxy sends every path under `/` to `web`, so these routes and the public pages share one unit. | A rule that answers "any other path" with the public not-found page would swallow these routes. | `address-routing` decides only the public address space of §8 (`claims`, rule 0); `DASHBOARD_PATH`, `REGISTRATION_PATH`, and `LOGIN_PATH` must lie outside it (§8); [PUB-E-5] applies only inside it; [PUB-T-158] |
-| Page frame of `web` | The footer with the legal links appears on every page, also on pages other features build (login, dashboard, share links, status page). | A feature that builds its own page frame would lose the footer. Whether legal pages can be read offline is not decided here. | [PUB-F-21]; the footer is part of the one page frame of `web` (architecture, §16). Offline reading belongs to [offline-mode.md](offline-mode.md). |
+| Page frame of `web` | The footer with the legal links appears on every page, also on pages other features build (login, dashboard, share links, status page). | A feature that builds its own page frame would lose the footer. Pages such as `/status`, `/health`, and later the dashboard have no `/de` or `/en` in their address, so the frame cannot take the language from it. The track plan Web already has a layout (M8: local font, title, `lang`). Whether legal pages can be read offline is not decided here. | [PUB-F-21]; the footer is part of the one page frame of `web` (architecture, §16), which builds on M8 of [scaffolding.track-web.md](scaffolding.track-web.md); a page without a content language sets its page language itself, gets the footer in that language and no language switch (`page-frame` rules 2 to 4, [PUB-T-160]). Offline reading belongs to [offline-mode.md](offline-mode.md). |
 | Theme memory of the design system ([DSA-F-2] of [design-system.md](design-system.md), R4) | `page-frame` draws every page with the design tokens and themes; R4 remembers a chosen theme in the cookie `stash-theme`. | A theme switcher shown to a person without a session would set that cookie, against [PUB-NF-3] (no cookie without a session). | The theme switcher is shown only to signed-in members (decision of `schwaigc` as owner of R4, Q65 of [../qa-log.md](../qa-log.md)); a person without a session sees the default theme and gets no cookie: `page-frame` rule 10, [PUB-T-146], [PUB-T-159]; change to `design-system.md` (§15) |
 | Member session ([identity.md](identity.md)) | `web` asks whether a visitor is a signed-in member ([PUB-F-12]). | Identity is built later and can be down; the landing page must still open. A person without a session gets no cookie ([PUB-NF-3]), so the language is carried by the address, never by a cookie. | [PUB-F-33], [PUB-F-27] |
 | Bot protection ([IDN-F-5], captcha) | `web` places the notice the provider prescribes ([PUB-F-23]). | The Identity concept does not hold the notice text or a setting for the hidden badge yet. | Change to `identity.md` (§15) |
@@ -873,12 +873,20 @@ session: SessionState         // valid only when the page is drawn for a signed-
 
 rules:
   1. Every page, including not found, unavailable, login, registration, share-link, and status pages built by other
-     features, is drawn by this one frame: header with the language switch, main content, footer (PUB-F-21).
-  2. Footer: links to /<l>/legal/imprint, /terms, /privacy with the fixed texts of §8, in the page language.
-  3. Language switch (PUB-U-2): "Deutsch" and "English" as text; it links to the same route in the other language,
-     for an error page to /<other>.
-  4. Head: title, description, og:title, og:description, og:type, og:url = PUBLIC_BASE_URL + the path of the page
-     (PUB-F-15). The document language is the page language; German passages under /en carry lang de.
+     features, is drawn by this one frame: header with the language switch, main content, footer (PUB-F-21). It
+     builds on the layout of M8 of the track plan Web (local font, title) and replaces its placeholder frame.
+  2. Footer: links to /<l>/legal/imprint, /terms, /privacy with the fixed texts of §8, where l is the page
+     language (rule 4), also on a page without a content language.
+  3. Language switch (PUB-U-2), only when route is present: "Deutsch" and "English" as text; it links to the same
+     route in the other language, for an error page to /<other>. A page without a content language in its address
+     (route absent: /status, the dashboard, login, registration, the not-found page outside the public address
+     space) has no version in the other language and gets no language switch.
+  4. Page language = result.language. For a page of the public address space it is the language of the address.
+     For a page without a content language it is the language the building feature sets in its PageResult (the
+     status page sets en, M5 of the track plan Web); the not-found page outside the public address space is de,
+     the default and fallback language (Q7). The document language is the page language; German passages under
+     /en carry lang de. Head: title, description, og:title, og:description, og:type, og:url = PUBLIC_BASE_URL +
+     the path of the page (PUB-F-15).
   5. translationNote true: the text "This page is not available in English." above the content (PUB-U-4).
   6. notice present: show it as text directly below the form it protects; absent: nothing (PUB-F-23, PUB-U-5).
   7. Exactly one level-1 heading; one column up to 320 pixels, content width up to 1280 pixels (PUB-U-1, PUB-NF-1).
@@ -1059,7 +1067,7 @@ The seams at which tests run (P-DES-2); everything behind a seam is exercised th
 | `address-routing` | PUB-T-89 to PUB-T-104, PUB-T-158 |
 | `rich-text` | PUB-T-105 to PUB-T-112 |
 | `page-resolution` | PUB-T-113 to PUB-T-137 |
-| `page-frame` | PUB-T-138 to PUB-T-150, PUB-T-159 |
+| `page-frame` | PUB-T-138 to PUB-T-150, PUB-T-159, PUB-T-160 |
 | `content-contracts` | PUB-T-151 to PUB-T-157 |
 | `setup-guide` | PUB-T-7 (acceptance test, README read as data) |
 
@@ -1192,6 +1200,7 @@ Per module, in the order of §16; values come from the worked examples of §10. 
 | PUB-T-149 | `page-frame` | The landing page at a width of 320 pixels, and of 1280 pixels | No horizontal scrolling at 320; the content uses the width up to 1280 | PUB-U-1 |
 | PUB-T-150 | `page-frame` | Images of a page | Each image address is `/media/<id>` on the own origin, with its alternative text in the language shown | PUB-F-32, PUB-NF-1 |
 | PUB-T-159 | `page-frame` | A stand-in page of another feature drawn with the session state `valid`, and the same page with `none` | With `valid` the header holds the theme switcher; with `none` it holds none; the frame sets no cookie in either case | PUB-NF-3 |
+| PUB-T-160 | `page-frame` | A stand-in status page at `/status` with page language `en` and no route, and the not-found page of the path `/unknown` | The status page has document language `en`, the footer links `/en/legal/imprint`, `/en/legal/terms`, `/en/legal/privacy` labelled "Imprint", "Terms", "Privacy policy", and no language switch; the not-found page has document language `de`, the German footer, and no language switch | PUB-F-21, PUB-U-2 |
 | PUB-T-151 | `content-contracts` | The configuration of §10, example 11 | The output of the example, a non-zero exit code, and neither value printed; `CONTENT_TIMEOUT_MS` falls back to 2000 | PUB-F-6 |
 | PUB-T-152 | `content-contracts` | `CONTENT_REFRESH_SECONDS` 1, 60, 0, 61 | 1 and 60 are accepted; 0 and 61 stop the unit | PUB-F-6 |
 | PUB-T-153 | `content-contracts` | `CONTENT_TIMEOUT_MS` 100, 30000, 99, 30001; `SESSION_CHECK_TIMEOUT_MS` 50, 5000, 49, 5001 | The first two of each are accepted; the last two of each stop the unit | PUB-E-1, PUB-F-33 |
