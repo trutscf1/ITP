@@ -490,35 +490,35 @@ The job `commit-messages` failed on !14 (body line over 100 characters in `45963
 
 > **Answer:** Reviewer anschreiben
 
-## Round 10 — 2026-10-20 — milestone plan (`trutscf1`)
+## Round 20 — 2026-10-20 — milestone plan (`trutscf1`)
 
 Planning of the sprints and milestones on the dates set by the team: Sprint 1 2026-11-03, Sprint 2 2026-11-24, Sprint 3 2027-01-12, Sprint 4 2027-01-26, Sprint 5 2027-02-23, Sprint 6 2027-03-16, final presentation 2027-04-06; each milestone ends one day earlier. Assumptions: A21 the dates are the review Tuesdays and the milestone due date is the Monday before; A22 school holidays as in `WORKFLOW.md` (to be corrected at sprint planning); A23 one story point is 0.75 h of human work.
 
-❓ **Q34** - **Konzept-Takt**: Wann entstehen die Konzepte (Phase 1–6, inkl. Test-Konzept §17) im Verhältnis zur Umsetzung? Options: Einen Sprint voraus (Recommended) / Alle Konzepte zuerst / Parallel pro Feature
+❓ **Q67** - **Konzept-Takt**: Wann entstehen die Konzepte (Phase 1–6, inkl. Test-Konzept §17) im Verhältnis zur Umsetzung? Options: Einen Sprint voraus (Recommended) / Alle Konzepte zuerst / Parallel pro Feature
 
 ➡️ Also immer konzept und dann wenn ein sprint (=milestone) abgeschlossen ist wird daraus der komplette code generiert. Bedenke dass wir schüler sind und nur jeden sienstafg 200min arbeiten können und wenn ferien sind nicht. also heute am ende soll der erste milestone zum großteil abgeschlossen sein, damit wir den code generieren können
 
 > **Answer:** Other (free text, quoted above)
 
-❓ **Q35** - **TDD-Durchsetzung**: Wie streng wird 'erst Tests, dann Code' im Prozess verankert? Options: DoD + MR + ID-Check (Recommended) / Nur DoD + MR-Template / Zusätzlich CI-Reihenfolgeprüfung
+❓ **Q68** - **TDD-Durchsetzung**: Wie streng wird 'erst Tests, dann Code' im Prozess verankert? Options: DoD + MR + ID-Check (Recommended) / Nur DoD + MR-Template / Zusätzlich CI-Reihenfolgeprüfung
 
 ➡️ DoD + MR + ID-Check (Recommended)
 
 > **Answer:** DoD + MR + ID-Check (Recommended)
 
-❓ **Q36** - **Nachweis 'aus Markdown generierbar'**: Wie wird das Ziel am Ende belegt? Options: Regenerations-Probe (Recommended) / Nur Rückverfolgbarkeit / Probe nur im Sprint 6
+❓ **Q69** - **Nachweis 'aus Markdown generierbar'**: Wie wird das Ziel am Ende belegt? Options: Regenerations-Probe (Recommended) / Nur Rückverfolgbarkeit / Probe nur im Sprint 6
 
 ➡️ Regenerations-Probe (Recommended)
 
 > **Answer:** Regenerations-Probe (Recommended)
 
-❓ **Q37** - **GitLab veröffentlichen**: Meilensteine, Zuordnung von 76 Issues und 34 neue Issues auf GitLab anlegen? Options: Alles ausführen (Recommended) / Nur Meilensteine + Zuordnung / Noch nicht
+❓ **Q70** - **GitLab veröffentlichen**: Meilensteine, Zuordnung von 76 Issues und 34 neue Issues auf GitLab anlegen? Options: Alles ausführen (Recommended) / Nur Meilensteine + Zuordnung / Noch nicht
 
 ➡️ Alles ausführen (Recommended)
 
 > **Answer:** Alles ausführen (Recommended)
 
-❓ **Q38** - **Sprint 1 verkleinern**: 25 offene Issues, 5 MRs warten auf Review, etwa 13 Stories sind nicht begonnen; was bleibt in Sprint 1? Options: Nur Begonnenes + R1-Kern (Recommended) / Noch kleiner: nur Reviews / Wie geplant lassen
+❓ **Q71** - **Sprint 1 verkleinern**: 25 offene Issues, 5 MRs warten auf Review, etwa 13 Stories sind nicht begonnen; was bleibt in Sprint 1? Options: Nur Begonnenes + R1-Kern (Recommended) / Noch kleiner: nur Reviews / Wie geplant lassen
 
 ➡️ Nur Begonnenes + R1-Kern (Recommended)
 

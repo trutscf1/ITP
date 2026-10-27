@@ -17,13 +17,13 @@ In every sprint the team first writes and reviews the documents of the sprint's 
 
 ## Context
 
-The team can work on Tuesday for 200 minutes and not in school holidays, about 53 h per person for the whole project. Writing every line by hand does not fit; the goal is a project that can be generated completely from its Markdown documents. Decided in [qa-log.md](../qa-log.md), Q34 to Q36.
+The team can work on Tuesday for 200 minutes and not in school holidays, about 53 h per person for the whole project. Writing every line by hand does not fit; the goal is a project that can be generated completely from its Markdown documents. Decided in [qa-log.md](../qa-log.md), Q67 to Q69.
 
 ## Decision
 
 - Each milestone follows the sprint cycle in `WORKFLOW.md`: concept `ready` (phases 1–6 including §17), code generated per story with the failing test commit first, review by another person, release MR, regeneration probe.
-- Test first is part of the Definition of Done (`WORKFLOW.md`, items 15 and 16): the test commit carrying the `AC` ID comes before the first code commit, and every acceptance criterion is covered by a test with its ID. No CI check of the commit order (Q35).
-- Per sprint one feature is regenerated in an empty worktree from its concept document and tests only; the final milestone repeats this for the whole project (Q36).
+- Test first is part of the Definition of Done (`WORKFLOW.md`, items 15 and 16): the test commit carrying the `AC` ID comes before the first code commit, and every acceptance criterion is covered by a test with its ID. No CI check of the commit order (Q68).
+- Per sprint one feature is regenerated in an empty worktree from its concept document and tests only; the final milestone repeats this for the whole project (Q69).
 
 ## Consequences
 
