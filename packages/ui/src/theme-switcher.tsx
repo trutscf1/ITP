@@ -1,7 +1,7 @@
 "use client";
 
 import { ToggleGroup } from "radix-ui";
-import { useState } from "react";
+import { type ReactElement, useState } from "react";
 import {
   applyTheme,
   isTheme,
@@ -27,10 +27,12 @@ export interface ThemeSwitcherProps {
  * remembers the choice in the browser (DSA-F-2), built on a Radix toggle
  * group so it works by keyboard and screen reader (DSA-F-3).
  */
-export function ThemeSwitcher({ initialTheme }: ThemeSwitcherProps) {
+export function ThemeSwitcher({
+  initialTheme,
+}: ThemeSwitcherProps): ReactElement {
   const [theme, setTheme] = useState<Theme>(initialTheme);
 
-  function choose(value: string) {
+  function choose(value: string): void {
     if (!isTheme(value)) return;
     applyTheme(document.documentElement, value);
     // biome-ignore lint/suspicious/noDocumentCookie: one plain cookie, read on the server

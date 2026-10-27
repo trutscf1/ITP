@@ -21,8 +21,10 @@ One user story of [Public content: landing page, help center, changelog, legal p
 | --- | --- | --- | --- | --- |
 | PUB-AC-4.1 | Footer links | A person without an account | They use the footer | Imprint, terms, and privacy policy are reachable |
 | PUB-AC-4.2 | Privacy content | The privacy policy | A reader opens it | It names all processed data and all services in use (for example captcha, OAuth providers) |
-| PUB-AC-4.3 | Captcha notice | A page whose captcha badge is hidden | A person opens it | The prescribed notice text is visible |
+| PUB-AC-4.3 | Captcha notice | A page on which bot protection is switched on and its badge is hidden | A person opens it | The prescribed notice text is visible; with bot protection switched off, no notice is shown |
 | PUB-AC-4.4 | Maintained in the CMS | A content editor | They change a legal page in the CMS | The change appears on the public page |
+| PUB-AC-4.5 | Built-in legal text | A fresh installation whose CMS was never reachable | A person opens a legal page | The page shows the legal text built into the product |
+| PUB-AC-4.6 | Legal templates | A fresh installation whose legal pages no editor has changed | A person opens a legal page | The text has marked placeholders for the operator's data, and its first sentence says that it is a template the operator has not filled in yet |
 
 ## Slices
 
@@ -30,7 +32,7 @@ The vertical slices that deliver this story. One slice is delivered by the story
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
-| 1 — whole story | PUB-AC-4.1, PUB-AC-4.2, PUB-AC-4.3, PUB-AC-4.4 | — | #81 |
+| 1 — whole story | PUB-AC-4.1, PUB-AC-4.2, PUB-AC-4.3, PUB-AC-4.4, PUB-AC-4.5, PUB-AC-4.6 | — | #81 |
 
 - **Story issue:** #81
 - **Weight:** 2

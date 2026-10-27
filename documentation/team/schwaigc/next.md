@@ -11,6 +11,7 @@ New tasks and ideas for this developer land here first, before anyone plans them
 
 ## Open
 
-- [2026-10-06] Add `Developer handle: schwaigc` to your own gitignored `CLAUDE.local.md` and read `team/TEAM.md`.
 - [2026-10-06] Review the drafts that concern your features: the roles and success signals in `GOAL.md`, the *Serves* column in `ROADMAP.md`, and the concept drafts and work items of your features.
+- [2026-10-07] From `trutscf1`: !4 is merged. Record your implementation time for #38 with `/spend` (Definition of Done 14; none was recorded at the merge), add the points deferred from the review to #102, and rebase !5 on `dev`.
+- [2026-10-20] R4 (`design-system.md`): state that the theme switcher is shown only to signed-in members and that a person without a session gets the default theme and no cookie (Q65, PUB-NF-3 of `public-content.md`, review of !18).
 - [2026-10-20] Track plan Web, M6: after !14 is merged, change `/api/docs` to the description generated on request from the contracts (as in !16), drop `OPENAPI_FILE` (A3), the fixture, and W-15 (Q69); M9 replaces the stop-gap `docker/web.Dockerfile` of !17 (Q70).

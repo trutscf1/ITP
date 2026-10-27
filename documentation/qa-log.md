@@ -250,69 +250,245 @@ Fabian's reviews of !4 and !5 (not approved) are worked through under `/engineer
 
 Review of !11 by `schwaigc`, point 1: `SCF-AC-5.3` and `SCF-AC-2.5` were stricter than `SCF-NF-6` after Q31. On `tschudea07`'s instruction to resolve the review, both criteria now carry the wording of `SCF-NF-6` (fixable findings; accepted exceptions with reason and expiry), in the story files and in the issues #42, #104, #39, #103. The work items belong to `trutscf1`: the approval as PM is requested on !11 and still open.
 
-❓ **Q34** - **Themes**: Welche vier Themes soll DSA-AC-1.2 liefern (neben Hell und Dunkel)? Hoher Kontrast gehört zu DSA-US-2 und zählt hier nicht. Options: Hell, Dunkel, Sepia, Nacht / Hell, Dunkel, System, Sepia / Hell, Dunkel, Ozean, Wald
+## Round 10 — 2026-10-06 — delivery
 
-➡️ Hell, Dunkel, Sepia, Nacht
+Merge decisions (P-MR-4, fixed options Merge now / No / Later / I merge myself), each MR approved by `schwaigc`:
 
-> **Answer:** Hell, Dunkel, Sepia, Nacht (Recommended)
+❓ **Q34** - **Merge !1**: concept/migrate-engineering-human nach dev mergen (Migration auf engineering-human, von schwaigc freigegeben)?
 
-❓ **Q35** - **Speichern**: DSA-AC-1.2 verlangt 'im Profil gespeichert', aber ein Benutzerprofil gibt es erst mit Identity (R3). Wie liefert Slice 1 das? Options: Cookie jetzt, Profil später / localStorage jetzt, Profil später / Auf Identity warten
+> **Answer:** Merge now
 
-➡️ Cookie jetzt, Profil später
+❓ **Q35** - **Merge !2**: chore/team-mode nach dev mergen (Team-Modus, von schwaigc freigegeben)? Nur nach !1.
 
-> **Answer:** Cookie jetzt, Profil später (Recommended)
+> **Answer:** Merge now
 
-❓ **Q36** - **Commits**: Du willst viele einzelne Commits. Wie fein? Options: Ein Commit pro Schritt / Ein Commit pro AC
+❓ **Q36** - **Merge !3**: concept/user-story-work-items nach dev mergen (48 User Stories als Work Items, von schwaigc freigegeben)? Nur nach !2.
 
-➡️ Ein Commit pro Schritt
+> **Answer:** Merge now
 
-> **Answer:** Ein Commit pro Schritt (Recommended)
+❓ **Q37** - **Feature**: Welches deiner Features soll zuerst gegrillt werden? Options: Public content / Observability baseline / Offline mode / Load tests
 
-❓ **Q37** - **Seams**: An welchen Schnittstellen teste ich #68 (node --test, Tests tragen die AC-ID)? (1) `tokens.css` in `@stash/ui`: jedes der vier Themes definiert denselben Token-Satz wie die Basis (AC-1.1/1.2); (2) `theme.ts` in `@stash/ui`: Theme-Namen, Cookie lesen/schreiben, `applyTheme` setzt `data-theme` am Wurzelelement (AC-1.2); (3) Struktur: `@stash/ui` hängt von Radix und Tailwind 4 ab, der ThemeSwitcher nutzt Radix, web lädt die Tokens (AC-1.3). Browser-Klicktest bleibt bei WEB-US-4. Options: Alle drei Seams / Nur (1) und (2) / Zusätzlich Render-Test
+➡️ Public content
 
-➡️ Alle drei Seams
+> **Answer:** Public content (Recommended)
 
-> **Answer:** Alle drei Seams (Recommended)
+❓ **Q38** - **Session**: Wo soll das Grilling laufen? Options: Neue Session / Hier weitermachen
 
-❓ **Q38** - **Stufe R4**: Sobald R4 auf 'in progress' steht, verlangt doc-check in §17 des Konzepts einen Test für jedes der 16 Akzeptanzkriterien von DSA-US-1 bis -3 (sonst Fehler, die CI wird rot). Gebaut und getestet sind nur AC-1.1 bis 1.3; der Rest des Konzepts ist ungegrillt. Wie lösen wir das? Options: §17 jetzt schreiben / Stufe 'concept' lassen
+➡️ Neue Session
 
-➡️ §17 jetzt schreiben
+> **Answer:** Neue Session (Recommended)
 
-> **Answer:** §17 jetzt schreiben (Recommended)
+## Round 11 — 2026-10-06 — delivery
 
-❓ **Q39** - **Push & MR**: Branch feature/68-design-tokens-and-themes (22 Commits, alles grün) pushen und das MR nach dev öffnen? Ohne GITLAB_TOKEN nur per git-Push-Option; Label und Beschreibung folgen per API. Options: Pushen + MR per Push-Option / Erst Token setzen / Nur pushen / Noch nichts
+Review of the merge requests of `schwaigc` (`feature/38-monorepo-setup`, `feature/85-project-documentation`):
 
-➡️ Pushen + MR per Push-Option
+❓ **Q39** - **MR-Auswahl**: Welche Merge Request soll ich reviewen? Lokal sehe ich zwei neue Branches von schwaigc, die noch nicht in dev sind. Options: Beide / #38 Monorepo-Setup / #85 Projektdoku
 
-> **Answer:** Pushen + MR per Push-Option (Recommended)
+➡️ Beide
 
-❓ **Q40** - **Issues**: Darf ich ein neues Issue für DSA-US-1 Slice 3 anlegen, die Beschreibung von #68 an die Story-Datei angleichen und bei #102 die Zeile „Lint für Root-Dateien“ korrigieren? Options: Ja, alle drei / Nein
+> **Answer:** die merge requests von christopher, dass ist der accestoken: [token removed from the log]
 
-➡️ Ja, alle drei
+❓ **Q40** - **GitLab-Token**: GITLAB_TOKEN ist in dieser Sitzung nicht gesetzt (weder Prozess noch Benutzer-Umgebung). Ohne ihn kann ich MR-Beschreibung, Threads und Pipeline nicht lesen und nicht approven. Wie weiter? Options: Ich setze den Token / Nur lokales Review
 
-> **Answer:** Ja, alle drei (Recommended)
+➡️ Ich setze den Token
 
-❓ **Q41** - **Nächstes Issue**: An welchem deiner Sprint-1-Issues (status::ready) soll ich weiterarbeiten? Options: #106 DSA-US-1 Slice 2 / #102 SCF-US-1 Slice 2 / #103 SCF-US-2 Slice 2 / #39 oder #40 (Shared)
+> **Answer:** Ich setze den Token (Recommended)
 
-➡️ #106 DSA-US-1 Slice 2
+❓ **Q41** - **Review posten**: Beide MRs (!4 Monorepo, !5 Projektdoku) sind nicht freigabefähig, daher approve ich nicht. Soll ich die Review-Kommentare unter deinem Namen auf GitLab posten? Options: Beide posten / Nur !4 posten / Nicht posten
 
-> **Answer:** #106 DSA-US-1 Slice 2 (Recommended)
+➡️ Beide posten
 
-## Round 10 — 2026-10-20 — delivery (`schwaigc`, merge the assigned MRs)
+> **Answer:** Beide posten (Recommended)
 
-Open MRs of `schwaigc` (author: !5, !7, !9; reviewer: !6) checked against P-MR-2/3: none is approved, !5 and !7 have an unresolved review thread of `tschudea07`, !9 has a conflict with `dev`, the pipeline of !6 fails on conflict markers in its branch. The author does not merge their own MR (P-MR-2), so nothing was merged in this round.
+## Round 12 — 2026-10-07 — delivery
 
-❓ **Q42** - **Eigene MRs (!5, !7, !9)**: Merge-fertig machen (dev einarbeiten, Konflikte lösen, Checks frisch laufen lassen, pushen, Kommentar an tschudea07), gemergt wird erst nach dem Approval? Options: Merge-fertig machen / Nur einarbeiten, kein Kommentar / Nichts anfassen
+Second review of the merge requests of `schwaigc` (!4 at commit `8cb0ef4`, !5 at commit `9a7b581`). Shown with the questions: the result tables and the comment for !4.
 
-➡️ Merge-fertig machen
+❓ **Q42** - **Review of !4**: All three blockers are fixed and verified. Shall I post the comment shown above on !4 under your name and approve the merge request? Options: Post and approve / Post only / Change the text first / Do not post
 
-> **Answer:** Merge-fertig machen (Recommended)
+➡️ Post and approve
 
-❓ **Q43** - **MR !6 public-content**: Die Pipeline schlägt wegen Konfliktmarkern fehl (ROADMAP-DETAILS.md, qa-log.md), dazu ein neuer Konflikt mit dev. Wie umgehen? Options: Nur Kommentar / Ich fixe den Branch / Nichts tun
+> **Answer:** Post and approve (Recommended)
 
-➡️ Nur Kommentar
+❓ **Q43** - **Review of !5**: Nothing reviewable changed, and schwaigc announced a rebase after !4 is merged. What should happen on !5 now? Options: No comment / Short confirmation
 
-> **Answer:** Nur Kommentar (Recommended)
+➡️ No comment
+
+> **Answer:** Short confirmation
+
+Result: the comment was posted on !4 and !4 was approved as `trutscf1`; a short confirmation of the split into #109 and #110 was posted on !5.
+
+## Round 13 — 2026-10-07 — delivery
+
+Merge of !4 (`feature/38-monorepo-setup` → `dev`) at commit `8cb0ef4`. Shown with the question: the check table (acceptance criteria met, pipeline green, no open threads, approved by `trutscf1`; Definition of Done 14 not met, 10 not runnable).
+
+Assumption stated with the round, not rejected:
+
+- **A8**: Definition of Done 10 (pre-commit checks) is treated as not applicable until the pre-commit configuration exists, as it was for !1–!3.
+
+❓ **Q44** - **Time tracking on !4**: Definition of Done 14 is not met, because no time is recorded on #38 or !4. How do we handle this before the merge? Options: Wait for the bookings / Time is booked now / Merge, book afterwards
+
+➡️ Wait for the bookings
+
+> **Answer:** Book 10min review time for me and merge
+
+Result: 10 minutes of review time were recorded on !4 for `trutscf1` on the owner's explicit instruction, a deviation from P-TIME-1 for this one entry (agents never book time). The answer names the merge, so it counts as _Merge now_ (P-MR-4). !4 was merged into `dev` with merge commit `725d327`, the branch is kept, and #38 is closed with `status::done`. The implementation time of `schwaigc` is still not recorded (Definition of Done 14).
+
+## Round 14 — 2026-10-20 — delivery (`schwaigc`, plan of the R1 track Web)
+
+The MRs !5, !7, !9 wait for reviews; the next task of `schwaigc` is chosen. The merge round before it (provisional Q42 and Q43, now Q80 and Q81) is on `feature/106-contrast-and-storybook` (!9) and is renumbered when !9 reaches `dev` (P-TEAM-5).
+
+❓ **Q45** - **Nächster Task**: Die MRs sind merge-fertig und warten auf Reviews. Womit soll ich bei deinen Tasks anfangen? Options: R1 Track-Web-Plan / R6 Web-Client grillen / R4 Rest grillen / Shared #39/#40/#103
+
+➡️ R1 Track-Web-Plan
+
+> **Answer:** R1 Track-Web-Plan (Recommended)
+
+❓ **Q46** - **Issue und Branch**: Issue „R1 track Web: plan of the web unit“ (type::concept, schwaigc, Sprint 1, Gewicht 1) und Branch `concept/scaffolding-track-web`, gestapelt auf !13 (Merge-Reihenfolge !13 → dieser MR)? Options: Ja, so anlegen / Ohne neues Issue / Auf dev statt auf !13
+
+➡️ Ja, so anlegen — issue #113
+
+> **Answer:** Ja, so anlegen (Recommended)
+
+❓ **Q47** - **Annahmen für den Plan**: A1 Statusseite unter `/status` (Server-Seite, ohne Cache, U-3). A2 Abfrage pro Unit mit Timeout `HEALTH_TIMEOUT_MS` (2000); ein Body, der kein HealthReport der richtigen Unit ist, gilt als down (E-3), egal welcher HTTP-Status. A3 Health-URLs der Units als Konfiguration im Web-Config-Contract (contracts/web), Defaults aus der Routing-Tabelle §8. A4 STACK.md §4: SCF-C-3 = Next.js 16.3 (App Router), SCF-C-13 = Playwright 1.63. A5 `apps/web/src/prisma` bleibt unberührt, offener Punkt für SCF-US-4. Options: Alle ok / Einzelne ändern
+
+➡️ Alle ok
+
+> **Answer:** Alle ok (Recommended)
+
+## Round 15 — 2026-10-20 — check (`schwaigc`, workflow documents against `docs/`)
+
+`WORKFLOW.md`, the MR and issue templates, `CLAUDE.md`, `README.md`, and the GitLab settings were compared with `docs/anforderungen_software_projekte.md` and `docs/git_workflow_commands.md`. Findings are in the log of `ROADMAP-DETAILS.md` (2026-10-20).
+
+❓ **Q48** - **Workflow-Fixes**: Welche der gefundenen Punkte soll ich jetzt beheben? Options: Issue-Labels aufräumen / Kommentar auf !15 / Doku-Fix-MR / Settings-Bitte an trutscf1
+
+➡️ Issue-Labels aufräumen, Kommentar auf !15
+
+> **Answer:** Issue-Labels aufräumen (Recommended), Kommentar auf !15 (Recommended)
+
+## Round 16 — 2026-10-20 — delivery (`schwaigc`, merge !6 and !13)
+
+`schwaigc` is not the author of !6 and !13, so these two may be merged by them. Both heads were checked in clean worktrees: doc-check and `--status` 0 errors, markdown lint clean, pipeline green, no conflict with `dev`; the concept text of !6 is unchanged since the approval on `c76350a`.
+
+❓ **Q49** - **Review-Freigabe**: Welche MRs approvst du (Kommentar und Approval unter deinem Namen)? Options: !6 approven / !13 approven / Keinen
+
+➡️ !6 und !13
+
+> **Answer:** !6 approven (Recommended), !13 approven
+
+❓ **Q50** - **Merge !6**: concept/public-content → dev, Head 6263c25. Options: Merge now / No / Later / I merge myself
+
+➡️ Merge now — merged as `2d7a6e0`, branch kept
+
+> **Answer:** Merge now
+
+❓ **Q51** - **Merge !13**: concept/migrate-scaffolding → dev, Head af3fc53. Options: Merge now / No / Later / I merge myself
+
+➡️ Merge now — after !6 the inbox files conflicted; `dev` merged in (`bd5e2d2`, both sides kept), which reset the approval
+
+> **Answer:** Merge now
+
+❓ **Q52** - **Re-Approval !13**: Approval auf bd5e2d2 erneuern? Options: Ja, erneuern / Nein
+
+➡️ Ja, erneuern
+
+> **Answer:** Ja, erneuern (Recommended)
+
+❓ **Q53** - **Merge !13**: Head bd5e2d2. Options: Merge now / No / Later / I merge myself
+
+➡️ Merge now — merged as `8786ed1`, branch kept; #111 closed and set to `status::done`
+
+> **Answer:** Merge now
+
+## Round 17 — 2026-10-20 — delivery (`schwaigc`, revise !14 after the review of `trutscf1`)
+
+The review of !14 (F1–F18) left six questions to the owner. Checked before asking: `next start` rejects `PORT=abc` with its own message, and the standalone `server.js` of the image falls back to port 3000 (`parseInt(process.env.PORT, 10) || 3000`).
+
+❓ **Q54** - **Start-Check (F1)**: Wie wird die Konfiguration von web vor der ersten Anfrage geprüft, sodass der Prozess bei einem Fehler wie in Beispiel 3 mit Exit-Code ≠ 0 endet? Options: Wrapper-Startskript / instrumentation.ts
+
+➡️ Wrapper-Startskript — M7 `apps/web/scripts/start.ts`
+
+> **Answer:** Wrapper-Startskript (Recommended)
+
+❓ **Q55** - **Schrift (F6)**: Das Layout lädt Geist über next/font/google (Internet beim Build, SCF-NF-1). Was stattdessen? Options: System-Schrift / Lokale Font-Dateien
+
+➡️ Lokale Font-Dateien — Geist from the package `geist` (SIL OFL 1.1) through `next/font/local`, licence row in the README
+
+> **Answer:** Lokale Font-Dateien
+
+❓ **Q56** - **Statusfarbe (F13)**: Bekommt die Statusseite schon in R1 eine Farbe zusätzlich zum Text? Options: Nein, nur Text / Ja, mit Tokens
+
+➡️ Nein, nur Text
+
+> **Answer:** Nein, nur Text (Recommended)
+
+❓ **Q57** - **Tests (F4c, F12)**: Wer schreibt welche Tests? Options: Web: T-39, T-40 / Alles Web / Gemeinsamer axe-Check
+
+➡️ Web: T-39, T-40 — in `tests/status-page.test.ts`; T-40 runs axe on `/status` with 0 violations of any impact; SCF-T-36 stays with the Platform track
+
+> **Answer:** Web: T-39, T-40 (Recommended)
+
+❓ **Q58** - **Health-Adressen (F8)**: Container-Hostnamen in den Defaults, localhost für den nativen Start? Options: Service = Unit-Name / Defaults = localhost
+
+➡️ Service = Unit-Name — interface with the Platform track; `.env.example` carries the container values and a comment with the native ones
+
+> **Answer:** Service = Unit-Name (Recommended)
+
+❓ **Q59** - **Fehlerantworten (F7)**: Antwortet web bei Fehlern mit ErrorResponse? Options: Ja, für /api/* / Auch für Seiten
+
+➡️ Ja, für /api/* — `/api/docs` without file: 500 `internal-error`; unknown `/api/*`: 404 `not-found`; HTML pages keep the normal not-found page
+
+> **Answer:** Ja, für /api/* (Recommended)
+
+❓ **Q60** - **Antwort auf das Review von !14**: Tabelle F1–F18 mit Erledigt und Ort, Entscheidungen Q54–Q59, Hinweis zu F18, Bitte um Re-Review posten? Options: Posten / Nicht posten
+
+➡️ Posten — answer posted on !14
+
+> **Answer:** Posten (Recommended)
+
+## Round 18 — 2026-10-20 — delivery (`schwaigc`, pipelines of !14 and !7)
+
+The job `commit-messages` failed on !14 (body line over 100 characters in `4596372`, by `schwaigc`) and on !7 (the same in `84508ee`, by `trutscf1`); the job `docs` failed on !14 because the position row named the MR's own branch, which the check reads as merged. `trutscf1` had added the assumptions A1–A6 to the plan.
+
+❓ **Q61** - **Commit-Nachrichten fixen**: Umschreiben und Force-Push mit `--force-with-lease` auf !14 (4596372 neu formuliert, die sieben folgenden Commits unverändert neu aufgesetzt) und !7 (84508ee mit kürzerer Body-Zeile), dazu ein Kommentar an trutscf1? Options: Ja, beide / Nur !14 / Keinen Force-Push
+
+➡️ Ja, beide — tree of each branch unchanged, commitlint clean
+
+> **Answer:** Ja, beide (Recommended)
+
+❓ **Q62** - **Annahmen A1–A6 von trutscf1**: tsconfig-Optionen, expliziter Test-Glob, `OPENAPI_FILE`, Template-Grafik löschen, Umgebung des Images, 405 mit ErrorResponse. Übernehmen? Options: Alle übernehmen / Einzelne ändern
+
+➡️ Alle übernehmen
+
+> **Answer:** Alle übernehmen (Recommended)
+
+## Round 19 — 2026-10-20 — review (`schwaigc`, !18 of `trutscf1`)
+
+!18 (R11 public content, §16 and §17, #108) was checked at `2a6af46`: doc-check, markdown lint, commitlint, and pipeline clean; findings at the boundary to the `web` unit and to R4.
+
+❓ **Q63** - **Review !18**: Wie soll das Review aussehen? Options: Changes requested / Approve mit Hinweisen / Nicht posten
+
+➡️ Changes requested — review with findings 1–7 posted, no approval; `schwaigc` set as reviewer
+
+> **Answer:** Changes requested (Recommended)
+
+❓ **Q64** - **Wer baut die web-Module von R11?** Options: trutscf1 baut, ich reviewe / Ich baue die web-Seite / Offen lassen
+
+➡️ trutscf1 baut, ich reviewe — every MR that changes `apps/web` gets the review of `schwaigc`
+
+> **Answer:** trutscf1 baut, ich reviewe (Recommended)
+
+❓ **Q65** - **Theme-Cookie gegen PUB-NF-3**: Options: Switcher nur für Mitglieder / Besucher ohne Speichern / Offen lassen
+
+➡️ Switcher nur für Mitglieder — a person without a session sees the default theme and gets no cookie
+
+> **Answer:** Switcher nur für Mitglieder (Recommended)
+
+❓ **Q66** - **Nächster Schritt**: Womit weitermachen, während die MRs auf Reviews warten? Options: R4 grillen (#116) / R6 grillen (#118) / Reviewer anschreiben / Session beenden
+
+➡️ Reviewer anschreiben — reminders posted on !7 (`tschudea07`: !5, !7, !9, merge order) and !14 (`trutscf1`: re-review of !14, revision of !18)
+
+> **Answer:** Reviewer anschreiben
 
 ## Round 20 — 2026-10-20 — review (`schwaigc`, !14 approved; reviews of !15, !16, !17)
 
@@ -347,3 +523,93 @@ Provisional numbers (P-TEAM-5): Q44 to Q66 of this day are on `concept/scaffoldi
 ➡️ Merge now — merged as `ab985fa` by `schwaigc` (the author), branch kept; #113 closed and set to `status::done`. Deviation from `docs/anforderungen_software_projekte.md` §4, decided by `schwaigc`
 
 > **Answer:** Merge now
+
+## Round 21 — 2026-10-13 — delivery (`schwaigc`, implement #68)
+
+Renumbered at the merge of `dev` into `feature/68-design-tokens-and-themes` on 2026-10-27 (P-TEAM-5): these questions were asked as Q34 to Q40 on 2026-10-13, and `dev` had used those numbers since.
+
+❓ **Q72** - **Themes**: Welche vier Themes soll DSA-AC-1.2 liefern (neben Hell und Dunkel)? Hoher Kontrast gehört zu DSA-US-2 und zählt hier nicht. Options: Hell, Dunkel, Sepia, Nacht / Hell, Dunkel, System, Sepia / Hell, Dunkel, Ozean, Wald
+
+➡️ Hell, Dunkel, Sepia, Nacht
+
+> **Answer:** Hell, Dunkel, Sepia, Nacht (Recommended)
+
+❓ **Q73** - **Speichern**: DSA-AC-1.2 verlangt 'im Profil gespeichert', aber ein Benutzerprofil gibt es erst mit Identity (R3). Wie liefert Slice 1 das? Options: Cookie jetzt, Profil später / localStorage jetzt, Profil später / Auf Identity warten
+
+➡️ Cookie jetzt, Profil später
+
+> **Answer:** Cookie jetzt, Profil später (Recommended)
+
+❓ **Q74** - **Commits**: Du willst viele einzelne Commits. Wie fein? Options: Ein Commit pro Schritt / Ein Commit pro AC
+
+➡️ Ein Commit pro Schritt
+
+> **Answer:** Ein Commit pro Schritt (Recommended)
+
+❓ **Q75** - **Seams**: An welchen Schnittstellen teste ich #68 (node --test, Tests tragen die AC-ID)? (1) `tokens.css` in `@stash/ui`: jedes der vier Themes definiert denselben Token-Satz wie die Basis (AC-1.1/1.2); (2) `theme.ts` in `@stash/ui`: Theme-Namen, Cookie lesen/schreiben, `applyTheme` setzt `data-theme` am Wurzelelement (AC-1.2); (3) Struktur: `@stash/ui` hängt von Radix und Tailwind 4 ab, der ThemeSwitcher nutzt Radix, web lädt die Tokens (AC-1.3). Browser-Klicktest bleibt bei WEB-US-4. Options: Alle drei Seams / Nur (1) und (2) / Zusätzlich Render-Test
+
+➡️ Alle drei Seams
+
+> **Answer:** Alle drei Seams (Recommended)
+
+❓ **Q76** - **Stufe R4**: Sobald R4 auf 'in progress' steht, verlangt doc-check in §17 des Konzepts einen Test für jedes der 16 Akzeptanzkriterien von DSA-US-1 bis -3 (sonst Fehler, die CI wird rot). Gebaut und getestet sind nur AC-1.1 bis 1.3; der Rest des Konzepts ist ungegrillt. Wie lösen wir das? Options: §17 jetzt schreiben / Stufe 'concept' lassen
+
+➡️ §17 jetzt schreiben
+
+> **Answer:** §17 jetzt schreiben (Recommended)
+
+❓ **Q77** - **Push & MR**: Branch feature/68-design-tokens-and-themes (22 Commits, alles grün) pushen und das MR nach dev öffnen? Ohne GITLAB_TOKEN nur per git-Push-Option; Label und Beschreibung folgen per API. Options: Pushen + MR per Push-Option / Erst Token setzen / Nur pushen / Noch nichts
+
+➡️ Pushen + MR per Push-Option
+
+> **Answer:** Pushen + MR per Push-Option (Recommended)
+
+❓ **Q78** - **Issues**: Darf ich ein neues Issue für DSA-US-1 Slice 3 anlegen, die Beschreibung von #68 an die Story-Datei angleichen und bei #102 die Zeile „Lint für Root-Dateien“ korrigieren? Options: Ja, alle drei / Nein
+
+➡️ Ja, alle drei
+
+> **Answer:** Ja, alle drei (Recommended)
+
+## Round 22 — 2026-10-13 — delivery (`schwaigc`, implement #106)
+
+Renumbered at the merge of `dev` on 2026-10-27 (P-TEAM-5): asked as Q41.
+
+❓ **Q79** - **Nächstes Issue**: An welchem deiner Sprint-1-Issues (status::ready) soll ich weiterarbeiten? Options: #106 DSA-US-1 Slice 2 / #102 SCF-US-1 Slice 2 / #103 SCF-US-2 Slice 2 / #39 oder #40 (Shared)
+
+➡️ #106 DSA-US-1 Slice 2
+
+> **Answer:** #106 DSA-US-1 Slice 2 (Recommended)
+
+## Round 23 — 2026-10-20 — delivery (`schwaigc`, merge the assigned MRs)
+
+Renumbered at the merge of `dev` on 2026-10-27 (P-TEAM-5): Q80 and Q81 were asked as Q42 and Q43.
+
+Open MRs of `schwaigc` (author: !5, !7, !9; reviewer: !6) checked against P-MR-2/3: none is approved, !5 and !7 have an unresolved review thread of `tschudea07`, !9 has a conflict with `dev`, the pipeline of !6 fails on conflict markers in its branch. The author does not merge their own MR (P-MR-2), so nothing was merged in this round.
+
+❓ **Q80** - **Eigene MRs (!5, !7, !9)**: Merge-fertig machen (dev einarbeiten, Konflikte lösen, Checks frisch laufen lassen, pushen, Kommentar an tschudea07), gemergt wird erst nach dem Approval? Options: Merge-fertig machen / Nur einarbeiten, kein Kommentar / Nichts anfassen
+
+➡️ Merge-fertig machen
+
+> **Answer:** Merge-fertig machen (Recommended)
+
+❓ **Q81** - **MR !6 public-content**: Die Pipeline schlägt wegen Konfliktmarkern fehl (ROADMAP-DETAILS.md, qa-log.md), dazu ein neuer Konflikt mit dev. Wie umgehen? Options: Nur Kommentar / Ich fixe den Branch / Nichts tun
+
+➡️ Nur Kommentar
+
+> **Answer:** Nur Kommentar (Recommended)
+
+## Round 24 — 2026-10-27 — review (`schwaigc`, open MRs)
+
+Open MRs: !5, !7, !9 of `schwaigc` (none approved; !7 and !9 in conflict with `dev`); !15 to !19 of `trutscf1` with `schwaigc` as reviewer. !15 and !16 have no commit since the review of 2026-10-20 and are left as they are. Every pipeline fails in `dependency-audit` (and `container-scan` on `dev`) because of the `next` advisories on `dev` itself, so nothing is mergeable (P-MR-3). The questions were asked as Q72 and Q73, before the merge of `dev` moved the questions of #68 to Q72 to Q78 (P-TEAM-5).
+
+❓ **Q82** - **Reviews posten**: Welche Review-Ergebnisse soll ich auf GitLab als Kommentar posten (unter deinem Account schwaigc)? Options: !19 Kommentar + Approve / !18 Kommentar + Approve / !17 Kommentar (changes requested)
+
+➡️ alle drei — !19 approved (inbox of `trutscf1`); !18 approved (all seven findings of the review of 2026-10-20 fixed); changes requested on !17 (job `test` fails on SCF-AC-1.5, quick start over 30 lines since `b44d10d`)
+
+> **Answer:** !19 Kommentar + Approve (Recommended), !18 Kommentar + Approve, !17 Kommentar (changes requested)
+
+❓ **Q83** - **!7/!9**: Soll ich die Konflikte von !7 und !9 mit dev jetzt auflösen und pushen? Options: Ja, !7 und !9 / Nur !7 / Später
+
+➡️ Ja, !7 und !9 — `dev` merged into !7 (questions of #68 moved to Q72–Q78, product name in DSA-US-1), !7 merged into !9 (questions moved to Q79–Q81)
+
+> **Answer:** Ja, !7 und !9 (Recommended)

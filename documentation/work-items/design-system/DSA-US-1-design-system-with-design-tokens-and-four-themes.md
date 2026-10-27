@@ -13,7 +13,7 @@ One user story of [Design system & accessibility modes](feature.md) and the acce
 
 | ID | Title | As a | I want | so that | Priority |
 | --- | --- | --- | --- | --- | --- |
-| DSA-US-1 | Design system with design tokens and four themes | member | to choose between several interface themes | Nimbus looks the way I prefer | Must |
+| DSA-US-1 | Design system with design tokens and four themes | member | to choose between several interface themes | stash looks the way I prefer | Must |
 
 ## Acceptance criteria
 
