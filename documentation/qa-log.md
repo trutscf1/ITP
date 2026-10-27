@@ -490,6 +490,16 @@ The job `commit-messages` failed on !14 (body line over 100 characters in `45963
 
 > **Answer:** Reviewer anschreiben
 
+## Round 20 — 2026-10-27 — delivery (`trutscf1`, agent: revise !18)
+
+The review of !18 by `schwaigc` (findings 1 to 7) was worked in on `concept/public-content`; the concept decisions are the assumptions A55 to A61 in round 13 of `concepts/public-content.qa-log.md`. No question was shown: the point below was decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions), with the recommended option.
+
+❓ **Q100** - **Answer to the review of !18**: Push the revision (`dev` merged in), post one reply per finding 1 to 7 with the place of the fix, and request the re-review of `schwaigc`? Options: Post and request re-review / Push only / Do not publish
+
+➡️ Post and request re-review — reply posted on !18, `schwaigc` requested as reviewer again; no thread resolved, no merge (author `trutscf1`)
+
+> **Answer:** decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions): Post and request re-review (Recommended)
+
 ## Round 20 — 2026-10-20 — milestone plan (`trutscf1`)
 
 Planning of the sprints and milestones on the dates set by the team: Sprint 1 2026-11-03, Sprint 2 2026-11-24, Sprint 3 2027-01-12, Sprint 4 2027-01-26, Sprint 5 2027-02-23, Sprint 6 2027-03-16, final presentation 2027-04-06; each milestone ends one day earlier. Assumptions: A21 the dates are the review Tuesdays and the milestone due date is the Monday before; A22 school holidays as in `WORKFLOW.md` (to be corrected at sprint planning); A23 one story point is 0.75 h of human work.
