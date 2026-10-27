@@ -13,7 +13,7 @@ One user story of [Public content: landing page, help center, changelog, legal p
 
 | ID | Title | As a | I want | so that | Priority |
 | --- | --- | --- | --- | --- | --- |
-| PUB-US-2 | Public landing page | visitor | to see on a landing page what Nimbus offers | I can decide whether to register | Should |
+| PUB-US-2 | Public landing page | visitor | to see on a landing page what stash offers | I can decide whether to register | Should |
 
 ## Acceptance criteria
 
