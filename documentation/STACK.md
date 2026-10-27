@@ -20,7 +20,7 @@ Every row traces to the capability IDs (`SCF-C-x`, later other prefixes) that de
 
 ## Capability index
 
-Every capability of `concepts/scaffolding.md` §7 and `concepts/observability.md` §7 and where its technology stands. The index only points to the track sections; it holds no technology of its own, except the capabilities added on 2026-10-13 that no section maps yet. Their owner moves the row into the own section when the technology is chosen.
+Every capability of `concepts/scaffolding.md` §7, `concepts/public-content.md` §7, and `concepts/observability.md` §7 and where its technology stands. The index only points to the track sections; it holds no technology of its own, except the capabilities added on 2026-10-13 that no section maps yet. Their owner moves the row into the own section when the technology is chosen.
 
 | ID | Capability | Technology | Owner |
 | --- | --- | --- | --- |
@@ -45,6 +45,10 @@ Every capability of `concepts/scaffolding.md` §7 and `concepts/observability.md
 | SCF-C-19 | Database access layer | section 3 (row "Database access layer") | `tschudea07` |
 | SCF-C-20 | Accessibility checker | section 3 (row "Accessibility check in CI") | `tschudea07` |
 | SCF-C-21 | Data model diagram tool | _open_ — Vertabelo per `SCF-AC-4.1` | `tschudea07` |
+| PUB-C-1 | Localized content management | to be chosen by the owner; builds on SCF-C-5 (section 1) | `trutscf1` |
+| PUB-C-2 | Password hashing | to be chosen by the owner | `trutscf1` |
+| PUB-C-3 | Safe rich text rendering | to be chosen by the owner | `trutscf1` |
+| PUB-C-4 | Accessibility check of public pages | section 3 (SCF-C-20, row "Accessibility check in CI"); the pages are added by the owner of `web` | `tschudea07` |
 | OBS-C-1 | Instrumentation library | section 1 | `trutscf1` |
 | OBS-C-2 | Telemetry collector | section 1 | `trutscf1` |
 | OBS-C-3 | Metric store | section 1 | `trutscf1` |
