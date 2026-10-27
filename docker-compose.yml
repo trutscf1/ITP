@@ -28,7 +28,7 @@ services:
 
   # Sessions, cache, and the job queue.
   redis:
-    image: redis:8-alpine
+    image: redis:8.8-alpine
     restart: unless-stopped
     command: ["sh", "-c", "exec redis-server --requirepass \"$$REDIS_PASSWORD\""]
     environment:
@@ -91,7 +91,7 @@ services:
 
   # Object storage with an S3 interface. The master answers on 9333 once the server is up.
   seaweedfs:
-    image: chrislusf/seaweedfs:4.05
+    image: chrislusf/seaweedfs:4.51
     restart: unless-stopped
     command: ["server", "-dir=/data", "-filer", "-s3"]
     networks:
@@ -130,7 +130,7 @@ services:
   # Local replacement for outgoing e-mail (SCF-AC-2.3): catches every message; the inbox is
   # at http://localhost:${MAILPIT_UI_PORT}.
   mailpit:
-    image: axllent/mailpit:v1.27
+    image: axllent/mailpit:v1.32
     restart: unless-stopped
     networks:
       - backend
@@ -174,7 +174,7 @@ services:
   # Reverse proxy: one origin for the browser (SCF-F-4). Routes for the other units are added
   # in docker/Caddyfile as they join the stack.
   proxy:
-    image: caddy:2-alpine
+    image: caddy:2.11-alpine
     restart: unless-stopped
     environment:
       WEB_PORT: ${WEB_PORT:?set WEB_PORT in .env}
