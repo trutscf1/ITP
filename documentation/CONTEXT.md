@@ -68,3 +68,23 @@ The copy of the legal templates held in the web client, shown when no content fr
 **Track**:
 One person's exclusive part of a feature: own paths, own plan file, own issues. Tracks meet only at interfaces fixed in the concept document.
 *Avoid*: area, workstream
+
+**Telemetry**:
+The metrics, log entries, and traces a unit reports about its own running behaviour. It holds no data that identifies a person.
+*Avoid*: monitoring data, analytics
+
+**Observability stack**:
+The containers that collect, keep, and show telemetry: a collector, a metric store, a log store, a trace store, and a dashboard tool. It is infrastructure of the local stack, not a unit, and starts only when requested.
+*Avoid*: monitoring stack, observability service
+
+**Trace**:
+The record of one request or job across all units it passes, made of timed steps that share one trace ID.
+*Avoid*: request log, call chain
+
+**Operations dashboard**:
+A page of the dashboard tool that shows telemetry to operators. It is not the dashboard of a member, which is the start page of the web client.
+*Avoid*: dashboard (alone), monitoring page
+
+**Alert rule**:
+A condition on telemetry that is checked at a fixed interval; while it holds, its alert is firing and shown in the alert list of the dashboard tool.
+*Avoid*: alarm, notification
