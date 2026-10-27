@@ -490,7 +490,17 @@ The job `commit-messages` failed on !14 (body line over 100 characters in `45963
 
 > **Answer:** Reviewer anschreiben
 
-## Round 20 — 2026-10-27 — delivery (`trutscf1` (agent), revise !17 after the review of `schwaigc`)
+## Round 20 — 2026-10-27 — delivery (`trutscf1`, agent: revise !18)
+
+The review of !18 by `schwaigc` (findings 1 to 7) was worked in on `concept/public-content`; the concept decisions are the assumptions A55 to A61 in round 13 of `concepts/public-content.qa-log.md`. No question was shown: the point below was decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions), with the recommended option.
+
+❓ **Q100** - **Answer to the review of !18**: Push the revision (`dev` merged in), post one reply per finding 1 to 7 with the place of the fix, and request the re-review of `schwaigc`? Options: Post and request re-review / Push only / Do not publish
+
+➡️ Post and request re-review — reply posted on !18, `schwaigc` requested as reviewer again; no thread resolved, no merge (author `trutscf1`)
+
+> **Answer:** decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions): Post and request re-review (Recommended)
+
+## Round 21 — 2026-10-27 — delivery (`trutscf1` (agent), revise !17 after the review of `schwaigc`)
 
 `schwaigc` requested changes on !17 (SCF-US-2 slice 1, #39) on 2026-10-20: the container scan fails, conflicts with `dev`, the `web` image must be marked as a stop-gap, the health check of `web`, and the image pins. No question was asked: each one below was decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions); the answer is the recommended option.
 
