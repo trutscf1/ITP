@@ -294,6 +294,20 @@ Assumptions stated with the round, none rejected yet:
 - **A53**: The legal templates follow the heading outline in §8 (headings and placeholders only); the wording below the headings is written by the author of the templates and is not legal advice (open question Q14).
 - **A54**: Two named error conditions were added so that no failure is left to guesswork: `PUB-E-11` (invalid content value) and `PUB-E-12` (action not permitted, including the failed sign-in).
 
+## Round 13 — 2026-10-27 — revise !18 after the review of `schwaigc` (agent, on request of trutscf1)
+
+Notes: no question was asked in this round. The review of !18 (2026-10-20, changes requested, findings 1 to 7) was worked through by the agent; every point below was decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions), with the recommended option or, for findings 1 and 3, with the position the reviewer took as owner of the `web` track and of R4 (Q64 and Q65 of `../qa-log.md`). `trutscf1` reviews them; a rejected one becomes a `Q<n>` of the next round, starting at Q30.
+
+Assumptions stated with the round, none rejected yet:
+
+- **A55** (finding 1): `trutscf1` builds the five `web` modules and `web-config` as owner of R11, and every MR that changes `apps/web` or the contracts folder `web` gets the review of `schwaigc` (Q64 of `../qa-log.md`). §16 says so in a paragraph of its own, and the slice table gets the column "Built by / reviewed by".
+- **A56** (finding 2): The public address space is `/` and every path whose first segment is exactly two lower-case letters `a` to `z`. `address-routing` gets the operation `claims(path)` and decides only claimed paths; `/media/<id>`, `/health`, `/status`, `/api/*`, and the later app paths never reach it, and `PUB-E-5` applies only inside the space. `DASHBOARD_PATH`, `REGISTRATION_PATH`, and `LOGIN_PATH` must lie outside it. New unit test `PUB-T-158`; `PUB-T-154` checks `/fr/home` as well.
+- **A57** (finding 3): The theme switcher of R4 is shown only to signed-in members (Q65 of `../qa-log.md`). `page-frame` gets the session state; with `valid` it shows the switcher, otherwise none, the default theme, and no cookie. The public pages of this feature are drawn with the state `none`, also for a member, because their session is checked only at `/`, `/de`, and `/en`. New §14 row, new §15 row for `design-system.md` (carried out by `schwaigc`), `PUB-T-146` extended, new unit test `PUB-T-159`.
+- **A58** (finding 4): The nine `web` values of §8 extend `WebConfig` of the track plan Web (M1) in the contracts folder `web` and are validated by its start check (M7); new module `web-config` with the unit tests `PUB-T-151` to `PUB-T-154`. `content-contracts` lives in the contracts folder `cms`, because `cms` provides the content interface; the token of `cms` extends the configuration shape of `cms`.
+- **A59** (finding 5): A page without a content language in its address sets its page language itself (the status page `en`, M5 of the track plan Web); the not-found page outside the public address space is German, the default and fallback language (Q7). Such a page gets the footer in its language and no language switch. New unit test `PUB-T-160`.
+- **A60** (finding 6): The §14 row "Scaffold on `dev`" names `apps/web`, both databases of the stack, and the earlier replacement of the template placeholder by M8 of the track plan Web; `PUB-US-2` then replaces that page.
+- **A61** (finding 7): The product is `stash`: example 13, `PUB-T-12`, and the story `PUB-US-2` use `stash` and `https://stash.example` instead of "Nimbus". The GitLab issue of `PUB-US-2` is brought in line when `/engineering-human tickets public-content` updates the issues.
+
 ## Open questions for the school management
 
 Legal questions the agent does not decide (grill flow, personal data). They are not answered in this log; the owner takes them to the data-protection contact of the school and records the answers here.
