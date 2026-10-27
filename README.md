@@ -30,7 +30,12 @@ pnpm install
 pnpm --filter @stash/web dev
 ```
 
-The stack serves the web application at <http://localhost:8080> (`PROXY_PORT`) and catches all e-mail in Mailpit at <http://localhost:8025>. The first start takes a few minutes. All settings come from `.env`; OAuth and captcha are off there, so the stack starts offline once the images are present. For hot reload, run step 3 against `docker compose up -d postgres` and put `DATABASE_URL` (host `localhost`) into `apps/web/.env`.
+The stack serves the web application at <http://localhost:8080> (`PROXY_PORT`) and catches all e-mail in Mailpit at <http://localhost:8025>. The first start takes a few minutes. All settings come from `.env`; OAuth and captcha are off there, so the stack starts offline once the images are present. For hot reload, start only the database with `docker compose up -d postgres`, put the connection into `apps/web/.env`, and run step 3:
+
+```bash
+# apps/web/.env — the values of POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_PORT, POSTGRES_DB in .env
+DATABASE_URL=postgresql://stash:change-me@localhost:5432/stash_db
+```
 
 Checks:
 
