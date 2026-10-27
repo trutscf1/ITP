@@ -500,45 +500,25 @@ The review of !18 by `schwaigc` (findings 1 to 7) was worked in on `concept/publ
 
 > **Answer:** decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions): Post and request re-review (Recommended)
 
-## Round 21 — 2026-10-20 — review (`schwaigc`, !14 approved; reviews of !15, !16, !17)
+## Round 21 — 2026-10-27 — delivery (`trutscf1`, agent, security fix for the pipeline of every MR)
 
-Rounds 21 to 25 were renumbered at the merges of `dev` on 2026-10-27 behind round 20 of `trutscf1` (P-TEAM-5).
+The pipeline of !19 (2026-10-27) failed in `dependency-audit` (Next.js 16.3.8: GHSA-2464-fhr4-w9xw and GHSA-673q-mjm6-r5xr critical, GHSA-p3m5-59mp-jv5r high, fixed in 16.4.1) and in `container-scan` (CVE-2026-111943 high in `usr/local/bin/gosu` of `postgres:18`, Go standard library 1.24.6). Both fail on `dev` itself, so they block every MR.
 
-Provisional numbers (P-TEAM-5): Q44 to Q66 of this day are on `concept/scaffolding-track-web` (!14); these follow them. `trutscf1` approved !14 at `0818a6c`. !15, !16, and !17 of `trutscf1` had no reviewer and red pipelines; each was checked in a clean worktree.
+❓ **Q150** - **Next.js-Version**: 16.4.3 (2026-10-23) ist die neueste, aber jünger als `minimumReleaseAge` (7 Tage) und bräuchte einen Eintrag in `minimumReleaseAgeExclude`; 16.4.2 (2026-10-15) ist gepatcht und hält die Regel ein. Welche Version? Options: 16.4.2 ohne Ausnahme / 16.4.3 mit Ausnahme
 
-❓ **Q67** - **Merge !14**: Der Autor darf seinen MR nicht selbst mergen (`docs/` §4). Wie vorgehen? Options: trutscf1 mergen lassen / Trotzdem selbst mergen / Later
+➡️ 16.4.2 ohne Ausnahme — the GitHub advisory database lists no advisory affecting 16.4.2, so 16.4.3 adds no security fix that would justify an exception to the supply-chain rule (SCF-NF-6, Q30). Decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions).
 
-➡️ trutscf1 mergen lassen — request posted on !14
+> **Answer:** 16.4.2 ohne Ausnahme (Recommended)
 
-> **Answer:** trutscf1 mergen lassen (Recommended)
+❓ **Q151** - **gosu in postgres:18 und mongo:8.0**: Kein offizielles Image enthält schon gosu 1.20 (2026-10-25); alle Varianten von postgres 18 (trixie, bookworm, alpine3.23, alpine3.24) und mongo 8.0 laden gosu 1.19. Wie umgehen? Options: Ausnahme in .trivyignore bis 2026-11-23 / Eigenes Image mit gosu 1.20 bauen
 
-❓ **Q68** - **Reviews**: Welche MRs von trutscf1 reviewen? Options: !16 Shared Contracts / !17 Docker Compose / !15 Meilensteinplan
+➡️ Ausnahme in .trivyignore bis 2026-11-23 — no newer clean tag of either image exists (checked in the Dockerfiles of `docker-library/postgres` and `docker-library/mongo` on 2026-10-27), and replacing the images is SCF-US-2 slice 2 (#103). Reason and expiry as the file demands (SCF-AC-5.3). Decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions).
 
-➡️ alle drei — changes requested on each (commit messages or image scan, conflicts with `dev`; !16 also `ErrorResponse` against `scaffolding.md` §8 and example 6)
-
-> **Answer:** !16 Shared Contracts (Recommended), !17 Docker Compose, !15 Meilensteinplan
-
-❓ **Q69** - **/api/docs**: Bei jeder Anfrage aus den Contracts erzeugen (!16) oder die generierte Datei ausliefern (Plan M6)? Options: !16 übernehmen, Plan anpassen / Plan M6 beibehalten
-
-➡️ !16 übernehmen, Plan anpassen — M6 of the track plan Web changes after !14 is merged; !16 adds the test of SCF-T-15
-
-> **Answer:** !16 übernehmen, Plan anpassen (Recommended)
-
-❓ **Q70** - **web-Image**: `docker/web.Dockerfile` aus !17 als Übergang oder ohne web mergen? Options: Als Übergang ok / Ohne web mergen
-
-➡️ Als Übergang ok — replaced by M9 (`apps/web/Dockerfile`) in SCF-US-8 slice 1
-
-> **Answer:** Als Übergang ok (Recommended)
-
-❓ **Q71** - **Merge !14**: concept/scaffolding-track-web → dev, Head 0818a6c, approved by trutscf1; the author merging is against `docs/` §4. Options: Merge now / No / Later / I merge myself
-
-➡️ Merge now — merged as `ab985fa` by `schwaigc` (the author), branch kept; #113 closed and set to `status::done`. Deviation from `docs/anforderungen_software_projekte.md` §4, decided by `schwaigc`
-
-> **Answer:** Merge now
+> **Answer:** Ausnahme in .trivyignore bis 2026-11-23 (Recommended)
 
 ## Round 22 — 2026-10-13 — delivery (`schwaigc`, implement #68)
 
-Renumbered at the merge of `dev` into `feature/68-design-tokens-and-themes` on 2026-10-27 (P-TEAM-5): these questions were asked as Q34 to Q40 on 2026-10-13, and `dev` had used those numbers since.
+Renumbered at the merge of `dev` into `feature/68-design-tokens-and-themes` on 2026-10-27 (P-TEAM-5): these questions were asked as Q34 to Q40 on 2026-10-13, and `dev` had used those numbers since. Moved to round 22 at the merge of `dev` after !24 (round 21 of `trutscf1`).
 
 ❓ **Q72** - **Themes**: Welche vier Themes soll DSA-AC-1.2 liefern (neben Hell und Dunkel)? Hoher Kontrast gehört zu DSA-US-2 und zählt hier nicht. Options: Hell, Dunkel, Sepia, Nacht / Hell, Dunkel, System, Sepia / Hell, Dunkel, Ozean, Wald
 
@@ -582,7 +562,43 @@ Renumbered at the merge of `dev` into `feature/68-design-tokens-and-themes` on 2
 
 > **Answer:** Ja, alle drei (Recommended)
 
-## Round 23 — 2026-10-13 — delivery (`schwaigc`, implement #106)
+## Round 23 — 2026-10-20 — review (`schwaigc`, !14 approved; reviews of !15, !16, !17)
+
+Rounds 23 to 27 were renumbered at the merges of `dev` on 2026-10-27 behind round 20 of `trutscf1` and round 21 of the security fix !24 (P-TEAM-5).
+
+Provisional numbers (P-TEAM-5): Q44 to Q66 of this day are on `concept/scaffolding-track-web` (!14); these follow them. `trutscf1` approved !14 at `0818a6c`. !15, !16, and !17 of `trutscf1` had no reviewer and red pipelines; each was checked in a clean worktree.
+
+❓ **Q67** - **Merge !14**: Der Autor darf seinen MR nicht selbst mergen (`docs/` §4). Wie vorgehen? Options: trutscf1 mergen lassen / Trotzdem selbst mergen / Later
+
+➡️ trutscf1 mergen lassen — request posted on !14
+
+> **Answer:** trutscf1 mergen lassen (Recommended)
+
+❓ **Q68** - **Reviews**: Welche MRs von trutscf1 reviewen? Options: !16 Shared Contracts / !17 Docker Compose / !15 Meilensteinplan
+
+➡️ alle drei — changes requested on each (commit messages or image scan, conflicts with `dev`; !16 also `ErrorResponse` against `scaffolding.md` §8 and example 6)
+
+> **Answer:** !16 Shared Contracts (Recommended), !17 Docker Compose, !15 Meilensteinplan
+
+❓ **Q69** - **/api/docs**: Bei jeder Anfrage aus den Contracts erzeugen (!16) oder die generierte Datei ausliefern (Plan M6)? Options: !16 übernehmen, Plan anpassen / Plan M6 beibehalten
+
+➡️ !16 übernehmen, Plan anpassen — M6 of the track plan Web changes after !14 is merged; !16 adds the test of SCF-T-15
+
+> **Answer:** !16 übernehmen, Plan anpassen (Recommended)
+
+❓ **Q70** - **web-Image**: `docker/web.Dockerfile` aus !17 als Übergang oder ohne web mergen? Options: Als Übergang ok / Ohne web mergen
+
+➡️ Als Übergang ok — replaced by M9 (`apps/web/Dockerfile`) in SCF-US-8 slice 1
+
+> **Answer:** Als Übergang ok (Recommended)
+
+❓ **Q71** - **Merge !14**: concept/scaffolding-track-web → dev, Head 0818a6c, approved by trutscf1; the author merging is against `docs/` §4. Options: Merge now / No / Later / I merge myself
+
+➡️ Merge now — merged as `ab985fa` by `schwaigc` (the author), branch kept; #113 closed and set to `status::done`. Deviation from `docs/anforderungen_software_projekte.md` §4, decided by `schwaigc`
+
+> **Answer:** Merge now
+
+## Round 24 — 2026-10-13 — delivery (`schwaigc`, implement #106)
 
 Renumbered at the merge of `dev` on 2026-10-27 (P-TEAM-5): asked as Q41.
 
@@ -592,7 +608,7 @@ Renumbered at the merge of `dev` on 2026-10-27 (P-TEAM-5): asked as Q41.
 
 > **Answer:** #106 DSA-US-1 Slice 2 (Recommended)
 
-## Round 24 — 2026-10-20 — delivery (`schwaigc`, merge the assigned MRs)
+## Round 25 — 2026-10-20 — delivery (`schwaigc`, merge the assigned MRs)
 
 Renumbered at the merge of `dev` on 2026-10-27 (P-TEAM-5): Q80 and Q81 were asked as Q42 and Q43.
 
@@ -610,7 +626,7 @@ Open MRs of `schwaigc` (author: !5, !7, !9; reviewer: !6) checked against P-MR-2
 
 > **Answer:** Nur Kommentar (Recommended)
 
-## Round 25 — 2026-10-27 — review (`schwaigc`, open MRs)
+## Round 26 — 2026-10-27 — review (`schwaigc`, open MRs)
 
 Open MRs: !5, !7, !9 of `schwaigc` (none approved; !7 and !9 in conflict with `dev`); !15 to !19 of `trutscf1` with `schwaigc` as reviewer. !15 and !16 have no commit since the review of 2026-10-20 and are left as they are. Every pipeline fails in `dependency-audit` (and `container-scan` on `dev`) because of the `next` advisories on `dev` itself, so nothing is mergeable (P-MR-3). The questions were asked as Q72 and Q73, before the merge of `dev` moved the questions of #68 to Q72 to Q78 (P-TEAM-5).
 
@@ -662,7 +678,7 @@ Open MRs: !5, !7, !9 of `schwaigc` (none approved; !7 and !9 in conflict with `d
 
 > **Answer:** !19 10m, !20 20m (Recommended)
 
-## Round 26 — 2026-10-27 — delivery (`schwaigc`, second review round of the day)
+## Round 27 — 2026-10-27 — delivery (`schwaigc`, second review round of the day)
 
 New since round 25: !21, !23, !24 of `trutscf1` with `schwaigc` as reviewer; revisions of !17 and !20; !19 in conflict with `dev`. Numbers Q152 to Q158 continue behind Q151 of !24 (provisional, P-TEAM-5).
 

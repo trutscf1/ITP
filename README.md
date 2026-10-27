@@ -150,6 +150,7 @@ The repository is public, so all content must be licence-free. Licences of what 
 | Component | Licence | Use |
 | --- | --- | --- |
 | Next.js, React, Tailwind CSS (`@tailwindcss/postcss`) | MIT | web application |
+| Radix UI (`radix-ui`) | MIT | accessible primitives of the design system (`@stash/ui`) |
 | dotenv | BSD-2-Clause | reads the `.env` file in the web application |
 | Prisma | Apache-2.0 | database access |
 | TypeScript | Apache-2.0 | language |
