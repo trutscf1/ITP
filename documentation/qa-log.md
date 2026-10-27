@@ -490,7 +490,19 @@ The job `commit-messages` failed on !14 (body line over 100 characters in `45963
 
 > **Answer:** Reviewer anschreiben
 
-## Round 20 — 2026-10-20 — review (`schwaigc`, !14 approved; reviews of !15, !16, !17)
+## Round 20 — 2026-10-27 — delivery (`trutscf1`, agent: revise !18)
+
+The review of !18 by `schwaigc` (findings 1 to 7) was worked in on `concept/public-content`; the concept decisions are the assumptions A55 to A61 in round 13 of `concepts/public-content.qa-log.md`. No question was shown: the point below was decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions), with the recommended option.
+
+❓ **Q100** - **Answer to the review of !18**: Push the revision (`dev` merged in), post one reply per finding 1 to 7 with the place of the fix, and request the re-review of `schwaigc`? Options: Post and request re-review / Push only / Do not publish
+
+➡️ Post and request re-review — reply posted on !18, `schwaigc` requested as reviewer again; no thread resolved, no merge (author `trutscf1`)
+
+> **Answer:** decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions): Post and request re-review (Recommended)
+
+## Round 21 — 2026-10-20 — review (`schwaigc`, !14 approved; reviews of !15, !16, !17)
+
+Rounds 21 to 25 were renumbered at the merges of `dev` on 2026-10-27 behind round 20 of `trutscf1` (P-TEAM-5).
 
 Provisional numbers (P-TEAM-5): Q44 to Q66 of this day are on `concept/scaffolding-track-web` (!14); these follow them. `trutscf1` approved !14 at `0818a6c`. !15, !16, and !17 of `trutscf1` had no reviewer and red pipelines; each was checked in a clean worktree.
 
@@ -524,7 +536,7 @@ Provisional numbers (P-TEAM-5): Q44 to Q66 of this day are on `concept/scaffoldi
 
 > **Answer:** Merge now
 
-## Round 21 — 2026-10-13 — delivery (`schwaigc`, implement #68)
+## Round 22 — 2026-10-13 — delivery (`schwaigc`, implement #68)
 
 Renumbered at the merge of `dev` into `feature/68-design-tokens-and-themes` on 2026-10-27 (P-TEAM-5): these questions were asked as Q34 to Q40 on 2026-10-13, and `dev` had used those numbers since.
 
@@ -570,7 +582,7 @@ Renumbered at the merge of `dev` into `feature/68-design-tokens-and-themes` on 2
 
 > **Answer:** Ja, alle drei (Recommended)
 
-## Round 22 — 2026-10-13 — delivery (`schwaigc`, implement #106)
+## Round 23 — 2026-10-13 — delivery (`schwaigc`, implement #106)
 
 Renumbered at the merge of `dev` on 2026-10-27 (P-TEAM-5): asked as Q41.
 
@@ -580,7 +592,7 @@ Renumbered at the merge of `dev` on 2026-10-27 (P-TEAM-5): asked as Q41.
 
 > **Answer:** #106 DSA-US-1 Slice 2 (Recommended)
 
-## Round 23 — 2026-10-20 — delivery (`schwaigc`, merge the assigned MRs)
+## Round 24 — 2026-10-20 — delivery (`schwaigc`, merge the assigned MRs)
 
 Renumbered at the merge of `dev` on 2026-10-27 (P-TEAM-5): Q80 and Q81 were asked as Q42 and Q43.
 
@@ -598,7 +610,7 @@ Open MRs of `schwaigc` (author: !5, !7, !9; reviewer: !6) checked against P-MR-2
 
 > **Answer:** Nur Kommentar (Recommended)
 
-## Round 24 — 2026-10-27 — review (`schwaigc`, open MRs)
+## Round 25 — 2026-10-27 — review (`schwaigc`, open MRs)
 
 Open MRs: !5, !7, !9 of `schwaigc` (none approved; !7 and !9 in conflict with `dev`); !15 to !19 of `trutscf1` with `schwaigc` as reviewer. !15 and !16 have no commit since the review of 2026-10-20 and are left as they are. Every pipeline fails in `dependency-audit` (and `container-scan` on `dev`) because of the `next` advisories on `dev` itself, so nothing is mergeable (P-MR-3). The questions were asked as Q72 and Q73, before the merge of `dev` moved the questions of #68 to Q72 to Q78 (P-TEAM-5).
 
