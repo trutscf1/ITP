@@ -32,6 +32,10 @@ CVE-2026-56862 exp:2026-11-23
 CVE-2026-78667 exp:2026-11-23
 CVE-2026-78669 exp:2026-11-23
 CVE-2026-97031 exp:2026-11-23
+# Added 2026-10-27 (Trivy DB of that day): gosu 1.19 is built with Go 1.24.6 (crypto/x509, fixed in
+# Go 1.26.10 / 1.27.3). gosu 1.20 (2026-10-25) is not yet in any official postgres:18 (trixie, bookworm,
+# alpine) or mongo:8.0 image, so no newer clean tag exists; gosu opens no TLS connection and verifies no certificate.
+CVE-2026-111943 exp:2026-11-23
 
 # js-yaml in the Node.js tools bundled with mongo:8.0 (mongosh); the stack does not run mongosh.
 # Upstream must update it.
