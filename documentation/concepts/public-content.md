@@ -558,6 +558,8 @@ The existing parts of the system this feature touches, checked on 2026-10-06 (Ph
 
 The feature lives in two units, `cms` and `web`, plus the shared contracts. The unit split and routing are fixed by [scaffolding.md](scaffolding.md) §16 and its ADR; this chapter adds the modules inside them. A module is named by its job; `STACK.md` decides how a module becomes files and packages (P-DES-3). Every module hides much behavior behind a small interface (P-DES-1): the `web` side has one operation to read content, one to decide an address, one to build a page, and one to wrap it.
 
+**Who builds and reviews.** `trutscf1` builds every module of this chapter as owner of R11. The `cms` modules, `content-contracts`, and the contracts folder `cms` lie in his own track (Platform & cms, [scaffolding.md](scaffolding.md) §16). The five `web` modules (`content-client`, `address-routing`, `rich-text`, `page-resolution`, `page-frame`) and `web-config` lie in `apps/web` and the contracts folder `web`, the owned paths of the track Web of `schwaigc` ([scaffolding.track-web.md](scaffolding.track-web.md)). For these paths the owner of the track decided that `trutscf1` builds them and `schwaigc` reviews (Q64 of [../qa-log.md](../qa-log.md)), in place of the issue request of the track rule (`WORKFLOW.md`, "Team"): every MR of this feature that changes `apps/web` or the contracts folder `web` gets the review of `schwaigc`. The slice table below names builder and reviewer per slice.
+
 ### Module Overview & Tree
 
 ```text
@@ -567,7 +569,7 @@ apps/cms                    unit cms
 ├── content-interface       the read interface for the web unit: token check, published versions only, image files
 ├── content-seed            example content on the first start
 └── cms-health              health report with the checks content-store and administrator-account
-apps/web                    unit web
+apps/web                    unit web (track Web of schwaigc; built by trutscf1, reviewed by schwaigc)
 ├── content-client          reads the content interface, keeps the last version of every group and its images
 ├── address-routing         language of the address, first visit, signed-in redirect, unknown addresses
 ├── rich-text               rich text markup to a safe structure
@@ -583,15 +585,15 @@ README.md                   setup-guide: the registration step of the quick star
 
 The slices and their issues stand in the story files (P-DOC-6); this table says which modules each slice builds or extends. Each slice is demoable on its own and fits into 4 h (`WORKFLOW.md`, "Issues and weight"); weights are the proposal of assumption A48.
 
-| Story | Slice | Weight | Modules built or extended | Demo |
-| --- | --- | --- | --- | --- |
-| PUB-US-1 | 1 — CMS runs with its content types | 3 | `content-contracts` (shapes, legal templates), `content-model`, `content-seed`, `cms-health` (check `content-store`) | the start command of the local stack: the `cms` container reports `ok` and holds the seed content |
-| PUB-US-1 | 2 — Editor roles and first administrator | 2 | `editor-accounts`, `content-interface`, `cms-health` (check `administrator-account`), `setup-guide` | the status data of `cms` is `degraded` with `administrator-account` until the first registration; content requests without the token are refused |
-| PUB-US-1 | 3 — Delivery by `web` | 3 | `web-config`, `content-client`, `address-routing`, `rich-text`, `page-resolution` (legal pages, unavailable page), `page-frame` (frame, meta tags, no tracking), fixed texts | a legal page at `/de/legal/privacy` shows the published text, changes after 60 s, and survives a stopped `cms` with its images |
-| PUB-US-2 | 1 — whole story | 3 | `page-resolution` (landing page), `address-routing` (signed-in redirect), `page-frame` (layout, accessibility check) | `/de` shows the landing page; a signed-in member lands on the dashboard |
-| PUB-US-3 | 1 — whole story | 3 | `page-resolution` (help center, search, contextual help, changelog) | the help center with search, an article, a help context link, and the changelog |
-| PUB-US-4 | 1 — whole story | 3 | `page-frame` (footer, notice slot), `content-contracts` (completed legal templates), `page-resolution` (built-in legal text) | the three legal pages from the footer, also with a never-reached `cms` |
-| PUB-US-5 | 1 — whole story | 3 | `address-routing` (first visit), `page-frame` (language switch, translation note), `page-resolution` (missing translation), `content-model` (language versions checked) | `/` leads to `/en` for an English browser; an article without English shows German with the note |
+| Story | Slice | Weight | Modules built or extended | Built by / reviewed by | Demo |
+| --- | --- | --- | --- | --- | --- |
+| PUB-US-1 | 1 — CMS runs with its content types | 3 | `content-contracts` (shapes, legal templates), `content-model`, `content-seed`, `cms-health` (check `content-store`) | `trutscf1` / another team member | the start command of the local stack: the `cms` container reports `ok` and holds the seed content |
+| PUB-US-1 | 2 — Editor roles and first administrator | 2 | `editor-accounts`, `content-interface`, `cms-health` (check `administrator-account`), `setup-guide` | `trutscf1` / another team member | the status data of `cms` is `degraded` with `administrator-account` until the first registration; content requests without the token are refused |
+| PUB-US-1 | 3 — Delivery by `web` | 3 | `web-config`, `content-client`, `address-routing`, `rich-text`, `page-resolution` (legal pages, unavailable page), `page-frame` (frame, meta tags, no tracking), fixed texts | `trutscf1` / `schwaigc` (changes `apps/web` and the contracts folder `web`) | a legal page at `/de/legal/privacy` shows the published text, changes after 60 s, and survives a stopped `cms` with its images |
+| PUB-US-2 | 1 — whole story | 3 | `page-resolution` (landing page), `address-routing` (signed-in redirect), `page-frame` (layout, accessibility check) | `trutscf1` / `schwaigc` (changes `apps/web`) | `/de` shows the landing page; a signed-in member lands on the dashboard |
+| PUB-US-3 | 1 — whole story | 3 | `page-resolution` (help center, search, contextual help, changelog) | `trutscf1` / `schwaigc` (changes `apps/web`) | the help center with search, an article, a help context link, and the changelog |
+| PUB-US-4 | 1 — whole story | 3 | `page-frame` (footer, notice slot), `content-contracts` (completed legal templates), `page-resolution` (built-in legal text) | `trutscf1` / `schwaigc` (changes `apps/web`) | the three legal pages from the footer, also with a never-reached `cms` |
+| PUB-US-5 | 1 — whole story | 3 | `address-routing` (first visit), `page-frame` (language switch, translation note), `page-resolution` (missing translation), `content-model` (language versions checked) | `trutscf1` / `schwaigc` (changes `apps/web`) | `/` leads to `/en` for an English browser; an article without English shows German with the note |
 
 Order: US-1 slice 1, then 2, then 3; US-2 to US-5 each depend only on US-1 (slice 3 supplies the web foundation they extend).
 
