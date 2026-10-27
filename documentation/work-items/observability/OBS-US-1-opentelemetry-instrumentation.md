@@ -7,32 +7,39 @@ id-prefix: "OBS"
 ---
 # OBS-US-1 OpenTelemetry instrumentation
 
-One user story of [Observability baseline](feature.md) and the acceptance criteria that decide when it is done. This file is the single source for both; the story issue copies them verbatim (P-DOC-6, P-TRK-2). The story was written by the team as tracker issue US-45 and brought into this form on 2026-10-06; its owner reviews the wording.
+One user story of [Observability baseline](feature.md) and the acceptance criteria that decide when it is done. This file is the single source for both; the story issue copies them verbatim (P-DOC-6, P-TRK-2). The story was written by the team as tracker issue US-45 and brought into this form on 2026-10-06. On 2026-10-27 the grilling replaced the technology names by neutral ones, extended the instrumentation to all five units, and added the criteria `OBS-AC-1.6` and `OBS-AC-1.7` ([question log](../../concepts/observability.qa-log.md), Q2–Q7). The file name keeps the story's original title, which names the technology chosen in `STACK.md`.
 
 ## User story
 
 | ID | Title | As a | I want | so that | Priority |
 | --- | --- | --- | --- | --- | --- |
-| OBS-US-1 | OpenTelemetry instrumentation | operator | all services to deliver metrics, logs, and traces | the runtime behaviour can be followed at any time | Must |
+| OBS-US-1 | OpenTelemetry instrumentation | operator | every unit to deliver metrics, log entries, and traces to one observability stack | the runtime behaviour can be followed at any time | Must |
 
 ## Acceptance criteria
 
 | ID | Title | Given | When | Then |
 | --- | --- | --- | --- | --- |
-| OBS-AC-1.1 | Instrumented services | The running stack | Web, storage API, and worker run | Each is instrumented with OpenTelemetry |
-| OBS-AC-1.2 | Collector routing | The OpenTelemetry Collector | It receives telemetry | It forwards metrics to Prometheus, logs to Loki, and traces to Tempo |
-| OBS-AC-1.3 | Connected trace | A request from the frontend | It passes the API and a worker job | It is visible as one connected trace |
-| OBS-AC-1.4 | Structured logs | A service | It writes a log entry | The entry is structured JSON with the trace ID and holds no password or token |
-| OBS-AC-1.5 | Optional stack | The Docker Compose file | An operator starts it with the observability profile | The observability stack starts with it |
+| OBS-AC-1.1 | Instrumented units | The local stack started with the observability profile | Each of the five units `web`, `identity`, `storage`, `worker`, `cms` has run for 60 seconds | The metric store holds the heartbeat metric of each unit, and the log store holds the start log entry of each unit, each with the unit's name |
+| OBS-AC-1.2 | Collector routing | The collector of the observability stack | A unit sends it metrics, log entries, and traces | Within 60 seconds the metrics are in the metric store, the log entries in the log store, and the traces in the trace store |
+| OBS-AC-1.3 | Connected trace | A request to `web` that calls `storage`, which queues a job for `worker` | The job has finished | The trace store holds one trace with the spans of `web`, `storage`, and the `worker` job under one trace ID |
+| OBS-AC-1.4 | Structured logs | A unit | It writes a log entry whose attributes hold a password and a session token | The entry is one JSON object with time, level, unit, message, and trace ID, and the values of the password and the token are replaced by `[redacted]` |
+| OBS-AC-1.5 | Optional stack | The stack definition | An operator starts it with the observability profile | The collector, the metric store, the log store, the trace store, and the dashboard tool start and report healthy |
+| OBS-AC-1.6 | No person identifiers | A request from IP address `203.0.113.7` to a share link, whose handling writes an error message containing `ada@example.org` | The unit records the request | No metric, log entry, or trace holds the IP address, the e-mail address, a member ID, the share-link token, or the query string |
+| OBS-AC-1.7 | Units without the stack | The local stack started without the observability profile | Every unit runs and answers requests | No unit is `down` or `degraded` because of telemetry, and every unit still writes its log entries as JSON lines to its standard output |
 
 ## Slices
 
-The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it. A story of this weight needs more than one slice of at most 4 h (`WORKFLOW.md`, "Issues and weight"); its owner cuts them in the concept document.
+The vertical slices that deliver this story (concept §16, Q30). Slice 1 is delivered by the story issue itself; every further slice becomes a child issue of it with `/engineering-human tickets observability`. Slices 3–6 change units of other tracks and are built by those tracks' owners.
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
-| 1 — whole story | OBS-AC-1.1, OBS-AC-1.2, OBS-AC-1.3, OBS-AC-1.4, OBS-AC-1.5 | — | #82 |
+| 1 — observability stack in the local stack (`trutscf1`) | OBS-AC-1.2, OBS-AC-1.5 | — | #82 |
+| 2 — shared package `telemetry` (`trutscf1`) | OBS-AC-1.4, OBS-AC-1.6, OBS-AC-1.7 | — | — |
+| 3 — `cms` instrumented (`trutscf1`) | OBS-AC-1.1 | slices 1, 2 | — |
+| 4 — `web` instrumented (`schwaigc`) | OBS-AC-1.1 | slices 1, 2 | — |
+| 5 — `identity` instrumented (`tschudea07`) | OBS-AC-1.1 | slices 1, 2 | — |
+| 6 — `storage` and `worker` instrumented, trace through the job (`schauby1`) | OBS-AC-1.1, OBS-AC-1.3 | slices 1, 2; a job queued by `storage` (R5, R9) | — |
 
 - **Story issue:** #82
-- **Weight:** 5
+- **Weight:** 8 (six slices; the weight 5 of 2026-10-06 is raised at `tickets`)
 - **Depends on:** SCF-US-2 (Local development environment with Docker Compose, #39)

@@ -12,11 +12,12 @@ The parent work item of this feature: its user stories in the order they are bui
 
 - **Concept document:** [`concepts/observability.md`](../../concepts/observability.md) — feature goal in §1
 - **Feature issue:** #88 (an issue labelled `type::feature`; to be promoted to a group epic, see `WORKFLOW.md`, "Mode")
+- **Concept issue:** #114
 - **Roadmap:** R2, owner trutscf1
 
 ## User stories
 
 In dependency order; each file holds the story, its acceptance criteria, and its slices.
 
-1. [OBS-US-1 OpenTelemetry instrumentation](OBS-US-1-opentelemetry-instrumentation.md)
-2. [OBS-US-2 Grafana dashboards and alerts](OBS-US-2-grafana-dashboards-and-alerts.md)
+1. [OBS-US-1 OpenTelemetry instrumentation](OBS-US-1-opentelemetry-instrumentation.md) — every unit delivers metrics, log entries, and traces, without data that identifies a person
+2. [OBS-US-2 Grafana dashboards and alerts](OBS-US-2-grafana-dashboards-and-alerts.md) — operations dashboards and four alert rules behind a login
