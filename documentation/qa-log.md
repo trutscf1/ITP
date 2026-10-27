@@ -545,3 +545,37 @@ The review of !18 by `schwaigc` (findings 1 to 7) was worked in on `concept/publ
 ➡️ This MR changes neither `next` nor an image; a red `dependency-audit` or `container-scan` caused only by `dev` is accepted for now and named in the MR description (instruction of the main session of 2026-10-27)
 
 > **Answer:** In diesem MR nichts ändern (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+## Round 22 — 2026-10-27 — delivery (`trutscf1`, agent: regeneration probe #127)
+
+Regeneration probe of sprint 1 (ADR-0005, `WORKFLOW.md` "Sprint cycle", step 5) for the contracts package of SCF-US-3, on the base `feature/40-shared-contracts` at `efa98916f`. The package was deleted and rebuilt from `concepts/scaffolding.md`, `STACK.md`, the track plans, the story file, and `tests/` only, then compared with the original. Every question below was decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions), each with the recommended option.
+
+❓ **Q155** - **Keep `package.json` and `tsconfig.json` of the package?** `STACK.md` §2 and the tests fix the name, the pinned versions, and the scripts `openapi:generate` and `build`, but not the exports, the module type, or the compiler options. Options: Delete and regenerate them too (Recommended) / Keep them
+
+➡️ Deleted and regenerated; the lockfile stayed unchanged, so the dependencies equal the original's. The manifest differs only in the order of its scripts, `tsconfig.json` only in an option without effect on the output (`erasableSyntaxOnly` instead of `allowImportingTsExtensions`); no gap
+
+> **Answer:** Delete and regenerate them too (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q156** - **Configuration helper in this probe?** Concept §16 counts the configuration helper to the contracts core, the story SCF-US-3 does not name it, and the traceability matrix puts SCF-F-11 under SCF-US-2. Options: Leave it out, as the story's scope, and state the scope in the story file (Recommended) / Build it as well
+
+➡️ Left out; the original holds no helper either. The story file now states the scope of the package in SCF-US-3
+
+> **Answer:** Leave it out and state the scope (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q157** - **Where do the export names and the content of the generated description go?** Options: `STACK.md` §2, next to `errorReplies` and `toErrorResponse` that stand there already (Recommended) / A new section in concept §16
+
+➡️ `STACK.md` §2: the list of exports and the content of the description (version, title, path, responses, components, examples); concept §8 gets "non-empty" for `name`, `version`, and `message`
+
+> **Answer:** `STACK.md` §2 (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q158** - **`@nimbus/contracts` in SCF-AC-3.1**: The criterion names a package the test does not accept; the correction was listed in `scaffolding.track-web.md` but never made. Options: Correct the story file and the copy in issue #40 (Recommended) / Leave it to the list of the Web track
+
+➡️ Story file corrected to `@stash/contracts`, the note in `STACK.md` §2 removed, the copy in #40 updated; the entry in the list of `scaffolding.track-web.md` (owner `schwaigc`) and `DSA-AC-1.1` (`@nimbus/ui`) stay for their owners
+
+> **Answer:** Correct the story file and the copy in #40 (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q159** - **Where do the fixes go?** Options: Branch `docs/127-regeneration-probe-contracts` from `feature/40-shared-contracts`, MR into that branch, reviewer `schwaigc`; the regenerated code is discarded (Recommended) / Push to `feature/40-shared-contracts` directly
+
+➡️ Own branch and MR into `feature/40-shared-contracts` (instruction of the main session); only documents are committed
+
+> **Answer:** Own branch and MR (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
