@@ -143,7 +143,8 @@ services:
       retries: 5
       start_period: 5s
 
-  # The `web` unit (Next.js), built from the repository.
+  # The `web` unit (Next.js). docker/web.Dockerfile is a temporary stop-gap; M9 of the track plan
+  # Web (documentation/concepts/scaffolding.track-web.md) replaces it with apps/web/Dockerfile.
   web:
     build:
       context: .
@@ -165,6 +166,8 @@ services:
       - frontend
       - backend
     healthcheck:
+      # `/` until `web` has `/health`: `/` becomes a redirect with R11 (public content), and M9
+      # moves this check to `/health`.
       test: ["CMD-SHELL", "wget -qO /dev/null http://127.0.0.1:$${PORT}/"]
       interval: 10s
       timeout: 5s

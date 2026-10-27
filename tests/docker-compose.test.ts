@@ -89,6 +89,12 @@ describe("SCF-AC-2.1 One start command (slice 1: data services, reverse proxy, w
     assert.ok(existsSync(join(root, "docker", "web.Dockerfile")));
   });
 
+  it("SCF-AC-2.1 marks the Dockerfile of web as a stop-gap that M9 of the track plan Web replaces", () => {
+    const dockerfile = readText("docker/web.Dockerfile");
+    assert.match(dockerfile, /TEMPORARY STOP-GAP/);
+    assert.match(dockerfile, /replaced by M9/);
+  });
+
   it("SCF-AC-2.1 routes the single origin to web through the reverse proxy", () => {
     const caddyfile = readText("docker/Caddyfile");
     assert.match(caddyfile, /reverse_proxy\s+web:/);
@@ -173,6 +179,20 @@ describe("SCF-AC-2.4 Health checks", () => {
       }
     }
     assert.deepEqual(weak, []);
+  });
+});
+
+describe("SCF-AC-2.5 Clean images", () => {
+  const services = readCompose().services;
+
+  it("SCF-AC-2.5 pins every image to a minor version, PostgreSQL to the major version of the school requirements", () => {
+    const loose: string[] = [];
+    for (const [name, service] of Object.entries(services)) {
+      if (!service.image || service.image === "postgres:18-alpine") continue;
+      const tag = service.image.split(":")[1] ?? "";
+      if (!/^v?\d+\.\d+/.test(tag)) loose.push(`${name}: ${service.image}`);
+    }
+    assert.deepEqual(loose, []);
   });
 });
 
