@@ -22,6 +22,8 @@ Session positions of one developer (P-TEAM-3). Precise enough that a fresh sessi
 
 Sprint 1 (until 2026-10-26), GitLab issues: #78, #81 (shared: #38, #39, #40, #85).
 
+Tooling (state after the merge of `feature/138-doc-check-ac-test`): #138 done — `tools/doc-check.mjs` rule `AC-TEST` checks that every acceptance criterion has a test name carrying its ID (`MANIFEST.md`, "What the script checks"). Open: drop "once built; until then the reviewer checks it by hand" from Definition of Done item 16 once both this MR and !15 are on `dev` (`qa-log.md` Q144).
+
 ## Project-wide notes
 
 Carried over from `ROADMAP-DETAILS.md` at the switch to team mode on 2026-10-06; this developer does the project controlling.
