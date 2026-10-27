@@ -661,3 +661,49 @@ Open MRs: !5, !7, !9 of `schwaigc` (none approved; !7 and !9 in conflict with `d
 ➡️ !19 10m, !20 20m — booked on the MRs
 
 > **Answer:** !19 10m, !20 20m (Recommended)
+
+## Round 26 — 2026-10-27 — delivery (`schwaigc`, second review round of the day)
+
+New since round 25: !21, !23, !24 of `trutscf1` with `schwaigc` as reviewer; revisions of !17 and !20; !19 in conflict with `dev`. Numbers Q152 to Q158 continue behind Q151 of !24 (provisional, P-TEAM-5).
+
+❓ **Q152** - **!24 Security-Fix**: Next.js 16.4.2 und gosu-CVE in `.trivyignore`; Pipeline komplett grün, lokal alles sauber. Review posten? Options: Kommentar + Approve / Nur Kommentar / Nichts tun
+
+➡️ Kommentar + Approve — review posted on !24 and approved; not merged
+
+> **Answer:** Kommentar + Approve (Recommended)
+
+❓ **Q153** - **!20**: Seit dem Approve nur `dev` hineingemergt, Approve dadurch weg. Erneut approven? Options: Re-Approve + kurzer Kommentar / Nichts tun
+
+➡️ Re-Approve + kurzer Kommentar — posted and approved; a note on !19 asks `trutscf1` to merge `dev` (conflict in `ROADMAP-DETAILS.md`)
+
+> **Answer:** Re-Approve + kurzer Kommentar (Recommended)
+
+❓ **Q154** - **!17**: Revision mit grünem `test`-Job; `trutscf1` bittet um einen echten `docker compose up`. Wie vorgehen? Options: Voll re-reviewen inkl. Docker / Re-Review ohne Docker / Später
+
+➡️ Re-Review ohne Docker
+
+> **Answer:** Re-Review ohne Docker
+
+❓ **Q155** - **Neue MRs**: !21 (Milestone-Plan), !23 (Shared Contracts), !19 (Konflikt). Welche jetzt? Options (multi): !23 reviewen / !21 reviewen / !19 Hinweis auf Konflikt
+
+➡️ all three
+
+> **Answer:** !23 reviewen, !21 reviewen, !19 Hinweis auf Konflikt
+
+❓ **Q156** - **!17 Re-Review**: Blocker behoben, 179/179 Tests, eine lange Kommentarzeile im Dockerfile offen (low). Posten? Options: Kommentar + Approve / Nur Kommentar / Nicht posten
+
+➡️ Kommentar + Approve — posted and approved; SCF-T-8 stays open on #103
+
+> **Answer:** Kommentar + Approve (Recommended)
+
+❓ **Q157** - **!23 Shared Contracts**: alle Checks grün; should-fix: geteilte `errorReplies`-Bodies sind veränderbar. Posten? Options: Kommentar + Approve / Changes requested / Nicht posten
+
+➡️ Kommentar + Approve — posted and approved, the freeze point as not blocking
+
+> **Answer:** Kommentar + Approve (Recommended)
+
+❓ **Q158** - **!21 Milestone-Plan**: Sprint-2-Zeile und `team/schwaigc/STATUS.md` nennen #109, #2, #112 in Sprint 2, GitLab hat Sprint 3/3/5; R5-Konzept fälschlich `schwaigc`. Wie reviewen? Options: Changes requested / Kommentar + Approve / Nicht posten
+
+➡️ Changes requested — posted, not approved; GitLab milestones are the reference
+
+> **Answer:** Changes requested (Recommended)
