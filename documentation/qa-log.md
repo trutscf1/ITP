@@ -489,3 +489,19 @@ The job `commit-messages` failed on !14 (body line over 100 characters in `45963
 ➡️ Reviewer anschreiben — reminders posted on !7 (`tschudea07`: !5, !7, !9, merge order) and !14 (`trutscf1`: re-review of !14, revision of !18)
 
 > **Answer:** Reviewer anschreiben
+
+## Round — 2026-10-27 — delivery (`trutscf1`, agent, security fix for the pipeline of every MR)
+
+The pipeline of !19 (2026-10-27) failed in `dependency-audit` (Next.js 16.3.8: GHSA-2464-fhr4-w9xw and GHSA-673q-mjm6-r5xr critical, GHSA-p3m5-59mp-jv5r high, fixed in 16.4.1) and in `container-scan` (CVE-2026-111943 high in `usr/local/bin/gosu` of `postgres:18`, Go standard library 1.24.6). Both fail on `dev` itself, so they block every MR.
+
+❓ **Q150** - **Next.js-Version**: 16.4.3 (2026-10-23) ist die neueste, aber jünger als `minimumReleaseAge` (7 Tage) und bräuchte einen Eintrag in `minimumReleaseAgeExclude`; 16.4.2 (2026-10-15) ist gepatcht und hält die Regel ein. Welche Version? Options: 16.4.2 ohne Ausnahme / 16.4.3 mit Ausnahme
+
+➡️ 16.4.2 ohne Ausnahme — the GitHub advisory database lists no advisory affecting 16.4.2, so 16.4.3 adds no security fix that would justify an exception to the supply-chain rule (SCF-NF-6, Q30). Decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions).
+
+> **Answer:** 16.4.2 ohne Ausnahme (Recommended)
+
+❓ **Q151** - **gosu in postgres:18 und mongo:8.0**: Kein offizielles Image enthält schon gosu 1.20 (2026-10-25); alle Varianten von postgres 18 (trixie, bookworm, alpine3.23, alpine3.24) und mongo 8.0 laden gosu 1.19. Wie umgehen? Options: Ausnahme in .trivyignore bis 2026-11-23 / Eigenes Image mit gosu 1.20 bauen
+
+➡️ Ausnahme in .trivyignore bis 2026-11-23 — no newer clean tag of either image exists (checked in the Dockerfiles of `docker-library/postgres` and `docker-library/mongo` on 2026-10-27), and replacing the images is SCF-US-2 slice 2 (#103). Reason and expiry as the file demands (SCF-AC-5.3). Decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions).
+
+> **Answer:** Ausnahme in .trivyignore bis 2026-11-23 (Recommended)
