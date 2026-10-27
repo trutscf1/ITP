@@ -11,6 +11,7 @@ New tasks and ideas for this developer land here first, before anyone plans them
 
 ## Open
 
+- [2026-10-27] From `trutscf1`, concept *Observability baseline* (R2, `concepts/observability.md` §15 and §16, MR of #114, you are its reviewer): `identity` includes `TelemetryConfig` in its configuration contract, calls `startTelemetry` and writes the start log entry before it accepts requests (OBS-F-1, OBS-F-25) — slice 5 of OBS-US-1, an issue for you after `tickets`. Log attributes holding passwords, tokens, or TOTP codes are redacted by key (OBS-F-14); nothing about a person goes into telemetry (OBS-NF-2).
 - [2026-10-06] Add `Developer handle: tschudea07` to your own gitignored `CLAUDE.local.md` and read `team/TEAM.md`.
 - [2026-10-06] Review the drafts that concern your features: the roles and success signals in `GOAL.md`, the *Serves* column in `ROADMAP.md`, and the concept drafts and work items of your features.
 - [2026-10-06] From `trutscf1`, *Public content* (R11): when you grill `concepts/identity.md`, specify the notice text the provider of the bot protection prescribes (German and English) and the configuration value that hides its badge; the web client places that notice (`concepts/public-content.md` §15, PUB-F-23). Two more points for your concepts: the landing page treats a person as not signed in when the session check does not answer (PUB-F-33), and a feature that stores a new kind of personal data adds its paragraph to the privacy template (`concepts/public-content.md` §14).

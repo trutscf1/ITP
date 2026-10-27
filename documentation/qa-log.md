@@ -489,3 +489,15 @@ The job `commit-messages` failed on !14 (body line over 100 characters in `45963
 ➡️ Reviewer anschreiben — reminders posted on !7 (`tschudea07`: !5, !7, !9, merge order) and !14 (`trutscf1`: re-review of !14, revision of !18)
 
 > **Answer:** Reviewer anschreiben
+
+## Round 20 — 2026-10-27 — delivery (`trutscf1`, agent: open the Phase 4 review gate of R2, #114)
+
+Concept work of *Observability baseline* (R2) is logged in `concepts/observability.qa-log.md` (Q1–Q34). Assumption stated with the round, not rejected:
+
+- **A1**: Phases 1–6 are complete in the branch, so the merge request says `Closes #114`; cutting the issues (`tickets`) follows after the merge.
+
+❓ **Q130** - **Publish the review gate**: Shall I push `concept/observability` and open the merge request to `dev` with assignee `trutscf1` and reviewer `tschudea07`, who signs off the Phase 4 gate in place of the PM approver `trutscf1`, the author (P-MR-2)? Options: Push and open the MR / Push only / Commit locally only
+
+➡️ Push and open the MR — merge request `concept/observability` → `dev`, not merged by the agent
+
+> **Answer:** Push and open the MR (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions); to be confirmed by trutscf1 in the MR
