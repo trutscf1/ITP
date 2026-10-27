@@ -524,41 +524,41 @@ Planning of the sprints and milestones on the dates set by the team: Sprint 1 20
 
 > **Answer:** Nur Begonnenes + R1-Kern (Recommended); the user's remark before: "heute werden niemals die restlichen 25 issues fertig". Moved to Sprint 2: #56, #105, #78, #81, #107, #109, #112, #2, #3, #116, #117.
 
-## Round 15 — 2026-10-20 — grill of the Sprint 1 issues of `trutscf1`
+## Round 21 — 2026-10-20 — grill of the Sprint 1 issues of `trutscf1`
 
 Issues #108 (concept Public content), #111 (concept R1), #39/#103, #40, #126, #147. Assumptions: A24 entry point is the open review findings, not a new concept; A25 `tests/` belongs to the Platform track (`trutscf1`), a unit's compose service name equals the unit name, and `@nimbus/*` in `SCF-AC-3.1` and `DSA-AC-1.1` becomes `@stash/*`; A26 for `PUB-C-1` to `PUB-C-3` the proposal applies (Strapi, its built-in password handling and rich-text checks) and "Strapi" stays in the titles and acceptance criteria; A27 the assumptions A21–A28 of the Scaffolding concept and A37–A54 of the Public content concept are accepted as a block.
 
-❓ **Q60** - **Barrierefreiheit in der Pipeline**: Das Erfolgssignal G-1.S2 verlangt 0 Verstöße, die gemeinsame axe-Prüfung schlägt aber nur bei kritischen fehl. Was gilt für SCF-T-40 und die CI? Options: Kritisch jetzt, 0 bis Release (Recommended) / Sofort 0 Verstöße / G-1.S2 aufweichen
+❓ **Q72** - **Barrierefreiheit in der Pipeline**: Das Erfolgssignal G-1.S2 verlangt 0 Verstöße, die gemeinsame axe-Prüfung schlägt aber nur bei kritischen fehl. Was gilt für SCF-T-40 und die CI? Options: Kritisch jetzt, 0 bis Release (Recommended) / Sofort 0 Verstöße / G-1.S2 aufweichen
 
 ➡️ Kritisch jetzt, 0 bis Release (Recommended)
 
 > **Answer:** Kritisch jetzt, 0 bis Release (Recommended)
 
-❓ **Q61** - **AC-2.1 und die fehlenden Units**: identity, storage, worker, cms haben noch keinen Code. Wie wird SCF-AC-2.1 erfüllt? Options: Pro Unit in deren Story (Recommended) / Eigene Slice 3 mit Platzhaltern / AC-2.1 abschwächen
+❓ **Q73** - **AC-2.1 und die fehlenden Units**: identity, storage, worker, cms haben noch keinen Code. Wie wird SCF-AC-2.1 erfüllt? Options: Pro Unit in deren Story (Recommended) / Eigene Slice 3 mit Platzhaltern / AC-2.1 abschwächen
 
 ➡️ Pro Unit in deren Story (Recommended)
 
 > **Answer:** Pro Unit in deren Story (Recommended)
 
-❓ **Q62** - **Sprint 2 überlastet**: Plan 70 gegen 44 Punkte, alle vier Mitglieder drüber. Was passiert mit Sprint 2? Options: Verschieben statt streichen (Recommended) / Streichreihenfolge jetzt anwenden / Erst im Sprint-Planning am 03.11.
+❓ **Q74** - **Sprint 2 überlastet**: Plan 70 gegen 44 Punkte, alle vier Mitglieder drüber. Was passiert mit Sprint 2? Options: Verschieben statt streichen (Recommended) / Streichreihenfolge jetzt anwenden / Erst im Sprint-Planning am 03.11.
 
 ➡️ Verschieben statt streichen (Recommended)
 
 > **Answer:** Verschieben statt streichen (Recommended)
 
-❓ **Q63** - **Reihenfolge der nächsten Schritte**: Was soll die Stunde nach den Antworten zuerst liefern? Options: Tickets für Public Content (Recommended) / Zuerst Review von !16 und !17 / Zuerst Sprint-Plan fixen
+❓ **Q75** - **Reihenfolge der nächsten Schritte**: Was soll die Stunde nach den Antworten zuerst liefern? Options: Tickets für Public Content (Recommended) / Zuerst Review von !16 und !17 / Zuerst Sprint-Plan fixen
 
 ➡️ Tickets für Public Content (Recommended)
 
 > **Answer:** Tickets für Public Content (Recommended)
 
-❓ **Q64** - **Ticketbaum Public Content (R11)**: Passen Granularität, Gewichte, Abhängigkeiten und Meilensteine des Entwurfs (Feature #97; PUB-US-1 in drei Slices Sprint 3, PUB-US-4 Sprint 3, PUB-US-2 und -3 Sprint 4, PUB-US-5 Sprint 6)? Options: Musts zuerst (Recommended) / Alles in Sprint 2/3 / Baum ja, Meilensteine später
+❓ **Q76** - **Ticketbaum Public Content (R11)**: Passen Granularität, Gewichte, Abhängigkeiten und Meilensteine des Entwurfs (Feature #97; PUB-US-1 in drei Slices Sprint 3, PUB-US-4 Sprint 3, PUB-US-2 und -3 Sprint 4, PUB-US-5 Sprint 6)? Options: Musts zuerst (Recommended) / Alles in Sprint 2/3 / Baum ja, Meilensteine später
 
 ➡️ Musts zuerst (Recommended)
 
 > **Answer:** Musts zuerst (Recommended)
 
-❓ **Q65** - **Gate**: Die Phasen 5/6 sind nur auf concept/public-content. Wie weiter, bevor Issues entstehen? Options: MR öffnen, danach Issues (Recommended) / Issues sofort, MR parallel / Erst Konzept nochmal prüfen
+❓ **Q77** - **Gate**: Die Phasen 5/6 sind nur auf concept/public-content. Wie weiter, bevor Issues entstehen? Options: MR öffnen, danach Issues (Recommended) / Issues sofort, MR parallel / Erst Konzept nochmal prüfen
 
 ➡️ MR öffnen, danach Issues (Recommended)
 
