@@ -275,7 +275,7 @@ A help context names a place in the web client, not an article: it is declared i
 | Ordered list | consecutive lines that start with a number, a full stop, and a space (`1.`, `2.`, and so on) | one numbered list, one item per line |
 | Link | `[text](address)` where the address starts with `http://`, `https://`, `mailto:`, or `/` | a link; with any other start the whole sequence is plain text |
 
-**Configuration.** Every value comes from the environment (P-DES-6, [SCF-NF-8]); a missing required value or one outside its range stops the unit as [SCF-E-1] (invalid configuration) of [scaffolding.md](scaffolding.md), naming the variable and the reason and never the value. The names are those of the example configuration ([SCF-F-17]).
+**Configuration.** Every value comes from the environment (P-DES-6, [SCF-NF-8]); a missing required value or one outside its range stops the unit as [SCF-E-1] (invalid configuration) of [scaffolding.md](scaffolding.md), naming the variable and the reason and never the value. The names are those of the example configuration ([SCF-F-17]). The `web` values extend the one configuration shape of `web`, `WebConfig` of the track plan Web ([scaffolding.track-web.md](scaffolding.track-web.md), M1; [SCF-F-9]), and are validated with it at the start (M7); the `cms` value extends the configuration shape of `cms` (module `web-config`, §16).
 
 | Name | Used by | Type | Default | Valid range | Boundary behavior |
 | --- | --- | --- | --- | --- | --- |
@@ -535,6 +535,7 @@ The existing parts of the system this feature touches, checked on 2026-10-06 (Ph
 | Member session ([identity.md](identity.md)) | `web` asks whether a visitor is a signed-in member ([PUB-F-12]). | Identity is built later and can be down; the landing page must still open. A person without a session gets no cookie ([PUB-NF-3]), so the language is carried by the address, never by a cookie. | [PUB-F-33], [PUB-F-27] |
 | Bot protection ([IDN-F-5], captcha) | `web` places the notice the provider prescribes ([PUB-F-23]). | The Identity concept does not hold the notice text or a setting for the hidden badge yet. | Change to `identity.md` (§15) |
 | Personal data of other features | The privacy template names every kind of personal data and every outside service ([PUB-F-22]). | The list goes stale when a feature stores a new kind of personal data, for example the IP address in the audit log ([TPM-AC-4.2]). | [PUB-F-22] extended; a feature that adds a kind of personal data adds its paragraph to the legal template in the same MR |
+| Configuration of `web` (`WebConfig`, M1 and M7 of [scaffolding.track-web.md](scaffolding.track-web.md)) | §8 adds nine `web` values: refresh, timeouts, access token, addresses, and paths. | [SCF-F-9] allows one configuration shape per unit; a second shape in `content-contracts` would be validated in a second place, after the start check of M7. | The nine values extend `WebConfig` in the contracts folder `web` (module `web-config`, §16) and are validated by `loadWebConfig` at the start; the token of `cms` extends the shape of `cms` |
 | Shared contracts ([SCF-F-9]) | Help contexts are declared there by the feature that places a help link (§8). | None: this feature declares no help context, and an undeclared one leads to the help center ([PUB-E-6]). | — |
 | `CHANGELOG.md` and the release steps (`WORKFLOW.md`, "Releases") | The public changelog is written by hand (Q2), next to the generated developer changelog ([SCF-F-16]). | Nothing reminds the team to write the public entry at a release. | Release step (§15, Q19) |
 | Scaffold on `dev` (`next/`, `docker-compose.yml`) | The application shows a placeholder page at `/`; the local stack has one relational database and no `cms` service. | The placeholder occupies the address of the landing page and links to hosts on the internet ([PUB-NF-2]). The content store must not share its data with another unit ([PUB-F-1]). | The placeholder is replaced with [PUB-US-2] (public landing page); the `cms` service and its content store are added with [PUB-US-1] (set up the headless CMS) |
@@ -573,7 +574,8 @@ apps/web                    unit web
 ├── page-resolution         content group + route + language to a page, a redirect, or an error page
 └── page-frame              footer, language switch, meta tags, notices, layout, no tracking
 packages/contracts          shared by both units
-└── content-contracts       shapes of the content interface, legal templates, fixed texts, configuration shapes
+├── content-contracts       contracts folder cms: shapes of the content interface, legal templates, fixed texts
+└── web-config              contracts folder web: the web values of §8 as an extension of WebConfig
 README.md                   setup-guide: the registration step of the quick start
 ```
 
@@ -585,7 +587,7 @@ The slices and their issues stand in the story files (P-DOC-6); this table says 
 | --- | --- | --- | --- | --- |
 | PUB-US-1 | 1 — CMS runs with its content types | 3 | `content-contracts` (shapes, legal templates), `content-model`, `content-seed`, `cms-health` (check `content-store`) | the start command of the local stack: the `cms` container reports `ok` and holds the seed content |
 | PUB-US-1 | 2 — Editor roles and first administrator | 2 | `editor-accounts`, `content-interface`, `cms-health` (check `administrator-account`), `setup-guide` | the status data of `cms` is `degraded` with `administrator-account` until the first registration; content requests without the token are refused |
-| PUB-US-1 | 3 — Delivery by `web` | 3 | `content-client`, `address-routing`, `rich-text`, `page-resolution` (legal pages, unavailable page), `page-frame` (frame, meta tags, no tracking), fixed texts | a legal page at `/de/legal/privacy` shows the published text, changes after 60 s, and survives a stopped `cms` with its images |
+| PUB-US-1 | 3 — Delivery by `web` | 3 | `web-config`, `content-client`, `address-routing`, `rich-text`, `page-resolution` (legal pages, unavailable page), `page-frame` (frame, meta tags, no tracking), fixed texts | a legal page at `/de/legal/privacy` shows the published text, changes after 60 s, and survives a stopped `cms` with its images |
 | PUB-US-2 | 1 — whole story | 3 | `page-resolution` (landing page), `address-routing` (signed-in redirect), `page-frame` (layout, accessibility check) | `/de` shows the landing page; a signed-in member lands on the dashboard |
 | PUB-US-3 | 1 — whole story | 3 | `page-resolution` (help center, search, contextual help, changelog) | the help center with search, an article, a help context link, and the changelog |
 | PUB-US-4 | 1 — whole story | 3 | `page-frame` (footer, notice slot), `content-contracts` (completed legal templates), `page-resolution` (built-in legal text) | the three legal pages from the footer, also with a never-reached `cms` |
@@ -633,7 +635,25 @@ legalTemplate(kind: LegalKind, language: Language) -> string   // template notic
 fixedText(key: string, language: Language) -> string           // the fixed texts of §8
 ```
 
-Traces to: [PUB-F-22], [PUB-F-26], [PUB-F-25]. Requires: the shared contracts package of [SCF-F-9].
+Traces to: [PUB-F-22], [PUB-F-26], [PUB-F-25]. Requires: the shared contracts package of [SCF-F-9]; it lives in the contracts folder `cms`, because `cms` provides the content interface (one folder per unit, owned by the unit's owner, [scaffolding.md](scaffolding.md) §16).
+
+**`web-config`** (contracts folder `web`)
+
+```text
+WebConfig += {                         // extends WebConfig of M1 of the track plan Web; one shape per unit (SCF-F-9)
+  CONTENT_REFRESH_SECONDS, CONTENT_TIMEOUT_MS, CONTENT_ACCESS_TOKEN, CMS_INTERNAL_URL, PUBLIC_BASE_URL,
+  SESSION_CHECK_TIMEOUT_MS, DASHBOARD_PATH, REGISTRATION_PATH, LOGIN_PATH   // types, defaults, ranges: §8
+}
+
+rules:
+  1. loadWebConfig (M1) validates these values together with those of the track plan, in one place; the start
+     command (M7) prints every problem and exits before Next.js starts (SCF-E-1, §10 example 11).
+  2. A problem names the variable and the reason, never the value; a secret is never printed (CONTENT_ACCESS_TOKEN).
+  3. cms reads CONTENT_ACCESS_TOKEN through the configuration shape of cms (contracts folder cms) with the same
+     range; no second configuration shape of web exists.
+```
+
+Traces to: [PUB-F-4], [PUB-F-6], [PUB-F-12], [PUB-F-33], [PUB-E-1]. Requires: `WebConfig`, `loadWebConfig` (M1), and the start command (M7) of [scaffolding.track-web.md](scaffolding.track-web.md).
 
 **`content-model`** (unit `cms`)
 
@@ -978,6 +998,7 @@ Handling of one page request in `web`, in order:
 | Account operations | `editor-accounts` | admin panel, `content-model` | `registerFirstAdministrator`, `createEditor`, `deleteEditor`, `changeOwn`, `signIn`, `canDo`, `hasAdministrator` | [PUB-E-9], [PUB-E-10], [PUB-E-12] |
 | Health endpoint | `cms-health` | status page, proxy, container health check | `GET /health` → HealthReport | [SCF-E-2] |
 | Seed | `content-seed` | start of `cms` | `seedIfEmpty()` | none |
+| Web configuration | `web-config` (through `loadWebConfig`, M1 of the track plan Web) | start command of `web` (M7), every `web` module | environment → `WebConfig` or a list of ConfigProblem | [SCF-E-1] |
 | Contracts | `content-contracts` | `cms` units and `web` | records, `legalTemplate`, `fixedText` | none |
 
 ### State Machine Diagram
@@ -1050,7 +1071,7 @@ The seams at which tests run (P-DES-2); everything behind a seam is exercised th
 
 | Story | Acceptance criteria | Requirements | Modules | Tests |
 | --- | --- | --- | --- | --- |
-| PUB-US-1 | PUB-AC-1.1 to PUB-AC-1.7 | PUB-F-1 to PUB-F-10, PUB-F-31, PUB-F-32, PUB-F-34, PUB-F-37; PUB-NF-4 to PUB-NF-8; PUB-E-1, PUB-E-2, PUB-E-7, PUB-E-9 to PUB-E-12; PUB-C-1, PUB-C-2 | `content-model`, `editor-accounts`, `content-interface`, `content-seed`, `cms-health`, `content-client`, `content-contracts`, `setup-guide` | PUB-T-1 to PUB-T-7, PUB-T-28, PUB-T-29, PUB-T-32, PUB-T-34, PUB-T-35 |
+| PUB-US-1 | PUB-AC-1.1 to PUB-AC-1.7 | PUB-F-1 to PUB-F-10, PUB-F-31, PUB-F-32, PUB-F-34, PUB-F-37; PUB-NF-4 to PUB-NF-8; PUB-E-1, PUB-E-2, PUB-E-7, PUB-E-9 to PUB-E-12; PUB-C-1, PUB-C-2 | `content-model`, `editor-accounts`, `content-interface`, `content-seed`, `cms-health`, `content-client`, `content-contracts`, `web-config`, `setup-guide` | PUB-T-1 to PUB-T-7, PUB-T-28, PUB-T-29, PUB-T-32, PUB-T-34, PUB-T-35 |
 | PUB-US-2 | PUB-AC-2.1 to PUB-AC-2.6 | PUB-F-11 to PUB-F-15, PUB-F-33, PUB-F-35, PUB-F-36; PUB-U-1; PUB-NF-1 to PUB-NF-3; PUB-E-4, PUB-E-8; PUB-C-3, PUB-C-4 | `page-resolution`, `address-routing`, `page-frame`, `rich-text`, `content-model` | PUB-T-8 to PUB-T-13, PUB-T-31, PUB-T-33 |
 | PUB-US-3 | PUB-AC-3.1 to PUB-AC-3.4 | PUB-F-16 to PUB-F-20; PUB-U-3; PUB-E-6 | `page-resolution`, `content-model` | PUB-T-14 to PUB-T-17, PUB-T-33 |
 | PUB-US-4 | PUB-AC-4.1 to PUB-AC-4.6 | PUB-F-21 to PUB-F-26; PUB-U-5; PUB-E-3 | `page-frame`, `page-resolution`, `content-contracts`, `content-seed` | PUB-T-18 to PUB-T-23, PUB-T-29 |
@@ -1068,7 +1089,8 @@ The seams at which tests run (P-DES-2); everything behind a seam is exercised th
 | `rich-text` | PUB-T-105 to PUB-T-112 |
 | `page-resolution` | PUB-T-113 to PUB-T-137 |
 | `page-frame` | PUB-T-138 to PUB-T-150, PUB-T-159, PUB-T-160 |
-| `content-contracts` | PUB-T-151 to PUB-T-157 |
+| `web-config` | PUB-T-151 to PUB-T-154 |
+| `content-contracts` | PUB-T-155 to PUB-T-157 |
 | `setup-guide` | PUB-T-7 (acceptance test, README read as data) |
 
 Every module traces to at least one requirement (the *Traces to* lines above), every requirement of §4 to §6 and §9 is named by at least one module, and every module has tests in §17. The per-requirement view is the *Covers* columns of §17.
@@ -1201,10 +1223,10 @@ Per module, in the order of §16; values come from the worked examples of §10. 
 | PUB-T-150 | `page-frame` | Images of a page | Each image address is `/media/<id>` on the own origin, with its alternative text in the language shown | PUB-F-32, PUB-NF-1 |
 | PUB-T-159 | `page-frame` | A stand-in page of another feature drawn with the session state `valid`, and the same page with `none` | With `valid` the header holds the theme switcher; with `none` it holds none; the frame sets no cookie in either case | PUB-NF-3 |
 | PUB-T-160 | `page-frame` | A stand-in status page at `/status` with page language `en` and no route, and the not-found page of the path `/unknown` | The status page has document language `en`, the footer links `/en/legal/imprint`, `/en/legal/terms`, `/en/legal/privacy` labelled "Imprint", "Terms", "Privacy policy", and no language switch; the not-found page has document language `de`, the German footer, and no language switch | PUB-F-21, PUB-U-2 |
-| PUB-T-151 | `content-contracts` | The configuration of §10, example 11 | The output of the example, a non-zero exit code, and neither value printed; `CONTENT_TIMEOUT_MS` falls back to 2000 | PUB-F-6 |
-| PUB-T-152 | `content-contracts` | `CONTENT_REFRESH_SECONDS` 1, 60, 0, 61 | 1 and 60 are accepted; 0 and 61 stop the unit | PUB-F-6 |
-| PUB-T-153 | `content-contracts` | `CONTENT_TIMEOUT_MS` 100, 30000, 99, 30001; `SESSION_CHECK_TIMEOUT_MS` 50, 5000, 49, 5001 | The first two of each are accepted; the last two of each stop the unit | PUB-E-1, PUB-F-33 |
-| PUB-T-154 | `content-contracts` | `CONTENT_ACCESS_TOKEN` of 32 characters, of 31 characters, and not set; `DASHBOARD_PATH` `/debug`, `/de/home`, `/fr/home`, `dashboard` | 32 and `/debug` accepted; the other five stop the unit | PUB-F-4, PUB-F-12 |
+| PUB-T-151 | `web-config` | The configuration of §10, example 11 | The output of the example, a non-zero exit code, and neither value printed; `CONTENT_TIMEOUT_MS` falls back to 2000 | PUB-F-6 |
+| PUB-T-152 | `web-config` | `CONTENT_REFRESH_SECONDS` 1, 60, 0, 61 | 1 and 60 are accepted; 0 and 61 stop the unit | PUB-F-6 |
+| PUB-T-153 | `web-config` | `CONTENT_TIMEOUT_MS` 100, 30000, 99, 30001; `SESSION_CHECK_TIMEOUT_MS` 50, 5000, 49, 5001 | The first two of each are accepted; the last two of each stop the unit | PUB-E-1, PUB-F-33 |
+| PUB-T-154 | `web-config` | `CONTENT_ACCESS_TOKEN` of 32 characters, of 31 characters, and not set; `DASHBOARD_PATH` `/debug`, `/de/home`, `/fr/home`, `dashboard` | 32 and `/debug` accepted; the other five stop the unit | PUB-F-4, PUB-F-12 |
 | PUB-T-155 | `content-contracts` | The legal templates of the three kinds in both languages | Each starts with the template notice, has the headings of the outline of §8 in order, and holds at least one `[[...]]` placeholder | PUB-F-26 |
 | PUB-T-156 | `content-contracts` | The privacy template | It has a paragraph under each of the 8 headings from "Mitgliedskonten" to "E-Mail-Versand", naming data and purpose | PUB-F-22 |
 | PUB-T-157 | `content-contracts` | Every fixed text of §8 | It exists in German and in English and is not empty | PUB-F-21, PUB-U-2 |
