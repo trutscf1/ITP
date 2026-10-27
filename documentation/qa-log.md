@@ -637,3 +637,27 @@ Open MRs: !5, !7, !9 of `schwaigc` (none approved; !7 and !9 in conflict with `d
 ➡️ Kommentar + Approve — !20 approved; `dev` must be merged in before the merge. The new rule gives no error on !5, !7, or !9
 
 > **Answer:** Kommentar + Approve (Recommended)
+
+❓ **Q86** - **Zeit #68 / !7**: Wie viel Zeit hast du heute für !7 gebraucht? Options: 30m / 15m / 45m / 1h
+
+➡️ 30m — booked on #68 by `schwaigc` (total 1h 20m)
+
+> **Answer:** 30m (Recommended)
+
+❓ **Q87** - **Zeit #106 / !9**: Wie viel Zeit hast du heute für !9 gebraucht? Options: 30m / 15m / 45m / 1h
+
+➡️ 15m — booked on #106 (total 1h 5m)
+
+> **Answer:** 15m
+
+❓ **Q88** - **Zeit Reviews !17 und !18**: Wie viel Zeit pro Review? Options: je 20m / je 10m / je 30m / !17 15m, !18 30m
+
+➡️ je 10m — booked on !17 and !18
+
+> **Answer:** je 10m
+
+❓ **Q89** - **Zeit Reviews !19 und !20**: Wie viel Zeit pro Review? Options: !19 10m, !20 20m / je 10m / je 20m / !19 15m, !20 30m
+
+➡️ !19 10m, !20 20m — booked on the MRs
+
+> **Answer:** !19 10m, !20 20m (Recommended)
