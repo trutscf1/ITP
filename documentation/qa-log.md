@@ -613,3 +613,9 @@ Open MRs: !5, !7, !9 of `schwaigc` (none approved; !7 and !9 in conflict with `d
 ➡️ Ja, !7 und !9 — `dev` merged into !7 (questions of #68 moved to Q72–Q78, product name in DSA-US-1), !7 merged into !9 (questions moved to Q79–Q81)
 
 > **Answer:** Ja, !7 und !9 (Recommended)
+
+❓ **Q84** - **Force-Push !7**: Die zwei neuen Commits auf feature/68 verletzen commitlint (Body-Zeilen über 100 Zeichen, Scope `design-system`); mit identischem Inhalt neu geschrieben. Ersetzen per `--force-with-lease`? Options: Force-with-lease erlauben / Ohne Force, Job bleibt rot / Nichts mehr pushen
+
+➡️ Force-with-lease erlauben — `de53cac` replaced by `3a344f6` on `feature/68-design-tokens-and-themes` (same tree); !9 pushed at `5e35b87`
+
+> **Answer:** Force-with-lease erlauben (Recommended)
