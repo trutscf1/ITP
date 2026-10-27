@@ -563,3 +563,19 @@ Issues #108 (concept Public content), #111 (concept R1), #39/#103, #40, #126, #1
 ➡️ MR öffnen, danach Issues (Recommended)
 
 > **Answer:** MR öffnen, danach Issues (Recommended). MR !18 opened (Closes #108); the issues of the tree are published after its review and merge.
+
+## Round 22 — 2026-10-27 — delivery (`trutscf1`, revise !15)
+
+Review of !15 by `schwaigc` (2026-10-20, changes requested): the job `commit-messages` fails on the scopes `roadmap` and `workflow` and on one subject with a capital letter; the question numbers collide with `dev` (Q34–Q66); please check the Sprint 2 overload and the Sprint 1 end date. Assumptions: A28 the pushed branch is not rewritten (no force-push), so its content is rebuilt on a new branch from `dev`; A29 the round of the milestone plan becomes round 20 (Q67–Q71) and the grilling round of the Sprint 1 issues becomes round 21 (Q72–Q77), behind `dev` (P-TEAM-5).
+
+❓ **Q78** - **Commit-Nachrichten von !15**: Die Header lassen sich ohne Force-Push nicht korrigieren. Wie weiter? Options: Neuer Branch mit korrigierten Commits, !15 schließen (Recommended) / Pipeline-Regel lockern / Force-Push
+
+➡️ Neuer Branch mit korrigierten Commits, !15 schließen (Recommended)
+
+> **Answer:** Neuer Branch mit korrigierten Commits, !15 schließen (Recommended), decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions). The twelve commits of `concept/milestone-plan` are re-created on `concept/milestone-plan-2` with the scope `repo` and a lower-case subject; the old branch stays unchanged.
+
+❓ **Q79** - **Sprint-2-Überlast**: Plan 70 gegen 44 Punkte. Jetzt Meilensteine verschieben oder beim Sprint-2-Planning entscheiden? Options: Beim Sprint-2-Planning am 03.11., DSA-US-3 als Option nennen (Recommended) / Jetzt verschieben / Offen lassen
+
+➡️ Beim Sprint-2-Planning am 03.11., DSA-US-3 als Option nennen (Recommended)
+
+> **Answer:** Beim Sprint-2-Planning am 03.11., DSA-US-3 als Option nennen (Recommended), decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions). `ROADMAP.md` records it below the load table; the GitLab milestones are not changed.
