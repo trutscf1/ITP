@@ -285,7 +285,7 @@ A help context names a place in the web client, not an article: it is declared i
 | `CMS_INTERNAL_URL` | `web` | string, address | the internal address of `cms` (port in [scaffolding.md](scaffolding.md) §8) | starts with `http://` or `https://` | anything else stops the unit |
 | `PUBLIC_BASE_URL` | `web` | string, address | the origin of the local stack | starts with `http://` or `https://`, no trailing `/` | anything else stops the unit |
 | `SESSION_CHECK_TIMEOUT_MS` | `web` | integer | 500 | 50 to 5000 | 50 and 5000 are accepted; 49 and 5001 stop the unit |
-| `DASHBOARD_PATH` | `web` | string, path | `/dashboard` | starts with `/`; is not `/de` or `/en` and does not start with `/de/` or `/en/` | anything else stops the unit |
+| `DASHBOARD_PATH` | `web` | string, path | `/dashboard` | starts with `/` and lies outside the public address space (below): its first segment is not exactly two lower-case letters | anything else stops the unit; `/debug` is accepted, `/de`, `/de/home`, and `/fr/home` stop it |
 | `REGISTRATION_PATH` | `web` | string, path | `/register` | as `DASHBOARD_PATH` | as `DASHBOARD_PATH` |
 | `LOGIN_PATH` | `web` | string, path | `/login` | as `DASHBOARD_PATH` | as `DASHBOARD_PATH` |
 
@@ -336,6 +336,8 @@ Under each heading of the privacy template from "Mitgliedskonten" to "E-Mail-Ver
 | Legal page | `/<l>/legal/<kind>` |
 | Image (no page, no language) | `/media/<id of the image>` |
 
+**Public address space.** The pages above, except the image, form the public address space: the path `/` and every path whose first segment is exactly two lower-case letters `a` to `z` (`/de`, `/en/help`, `/fr`). Only this space is decided by `address-routing` (§16), and only inside it does [PUB-E-5] (page not found) apply. The reverse proxy sends every path under `/` to `web` ([scaffolding.md](scaffolding.md) §8); every path outside the space belongs to the route of another module of `web` and never reaches `address-routing`: `/media/<id>` (`page-frame`), `/health`, `/status`, `/api/docs`, and every other path under `/api` ([scaffolding.track-web.md](scaffolding.track-web.md), M2, M5, M6), and later `DASHBOARD_PATH`, `REGISTRATION_PATH`, and `LOGIN_PATH`. A path outside the space that no route answers gets the not-found page of the `web` unit, drawn by `page-frame` as a page without a content language (§16).
+
 ## 9. Error Conditions
 
 | ID | Title | Trigger | Required behavior | Fallback | Derives from |
@@ -344,7 +346,7 @@ Under each heading of the privacy template from "Mitgliedskonten" to "E-Mail-Ver
 | PUB-E-2 | Unauthorized content request | A request to the content interface carries no access token or a wrong one. | The `cms` unit answers "not authorized" and returns no content. | None. | PUB-AC-1.3 (Editor roles) |
 | PUB-E-3 | Content unavailable | A public page other than a legal page was never loaded and the content interface does not answer. | The `web` unit answers "service unavailable" with a page saying "Inhalt derzeit nicht verfügbar." or "Content is currently unavailable.", including the footer of [PUB-F-21]. | None. | PUB-AC-1.6 (CMS unavailable) |
 | PUB-E-4 | Image without licence | An editor saves an image with an empty source or an empty licence. | The `cms` unit refuses to save and names the empty field. | None. | PUB-AC-2.3 (Licence-free media) |
-| PUB-E-5 | Page not found | An address names a language other than `de` or `en`, an unknown legal kind, or a help article that does not exist or has no published German version. | The `web` unit answers "not found" with a page in the language of the address, German if that language is unknown, including the footer of [PUB-F-21]. | None. | PUB-AC-5.1 (Language in the address) |
+| PUB-E-5 | Page not found | An address in the public address space (§8) names a language other than `de` or `en`, a path below `/de` or `/en` that §8 does not list, an unknown legal kind, or a help article that does not exist or has no published German version. | The `web` unit answers "not found" with a page in the language of the address, German if that language is unknown, including the footer of [PUB-F-21]. | None. | PUB-AC-5.1 (Language in the address) |
 | PUB-E-6 | Unknown help context | No published help article is assigned to the help context in the address. | The `web` unit redirects to the start page of the help center in the same language. | None. | PUB-AC-3.3 (Contextual help) |
 | PUB-E-7 | Legal page must stay published | An editor or a CMS administrator tries to unpublish the German version of a legal page. | The `cms` unit refuses, leaves the page published, and says that a legal page must stay published in German. | None. | PUB-AC-4.1 (Footer links) |
 | PUB-E-8 | Image not allowed | An editor saves an image file whose content is not PNG, JPEG, or WebP, or that is larger than 2 097 152 bytes. | The `cms` unit refuses to save and says which of the two limits was broken. | None. | PUB-AC-2.3 (Licence-free media) |
@@ -446,6 +448,7 @@ The exit code is non-zero, no request is accepted, and neither value is printed.
 | `/en/help/context/Upload Files` | redirect to `/en/help` (not a valid help context) |
 | `/media/<id of an image web holds>` | the image file, status 200 |
 | `/media/<unknown id>` | "not found" (404) without a page |
+| `/status`, `/health`, `/api/docs` | outside the public address space: answered by the routes of the track Web, never by the not-found page of [PUB-E-5] |
 
 **Example 13 — meta tags ([PUB-F-15]).** `PUBLIC_BASE_URL` is `https://nimbus.example`; the first hero section has the German body "Nimbus speichert **Ihre** Dateien auf Ihrem eigenen Server."
 
@@ -526,6 +529,7 @@ The existing parts of the system this feature touches, checked on 2026-10-06 (Ph
 | Health report of `cms` ([scaffolding.md](scaffolding.md) §7) | `cms` reports the checks `content-store` and `administrator-account`. | A fresh installation reports `degraded`, but [SCF-NF-1] demands `ok` on all units after the start. The public health report shows that no CMS administrator exists; the registration form of the admin panel shows the same, so nothing new is revealed. | [PUB-F-9], [PUB-F-31]; [SCF-NF-1] narrowed (§15, Q17) |
 | Status page of `web` ([SCF-F-8]) | The operator reads the state of `cms` there ([PUB-AC-1.7]). | The page shows only `degraded`, not the reason. | [SCF-F-8] and [SCF-U-1] extended (§15, Q18) |
 | Reverse proxy ([SCF-F-4]) | The admin panel is served under the prefix of `cms`; the public pages under `/de` and `/en` belong to `web`. | No address of a public page (§8) starts with the prefix of another unit. Image files requested from `cms` directly would be refused by [PUB-F-4]. | [PUB-F-32] |
+| Routes of `web` outside the public pages (`/health`, `/status`, `/api/docs`, `/api/*` of [scaffolding.track-web.md](scaffolding.track-web.md); later the dashboard, login, and registration) | The proxy sends every path under `/` to `web`, so these routes and the public pages share one unit. | A rule that answers "any other path" with the public not-found page would swallow these routes. | `address-routing` decides only the public address space of §8 (`claims`, rule 0); `DASHBOARD_PATH`, `REGISTRATION_PATH`, and `LOGIN_PATH` must lie outside it (§8); [PUB-E-5] applies only inside it; [PUB-T-158] |
 | Page frame of `web` | The footer with the legal links appears on every page, also on pages other features build (login, dashboard, share links, status page). | A feature that builds its own page frame would lose the footer. Whether legal pages can be read offline is not decided here. | [PUB-F-21]; the footer is part of the one page frame of `web` (architecture, §16). Offline reading belongs to [offline-mode.md](offline-mode.md). |
 | Member session ([identity.md](identity.md)) | `web` asks whether a visitor is a signed-in member ([PUB-F-12]). | Identity is built later and can be down; the landing page must still open. A person without a session gets no cookie ([PUB-NF-3]), so the language is carried by the address, never by a cookie. | [PUB-F-33], [PUB-F-27] |
 | Bot protection ([IDN-F-5], captcha) | `web` places the notice the provider prescribes ([PUB-F-23]). | The Identity concept does not hold the notice text or a setting for the hidden badge yet. | Change to `identity.md` (§15) |
@@ -764,7 +768,10 @@ Traces to: [PUB-F-6], [PUB-F-8], [PUB-F-32], [PUB-E-1], [PUB-E-3]. Requires: `co
 **`address-routing`** (unit `web`)
 
 ```text
-decide(request: RequestInfo) -> RouteDecision
+claims(path: string) -> boolean
+  true for "/" and for every path whose first segment is exactly two lower-case letters a to z; false otherwise
+
+decide(request: RequestInfo) -> RouteDecision       // called only for a path that claims accepts
   RequestInfo   { path: string, acceptLanguage: optional<string>, hasSessionCookie: boolean, cookies: string }
   RouteDecision { kind: enum(redirect|render|notFound), status: integer, redirectTo: optional<string>,
                   language: Language, routeKind: optional<RouteKind>, articleId: optional<string>,
@@ -774,14 +781,18 @@ decide(request: RequestInfo) -> RouteDecision
 SessionState = enum(valid|none|unknown)    // answered by the session check of the Identity concept
 
 rules (first match wins; a single trailing slash is ignored):
+  0. Only the public address space of §8 is decided here. The request handler of web calls decide only when
+     claims(path) is true; every other path (/media/<id>, /health, /status, /api/..., DASHBOARD_PATH,
+     REGISTRATION_PATH, LOGIN_PATH) belongs to the route of another module and never reaches this module.
   1. path "/": state = sessionState(request). valid -> redirect DASHBOARD_PATH. Otherwise redirect to /en if
      preferredLanguage(acceptLanguage) is en, else /de.
   2. path /de or /en: state valid -> redirect DASHBOARD_PATH; otherwise render routeKind landing.
   3. /<l>/help (query q optional) -> help-start; /<l>/help/context/<c> -> help-context with context c;
      /<l>/help/<id> -> help-article with articleId id; /<l>/changelog -> changelog;
      /<l>/legal/<kind> with kind in imprint, terms, privacy -> legal. l is de or en.
-  4. Any other path, any other language, or an unknown legal kind: notFound, status 404, language de if the
-     first path part is not de or en (PUB-E-5).
+  4. Any other claimed path (another two-letter language such as /fr, a path below /de or /en that rule 3 does
+     not list, an unknown legal kind): notFound, status 404, language de if the first path part is not de or en
+     (PUB-E-5).
   5. sessionState: no session cookie -> none without a call. Otherwise ask the session check; no answer within
      SESSION_CHECK_TIMEOUT_MS, an error, or a missing Identity unit -> unknown, treated as none (PUB-F-33).
   6. preferredLanguage: split acceptLanguage at commas; each entry has a tag and a quality (default 1; entries with
@@ -907,7 +918,10 @@ flowchart LR
 
     visitor --> proxy
     editor --> proxy
-    proxy -- "/ , /de , /en , /media" --> routing
+    others["other routes of web<br/>/health, /status, /api"]
+    proxy -- "/ and /xx/… (public address space)" --> routing
+    proxy -- "/media" --> frame
+    proxy -- "every other path" --> others
     proxy -- "/cms" --> panel
     routing -. "session state" .-> identity
     routing --> resolution
@@ -925,7 +939,7 @@ flowchart LR
 
 Handling of one page request in `web`, in order:
 
-1. The proxy passes the request to `web`. A path `/media/<id>` is answered by `page-frame` rule 9 and ends there.
+1. The proxy passes the request to `web`. A path `/media/<id>` is answered by `page-frame` rule 9 and ends there. Every other path outside the public address space (§8; `address-routing.claims` is false) goes to the route of its module, for example `/health`, `/status`, and `/api/*` of the track Web, and never reaches the steps below.
 2. `address-routing.decide` classifies the path; for `/`, `/de`, `/en` it asks the session check only if a session cookie is present.
 3. A `redirect` or `notFound` decision is answered at once (a not-found page is drawn by `page-frame`).
 4. For `render`, `page-resolution.resolve` asks `content-client.get(group)`, which refreshes the group first if the last attempt is at least `CONTENT_REFRESH_SECONDS` old.
@@ -938,7 +952,7 @@ Handling of one page request in `web`, in order:
 | --- | --- | --- | --- | --- |
 | Content interface | `content-interface` (`cms`) | `content-client` | `getGroup(token, group)` → ContentGroupData; `getImageFile(token, session, id)` → ImageFile | [PUB-E-2] |
 | Content client | `content-client` (`web`) | `page-resolution`, `page-frame` | `get(group)` → LoadResult; `image(id)` → optional ImageFile; `held(group)` → optional ContentGroupData | [PUB-E-1] (inside), [PUB-E-3] (caller) |
-| Address decision | `address-routing` | request handler of `web` | RequestInfo → RouteDecision | [PUB-E-5] |
+| Address decision | `address-routing` | request handler of `web` | `claims(path)` → boolean; RequestInfo of a claimed path → RouteDecision | [PUB-E-5], only inside the public address space |
 | Session check | Identity concept ([identity.md](identity.md)) | `address-routing` | cookies → SessionState (`valid`, `none`, `unknown`) | none; no answer counts as `unknown` ([PUB-F-33]) |
 | Page resolution | `page-resolution` | request handler | RouteDecision + `content-client` → PageResult | [PUB-E-3], [PUB-E-5], [PUB-E-6] |
 | Rich text | `rich-text` | `page-resolution` | string → list of RichBlock | none |
@@ -1034,7 +1048,7 @@ The seams at which tests run (P-DES-2); everything behind a seam is exercised th
 | `content-seed` | PUB-T-70 to PUB-T-73 |
 | `cms-health` | PUB-T-74 to PUB-T-77 |
 | `content-client` | PUB-T-78 to PUB-T-88 |
-| `address-routing` | PUB-T-89 to PUB-T-104 |
+| `address-routing` | PUB-T-89 to PUB-T-104, PUB-T-158 |
 | `rich-text` | PUB-T-105 to PUB-T-112 |
 | `page-resolution` | PUB-T-113 to PUB-T-137 |
 | `page-frame` | PUB-T-138 to PUB-T-150 |
@@ -1122,6 +1136,7 @@ Per module, in the order of §16; values come from the worked examples of §10. 
 | PUB-T-102 | `address-routing` | Path `/en/legal/cookies` | Not found, in English (PUB-E-5) | PUB-F-27, PUB-E-5 |
 | PUB-T-103 | `address-routing` | Path `/de/` with a trailing slash | Route landing page, language `de` | PUB-F-27 |
 | PUB-T-104 | `address-routing` | Paths `/en/help`, `/de/changelog`, `/de/legal/terms`, `/en/help/context/upload-files` | Routes help start, changelog, legal `terms`, help context `upload-files`, each with the language of the address | PUB-F-27 |
+| PUB-T-158 | `address-routing` | `claims` for `/status`, `/health`, `/api/docs`, `/api/unknown`, `/dashboard`, `/media/<id>`, `/DE`; and for `/`, `/de/help`, `/fr` | False for the first seven: `address-routing` decides none of them, so none gets the not-found page of PUB-E-5; true for the last three | PUB-F-27, PUB-E-5 |
 | PUB-T-105 | `rich-text` | `## Ordner teilen` and `# Titel` (§10, example 8) | A heading of level 2; a paragraph "# Titel" | PUB-F-36, PUB-C-3 |
 | PUB-T-106 | `rich-text` | `Ein **wichtiger** Hinweis` | A paragraph with bold "wichtiger" | PUB-F-36 |
 | PUB-T-107 | `rich-text` | `<b>x</b>` | A paragraph with the characters `<b>x</b>` and no bold text | PUB-F-36, PUB-C-3 |
@@ -1171,7 +1186,7 @@ Per module, in the order of §16; values come from the worked examples of §10. 
 | PUB-T-151 | `content-contracts` | The configuration of §10, example 11 | The output of the example, a non-zero exit code, and neither value printed; `CONTENT_TIMEOUT_MS` falls back to 2000 | PUB-F-6 |
 | PUB-T-152 | `content-contracts` | `CONTENT_REFRESH_SECONDS` 1, 60, 0, 61 | 1 and 60 are accepted; 0 and 61 stop the unit | PUB-F-6 |
 | PUB-T-153 | `content-contracts` | `CONTENT_TIMEOUT_MS` 100, 30000, 99, 30001; `SESSION_CHECK_TIMEOUT_MS` 50, 5000, 49, 5001 | The first two of each are accepted; the last two of each stop the unit | PUB-E-1, PUB-F-33 |
-| PUB-T-154 | `content-contracts` | `CONTENT_ACCESS_TOKEN` of 32 characters, of 31 characters, and not set; `DASHBOARD_PATH` `/debug`, `/de/home`, `dashboard` | 32 and `/debug` accepted; the other four stop the unit | PUB-F-4, PUB-F-12 |
+| PUB-T-154 | `content-contracts` | `CONTENT_ACCESS_TOKEN` of 32 characters, of 31 characters, and not set; `DASHBOARD_PATH` `/debug`, `/de/home`, `/fr/home`, `dashboard` | 32 and `/debug` accepted; the other five stop the unit | PUB-F-4, PUB-F-12 |
 | PUB-T-155 | `content-contracts` | The legal templates of the three kinds in both languages | Each starts with the template notice, has the headings of the outline of §8 in order, and holds at least one `[[...]]` placeholder | PUB-F-26 |
 | PUB-T-156 | `content-contracts` | The privacy template | It has a paragraph under each of the 8 headings from "Mitgliedskonten" to "E-Mail-Versand", naming data and purpose | PUB-F-22 |
 | PUB-T-157 | `content-contracts` | Every fixed text of §8 | It exists in German and in English and is not empty | PUB-F-21, PUB-U-2 |
