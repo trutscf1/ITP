@@ -149,8 +149,9 @@ The repository is public, so all content must be licence-free. Licences of what 
 
 | Component | Licence | Use |
 | --- | --- | --- |
-| Next.js, React, Tailwind CSS (`@tailwindcss/postcss`) | MIT | web application |
+| Next.js, React, Tailwind CSS (`@tailwindcss/postcss`, `@tailwindcss/vite`) | MIT | web application; `@tailwindcss/vite` builds the styles of Storybook |
 | Radix UI (`radix-ui`) | MIT | accessible primitives of the design system (`@stash/ui`) |
+| Storybook (`storybook`, `@storybook/react-vite`), Vite | MIT | component documentation of the design system (`packages/ui`) |
 | dotenv | BSD-2-Clause | reads the `.env` file in the web application |
 | Prisma | Apache-2.0 | database access |
 | TypeScript | Apache-2.0 | language |
