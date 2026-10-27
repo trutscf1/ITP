@@ -469,8 +469,8 @@ Where this feature meets other parts of the system. The interferences behind eac
 | Point | Between | What crosses it | Specified in |
 | --- | --- | --- | --- |
 | Content interface | `web` → `cms` | Published content entries and image files, requested with the access token of the `web` unit | [PUB-F-4], [PUB-F-5], [PUB-F-32], [PUB-E-1], [PUB-E-2] |
-| Admin panel | browser of a content editor → reverse proxy → `cms` | Login, content entries, editor accounts, under the proxy path prefix of `cms` | [PUB-F-3], [PUB-F-4], [PUB-F-10]; routing in [scaffolding.md](scaffolding.md) §7 |
-| Health report of `cms` | `cms` → status page of `web` | The dependency checks `content-store` and `administrator-account` | [PUB-F-9], [PUB-F-31]; contract in [scaffolding.md](scaffolding.md) §7 |
+| Admin panel | browser of a content editor → reverse proxy → `cms` | Login, content entries, editor accounts, under the proxy path prefix of `cms` | [PUB-F-3], [PUB-F-4], [PUB-F-10]; routing in [scaffolding.md](scaffolding.md) §8 |
+| Health report of `cms` | `cms` → status page of `web` | The dependency checks `content-store` and `administrator-account` | [PUB-F-9], [PUB-F-31]; contract in [scaffolding.md](scaffolding.md) §8 |
 | Member session | `web` → `identity` | The question whether a request carries a valid member session | [PUB-F-12], [PUB-F-33]; answer specified in [identity.md](identity.md) |
 | Bot protection notice | `identity` concept → `web` | The notice text and whether the badge is hidden | [PUB-F-23], [PUB-U-5] |
 | Help contexts | features of the web client → shared contracts → `web` | The declared help contexts a help link may name | [PUB-F-19], §8 |
@@ -531,7 +531,7 @@ The existing parts of the system this feature touches, checked on 2026-10-06 (Ph
 
 | Artifact | Interaction | Interference | Resolved by |
 | --- | --- | --- | --- |
-| Health report of `cms` ([scaffolding.md](scaffolding.md) §7) | `cms` reports the checks `content-store` and `administrator-account`. | A fresh installation reports `degraded`, but [SCF-NF-1] demands `ok` on all units after the start. The public health report shows that no CMS administrator exists; the registration form of the admin panel shows the same, so nothing new is revealed. | [PUB-F-9], [PUB-F-31]; [SCF-NF-1] narrowed (§15, Q17) |
+| Health report of `cms` ([scaffolding.md](scaffolding.md) §8) | `cms` reports the checks `content-store` and `administrator-account`. | A fresh installation reports `degraded`, but [SCF-NF-1] demands `ok` on all units after the start. The public health report shows that no CMS administrator exists; the registration form of the admin panel shows the same, so nothing new is revealed. | [PUB-F-9], [PUB-F-31]; [SCF-NF-1] narrowed (§15, Q17) |
 | Status page of `web` ([SCF-F-8]) | The operator reads the state of `cms` there ([PUB-AC-1.7]). | The page shows only `degraded`, not the reason. | [SCF-F-8] and [SCF-U-1] extended (§15, Q18) |
 | Reverse proxy ([SCF-F-4]) | The admin panel is served under the prefix of `cms`; the public pages under `/de` and `/en` belong to `web`. | No address of a public page (§8) starts with the prefix of another unit. Image files requested from `cms` directly would be refused by [PUB-F-4]. | [PUB-F-32] |
 | Routes of `web` outside the public pages (`/health`, `/status`, `/api/docs`, `/api/*` of [scaffolding.track-web.md](scaffolding.track-web.md); later the dashboard, login, and registration) | The proxy sends every path under `/` to `web`, so these routes and the public pages share one unit. | A rule that answers "any other path" with the public not-found page would swallow these routes. | `address-routing` decides only the public address space of §8 (`claims`, rule 0); `DASHBOARD_PATH`, `REGISTRATION_PATH`, and `LOGIN_PATH` must lie outside it (§8); [PUB-E-5] applies only inside it; [PUB-T-158] |
@@ -547,14 +547,14 @@ The existing parts of the system this feature touches, checked on 2026-10-06 (Ph
 
 ## 15. Schema Extensions
 
-**Contracts.** None. The health report contract of [scaffolding.md](scaffolding.md) §7 stays unchanged: the name of a dependency check is free text, so `content-store` and `administrator-account` need no new field. The content types of §8 are new and extend nothing.
+**Contracts.** None. The health report contract of [scaffolding.md](scaffolding.md) §8 stays unchanged: the name of a dependency check is free text, so `content-store` and `administrator-account` need no new field. The content types of §8 are new and extend nothing.
 
-**Required changes to other documents.** This concept does not edit documents of other owners (P-TEAM-4); each change is in the inbox of the handle named.
+**Required changes to other documents.** This concept does not edit documents of other owners (P-TEAM-4); each change is in the inbox of the handle named. The two changes to `scaffolding.md` are done (checked on 2026-10-27); the other three are open.
 
 | Document | Change | Reason | Carried out by |
 | --- | --- | --- | --- |
-| [scaffolding.md](scaffolding.md), [SCF-NF-1] | New wording: the local stack MUST start without internet access with no unit `down`; a unit MAY be `degraded` only because of a non-essential check, and on a fresh installation that is exactly `administrator-account` of `cms`. | Q17 | `trutscf1`, with the migration of `scaffolding.md` (legacy format, P-DOC-5) |
-| [scaffolding.md](scaffolding.md), [SCF-F-8] and [SCF-U-1] | The row of a unit whose status is not `ok` MUST also show, as text, the names of its dependency checks that are `down`. | Q18, [PUB-AC-1.7] | `trutscf1` in the concept (same migration); `schwaigc` in the status page (#16) |
+| [scaffolding.md](scaffolding.md), [SCF-NF-1] | New wording: the local stack MUST start without internet access with no unit `down`; a unit MAY be `degraded` only because of a non-essential check, and on a fresh installation that is exactly `administrator-account` of `cms`. | Q17 | **Done** by `trutscf1` with the migration of `scaffolding.md` (!13, #111, merged 2026-10-20) in the general form: no unit `down`, `degraded` only because of a non-essential check; `administrator-account` of `cms` is such a check ([PUB-F-9]) |
+| [scaffolding.md](scaffolding.md), [SCF-F-8] and [SCF-U-1] | The row of a unit whose status is not `ok` MUST also show, as text, the names of its dependency checks that are `down`. | Q18, [PUB-AC-1.7] | **Done** in the concept by `trutscf1` with the same migration (!13); the status page that shows the names is built by `schwaigc` (M3 to M5 of [scaffolding.track-web.md](scaffolding.track-web.md), SCF-US-8 slice 2) |
 | [design-system.md](design-system.md), [DSA-F-2] | The theme switcher is shown only to signed-in members; a person without a session sees the default theme, and no theme cookie is set for them. | [PUB-NF-3], Q65 of [../qa-log.md](../qa-log.md) | `schwaigc`, owner of R4, when he next changes `design-system.md` |
 | [identity.md](identity.md) | Specify the notice text the provider of the bot protection prescribes, in German and English, and the configuration value that hides the badge. | [PUB-F-23] | `tschudea07` |
 | `WORKFLOW.md`, "Releases" | New step: a content editor writes and publishes the changelog entry of the release in the team's installation. | Q19 | `trutscf1`, in the MR that delivers [PUB-US-3] (help center and changelog) |
