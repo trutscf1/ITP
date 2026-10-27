@@ -745,3 +745,21 @@ After the merges of !24 and !5 by `trutscf1`: `dev` merged into !7 (`qa-log.md` 
 ➡️ Ja — notes posted on !7 and !9 with what changed and the request to approve again
 
 > **Answer:** Ja, auf beiden posten (Recommended)
+
+❓ **Q162** - **Zeit #68 / #106**: Nachziehen von `dev` und Lizenz-Fixes auf !7 und !9? Options: je 20m / je 15m / je 30m
+
+➡️ je 15m — booked on #68 (total 1h 35m) and #106 (total 1h 20m)
+
+> **Answer:** je 15m
+
+❓ **Q163** - **Zeit !24, !20, !19**? Options: !24 20m, !20 5m, !19 5m / !24 15m, !20 5m, !19 5m / !24 30m, !20 10m, !19 5m
+
+➡️ !24 15m, !20 5m, !19 5m — booked on the MRs
+
+> **Answer:** !24 15m, !20 5m, !19 5m
+
+❓ **Q164** - **Zeit !17, !23, !21, !25**? Options: !17 15m, !23 30m, !21 20m, !25 15m / je 15m / !17 20m, !23 45m, !21 30m, !25 20m
+
+➡️ read as "je 15m" (assumption A: the answer "15m" means 15 minutes for each review) — booked on the MRs
+
+> **Answer:** 15m
