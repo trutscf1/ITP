@@ -500,7 +500,7 @@ The review of !18 by `schwaigc` (findings 1 to 7) was worked in on `concept/publ
 
 > **Answer:** decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions): Post and request re-review (Recommended)
 
-## Round 20 — 2026-10-20 — milestone plan (`trutscf1`)
+## Round 21 — 2026-10-20 — milestone plan (`trutscf1`)
 
 Planning of the sprints and milestones on the dates set by the team: Sprint 1 2026-11-03, Sprint 2 2026-11-24, Sprint 3 2027-01-12, Sprint 4 2027-01-26, Sprint 5 2027-02-23, Sprint 6 2027-03-16, final presentation 2027-04-06; each milestone ends one day earlier. Assumptions: A21 the dates are the review Tuesdays and the milestone due date is the Monday before; A22 school holidays as in `WORKFLOW.md` (to be corrected at sprint planning); A23 one story point is 0.75 h of human work.
 
@@ -534,7 +534,7 @@ Planning of the sprints and milestones on the dates set by the team: Sprint 1 20
 
 > **Answer:** Nur Begonnenes + R1-Kern (Recommended); the user's remark before: "heute werden niemals die restlichen 25 issues fertig". Moved to Sprint 2: #56, #105, #78, #81, #107, #109, #112, #2, #3, #116, #117.
 
-## Round 21 — 2026-10-20 — grill of the Sprint 1 issues of `trutscf1`
+## Round 22 — 2026-10-20 — grill of the Sprint 1 issues of `trutscf1`
 
 Issues #108 (concept Public content), #111 (concept R1), #39/#103, #40, #126, #147. Assumptions: A24 entry point is the open review findings, not a new concept; A25 `tests/` belongs to the Platform track (`trutscf1`), a unit's compose service name equals the unit name, and `@nimbus/*` in `SCF-AC-3.1` and `DSA-AC-1.1` becomes `@stash/*`; A26 for `PUB-C-1` to `PUB-C-3` the proposal applies (Strapi, its built-in password handling and rich-text checks) and "Strapi" stays in the titles and acceptance criteria; A27 the assumptions A21–A28 of the Scaffolding concept and A37–A54 of the Public content concept are accepted as a block.
 
@@ -574,9 +574,9 @@ Issues #108 (concept Public content), #111 (concept R1), #39/#103, #40, #126, #1
 
 > **Answer:** MR öffnen, danach Issues (Recommended). MR !18 opened (Closes #108); the issues of the tree are published after its review and merge.
 
-## Round 22 — 2026-10-27 — delivery (`trutscf1`, revise !15)
+## Round 23 — 2026-10-27 — delivery (`trutscf1`, revise !15)
 
-Review of !15 by `schwaigc` (2026-10-20, changes requested): the job `commit-messages` fails on the scopes `roadmap` and `workflow` and on one subject with a capital letter; the question numbers collide with `dev` (Q34–Q66); please check the Sprint 2 overload and the Sprint 1 end date. Assumptions: A28 the pushed branch is not rewritten (no force-push), so its content is rebuilt on a new branch from `dev`; A29 the round of the milestone plan becomes round 20 (Q67–Q71) and the grilling round of the Sprint 1 issues becomes round 21 (Q72–Q77), behind `dev` (P-TEAM-5).
+Review of !15 by `schwaigc` (2026-10-20, changes requested): the job `commit-messages` fails on the scopes `roadmap` and `workflow` and on one subject with a capital letter; the question numbers collide with `dev` (Q34–Q66); please check the Sprint 2 overload and the Sprint 1 end date. Assumptions: A28 the pushed branch is not rewritten (no force-push), so its content is rebuilt on a new branch from `dev`; A29 the round of the milestone plan becomes round 21 (Q67–Q71) and the grilling round of the Sprint 1 issues becomes round 22 (Q72–Q77), behind `dev` (P-TEAM-5).
 
 ❓ **Q78** - **Commit-Nachrichten von !15**: Die Header lassen sich ohne Force-Push nicht korrigieren. Wie weiter? Options: Neuer Branch mit korrigierten Commits, !15 schließen (Recommended) / Pipeline-Regel lockern / Force-Push
 
