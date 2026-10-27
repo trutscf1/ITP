@@ -333,3 +333,159 @@ Assumption stated with the round, not rejected:
 > **Answer:** Book 10min review time for me and merge
 
 Result: 10 minutes of review time were recorded on !4 for `trutscf1` on the owner's explicit instruction, a deviation from P-TIME-1 for this one entry (agents never book time). The answer names the merge, so it counts as _Merge now_ (P-MR-4). !4 was merged into `dev` with merge commit `725d327`, the branch is kept, and #38 is closed with `status::done`. The implementation time of `schwaigc` is still not recorded (Definition of Done 14).
+
+## Round 14 — 2026-10-20 — delivery (`schwaigc`, plan of the R1 track Web)
+
+The MRs !5, !7, !9 wait for reviews; the next task of `schwaigc` is chosen. The merge round before it (provisional Q42 and Q43) is on `feature/106-contrast-and-storybook` (!9) and is renumbered when !9 reaches `dev` (P-TEAM-5).
+
+❓ **Q45** - **Nächster Task**: Die MRs sind merge-fertig und warten auf Reviews. Womit soll ich bei deinen Tasks anfangen? Options: R1 Track-Web-Plan / R6 Web-Client grillen / R4 Rest grillen / Shared #39/#40/#103
+
+➡️ R1 Track-Web-Plan
+
+> **Answer:** R1 Track-Web-Plan (Recommended)
+
+❓ **Q46** - **Issue und Branch**: Issue „R1 track Web: plan of the web unit“ (type::concept, schwaigc, Sprint 1, Gewicht 1) und Branch `concept/scaffolding-track-web`, gestapelt auf !13 (Merge-Reihenfolge !13 → dieser MR)? Options: Ja, so anlegen / Ohne neues Issue / Auf dev statt auf !13
+
+➡️ Ja, so anlegen — issue #113
+
+> **Answer:** Ja, so anlegen (Recommended)
+
+❓ **Q47** - **Annahmen für den Plan**: A1 Statusseite unter `/status` (Server-Seite, ohne Cache, U-3). A2 Abfrage pro Unit mit Timeout `HEALTH_TIMEOUT_MS` (2000); ein Body, der kein HealthReport der richtigen Unit ist, gilt als down (E-3), egal welcher HTTP-Status. A3 Health-URLs der Units als Konfiguration im Web-Config-Contract (contracts/web), Defaults aus der Routing-Tabelle §8. A4 STACK.md §4: SCF-C-3 = Next.js 16.3 (App Router), SCF-C-13 = Playwright 1.63. A5 `apps/web/src/prisma` bleibt unberührt, offener Punkt für SCF-US-4. Options: Alle ok / Einzelne ändern
+
+➡️ Alle ok
+
+> **Answer:** Alle ok (Recommended)
+
+## Round 15 — 2026-10-20 — check (`schwaigc`, workflow documents against `docs/`)
+
+`WORKFLOW.md`, the MR and issue templates, `CLAUDE.md`, `README.md`, and the GitLab settings were compared with `docs/anforderungen_software_projekte.md` and `docs/git_workflow_commands.md`. Findings are in the log of `ROADMAP-DETAILS.md` (2026-10-20).
+
+❓ **Q48** - **Workflow-Fixes**: Welche der gefundenen Punkte soll ich jetzt beheben? Options: Issue-Labels aufräumen / Kommentar auf !15 / Doku-Fix-MR / Settings-Bitte an trutscf1
+
+➡️ Issue-Labels aufräumen, Kommentar auf !15
+
+> **Answer:** Issue-Labels aufräumen (Recommended), Kommentar auf !15 (Recommended)
+
+## Round 16 — 2026-10-20 — delivery (`schwaigc`, merge !6 and !13)
+
+`schwaigc` is not the author of !6 and !13, so these two may be merged by them. Both heads were checked in clean worktrees: doc-check and `--status` 0 errors, markdown lint clean, pipeline green, no conflict with `dev`; the concept text of !6 is unchanged since the approval on `c76350a`.
+
+❓ **Q49** - **Review-Freigabe**: Welche MRs approvst du (Kommentar und Approval unter deinem Namen)? Options: !6 approven / !13 approven / Keinen
+
+➡️ !6 und !13
+
+> **Answer:** !6 approven (Recommended), !13 approven
+
+❓ **Q50** - **Merge !6**: concept/public-content → dev, Head 6263c25. Options: Merge now / No / Later / I merge myself
+
+➡️ Merge now — merged as `2d7a6e0`, branch kept
+
+> **Answer:** Merge now
+
+❓ **Q51** - **Merge !13**: concept/migrate-scaffolding → dev, Head af3fc53. Options: Merge now / No / Later / I merge myself
+
+➡️ Merge now — after !6 the inbox files conflicted; `dev` merged in (`bd5e2d2`, both sides kept), which reset the approval
+
+> **Answer:** Merge now
+
+❓ **Q52** - **Re-Approval !13**: Approval auf bd5e2d2 erneuern? Options: Ja, erneuern / Nein
+
+➡️ Ja, erneuern
+
+> **Answer:** Ja, erneuern (Recommended)
+
+❓ **Q53** - **Merge !13**: Head bd5e2d2. Options: Merge now / No / Later / I merge myself
+
+➡️ Merge now — merged as `8786ed1`, branch kept; #111 closed and set to `status::done`
+
+> **Answer:** Merge now
+
+## Round 17 — 2026-10-20 — delivery (`schwaigc`, revise !14 after the review of `trutscf1`)
+
+The review of !14 (F1–F18) left six questions to the owner. Checked before asking: `next start` rejects `PORT=abc` with its own message, and the standalone `server.js` of the image falls back to port 3000 (`parseInt(process.env.PORT, 10) || 3000`).
+
+❓ **Q54** - **Start-Check (F1)**: Wie wird die Konfiguration von web vor der ersten Anfrage geprüft, sodass der Prozess bei einem Fehler wie in Beispiel 3 mit Exit-Code ≠ 0 endet? Options: Wrapper-Startskript / instrumentation.ts
+
+➡️ Wrapper-Startskript — M7 `apps/web/scripts/start.ts`
+
+> **Answer:** Wrapper-Startskript (Recommended)
+
+❓ **Q55** - **Schrift (F6)**: Das Layout lädt Geist über next/font/google (Internet beim Build, SCF-NF-1). Was stattdessen? Options: System-Schrift / Lokale Font-Dateien
+
+➡️ Lokale Font-Dateien — Geist from the package `geist` (SIL OFL 1.1) through `next/font/local`, licence row in the README
+
+> **Answer:** Lokale Font-Dateien
+
+❓ **Q56** - **Statusfarbe (F13)**: Bekommt die Statusseite schon in R1 eine Farbe zusätzlich zum Text? Options: Nein, nur Text / Ja, mit Tokens
+
+➡️ Nein, nur Text
+
+> **Answer:** Nein, nur Text (Recommended)
+
+❓ **Q57** - **Tests (F4c, F12)**: Wer schreibt welche Tests? Options: Web: T-39, T-40 / Alles Web / Gemeinsamer axe-Check
+
+➡️ Web: T-39, T-40 — in `tests/status-page.test.ts`; T-40 runs axe on `/status` with 0 violations of any impact; SCF-T-36 stays with the Platform track
+
+> **Answer:** Web: T-39, T-40 (Recommended)
+
+❓ **Q58** - **Health-Adressen (F8)**: Container-Hostnamen in den Defaults, localhost für den nativen Start? Options: Service = Unit-Name / Defaults = localhost
+
+➡️ Service = Unit-Name — interface with the Platform track; `.env.example` carries the container values and a comment with the native ones
+
+> **Answer:** Service = Unit-Name (Recommended)
+
+❓ **Q59** - **Fehlerantworten (F7)**: Antwortet web bei Fehlern mit ErrorResponse? Options: Ja, für /api/* / Auch für Seiten
+
+➡️ Ja, für /api/* — `/api/docs` without file: 500 `internal-error`; unknown `/api/*`: 404 `not-found`; HTML pages keep the normal not-found page
+
+> **Answer:** Ja, für /api/* (Recommended)
+
+❓ **Q60** - **Antwort auf das Review von !14**: Tabelle F1–F18 mit Erledigt und Ort, Entscheidungen Q54–Q59, Hinweis zu F18, Bitte um Re-Review posten? Options: Posten / Nicht posten
+
+➡️ Posten — answer posted on !14
+
+> **Answer:** Posten (Recommended)
+
+## Round 18 — 2026-10-20 — delivery (`schwaigc`, pipelines of !14 and !7)
+
+The job `commit-messages` failed on !14 (body line over 100 characters in `4596372`, by `schwaigc`) and on !7 (the same in `84508ee`, by `trutscf1`); the job `docs` failed on !14 because the position row named the MR's own branch, which the check reads as merged. `trutscf1` had added the assumptions A1–A6 to the plan.
+
+❓ **Q61** - **Commit-Nachrichten fixen**: Umschreiben und Force-Push mit `--force-with-lease` auf !14 (4596372 neu formuliert, die sieben folgenden Commits unverändert neu aufgesetzt) und !7 (84508ee mit kürzerer Body-Zeile), dazu ein Kommentar an trutscf1? Options: Ja, beide / Nur !14 / Keinen Force-Push
+
+➡️ Ja, beide — tree of each branch unchanged, commitlint clean
+
+> **Answer:** Ja, beide (Recommended)
+
+❓ **Q62** - **Annahmen A1–A6 von trutscf1**: tsconfig-Optionen, expliziter Test-Glob, `OPENAPI_FILE`, Template-Grafik löschen, Umgebung des Images, 405 mit ErrorResponse. Übernehmen? Options: Alle übernehmen / Einzelne ändern
+
+➡️ Alle übernehmen
+
+> **Answer:** Alle übernehmen (Recommended)
+
+## Round 19 — 2026-10-20 — review (`schwaigc`, !18 of `trutscf1`)
+
+!18 (R11 public content, §16 and §17, #108) was checked at `2a6af46`: doc-check, markdown lint, commitlint, and pipeline clean; findings at the boundary to the `web` unit and to R4.
+
+❓ **Q63** - **Review !18**: Wie soll das Review aussehen? Options: Changes requested / Approve mit Hinweisen / Nicht posten
+
+➡️ Changes requested — review with findings 1–7 posted, no approval; `schwaigc` set as reviewer
+
+> **Answer:** Changes requested (Recommended)
+
+❓ **Q64** - **Wer baut die web-Module von R11?** Options: trutscf1 baut, ich reviewe / Ich baue die web-Seite / Offen lassen
+
+➡️ trutscf1 baut, ich reviewe — every MR that changes `apps/web` gets the review of `schwaigc`
+
+> **Answer:** trutscf1 baut, ich reviewe (Recommended)
+
+❓ **Q65** - **Theme-Cookie gegen PUB-NF-3**: Options: Switcher nur für Mitglieder / Besucher ohne Speichern / Offen lassen
+
+➡️ Switcher nur für Mitglieder — a person without a session sees the default theme and gets no cookie
+
+> **Answer:** Switcher nur für Mitglieder (Recommended)
+
+❓ **Q66** - **Nächster Schritt**: Womit weitermachen, während die MRs auf Reviews warten? Options: R4 grillen (#116) / R6 grillen (#118) / Reviewer anschreiben / Session beenden
+
+➡️ Reviewer anschreiben — reminders posted on !7 (`tschudea07`: !5, !7, !9, merge order) and !14 (`trutscf1`: re-review of !14, revision of !18)
+
+> **Answer:** Reviewer anschreiben
