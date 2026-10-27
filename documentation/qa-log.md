@@ -490,7 +490,17 @@ The job `commit-messages` failed on !14 (body line over 100 characters in `45963
 
 > **Answer:** Reviewer anschreiben
 
-## Round — 2026-10-27 — delivery (`trutscf1`, agent, security fix for the pipeline of every MR)
+## Round 20 — 2026-10-27 — delivery (`trutscf1`, agent: revise !18)
+
+The review of !18 by `schwaigc` (findings 1 to 7) was worked in on `concept/public-content`; the concept decisions are the assumptions A55 to A61 in round 13 of `concepts/public-content.qa-log.md`. No question was shown: the point below was decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions), with the recommended option.
+
+❓ **Q100** - **Answer to the review of !18**: Push the revision (`dev` merged in), post one reply per finding 1 to 7 with the place of the fix, and request the re-review of `schwaigc`? Options: Post and request re-review / Push only / Do not publish
+
+➡️ Post and request re-review — reply posted on !18, `schwaigc` requested as reviewer again; no thread resolved, no merge (author `trutscf1`)
+
+> **Answer:** decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions): Post and request re-review (Recommended)
+
+## Round 21 — 2026-10-27 — delivery (`trutscf1`, agent, security fix for the pipeline of every MR)
 
 The pipeline of !19 (2026-10-27) failed in `dependency-audit` (Next.js 16.3.8: GHSA-2464-fhr4-w9xw and GHSA-673q-mjm6-r5xr critical, GHSA-p3m5-59mp-jv5r high, fixed in 16.4.1) and in `container-scan` (CVE-2026-111943 high in `usr/local/bin/gosu` of `postgres:18`, Go standard library 1.24.6). Both fail on `dev` itself, so they block every MR.
 
