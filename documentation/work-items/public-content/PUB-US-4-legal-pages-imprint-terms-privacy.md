@@ -35,5 +35,5 @@ The vertical slices that deliver this story. One slice is delivered by the story
 | 1 — whole story | PUB-AC-4.1, PUB-AC-4.2, PUB-AC-4.3, PUB-AC-4.4, PUB-AC-4.5, PUB-AC-4.6 | — | #81 |
 
 - **Story issue:** #81
-- **Weight:** 2
-- **Depends on:** PUB-US-1 (Set up the headless CMS with Strapi, #78)
+- **Weight:** 3, re-estimated with the architecture chapter on 2026-10-20 (the three legal templates and the privacy paragraphs are written text, [concept §8](../../concepts/public-content.md)); the tracker still shows 2 (the owner decides)
+- **Depends on:** PUB-US-1 (Set up the headless CMS with Strapi, #78), slice 3 (delivery by web)
