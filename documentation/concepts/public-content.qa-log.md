@@ -269,6 +269,45 @@ Shown with the next question: the two fix commits (the concept changes with requ
 
 > **Answer:** Commit, push, reply (Recommended)
 
+## Round 12 — 2026-10-20 — Phases 5 and 6, review findings of the agent review of !6 (agent, on request of trutscf1)
+
+Notes: no question was asked in this round. The owner asked the agent to apply the recommended default for the open points of the agent review (findings 3, 5, 6, 7) and to leave the school questions Q12 to Q14 open. Every assumption below is reviewed by `trutscf1`; a rejected one becomes a `Q<n>` of the next round. Question numbers continue from Q29, so the next free one is Q30 (process questions Q15, Q21 to Q27, and Q29 are not listed in §13 of the concept).
+
+Assumptions stated with the round, none rejected yet:
+
+- **A37**: `CONTENT_REFRESH_SECONDS` is an integer from 1 to 60, default 60, because `PUB-AC-1.4` promises that a change is public within 60 seconds and a larger value would break it.
+- **A38**: `CONTENT_TIMEOUT_MS` is an integer from 100 to 30000, default 2000, the same default as the health timeouts of the scaffolding concept.
+- **A39**: The access token of the `web` unit is the secret `CONTENT_ACCESS_TOKEN`, a string of at least 32 characters without a default, equal in `cms` and `web`; a missing or short value stops the unit like any invalid configuration (`SCF-E-1`).
+- **A40**: Allowed image types are PNG, JPEG, and WebP, recognized by their content, up to 2 097 152 bytes (2 MiB); SVG is excluded because it can carry scripts. New `PUB-F-35` and `PUB-E-8`.
+- **A41**: The rich text format is a small fixed markup (paragraphs, headings of level 2 to 4, bold, italic, two list kinds, links to `http`, `https`, `mailto`, or an own address); everything else is shown as plain text. New `PUB-F-36`.
+- **A42**: The record types of §8 use the neutral types of the manifest: `identifier` is `uuid`, `text(a..b)` is a `string` of a to b characters, `date` is a `string` of the form `YYYY-MM-DD`, and `rich text` is a `string` in the markup of A41; they are declared once as named types.
+- **A43**: Six further configuration values get their defaults until the Identity and web client concepts define them: `CMS_INTERNAL_URL`, `PUBLIC_BASE_URL`, `SESSION_CHECK_TIMEOUT_MS` (500, range 50 to 5000), `DASHBOARD_PATH`, `REGISTRATION_PATH`, `LOGIN_PATH`.
+- **A44**: Editor data rules: name 1 to 100 characters, e-mail address unique, password 12 to 128 characters; the panel creates and deletes only accounts of the role `editor`, and the administrator account cannot be deleted there (recovery is an operator task outside this concept). New `PUB-F-37`, `PUB-E-9`, `PUB-E-10`.
+- **A45**: The description of a page without its own description is the plain text of the body of the first `hero` section, cut after 160 characters; if there is none, the page title. The start pages of help center and changelog have the fixed titles of §8.
+- **A46**: The capabilities `PUB-C-1` to `PUB-C-4` of §7 are the ones the review named (content management with languages, password hashing, safe rich text, accessibility check); `STACK.md` gets capability-index rows only and the text "to be chosen by the owner".
+- **A47**: Work-item titles and issue #78 stay as they are, although "Strapi" is in the title of `PUB-US-1` and in `PUB-AC-1.1`; the finding is reported to the owner, who decides on a rename.
+- **A48**: Slices: `PUB-US-1` is cut into three slices (the cms unit, editor accounts, delivery by `web`); the other stories keep their one slice. Weights are re-estimated and proposed, the tracker is not changed by this round.
+- **A49**: The translation note is shown once at the top of a page that shows any German text under `/en`; each German passage is marked as German.
+- **A50**: `web` refreshes a content group when a request arrives and the last attempt is at least `CONTENT_REFRESH_SECONDS` old; one attempt per group runs at a time; a refresh succeeds only if all image files of the group were fetched too.
+- **A51**: The stage of the feature in `ROADMAP.md` stays `concept` until the issues are cut (`ready` means issues cut) and the reviewer accepted §16 and §17.
+- **A52**: Articles inside a help category are ordered alphabetically by title, because the data model has no position for articles; `PUB-F-16` says so.
+- **A53**: The legal templates follow the heading outline in §8 (headings and placeholders only); the wording below the headings is written by the author of the templates and is not legal advice (open question Q14).
+- **A54**: Two named error conditions were added so that no failure is left to guesswork: `PUB-E-11` (invalid content value) and `PUB-E-12` (action not permitted, including the failed sign-in).
+
+## Round 13 — 2026-10-27 — revise !18 after the review of `schwaigc` (agent, on request of trutscf1)
+
+Notes: no question was asked in this round. The review of !18 (2026-10-20, changes requested, findings 1 to 7) was worked through by the agent; every point below was decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions), with the recommended option or, for findings 1 and 3, with the position the reviewer took as owner of the `web` track and of R4 (Q64 and Q65 of `../qa-log.md`). `trutscf1` reviews them; a rejected one becomes a `Q<n>` of the next round, starting at Q30.
+
+Assumptions stated with the round, none rejected yet:
+
+- **A55** (finding 1): `trutscf1` builds the five `web` modules and `web-config` as owner of R11, and every MR that changes `apps/web` or the contracts folder `web` gets the review of `schwaigc` (Q64 of `../qa-log.md`). §16 says so in a paragraph of its own, and the slice table gets the column "Built by / reviewed by".
+- **A56** (finding 2): The public address space is `/` and every path whose first segment is exactly two lower-case letters `a` to `z`. `address-routing` gets the operation `claims(path)` and decides only claimed paths; `/media/<id>`, `/health`, `/status`, `/api/*`, and the later app paths never reach it, and `PUB-E-5` applies only inside the space. `DASHBOARD_PATH`, `REGISTRATION_PATH`, and `LOGIN_PATH` must lie outside it. New unit test `PUB-T-158`; `PUB-T-154` checks `/fr/home` as well.
+- **A57** (finding 3): The theme switcher of R4 is shown only to signed-in members (Q65 of `../qa-log.md`). `page-frame` gets the session state; with `valid` it shows the switcher, otherwise none, the default theme, and no cookie. The public pages of this feature are drawn with the state `none`, also for a member, because their session is checked only at `/`, `/de`, and `/en`. New §14 row, new §15 row for `design-system.md` (carried out by `schwaigc`), `PUB-T-146` extended, new unit test `PUB-T-159`.
+- **A58** (finding 4): The nine `web` values of §8 extend `WebConfig` of the track plan Web (M1) in the contracts folder `web` and are validated by its start check (M7); new module `web-config` with the unit tests `PUB-T-151` to `PUB-T-154`. `content-contracts` lives in the contracts folder `cms`, because `cms` provides the content interface; the token of `cms` extends the configuration shape of `cms`.
+- **A59** (finding 5): A page without a content language in its address sets its page language itself (the status page `en`, M5 of the track plan Web); the not-found page outside the public address space is German, the default and fallback language (Q7). Such a page gets the footer in its language and no language switch. New unit test `PUB-T-160`.
+- **A60** (finding 6): The §14 row "Scaffold on `dev`" names `apps/web`, both databases of the stack, and the earlier replacement of the template placeholder by M8 of the track plan Web; `PUB-US-2` then replaces that page.
+- **A61** (finding 7): The product is `stash`: example 13, `PUB-T-12`, and the story `PUB-US-2` use `stash` and `https://stash.example` instead of "Nimbus". The GitLab issue of `PUB-US-2` is brought in line when `/engineering-human tickets public-content` updates the issues.
+
 ## Open questions for the school management
 
 Legal questions the agent does not decide (grill flow, personal data). They are not answered in this log; the owner takes them to the data-protection contact of the school and records the answers here.

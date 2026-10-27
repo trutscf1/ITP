@@ -34,4 +34,4 @@ The vertical slices that deliver this story. One slice is delivered by the story
 
 - **Story issue:** #80
 - **Weight:** 3
-- **Depends on:** PUB-US-1 (Set up the headless CMS with Strapi, #78)
+- **Depends on:** PUB-US-1 (Set up the headless CMS with Strapi, #78), slice 3 (delivery by web)

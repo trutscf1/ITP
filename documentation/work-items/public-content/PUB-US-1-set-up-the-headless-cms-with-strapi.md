@@ -29,13 +29,14 @@ One user story of [Public content: landing page, help center, changelog, legal p
 
 ## Slices
 
-The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it. Proposed cut of 2026-10-06, made before the architecture chapter exists, so that each slice fits into 4 h (`WORKFLOW.md`, "Issues and weight"); the owner may recut it.
+The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it. Cut of 2026-10-20 with the architecture chapter ([concept §16](../../concepts/public-content.md)), so that each slice fits into 4 h (`WORKFLOW.md`, "Issues and weight"); it replaces the proposal of 2026-10-06, which had two slices. The modules of each slice are in the concept, §16, *Vertical Slices Breakdown*. The owner may recut it.
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
 | 1 — CMS runs with its content types | PUB-AC-1.1, PUB-AC-1.2, PUB-AC-1.5 | — | #78 |
-| 2 — Editor roles and cached delivery | PUB-AC-1.3, PUB-AC-1.4, PUB-AC-1.6, PUB-AC-1.7 | 1 | #107 |
+| 2 — Editor roles and first administrator | PUB-AC-1.3, PUB-AC-1.7 | 1 | #107 |
+| 3 — Delivery by web | PUB-AC-1.4, PUB-AC-1.6 | 2 | — |
 
 - **Story issue:** #78
-- **Weight:** 5 (slice 1: 3, slice 2: 2), estimated before PUB-AC-1.6 and PUB-AC-1.7 were added on 2026-10-06; re-estimated with the architecture chapter
+- **Weight:** 8 (slice 1: 3, slice 2: 2, slice 3: 3), re-estimated with the architecture chapter on 2026-10-20; the tracker still shows 5 and the title of #107 still names the old cut (the owner decides)
 - **Depends on:** SCF-US-2 (Local development environment with Docker Compose, #39)
