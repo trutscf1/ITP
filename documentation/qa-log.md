@@ -631,3 +631,9 @@ Open MRs: !5, !7, !9 of `schwaigc` (none approved; !7 and !9 in conflict with `d
 ➡️ Force-with-lease erlauben — `de53cac` replaced by `3a344f6` on `feature/68-design-tokens-and-themes` (same tree); !9 pushed at `5e35b87`
 
 > **Answer:** Force-with-lease erlauben (Recommended)
+
+❓ **Q85** - **Review !20**: doc-check-Regel AC-TEST (trutscf1). Inhaltlich ok, offen: Konflikt mit dev, Pipeline nur wegen dev rot. Wie posten? Options: Kommentar + Approve / Nur Kommentar / Nichts posten
+
+➡️ Kommentar + Approve — !20 approved; `dev` must be merged in before the merge. The new rule gives no error on !5, !7, or !9
+
+> **Answer:** Kommentar + Approve (Recommended)
