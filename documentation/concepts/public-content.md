@@ -531,6 +531,7 @@ The existing parts of the system this feature touches, checked on 2026-10-06 (Ph
 | Reverse proxy ([SCF-F-4]) | The admin panel is served under the prefix of `cms`; the public pages under `/de` and `/en` belong to `web`. | No address of a public page (§8) starts with the prefix of another unit. Image files requested from `cms` directly would be refused by [PUB-F-4]. | [PUB-F-32] |
 | Routes of `web` outside the public pages (`/health`, `/status`, `/api/docs`, `/api/*` of [scaffolding.track-web.md](scaffolding.track-web.md); later the dashboard, login, and registration) | The proxy sends every path under `/` to `web`, so these routes and the public pages share one unit. | A rule that answers "any other path" with the public not-found page would swallow these routes. | `address-routing` decides only the public address space of §8 (`claims`, rule 0); `DASHBOARD_PATH`, `REGISTRATION_PATH`, and `LOGIN_PATH` must lie outside it (§8); [PUB-E-5] applies only inside it; [PUB-T-158] |
 | Page frame of `web` | The footer with the legal links appears on every page, also on pages other features build (login, dashboard, share links, status page). | A feature that builds its own page frame would lose the footer. Whether legal pages can be read offline is not decided here. | [PUB-F-21]; the footer is part of the one page frame of `web` (architecture, §16). Offline reading belongs to [offline-mode.md](offline-mode.md). |
+| Theme memory of the design system ([DSA-F-2] of [design-system.md](design-system.md), R4) | `page-frame` draws every page with the design tokens and themes; R4 remembers a chosen theme in the cookie `stash-theme`. | A theme switcher shown to a person without a session would set that cookie, against [PUB-NF-3] (no cookie without a session). | The theme switcher is shown only to signed-in members (decision of `schwaigc` as owner of R4, Q65 of [../qa-log.md](../qa-log.md)); a person without a session sees the default theme and gets no cookie: `page-frame` rule 10, [PUB-T-146], [PUB-T-159]; change to `design-system.md` (§15) |
 | Member session ([identity.md](identity.md)) | `web` asks whether a visitor is a signed-in member ([PUB-F-12]). | Identity is built later and can be down; the landing page must still open. A person without a session gets no cookie ([PUB-NF-3]), so the language is carried by the address, never by a cookie. | [PUB-F-33], [PUB-F-27] |
 | Bot protection ([IDN-F-5], captcha) | `web` places the notice the provider prescribes ([PUB-F-23]). | The Identity concept does not hold the notice text or a setting for the hidden badge yet. | Change to `identity.md` (§15) |
 | Personal data of other features | The privacy template names every kind of personal data and every outside service ([PUB-F-22]). | The list goes stale when a feature stores a new kind of personal data, for example the IP address in the audit log ([TPM-AC-4.2]). | [PUB-F-22] extended; a feature that adds a kind of personal data adds its paragraph to the legal template in the same MR |
@@ -548,6 +549,7 @@ The existing parts of the system this feature touches, checked on 2026-10-06 (Ph
 | --- | --- | --- | --- |
 | [scaffolding.md](scaffolding.md), [SCF-NF-1] | New wording: the local stack MUST start without internet access with no unit `down`; a unit MAY be `degraded` only because of a non-essential check, and on a fresh installation that is exactly `administrator-account` of `cms`. | Q17 | `trutscf1`, with the migration of `scaffolding.md` (legacy format, P-DOC-5) |
 | [scaffolding.md](scaffolding.md), [SCF-F-8] and [SCF-U-1] | The row of a unit whose status is not `ok` MUST also show, as text, the names of its dependency checks that are `down`. | Q18, [PUB-AC-1.7] | `trutscf1` in the concept (same migration); `schwaigc` in the status page (#16) |
+| [design-system.md](design-system.md), [DSA-F-2] | The theme switcher is shown only to signed-in members; a person without a session sees the default theme, and no theme cookie is set for them. | [PUB-NF-3], Q65 of [../qa-log.md](../qa-log.md) | `schwaigc`, owner of R4, when he next changes `design-system.md` |
 | [identity.md](identity.md) | Specify the notice text the provider of the bot protection prescribes, in German and English, and the configuration value that hides the badge. | [PUB-F-23] | `tschudea07` |
 | `WORKFLOW.md`, "Releases" | New step: a content editor writes and publishes the changelog entry of the release in the team's installation. | Q19 | `trutscf1`, in the MR that delivers [PUB-US-3] (help center and changelog) |
 
@@ -864,8 +866,10 @@ Traces to: [PUB-F-11], [PUB-F-14], [PUB-F-15], [PUB-F-16], [PUB-F-17], [PUB-F-18
 **`page-frame`** (unit `web`)
 
 ```text
-frame(result: PageResult, route: RouteDecision, notice: optional<string>) -> HtmlResponse
+frame(result: PageResult, route: optional<RouteDecision>, notice: optional<string>, session: SessionState) -> HtmlResponse
+route: optional<RouteDecision> // present for a page of the public address space (§8); absent for a page of another feature
 notice: optional<string>      // the notice text from the Identity concept; present only when bot protection is on and its badge hidden
+session: SessionState         // valid only when the page is drawn for a signed-in member (address-routing, SessionState)
 
 rules:
   1. Every page, including not found, unavailable, login, registration, share-link, and status pages built by other
@@ -878,12 +882,16 @@ rules:
   5. translationNote true: the text "This page is not available in English." above the content (PUB-U-4).
   6. notice present: show it as text directly below the form it protects; absent: nothing (PUB-F-23, PUB-U-5).
   7. Exactly one level-1 heading; one column up to 320 pixels, content width up to 1280 pixels (PUB-U-1, PUB-NF-1).
-  8. The response sets no cookie, and the page holds no analytics; every resource address is on the own origin;
+  8. The frame sets no cookie, and the page holds no analytics; every resource address is on the own origin;
      images are /media/<id> (PUB-NF-2, PUB-NF-3, PUB-F-32).
   9. GET /media/<id>: content-client.image(id) -> the file with its media type, else "not found" without a page.
+ 10. Theme (decision of the owner of R4, Q65 of ../qa-log.md): session valid -> the header holds the theme switcher
+     of the design system and the page shows the member's theme (DSA-F-2). Any other state -> no theme switcher,
+     the default theme, and no cookie (PUB-NF-3). The public pages of this feature are drawn with the state none:
+     address-routing checks the session only at /, /de, and /en, and redirects a valid one (PUB-F-12).
 ```
 
-Traces to: [PUB-F-15], [PUB-F-21], [PUB-F-23], [PUB-F-32], [PUB-U-1], [PUB-U-2], [PUB-U-4], [PUB-U-5], [PUB-NF-1], [PUB-NF-2], [PUB-NF-3]. Requires: [PUB-C-4]; design tokens of [design-system.md](design-system.md); `content-client` (images).
+Traces to: [PUB-F-15], [PUB-F-21], [PUB-F-23], [PUB-F-32], [PUB-U-1], [PUB-U-2], [PUB-U-4], [PUB-U-5], [PUB-NF-1], [PUB-NF-2], [PUB-NF-3]. Requires: [PUB-C-4]; design tokens, themes, and the theme switcher of [design-system.md](design-system.md); `content-client` (images).
 
 **`setup-guide`** (`README.md`): the quick start of [SCF-F-19] holds, directly after the start command, the numbered step "Open `<origin>/cms` and register the CMS administrator", and the sentence that until then anyone who reaches the admin panel can do so. Traces to: [PUB-F-34].
 
@@ -944,7 +952,7 @@ Handling of one page request in `web`, in order:
 3. A `redirect` or `notFound` decision is answered at once (a not-found page is drawn by `page-frame`).
 4. For `render`, `page-resolution.resolve` asks `content-client.get(group)`, which refreshes the group first if the last attempt is at least `CONTENT_REFRESH_SECONDS` old.
 5. `page-resolution` renders rich text through `rich-text`, picks language versions, and returns a `PageResult` (page, redirect, 404, or 503).
-6. `page-frame.frame` wraps the page and sends it without a cookie.
+6. `page-frame.frame` wraps the page with the session state `none` (default theme, no theme switcher) and sends it without a cookie.
 
 ### Inter-Module Interfaces
 
@@ -956,7 +964,7 @@ Handling of one page request in `web`, in order:
 | Session check | Identity concept ([identity.md](identity.md)) | `address-routing` | cookies → SessionState (`valid`, `none`, `unknown`) | none; no answer counts as `unknown` ([PUB-F-33]) |
 | Page resolution | `page-resolution` | request handler | RouteDecision + `content-client` → PageResult | [PUB-E-3], [PUB-E-5], [PUB-E-6] |
 | Rich text | `rich-text` | `page-resolution` | string → list of RichBlock | none |
-| Page frame | `page-frame` | request handler, other features' pages | PageResult + RouteDecision + optional notice → HtmlResponse | none |
+| Page frame | `page-frame` | request handler, other features' pages | PageResult + optional RouteDecision + optional notice + SessionState → HtmlResponse | none |
 | Bot protection notice | Identity concept | `page-frame` | language → optional string | none |
 | Content operations | `content-model` | admin panel | `save`, `publish`, `unpublish`, `delete`, `saveImage` | [PUB-E-4], [PUB-E-7], [PUB-E-8], [PUB-E-11], [PUB-E-12] |
 | Account operations | `editor-accounts` | admin panel, `content-model` | `registerFirstAdministrator`, `createEditor`, `deleteEditor`, `changeOwn`, `signIn`, `canDo`, `hasAdministrator` | [PUB-E-9], [PUB-E-10], [PUB-E-12] |
@@ -1051,7 +1059,7 @@ The seams at which tests run (P-DES-2); everything behind a seam is exercised th
 | `address-routing` | PUB-T-89 to PUB-T-104, PUB-T-158 |
 | `rich-text` | PUB-T-105 to PUB-T-112 |
 | `page-resolution` | PUB-T-113 to PUB-T-137 |
-| `page-frame` | PUB-T-138 to PUB-T-150 |
+| `page-frame` | PUB-T-138 to PUB-T-150, PUB-T-159 |
 | `content-contracts` | PUB-T-151 to PUB-T-157 |
 | `setup-guide` | PUB-T-7 (acceptance test, README read as data) |
 
@@ -1178,11 +1186,12 @@ Per module, in the order of §16; values come from the worked examples of §10. 
 | PUB-T-143 | `page-frame` | A result with the translation note and a German passage under `/en` | The text "This page is not available in English." is above the content, and the German passage is marked as German | PUB-U-4 |
 | PUB-T-144 | `page-frame` | A form page, bot protection on with a hidden badge, notice "Geschützt durch den Bot-Schutz" | The notice is text, directly below the form, visible without scrolling past the form | PUB-F-23, PUB-U-5 |
 | PUB-T-145 | `page-frame` | The same page with bot protection off, and with the badge visible | No notice is shown | PUB-F-23 |
-| PUB-T-146 | `page-frame` | A response for a person without a session | It sets no cookie and holds no analytics code | PUB-NF-3 |
+| PUB-T-146 | `page-frame` | A response for a person without a session, with the session state `none` and with `unknown` | It sets no cookie, holds no analytics code, and holds no theme switcher; the page shows the default theme | PUB-NF-3 |
 | PUB-T-147 | `page-frame` | Every address in `src`, `href` of resources, and style references of any page | Each starts with `/` or with `PUBLIC_BASE_URL`; none points to another host | PUB-NF-2 |
 | PUB-T-148 | `page-frame` | Any page | Exactly one heading of level 1; the document language equals the page language | PUB-NF-1 |
 | PUB-T-149 | `page-frame` | The landing page at a width of 320 pixels, and of 1280 pixels | No horizontal scrolling at 320; the content uses the width up to 1280 | PUB-U-1 |
 | PUB-T-150 | `page-frame` | Images of a page | Each image address is `/media/<id>` on the own origin, with its alternative text in the language shown | PUB-F-32, PUB-NF-1 |
+| PUB-T-159 | `page-frame` | A stand-in page of another feature drawn with the session state `valid`, and the same page with `none` | With `valid` the header holds the theme switcher; with `none` it holds none; the frame sets no cookie in either case | PUB-NF-3 |
 | PUB-T-151 | `content-contracts` | The configuration of §10, example 11 | The output of the example, a non-zero exit code, and neither value printed; `CONTENT_TIMEOUT_MS` falls back to 2000 | PUB-F-6 |
 | PUB-T-152 | `content-contracts` | `CONTENT_REFRESH_SECONDS` 1, 60, 0, 61 | 1 and 60 are accepted; 0 and 61 stop the unit | PUB-F-6 |
 | PUB-T-153 | `content-contracts` | `CONTENT_TIMEOUT_MS` 100, 30000, 99, 30001; `SESSION_CHECK_TIMEOUT_MS` 50, 5000, 49, 5001 | The first two of each are accepted; the last two of each stop the unit | PUB-E-1, PUB-F-33 |
