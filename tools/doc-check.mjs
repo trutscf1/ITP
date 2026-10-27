@@ -4,8 +4,10 @@
 // Usage: node tools/doc-check.mjs [documentation-dir] [--json]
 //        [--status [--pending-title <MR title>] [--pending-branch <MR source branch>]]
 // --status also compares the ROADMAP stages and the position rows with the git history (S-3).
+// Rule AC-TEST looks for each acceptance criterion's ID in the test names of the code next to the
+// documentation folder; --pending-branch names the merge request whose slice must be tested.
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
-import { join, relative, posix } from "node:path";
+import { dirname, join, relative, resolve, posix } from "node:path";
 import { execFileSync } from "node:child_process";
 
 const DOC_TYPES = ["goal", "manifest", "context", "adr", "concept", "feature", "story", "qa-log", "stack", "workflow", "roadmap", "roadmap-details", "inbox", "versioning", "team", "status"];
@@ -13,11 +15,17 @@ const FORMATS = ["engineering-human/2", "legacy"];
 const AUDIENCES = ["product", "developer", "reviewer", "agent"];
 const STAGES = ["idea", "concept", "ready", "in progress", "in dev", "released"];
 const EARLY_STAGES = ["idea", "concept"];
+const DONE_STAGES = ["in dev", "released"];
 const ADR_STATUS = ["proposed", "accepted", "rejected", "deprecated", "superseded"];
 
 const ID_TOKEN = /(?<![\w-])(?:[A-Z]{2,4}-AC-\d+\.\d+|[A-Z]{2,4}-(?:US|NF|F|U|C|E|T)-\d+|G-1(?:\.[SN]\d+)?|R-\d+)(?!\w)/g;
 const CONCEPT_ID = /^([A-Z]{2,4})-(US|NF|F|U|C|E|T)-(\d+)$/;
 const AC_ID = /^([A-Z]{2,4})-AC-(\d+)\.(\d+)$/;
+// Rule AC-TEST: test files, folders never searched, test calls with their name, AC IDs in a name.
+const TEST_FILE = /\.(?:test|spec)\.[cm]?[jt]sx?$/;
+const SKIPPED_DIRS = new Set(["node_modules", "dist", "build", "out", "coverage", "storybook-static"]);
+const TEST_CALL = /(?<![\w$.])(?:test\.)?(?:describe|it|test|suite)(?:\.only)?\s*\(\s*(["'`])((?:\\[\s\S]|(?!\1)[^\\])*)\1/g;
+const AC_IN_NAME = /(?<![\w-])[A-Z]{2,4}-AC-\d+\.\d+(?!\w|\.\d)/g;
 
 const args = process.argv.slice(2);
 const VALUE_OPTIONS = ["--pending-title", "--pending-branch"];
@@ -169,6 +177,7 @@ const stackIds = [];
 const roles = [];
 const features = []; // work-item tree (P-DOC-6): feature.md per folder
 const storyFiles = []; // one user story per file
+const slices = []; // {acs, issues} per row of a story file's slice table
 let goalFound = false;
 
 function define(id, file, line) {
@@ -273,9 +282,12 @@ for (const path of listMarkdown(root)) {
         case "story:acs":
           conceptRow(story, kind, table, row, rawId, file, at);
           break;
-        case "story:slices":
-          for (const id of ids(col(table, row, "delivers"))) refs.push({ id, file, line: at, from: "Delivers" });
+        case "story:slices": {
+          const delivers = ids(col(table, row, "delivers"));
+          for (const id of delivers) refs.push({ id, file, line: at, from: "Delivers" });
+          slices.push({ acs: delivers, issues: [...col(table, row, "issue").matchAll(/#(\d+)/g)].map((m) => m[1]) });
           break;
+        }
         default:
           if (d.doc === "concept") conceptRow(concepts.at(-1), kind, table, row, rawId, file, at);
       }
@@ -395,7 +407,94 @@ for (const s of stackIds) {
   if (!defined.has(s.id)) report("warning", "STACK", s.file, s.line, s.id, "mapping without a capability requirement (dead weight)");
 }
 if (!goalFound) report("error", "FM", root, 0, "", "no document with doc: goal (GOAL.md) found");
+checkAcceptanceTests();
 if (statusMode) checkStatus();
+
+// ---------- acceptance criteria against the test names in code (AC-TEST) ----------
+
+// Definition of Done item 1: every acceptance criterion is demonstrated by a test whose name carries
+// its AC ID. Test files are *.test.* and *.spec.* scripts under tests/, apps/, and packages/ of the
+// folder that holds the documentation folder; a test name is the first string argument of
+// describe, it, test, suite, or test.describe (also with .only). Skipped and todo tests and
+// comments do not count. Severity: error once the feature is in dev or released, or when the
+// merge request (--pending-branch feature/<issue>-…) is the issue of a slice that delivers the
+// criterion; warning while the feature is in progress; nothing before. An untested justification
+// in the concept (§17, ID | Reason) lowers the error to a warning.
+function checkAcceptanceTests() {
+  const pendingIssue = pendingBranch.match(/^(?:feature|fix)\/(\d+)-/)?.[1];
+  const delivered = new Set(slices.filter((s) => pendingIssue && s.issues.includes(pendingIssue)).flatMap((s) => s.acs));
+  let tested = null;
+  for (const c of concepts) {
+    if (c.legacy) continue;
+    const stage = stageOf(c.title);
+    const done = DONE_STAGES.includes(stage);
+    for (const a of c.acs) {
+      const due = done || delivered.has(a.id);
+      if (!due && stage !== "in progress") continue;
+      tested ??= testedCriteria(dirname(resolve(root)));
+      if (tested.has(a.id)) continue;
+      const why = done ? `the feature is ${stage}` : delivered.has(a.id) ? `this merge request (#${pendingIssue}) delivers it` : "";
+      const justified = due && c.untested.has(a.id);
+      const note = justified ? `; ${why}, but an untested justification names it` : why ? `, and ${why}` : "";
+      report(due && !justified ? "error" : "warning", "AC-TEST", a.file, a.line, a.id, `no test name in tests/, apps/, or packages/ carries this ID${note}`);
+    }
+  }
+}
+
+function testedCriteria(codeRoot) {
+  const tested = new Set();
+  const walk = (dir) => {
+    if (!existsSync(dir)) return;
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        if (!entry.name.startsWith(".") && !SKIPPED_DIRS.has(entry.name)) walk(join(dir, entry.name));
+      } else if (entry.isFile() && TEST_FILE.test(entry.name)) {
+        for (const call of withoutComments(readFileSync(join(dir, entry.name), "utf8")).matchAll(TEST_CALL))
+          for (const id of call[2].match(AC_IN_NAME) ?? []) tested.add(id);
+      }
+    }
+  };
+  for (const top of ["tests", "apps", "packages"]) walk(join(codeRoot, top));
+  return tested;
+}
+
+// Removes // and /* */ comments; strings, template literals, and regular-expression literals stay
+// as they are, so a "//" inside them is not taken for a comment.
+function withoutComments(source) {
+  let out = "";
+  let i = 0;
+  let last = ""; // last significant character outside strings and comments
+  while (i < source.length) {
+    const c = source[i];
+    const next = source[i + 1];
+    if (c === "/" && next === "/") {
+      while (i < source.length && source[i] !== "\n") i++;
+    } else if (c === "/" && next === "*") {
+      const end = source.indexOf("*/", i + 2);
+      i = end < 0 ? source.length : end + 2;
+    } else if (c === '"' || c === "'" || c === "`" || (c === "/" && (last === "" || "(,=:[!&|?{};+-*%<>~^".includes(last)))) {
+      let j = i + 1;
+      let inClass = false;
+      while (j < source.length) {
+        const d = source[j];
+        if (d === "\\") j++;
+        else if (c === "/" && d === "[") inClass = true;
+        else if (c === "/" && d === "]") inClass = false;
+        else if (d === c && !inClass) break;
+        else if (c !== "`" && d === "\n") break;
+        j++;
+      }
+      out += source.slice(i, j + 1);
+      i = j + 1;
+      last = c;
+    } else {
+      out += c;
+      if (!/\s/.test(c)) last = c;
+      i++;
+    }
+  }
+  return out;
+}
 
 // ---------- status against git (--status) ----------
 
