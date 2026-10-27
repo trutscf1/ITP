@@ -570,7 +570,7 @@ Regeneration probe of sprint 1 (ADR-0005, `WORKFLOW.md` "Sprint cycle", step 5) 
 
 ❓ **Q158** - **`@nimbus/contracts` in SCF-AC-3.1**: The criterion names a package the test does not accept; the correction was listed in `scaffolding.track-web.md` but never made. Options: Correct the story file and the copy in issue #40 (Recommended) / Leave it to the list of the Web track
 
-➡️ Story file corrected to `@stash/contracts`, the note in `STACK.md` §2 removed, the copy in #40 updated; the entry in the list of `scaffolding.track-web.md` (owner `schwaigc`) and `DSA-AC-1.1` (`@nimbus/ui`) stay for their owners
+➡️ Story file corrected to `@stash/contracts`, the note in `STACK.md` §2 removed; the copy of SCF-AC-3.1 in the description of #40 is still to be updated (the agent was not permitted to edit the issue); the entry in the list of `scaffolding.track-web.md` (owner `schwaigc`) and `DSA-AC-1.1` (`@nimbus/ui`) stay for their owners
 
 > **Answer:** Correct the story file and the copy in #40 (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
 
