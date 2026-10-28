@@ -489,3 +489,15 @@ The job `commit-messages` failed on !14 (body line over 100 characters in `45963
 ➡️ Reviewer anschreiben — reminders posted on !7 (`tschudea07`: !5, !7, !9, merge order) and !14 (`trutscf1`: re-review of !14, revision of !18)
 
 > **Answer:** Reviewer anschreiben
+
+## Round 20 — 2026-10-27 — delivery (`trutscf1`, agent: implement #41)
+
+Concept questions of this issue are in `concepts/scaffolding.qa-log.md`, round 6 (Q21–Q29). The questions below were **decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)**; no pop-up was shown.
+
+Shown with the round: the Docker engine on the developer machine did not answer (HTTP 500), so the migration was planned offline with `prisma migration plan` (Prisma 8 needs no database for it) and applied and tested against a local PostgreSQL 18 started from the binaries of the npm package `embedded-postgres`, outside the repository.
+
+❓ **Q120** - **Merge Request veröffentlichen**: Branch pushen und MR nach dev mit „Closes #41", Assignee trutscf1, Reviewer tschudea07 öffnen? Options: Veröffentlichen (Recommended) / Nur pushen / Lokal lassen
+
+➡️ Veröffentlichen — the MR states that it depends on !17 (#39)
+
+> **Answer:** Veröffentlichen (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
