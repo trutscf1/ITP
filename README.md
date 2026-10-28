@@ -8,7 +8,7 @@ The project goal, its target users, and its non-goals are in [documentation/GOAL
 
 Early scaffold. What exists today:
 
-- a pnpm and Turborepo workspace with the five units in `apps/` and the shared packages in `packages/`; the Next.js application is the `web` unit in `apps/web/` (App Router, React, Tailwind CSS, Biome, Prisma), the other units are empty
+- a pnpm and Turborepo workspace with the five units in `apps/` and the shared packages in `packages/`; the Next.js application is the `web` unit in `apps/web/` (App Router, React, Tailwind CSS, Biome), the other units are empty; the shared package `packages/db` holds the relational schema (Prisma 8), its migrations, and the seed data
 - a `docker-compose.yml` that starts PostgreSQL 18 and MongoDB 8
 - the project documentation in `documentation/`
 
@@ -25,12 +25,12 @@ cp .env.example .env
 # 2. start the databases (PostgreSQL 18, MongoDB 8)
 docker compose up -d
 
-# 3. start the web application
-pnpm install
+# 3. install, create the tables, add the local test data, start the web application
+pnpm install && pnpm db:migrate && pnpm db:seed
 pnpm --filter @stash/web dev
 ```
 
-The web application then runs at <http://localhost:3000>. It reads the database connection from `DATABASE_URL`; copy the `DATABASE_URL` line of `.env.example` into `apps/web/.env` and make it match the PostgreSQL values of step 1.
+The web application then runs at <http://localhost:3000>. `pnpm db:migrate` and `pnpm db:seed` read the database connection from `DATABASE_URL` in `.env`; make it match the PostgreSQL values of step 1.
 
 Checks:
 
@@ -88,25 +88,22 @@ The planned technology is listed in the project proposal ([docs/projektantrag.md
 
 ## Data model
 
-Draft of the relational schema, derived from the project proposal (`docs/projektantrag.md`). Table names are plural, as the SQL style guide of the school demands. The binding diagram, created in Vertabelo, and the Prisma schema come with the story *Data model and Prisma schema* (`SCF-US-4`, [documentation/work-items/scaffolding/](documentation/work-items/scaffolding/)); they replace this draft. The application's own `users` table is in a 1:1 relation to the table of the authentication library.
+The relational schema as it stands, defined in `packages/db` (Prisma 8) and drawn with every column in [documentation/concepts/scaffolding.md](documentation/concepts/scaffolding.md) §8, "Relational data model" (story `SCF-US-4`). Table names are plural, as the SQL style guide of the school demands. The application's own `users` table is in a 1:1 relation to the user table of the authentication library: the database creates the `users` row with every auth user. Files, share links, quotas, and the audit log join with their features. The diagram drawn in Vertabelo follows as an export (open human step).
 
 ```mermaid
 erDiagram
-  auth_users ||--|| users : "1:1"
-  users ||--o{ team_members : joins
+  auth_users ||--|| users : "has exactly one"
+  auth_users ||--o{ auth_sessions : has
+  auth_users ||--o{ auth_accounts : has
+  users ||--o{ team_members : "belongs to teams through"
   teams ||--o{ team_members : has
-  users ||--o{ folders : owns
-  folders ||--o{ folders : "parent of"
-  folders ||--o{ files : contains
-  folders ||--o{ folder_permissions : "is granted by"
-  teams ||--o{ folder_permissions : receives
-  users ||--o{ folder_permissions : receives
-  users ||--o{ share_links : creates
-  files ||--o{ share_links : "is shared by"
-  folders ||--o{ share_links : "is shared by"
-  users ||--o| storage_quotas : has
-  users ||--o{ audit_logs : causes
+  teams ||--o{ folders : owns
+  folders |o--o{ folders : contains
+  folders ||--o{ folder_permissions : grants
+  users |o--o{ folder_permissions : "is granted"
 ```
+
+`auth_verifications` (e-mail confirmation and reset tokens of the authentication library) has no relation.
 
 ## Operation and deployment
 
@@ -150,8 +147,9 @@ The repository is public, so all content must be licence-free. Licences of what 
 | Component | Licence | Use |
 | --- | --- | --- |
 | Next.js, React, Tailwind CSS (`@tailwindcss/postcss`) | MIT | web application |
-| dotenv | BSD-2-Clause | reads the `.env` file in the web application |
-| Prisma | Apache-2.0 | database access |
+| dotenv | BSD-2-Clause | reads the `.env` file in `packages/db` |
+| Prisma | Apache-2.0 | database access, schema, and migrations (`packages/db`) |
+| node-postgres (`pg`) | MIT | seed command and database tests of `packages/db` |
 | TypeScript | Apache-2.0 | language |
 | Biome | MIT or Apache-2.0 | lint and format |
 | pnpm, Turborepo | MIT | package manager and task runner |
