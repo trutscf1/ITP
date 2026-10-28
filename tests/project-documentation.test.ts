@@ -149,8 +149,19 @@ describe("SCF-AC-7.5 Licence notes", () => {
   it("SCF-AC-7.5 lists the Docker images of docker-compose.yml", () => {
     const licences = section("Licence notes");
     const compose = readFileSync(join(root, "docker-compose.yml"), "utf8");
-    for (const [, image] of compose.matchAll(/image:\s*(\w+):/g)) {
-      const label = image === "postgres" ? "PostgreSQL" : "MongoDB";
+    const labels: Record<string, string> = {
+      postgres: "PostgreSQL",
+      mongo: "MongoDB",
+      redis: "Redis",
+      couchdb: "CouchDB",
+      seaweedfs: "SeaweedFS",
+      clamav: "ClamAV",
+      mailpit: "Mailpit",
+      caddy: "Caddy",
+    };
+    for (const [, image] of compose.matchAll(/image:\s*([\w./-]+):/g)) {
+      const label = labels[image.split("/").at(-1) ?? image];
+      assert.ok(label, `${image} image has no known name in the licence table`);
       assert.ok(licences.includes(label), `${image} image not listed`);
     }
   });
