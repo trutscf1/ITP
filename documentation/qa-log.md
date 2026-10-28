@@ -877,3 +877,19 @@ Decided by the agent on the owner's standing instruction of 2026-10-27 (work wit
 ➡️ Punkt 1 und CI/CD hier, Punkt 16 nach dem zweiten Merge — this MR names the rule in item 1 and in "CI/CD"; whichever of !15 and this MR is merged second drops "once built; until then the reviewer checks it by hand" from item 16
 
 > **Answer:** decided by the agent: Punkt 1 und CI/CD hier, Punkt 16 nach dem zweiten Merge (Recommended)
+
+## Round 33 — 2026-10-28 — delivery (`schwaigc`, close #103: offline check SCF-T-8)
+
+Provisional numbers (P-TEAM-5): Q165 to Q177 are on !28 and Q178 to Q180 on !29; these follow them. SCF-T-8 ran with internal networks (no route to the internet) and passed; `clamav/clamav:1.5` has no `arm64` image, so on this Apple Silicon machine it ran with `platform: linux/amd64` in a local override only.
+
+❓ **Q181** - **ClamAV auf Apple Silicon**: `clamav/clamav:1.5` gibt es nur für amd64, `docker compose up` bricht auf ARM-Macs beim Pull ab. Wie beheben? Options: platform: linux/amd64 / clamav/clamav-debian:1.5 / Nur melden
+
+➡️ Nur melden — bug issue #148 for `trutscf1` (owner of `docker-compose.yml`) with both options; `docker-compose.yml` unchanged
+
+> **Answer:** Nur melden
+
+❓ **Q182** - **Abschluss von #103**: SCF-AC-2.3 durch SCF-T-8, SCF-AC-2.5 durch den grünen `container-scan` (!17). Wie abschließen? Options: Kleiner MR, Closes #103 / Nur Kommentar + Issue schließen
+
+➡️ Kleiner MR — `docker/compose.offline-check.yml`, README, story file, log; reviewer `trutscf1`
+
+> **Answer:** Kleiner MR, Closes #103 (Recommended)

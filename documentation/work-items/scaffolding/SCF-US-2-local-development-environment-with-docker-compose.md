@@ -38,6 +38,8 @@ The vertical slices that deliver this story. One slice is delivered by the story
 | 3 — All units in the stack | SCF-AC-2.1 (complete) | 1, and the issue that makes each unit runnable | — |
 | 4 — Configuration check and native start | SCF-AC-2.6, SCF-AC-2.7 | 1 | — |
 
+**Offline check (SCF-T-8, slice 2).** Run on 2026-10-28 by `schwaigc` with `docker/compose.offline-check.yml` (internal networks, no host ports, `--pull never --no-build`, `.env.example` unchanged): all nine services (postgres, redis, mongodb, couchdb, seaweedfs, clamav, mailpit, web, proxy) became healthy within 20 s; `web` reached neither a host name nor an IP address on the internet; `OAUTH_ENABLED` and `CAPTCHA_ENABLED` were `false`, e-mail went to `mailpit`, ClamAV ran without `freshclam`; through the proxy `/` answered 200 and `/api/docs` the API description. Two findings: `clamav/clamav:1.5` has no `arm64` image, so on ARM machines the check ran with `platform: linux/amd64` (#148); the `web` image needs the build of the workspace packages of !29.
+
 **Temporary `web` image.** Slice 1 builds `web` from `docker/web.Dockerfile`, a stop-gap accepted in the review of !17 so that `docker compose up` starts `web` before its owner's build exists. It ships the whole repository with its development dependencies and is not meant for a deployment; nobody builds on it. M9 (container build) of the [track plan Web](../../concepts/scaffolding.track-web.md) replaces it with `apps/web/Dockerfile` in slice 1 of SCF-US-8, deletes the stop-gap, and moves the health check of `web` from `/` to `/health`.
 
 - **Story issue:** #39
