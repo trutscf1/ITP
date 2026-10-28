@@ -57,7 +57,7 @@ Refs: #<issue>
 
 ## CI/CD
 
-GitLab CI (`.gitlab-ci.yml`) runs one pipeline per change: a merge request pipeline while an MR is open, otherwise a branch pipeline on every push to a feature branch, `dev`, or `main`; the jobs are defined by `documentation/concepts/scaffolding.md` SCF-F-15, plus the documentation checks in `.gitlab/ci/docs.yml` (markdown lint and `tools/doc-check.mjs`). "Pipeline must succeed" is enabled as a merge check. Deployment on push to `main` follows with roadmap item R14.
+GitLab CI (`.gitlab-ci.yml`) runs one pipeline per change: a merge request pipeline while an MR is open, otherwise a branch pipeline on every push to a feature branch, `dev`, or `main`; the jobs are defined by `documentation/concepts/scaffolding.md` SCF-F-15, plus the documentation checks in `.gitlab/ci/docs.yml` (markdown lint and `tools/doc-check.mjs`, including the rule `AC-TEST` for tests carrying the `AC` IDs). "Pipeline must succeed" is enabled as a merge check. Deployment on push to `main` follows with roadmap item R14.
 
 ## Deviations from the profile
 
@@ -153,7 +153,7 @@ Record time on the issue or MR with `/spend` (§9): one entry per work session, 
 
 An issue is done, and its MR may be merged, only when every item holds:
 
-1. All acceptance criteria `AC-n.m` of the issue are met and demonstrated by a passing acceptance test carrying the AC ID.
+1. All acceptance criteria `AC-n.m` of the issue are met and demonstrated by a passing acceptance test carrying the AC ID. `tools/doc-check.mjs` rule `AC-TEST` checks that a test name carries the ID; in the MR pipeline it fails for every criterion the MR's slice delivers that has none (`MANIFEST.md`, "What the script checks").
 2. All tests pass in CI; no test is skipped without a written reason in the MR.
 3. Every commit follows "Commit messages" above; every commit touching production code names a requirement ID (P-GIT-4).
 4. The owning concept document (and Part H, if affected) is updated in the same MR (P-GIT-5, P-HUM-3).
