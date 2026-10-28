@@ -48,6 +48,7 @@ function licenceLabel(name: string): string | undefined {
   if (name === "prisma" || name.startsWith("@prisma/")) return "Prisma";
   if (name.startsWith("@commitlint/")) return "commitlint";
   const labels: Record<string, string> = {
+    "@asteasolutions/zod-to-openapi": "zod-to-openapi",
     "@biomejs/biome": "Biome",
     dotenv: "dotenv",
     next: "Next.js",
@@ -58,6 +59,7 @@ function licenceLabel(name: string): string | undefined {
     turbo: "Turborepo",
     typescript: "TypeScript",
     yaml: "yaml",
+    zod: "Zod",
   };
   const label = labels[name];
   assert.ok(label, `dependency ${name} has no known name in the licence table`);

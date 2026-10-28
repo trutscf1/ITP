@@ -150,6 +150,7 @@ The repository is public, so all content must be licence-free. Licences of what 
 | Component | Licence | Use |
 | --- | --- | --- |
 | Next.js, React, Tailwind CSS (`@tailwindcss/postcss`) | MIT | web application |
+| Zod, zod-to-openapi (`@asteasolutions/zod-to-openapi`) | MIT | shared contracts and the generated API description (`packages/contracts`) |
 | dotenv | BSD-2-Clause | reads the `.env` file in the web application |
 | Prisma | Apache-2.0 | database access |
 | TypeScript | Apache-2.0 | language |
