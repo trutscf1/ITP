@@ -28,6 +28,22 @@ services:
       - mongo-data:/data/db
       - mongo-config:/data/configdb
 
+  # Applies the pending migrations of the relational schema once and exits (SCF-F-26, SCF-E-7).
+  # Every service that uses the relational database depends on it with
+  # `condition: service_completed_successfully`. Needs the health check of `postgres` (!17).
+  db-migrate:
+    build:
+      context: .
+      dockerfile: packages/db/Dockerfile
+    restart: "no"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-stash_db}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - backend
+
 networks:
   frontend:
   backend:
