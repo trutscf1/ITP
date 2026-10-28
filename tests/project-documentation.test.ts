@@ -54,6 +54,7 @@ function licenceLabel(name: string): string | undefined {
   if (name === "storybook" || name.startsWith("@storybook/"))
     return "Storybook";
   const labels: Record<string, string> = {
+    "@asteasolutions/zod-to-openapi": "zod-to-openapi",
     "@biomejs/biome": "Biome",
     dotenv: "dotenv",
     next: "Next.js",
@@ -66,6 +67,7 @@ function licenceLabel(name: string): string | undefined {
     typescript: "TypeScript",
     vite: "Vite",
     yaml: "yaml",
+    zod: "Zod",
   };
   const label = labels[name];
   assert.ok(label, `dependency ${name} has no known name in the licence table`);
@@ -101,7 +103,8 @@ describe("SCF-AC-7.2 Setup guide", () => {
   it("SCF-AC-7.2 every variable of docker-compose.yml is in .env.example", () => {
     const compose = readFileSync(join(root, "docker-compose.yml"), "utf8");
     const example = readFileSync(join(root, ".env.example"), "utf8");
-    for (const [, name] of compose.matchAll(/\$\{(\w+)\}/g)) {
+    // $${NAME} is escaped for the shell of the container, not a variable of docker-compose.yml.
+    for (const [, name] of compose.matchAll(/(?<!\$)\$\{(\w+)[:}]/g)) {
       assert.match(example, new RegExp(`^${name}=`, "m"), `${name} missing`);
     }
   });
@@ -109,7 +112,8 @@ describe("SCF-AC-7.2 Setup guide", () => {
   it("SCF-AC-7.2 the DATABASE_URL named by the quick start is in .env.example", () => {
     assert.match(section("Quick start"), /DATABASE_URL/);
     const example = readFileSync(join(root, ".env.example"), "utf8");
-    assert.match(example, /^DATABASE_URL=\S+/m);
+    // A commented example: docker-compose.yml builds DATABASE_URL itself inside the stack.
+    assert.match(example, /^#? ?DATABASE_URL=\S+/m);
   });
 });
 
@@ -149,8 +153,19 @@ describe("SCF-AC-7.5 Licence notes", () => {
   it("SCF-AC-7.5 lists the Docker images of docker-compose.yml", () => {
     const licences = section("Licence notes");
     const compose = readFileSync(join(root, "docker-compose.yml"), "utf8");
-    for (const [, image] of compose.matchAll(/image:\s*(\w+):/g)) {
-      const label = image === "postgres" ? "PostgreSQL" : "MongoDB";
+    const labels: Record<string, string> = {
+      postgres: "PostgreSQL",
+      mongo: "MongoDB",
+      redis: "Redis",
+      couchdb: "CouchDB",
+      seaweedfs: "SeaweedFS",
+      clamav: "ClamAV",
+      mailpit: "Mailpit",
+      caddy: "Caddy",
+    };
+    for (const [, image] of compose.matchAll(/image:\s*([\w./-]+):/g)) {
+      const label = labels[image.split("/").at(-1) ?? image];
+      assert.ok(label, `${image} image has no known name in the licence table`);
       assert.ok(licences.includes(label), `${image} image not listed`);
     }
   });

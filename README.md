@@ -9,7 +9,7 @@ The project goal, its target users, and its non-goals are in [documentation/GOAL
 Early scaffold. What exists today:
 
 - a pnpm and Turborepo workspace with the five units in `apps/` and the shared packages in `packages/`; the Next.js application is the `web` unit in `apps/web/` (App Router, React, Tailwind CSS, Biome, Prisma), the other units are empty
-- a `docker-compose.yml` that starts PostgreSQL 18 and MongoDB 8
+- a `docker-compose.yml` that starts PostgreSQL 18, Redis, MongoDB, CouchDB, SeaweedFS, ClamAV, Mailpit, a Caddy reverse proxy, and the `web` unit; the other four units join when their code runs
 - the project documentation in `documentation/`
 
 Everything else in the architecture below is planned. The current state of every feature is in [documentation/ROADMAP.md](documentation/ROADMAP.md) and [documentation/ROADMAP-DETAILS.md](documentation/ROADMAP-DETAILS.md).
@@ -22,7 +22,7 @@ Requirements: Docker with Docker Compose, Node.js 24 LTS, and pnpm.
 # 1. configuration: copy the example and set your own values
 cp .env.example .env
 
-# 2. start the databases (PostgreSQL 18, MongoDB 8)
+# 2. start the stack (data services, mail catcher, reverse proxy, web)
 docker compose up -d
 
 # 3. start the web application
@@ -30,7 +30,7 @@ pnpm install
 pnpm --filter @stash/web dev
 ```
 
-The web application then runs at <http://localhost:3000>. It reads the database connection from `DATABASE_URL`; copy the `DATABASE_URL` line of `.env.example` into `apps/web/.env` and make it match the PostgreSQL values of step 1.
+The stack serves the web application at <http://localhost:8080> (`PROXY_PORT`) and catches all e-mail in Mailpit at <http://localhost:8025>. The first start takes a few minutes. All settings come from `.env`; OAuth and captcha are off there, so the stack starts offline once the images are present. For hot reload, run step 3 against `docker compose up -d postgres` with the line `DATABASE_URL=postgresql://stash:change-me@localhost:5432/stash_db` in `apps/web/.env` (user, password, port, and database as in `.env`, host `localhost`).
 
 Checks:
 
@@ -152,6 +152,7 @@ The repository is public, so all content must be licence-free. Licences of what 
 | Next.js, React, Tailwind CSS (`@tailwindcss/postcss`, `@tailwindcss/vite`) | MIT | web application; `@tailwindcss/vite` builds the styles of Storybook |
 | Radix UI (`radix-ui`) | MIT | accessible primitives of the design system (`@stash/ui`) |
 | Storybook (`storybook`, `@storybook/react-vite`), Vite | MIT | component documentation of the design system (`packages/ui`) |
+| Zod, zod-to-openapi (`@asteasolutions/zod-to-openapi`) | MIT | shared contracts and the generated API description (`packages/contracts`) |
 | dotenv | BSD-2-Clause | reads the `.env` file in the web application |
 | Prisma | Apache-2.0 | database access |
 | TypeScript | Apache-2.0 | language |
@@ -163,6 +164,12 @@ The repository is public, so all content must be licence-free. Licences of what 
 | `@axe-core/playwright` | MPL-2.0 | accessibility tests |
 | PostgreSQL 18 (Docker image) | PostgreSQL Licence | relational database, runs as a container |
 | MongoDB 8.0 (Docker image) | SSPL | metadata database, runs as a container; not part of the delivered source |
+| Redis 8.8 (Docker image) | RSALv2, SSPLv1, or AGPLv3, at the user's choice | sessions and cache, runs as a container |
+| CouchDB 3.5 (Docker image) | Apache-2.0 | offline sync database, runs as a container |
+| SeaweedFS 4.51 (Docker image) | Apache-2.0 | object storage, runs as a container |
+| ClamAV 1.5 (Docker image) | GPL-2.0 | virus scanner, runs as a container; not part of the delivered source |
+| Mailpit 1.32 (Docker image) | MIT | catches all outgoing e-mail of the local stack |
+| Caddy 2.11 (Docker image) | Apache-2.0 | reverse proxy of the local stack |
 | Geist and Geist Mono fonts | SIL Open Font Licence 1.1 | loaded by the starter layout |
 | `next.svg` and `vercel.svg` in `apps/web/public/` | logos of Vercel (third party), shipped with the Next.js starter | **to be replaced** by own assets before the final submission; `file.svg`, `globe.svg`, and `window.svg` of the starter are unused and to be deleted |
 
