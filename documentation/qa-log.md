@@ -893,3 +893,21 @@ Provisional numbers (P-TEAM-5): Q165 to Q177 are on !28 and Q178 to Q180 on !29;
 ➡️ Kleiner MR — `docker/compose.offline-check.yml`, README, story file, log; reviewer `trutscf1`
 
 > **Answer:** Kleiner MR, Closes #103 (Recommended)
+
+❓ **Q183** - **Zeit Reviews 28.10.**: Re-Approves !17, !19, !20, !25, !26 und Status-MR !28. Wie buchen? Options: !26 15m, !17 10m, Rest je 5m / je 10m, !28 30m / je 5m, !28 15m
+
+➡️ !26 15m, !17 10m, !19, !20, !25 je 5m, !28 20m — booked on the MRs
+
+> **Answer:** !26 15m, !17 10m, Rest je 5m (Recommended)
+
+❓ **Q184** - **Zeit #40**: `/api/docs` mit M1, Tests, Docker-Fix, Doku, MR !29? Options: 2h / 1h 30m / 2h 30m
+
+➡️ 1h 30m — booked on #40 (total 2h)
+
+> **Answer:** 1h 30m
+
+❓ **Q185** - **Zeit #103**: Offline-Check SCF-T-8, #148, MR !30? Options: 1h / 45m / 1h 30m
+
+➡️ 30m — booked on #103 (total 30m)
+
+> **Answer:** 30m
