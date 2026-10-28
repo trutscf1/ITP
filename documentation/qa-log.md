@@ -764,7 +764,87 @@ After the merges of !24 and !5 by `trutscf1`: `dev` merged into !7 (`qa-log.md` 
 
 > **Answer:** 15m
 
-## Round 29 — 2026-10-27 — delivery (`trutscf1` (agent), implement #138, doc-check rule `AC-TEST`)
+## Round 29 — 2026-10-27 — delivery (`trutscf1`, agent: revise !16)
+
+`schwaigc` requested changes on !16 on 2026-10-20: the job `commit-messages` fails (two headers over 120 characters), ErrorResponse contradicts `concepts/scaffolding.md` §8 and §10 example 6, conflicts with `dev`, a test for SCF-T-15, and caret ranges. Every question below was decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions), each with the recommended option.
+
+❓ **Q80** - **Commit-Header kürzen ohne Force-Push**: Force-Push ist gesperrt. Options: Neuer Branch `feature/40-shared-contracts` von `dev` mit sauberen Commits, neues MR, !16 schließen (Recommended) / Merge-Commit auf !16 (behebt den Job nicht, er prüft alle Commits)
+
+➡️ New branch from `dev`, test commit before the `feat` commit, one requirement ID per header; `feature/40-shared-contracts-zod-openapi` stays untouched
+
+> **Answer:** Neuer Branch, neues MR, !16 schließen (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q81** - **Route `/api/docs`**: Der gemergte Plan der Spur Web (M6) liest die generierte Datei über `OPENAPI_FILE` und kommt nach #40 (Order of work, Schritt 3); `apps/web` gehört `schwaigc`. Options: Route verlässt dieses MR, M6 liefert sie (Recommended) / Route nach M6 hier bauen (braucht M1, Pfad der Spur Web)
+
+➡️ The route leaves this MR; this MR provides what M6 requires: the generation command and its output path `packages/contracts/dist/openapi.json` (the default of `OPENAPI_FILE`, A3 of the track plan) and ErrorResponse. #40 stays open until M6 is merged (story file, slice 1)
+
+> **Answer:** Route verlässt dieses MR (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q82** - **ErrorResponse**: Options: Flaches `{ code, message }` von §8 mit den vier Codes als Aufzählung und einer Tabelle Code → Status → Meldung in §8 (Recommended) / Verschachtelte Form mit `fields` und §8 ändern
+
+➡️ §8 keeps its one block; `code` becomes `enum(validation-failed|not-found|method-not-allowed|internal-error)`, a table below it fixes status and message per code (the values of §10 example 6 and of M6/W-15/W-16/W-21 of the track Web)
+
+> **Answer:** Flaches Format von §8 mit Tabelle (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q83** - **Versionsbereiche von zod und zod-to-openapi**: Options: Exakt pinnen (4.6.7, 8.5.0) (Recommended) / Caret lassen und in STACK.md begründen
+
+➡️ Pinned exactly; STACK.md §2 says so
+
+> **Answer:** Exakt pinnen (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q84** - **Wann entsteht die Datei der API-Beschreibung?** Options: `openapi:generate` und zusätzlich `build` schreiben `packages/contracts/dist/openapi.json` (Recommended) / Nur `openapi:generate`
+
+➡️ Both; so the file exists for the native start, the tests of `web`, and the image (M9 builds `@stash/contracts`)
+
+> **Answer:** `openapi:generate` und `build` (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q85** - **Antworten auf !16 posten und !16 schließen?** Options: Posten und schließen (Recommended) / Nicht posten
+
+➡️ Reply on !16 with the place of every fix in the new MR, then close !16; publishing needs no confirmation (override 6 waived by the owner)
+
+> **Answer:** Posten und schließen (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q86** - **`dependency-audit` schlägt auf `dev` fehl**: `next` 16.3.8 hat seit 2026-10-22 zwei kritische und eine hohe Lücke (behoben ab 16.4.1). Options: In diesem MR nichts ändern, das Sicherheits-MR `fix/next-and-image-security-2026-10-27` behebt es für `dev` (Recommended) / `next` in diesem MR heben
+
+➡️ This MR changes neither `next` nor an image; a red `dependency-audit` or `container-scan` caused only by `dev` is accepted for now and named in the MR description (instruction of the main session of 2026-10-27)
+
+> **Answer:** In diesem MR nichts ändern (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+## Round 30 — 2026-10-27 — delivery (`trutscf1` (agent), revise !17 after the review of `schwaigc`)
+
+`schwaigc` requested changes on !17 (SCF-US-2 slice 1, #39) on 2026-10-20: the container scan fails, conflicts with `dev`, the `web` image must be marked as a stop-gap, the health check of `web`, and the image pins. No question was asked: each one below was decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions); the answer is the recommended option.
+
+❓ **Q90** - **Image findings without a fixed image**: After moving every image to the newest tag of a pinned minor version, findings remain that no published image fixes yet (Go standard library in gosu and caddy, brotli and curl packages released after the images were built, Jackson and Jetty in the unused Nouveau server of couchdb). How to handle them? Options: `.trivyignore` with reason and expiry 2026-11-23 / Drop the affected services / Let the container scan fail
+
+➡️ `.trivyignore` with reason and expiry 2026-11-23 — same expiry as the existing entries (end of Sprint 2); this delivers SCF-AC-2.5
+
+> **Answer:** `.trivyignore` with reason and expiry 2026-11-23 (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q91** - **Container scan stops at the first image**: The job ended at couchdb and never scanned the images after it. Change the job? Options: Scan every image, then fail / Keep it
+
+➡️ Scan every image, then fail — one run lists all findings
+
+> **Answer:** Scan every image, then fail (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q92** - **Dependency audit fails on next 16.3.8**: Bump Next.js in !17? Options: No, the separate security MR does it / Yes, in !17
+
+➡️ No, the separate security MR does it — the coordinator assigned the Next.js update and the gosu tag of `postgres` to the branch `fix/next-and-image-security-2026-10-27`; !17 gets it with `dev`
+
+> **Answer:** No, the separate security MR does it (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q93** - **Close #103 with !17?** SCF-AC-2.5 is met by the green container scan (SCF-T-10); SCF-AC-2.3 is met by the configuration tests, but SCF-T-8 (start with the network disconnected) has not run. Options: Keep #103 open until SCF-T-8 has run / Close #103 now
+
+➡️ Keep #103 open until SCF-T-8 has run — the MR delivers SCF-AC-2.5 and names SCF-T-8 as the one open check
+
+> **Answer:** Keep #103 open until SCF-T-8 has run (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q94** - **Example for `DATABASE_URL`** (inbox, review of !1 to !3): where? Options: Commented line in `.env.example` and one line in the README quick start / Own `apps/web/.env.example`
+
+➡️ Commented line in `.env.example` and one line in the README quick start — the quick start stays within 30 lines (SCF-AC-1.5)
+
+> **Answer:** Commented line in `.env.example` and one line in the README quick start (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+## Round 31 — 2026-10-27 — delivery (`trutscf1` (agent), implement #138, doc-check rule `AC-TEST`)
 
 Decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions); each question names the options and the chosen one, the recommendation of the agent.
 
