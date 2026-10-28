@@ -12,7 +12,6 @@ New tasks and ideas for this developer land here first, before anyone plans them
 ## Open
 
 - [2026-10-06] Revoke the two project access tokens used until 2026-10-06 (Project → Settings → Access tokens). The other three team members each create an own personal access token (`docs/agents/issue-tracker.md`, "Access").
-- [2026-10-06] Follow up the last non-blocking remark of the reviews of !1–!3 (`schwaigc`): the README quick start needs an example value for `DATABASE_URL` (requested in !17, SCF-US-2, which defines the PostgreSQL service).
 - [2026-10-06] Team review of the drafts in `GOAL.md` (roles R-1…R-3, success signals G-1.S1…S3) and of the *Serves* column in `ROADMAP.md`; only the wording of G-1 is confirmed.
 - [2026-10-06] Promote the feature issues #87–#100 to group epics (`/promote`); needs a membership in the group, which `trutscf1` does not have — ask the teacher or a group owner.
 - [2026-09-29] Set the merge settings per `docs/git_workflow_commands.md` §2.3 (squash never, "delete source branch" off, pipeline must succeed, discussions resolved) and the GitHub mirror (§18). Not chosen on 2026-10-06 (`qa-log.md`, Q14); the default branch is already `dev`.
