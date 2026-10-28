@@ -1,0 +1,151 @@
+// use prisma-8
+// Relational schema of stash: the mapping of the entity-relationship diagram in
+// documentation/concepts/scaffolding.md §8 (SCF-F-22, SCF-F-23). Table and column names are
+// plural snake_case as the SQL style guide demands.
+//
+// After a change (never edit an applied migration, SCF-F-23):
+//   pnpm --filter @stash/db exec prisma contract emit
+//   pnpm --filter @stash/db exec prisma migration plan --name <snake_slug>
+
+enum team_role {
+  @@type("pg/text@1")
+  owner  = "owner"
+  admin  = "admin"
+  editor = "editor"
+  viewer = "viewer"
+}
+
+enum permission_level {
+  @@type("pg/text@1")
+  read   = "read"
+  write  = "write"
+  manage = "manage"
+}
+
+// The four core tables of the authentication library, under plural names. The library's own
+// model and field names are mapped onto them by its configuration (STACK.md §3).
+model AuthUser {
+  id            String            @id
+  name          String
+  email         String            @unique
+  emailVerified Boolean           @default(false) @map("email_verified")
+  image         String?
+  createdAt     TimestamptzString @default(now()) @map("created_at")
+  updatedAt     TimestamptzString @default(now()) @map("updated_at")
+
+  @@map("auth_users")
+}
+
+model AuthSession {
+  id        String            @id
+  userId    String            @map("user_id")
+  user      AuthUser          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String            @unique
+  expiresAt TimestamptzString @map("expires_at")
+  ipAddress String?           @map("ip_address")
+  userAgent String?           @map("user_agent")
+  createdAt TimestamptzString @default(now()) @map("created_at")
+  updatedAt TimestamptzString @default(now()) @map("updated_at")
+
+  @@index([userId])
+  @@map("auth_sessions")
+}
+
+model AuthAccount {
+  id                    String             @id
+  userId                String             @map("user_id")
+  user                  AuthUser           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId             String             @map("account_id")
+  providerId            String             @map("provider_id")
+  accessToken           String?            @map("access_token")
+  refreshToken          String?            @map("refresh_token")
+  idToken               String?            @map("id_token")
+  accessTokenExpiresAt  TimestamptzString? @map("access_token_expires_at")
+  refreshTokenExpiresAt TimestamptzString? @map("refresh_token_expires_at")
+  scope                 String?
+  password              String?
+  createdAt             TimestamptzString  @default(now()) @map("created_at")
+  updatedAt             TimestamptzString  @default(now()) @map("updated_at")
+
+  @@index([userId])
+  @@map("auth_accounts")
+}
+
+model AuthVerification {
+  id         String            @id
+  identifier String
+  value      String
+  expiresAt  TimestamptzString @map("expires_at")
+  createdAt  TimestamptzString @default(now()) @map("created_at")
+  updatedAt  TimestamptzString @default(now()) @map("updated_at")
+
+  @@index([identifier])
+  @@map("auth_verifications")
+}
+
+// The own users table: exactly one row per row of auth_users (SCF-F-24). The row is created
+// by the trigger of the first migration, so every way the library creates a user is covered.
+model User {
+  id         Uuid              @id @default(sql`gen_random_uuid()`)
+  authUserId String            @unique @map("auth_user_id")
+  authUser   AuthUser          @relation(fields: [authUserId], references: [id], onDelete: Cascade)
+  createdAt  TimestamptzString @default(now()) @map("created_at")
+
+  @@map("users")
+}
+
+model Team {
+  id        Uuid              @id @default(sql`gen_random_uuid()`)
+  name      String
+  createdAt TimestamptzString @default(now()) @map("created_at")
+
+  @@map("teams")
+}
+
+model TeamMember {
+  teamId    Uuid              @map("team_id")
+  team      Team              @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId    Uuid              @map("user_id")
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      team_role
+  createdAt TimestamptzString @default(now()) @map("created_at")
+
+  @@id([teamId, userId])
+  @@index([userId])
+  @@map("team_members")
+}
+
+// Folders form one tree per team; the root folder has no parent.
+model Folder {
+  id                  Uuid              @id @default(sql`gen_random_uuid()`)
+  teamId              Uuid              @map("team_id")
+  team                Team              @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  parentId            Uuid?             @map("parent_id")
+  parent              Folder?           @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  name                String
+  inheritsPermissions Boolean           @default(true) @map("inherits_permissions")
+  createdAt           TimestamptzString @default(now()) @map("created_at")
+  updatedAt           TimestamptzString @default(now()) @map("updated_at")
+
+  @@unique([parentId, name])
+  @@index([teamId])
+  @@index([teamId], where: "parent_id IS NULL", unique: true, name: "folders_one_root_per_team")
+  @@map("folders")
+}
+
+// A permission on a folder, granted either to one member or to a team role.
+model FolderPermission {
+  id        Uuid              @id @default(sql`gen_random_uuid()`)
+  folderId  Uuid              @map("folder_id")
+  folder    Folder            @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  userId    Uuid?             @map("user_id")
+  user      User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      team_role?
+  level     permission_level
+  createdAt TimestamptzString @default(now()) @map("created_at")
+
+  @@unique([folderId, userId])
+  @@unique([folderId, role])
+  @@check(expression: "(user_id IS NULL) <> (role IS NULL)", name: "folder_permissions_member_or_role")
+  @@map("folder_permissions")
+}

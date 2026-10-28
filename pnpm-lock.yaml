@@ -62,12 +62,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@prisma/orm-postgres':
-        specifier: 8.0.0-rc.13
-        version: 8.0.0-rc.13(@prisma/cli-engine@0.6.2(@prisma/management-api-sdk@1.80.0)(magicast@0.5.5))(magicast@0.5.5)(typanion@3.14.0)(typescript@5.9.3)(vite@8.3.3(@types/node@24.19.1)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
-      dotenv:
-        specifier: ^18.0.4
-        version: 18.0.5
       next:
         specifier: 16.3.8
         version: 16.3.8(@types/node@24.19.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -78,9 +72,6 @@ importers:
         specifier: 19.2.8
         version: 19.2.8(react@19.2.8)
     devDependencies:
-      '@prisma/cli-engine':
-        specifier: 0.6.2
-        version: 0.6.2(@prisma/management-api-sdk@1.80.0)(magicast@0.5.5)
       '@stash/config':
         specifier: workspace:*
         version: link:../../packages/config
@@ -96,9 +87,6 @@ importers:
       '@types/react-dom':
         specifier: ^19
         version: 19.3.0(@types/react@19.3.0)
-      prisma:
-        specifier: 8.0.0-rc.19
-        version: 8.0.0-rc.19(@types/node@24.19.1)(@types/react@19.3.0)(@vercel/nft@1.11.0)(magicast@0.5.5)(pg@8.22.0)(typanion@3.14.0)(typescript@5.9.3)(vite@8.3.3(@types/node@24.19.1)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.0.3(@types/node@24.19.1)(vite@8.3.3(@types/node@24.19.1)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)))(ws@8.22.0)
       tailwindcss:
         specifier: ^4
         version: 4.3.3
@@ -117,6 +105,34 @@ importers:
         specifier: workspace:*
         version: link:../config
 
+  packages/db:
+    dependencies:
+      '@prisma/orm-postgres':
+        specifier: 8.0.0-rc.13
+        version: 8.0.0-rc.13(@prisma/cli-engine@0.6.2(@prisma/management-api-sdk@1.80.0)(magicast@0.5.5))(magicast@0.5.5)(typanion@3.14.0)(typescript@5.9.3)(vite@8.3.3(@types/node@24.19.1)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
+      dotenv:
+        specifier: ^18.0.4
+        version: 18.0.5
+      pg:
+        specifier: 8.22.0
+        version: 8.22.0
+    devDependencies:
+      '@prisma/cli-engine':
+        specifier: 0.6.2
+        version: 0.6.2(@prisma/management-api-sdk@1.80.0)(magicast@0.5.5)
+      '@stash/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/node':
+        specifier: ^24
+        version: 24.19.1
+      '@types/pg':
+        specifier: 8.20.4
+        version: 8.20.4
+      prisma:
+        specifier: 8.0.0-rc.19
+        version: 8.0.0-rc.19(@types/node@24.19.1)(@types/react@19.3.0)(@vercel/nft@1.11.0)(magicast@0.5.5)(pg@8.22.0)(typanion@3.14.0)(typescript@5.9.3)(vite@8.3.3(@types/node@24.19.1)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.0.3(@types/node@24.19.1)(vite@8.3.3(@types/node@24.19.1)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)))(ws@8.22.0)
+
   packages/ui:
     devDependencies:
       '@stash/config':
@@ -128,9 +144,18 @@ importers:
       '@stash/config':
         specifier: workspace:*
         version: link:../packages/config
+      '@stash/db':
+        specifier: workspace:*
+        version: link:../packages/db
       '@types/node':
         specifier: ^24
         version: 24.19.1
+      '@types/pg':
+        specifier: 8.20.4
+        version: 8.20.4
+      pg:
+        specifier: 8.22.0
+        version: 8.22.0
 
 packages:
 

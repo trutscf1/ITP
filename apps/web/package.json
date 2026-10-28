@@ -9,25 +9,20 @@
     "start": "next start",
     "lint": "biome check .",
     "format": "biome format --write",
-    "contract:emit": "prisma contract emit",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "node --test"
   },
   "dependencies": {
-    "@prisma/orm-postgres": "8.0.0-rc.13",
-    "dotenv": "^18.0.4",
     "next": "16.3.8",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
   "devDependencies": {
-    "@prisma/cli-engine": "0.6.2",
     "@stash/config": "workspace:*",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "prisma": "8.0.0-rc.19",
     "tailwindcss": "^4"
   }
 }
