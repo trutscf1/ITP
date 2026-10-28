@@ -17,7 +17,9 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "dev": "tsc --watch --preserveWatchOutput",
-    "test": "node --test"
+    "test": "node --test",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "radix-ui": "1.6.7"
@@ -28,8 +30,14 @@
   },
   "devDependencies": {
     "@stash/config": "workspace:*",
+    "@storybook/react-vite": "10.6.1",
+    "@tailwindcss/vite": "4.3.3",
     "@types/react": "^19",
+    "@types/react-dom": "^19.3.0",
     "react": "19.2.8",
-    "tailwindcss": "^4"
+    "react-dom": "19.2.8",
+    "storybook": "10.6.1",
+    "tailwindcss": "^4",
+    "vite": "8.3.3"
   }
 }
