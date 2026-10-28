@@ -763,3 +763,25 @@ After the merges of !24 and !5 by `trutscf1`: `dev` merged into !7 (`qa-log.md` 
 ➡️ read as "je 15m" (assumption A: the answer "15m" means 15 minutes for each review) — booked on the MRs
 
 > **Answer:** 15m
+
+## Round 29 — 2026-10-28 — review (`schwaigc`, open MRs after the merges of !7 and !9)
+
+`trutscf1` merged !7 and !9 on 2026-10-28 and replaced !23 by !26 (same code, commit messages that pass). Provisional numbers (P-TEAM-5).
+
+❓ **Q165** - **Re-Approvals**: !19, !20 (nur `dev`-Merge und Logs), !25 (unverändert, umgezielt auf !26), !26 (ersetzt !23, identischer Contracts-Code). Welche approven? Options (multi): !26 approven / !19 re-approven / !20 re-approven / !25 re-approven
+
+➡️ all four — short note and approval on each; not merged
+
+> **Answer:** !26 approven, !19 re-approven, !20 re-approven, !25 re-approven
+
+❓ **Q166** - **!17**: Lizenztest kennt jedes Image, sechs Image-Lizenzen, `DATABASE_URL` als Kommentar, Guava und go-jose in `.trivyignore`; Redis 8.8 unter RSALv2/SSPLv1/AGPLv3 gehört in #110. Wie vorgehen? Options: Re-Approve mit Redis-Hinweis / Nur Kommentar / Nichts tun
+
+➡️ Re-Approve mit Redis-Hinweis — posted and approved
+
+> **Answer:** Re-Approve mit Redis-Hinweis (Recommended)
+
+❓ **Q167** - **Status-MR**: `team/schwaigc/STATUS.md` auf `dev` nennt !7, !9, !23 noch als wartend. Status-MR von `dev` aus? Options: Ja, Status-MR / Nein
+
+➡️ Ja — branch `chore/status-schwaigc-2026-10-28`, reviewer `trutscf1`
+
+> **Answer:** Ja, Status-MR (Recommended)
