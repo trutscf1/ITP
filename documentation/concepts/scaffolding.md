@@ -44,7 +44,7 @@ Every developer starts the whole system with one command and builds their own ar
 
 ## H5. How it is built, in plain words
 
-The system consists of five separately running units — `web`, `identity`, `storage`, `worker`, `cms` — behind one reverse proxy, plus the data services they use (§16). Four people work in four tracks with paths of their own; the tracks meet only at a few fixed interfaces: the names of the root tasks, the shape of a health report, the routing table, the way a unit reports a wrong configuration, the error response, and the commit format (§16, "Inter-Module Interfaces"). A health report is a small record with the unit's name, its version, a status, and one entry per thing the unit depends on (§8). Which technology fills each capability stands only in `STACK.md`.
+The system consists of five separately running units — `web`, `identity`, `storage`, `worker`, `cms` — behind one reverse proxy, plus the data services they use (§16). Four people work in four tracks with paths of their own; the tracks meet only at a few fixed interfaces: the names of the root tasks, the shape of a health report, the routing table, the way a unit reports a wrong configuration, the error response, and the commit format (§16, "Inter-Module Interfaces"). A health report is a small record with the unit's name, its version, a status, and one entry per thing the unit depends on (§8). The relational data model — users, teams, folders, folder permissions, and the tables of the login library — is drawn in §8; one shared package holds its schema, its migrations, and the test data, and a one-shot container applies the migrations before any unit that needs the database starts (Q21, Q25). Which technology fills each capability stands only in `STACK.md`.
 
 ## H6. How we know it works
 
@@ -61,6 +61,7 @@ Every acceptance criterion has one acceptance test in §17 ([SCF-T-1] to [SCF-T-
 | Q13 Work split | One track per person with exclusive paths | Everyone plans and implements separately |
 | Q14 Missing story | New story [SCF-US-8] for status page, health reports, and proxy | They had requirements but no story |
 | A11 Data services | The local stack holds all data services from the start | [SCF-AC-2.1] demands it; the earlier assumption A3 is withdrawn |
+| Q23 Own users table | The database creates the `users` row with every auth user | Holds for every way a user is created, in one transaction |
 
 # Part S — Specification (normative)
 
@@ -126,11 +127,11 @@ The user stories and their acceptance criteria are the work items in [work-items
 | SCF-F-19 | Quick start | The README MUST contain a quick start of at most 30 lines that names every step from a fresh clone to the running project, and every command it names MUST exist in the repository. | SCF-AC-1.5 (Quick start) |
 | SCF-F-20 | Container health checks | Every container of the local stack MUST define a health check. The container of a unit MUST start only after the containers it depends on report healthy. | SCF-AC-2.4 (Health checks) |
 | SCF-F-21 | Uniform error response | Every HTTP endpoint of a unit MUST answer a failed request with an `ErrorResponse` (§8) and the matching HTTP status. | SCF-AC-3.4 (Uniform error format) |
-| SCF-F-22 | Data model diagram | The project documentation MUST hold the entity-relationship diagram of the relational data model, with plural table names. | SCF-AC-4.1 (ER diagram), SCF-AC-7.4 (ER diagram included) |
-| SCF-F-23 | Versioned migrations | The relational schema MUST be defined in one schema definition that matches the diagram of [SCF-F-22]. Every change to it MUST be a versioned migration file in the repository; an applied migration MUST NOT be edited. | SCF-AC-4.2 (Schema matches diagram) |
-| SCF-F-24 | Own users table | The relational schema MUST hold an own table `users` with exactly one row per user of the authentication library, in a 1:1 relation to that library's user table. | SCF-AC-4.3 (Own users table) |
-| SCF-F-25 | Seed data | One command MUST fill a fresh local database with test data: at least one user, one team, and one folder. | SCF-AC-4.4 (Seed data) |
-| SCF-F-26 | Migrations at start | When the local stack starts, all pending migrations MUST be applied before a unit that uses the relational database accepts requests ([SCF-E-7], failed migration). | SCF-AC-4.5 (Migrations at start) |
+| SCF-F-22 | Data model diagram | The project documentation MUST hold the entity-relationship diagram of the relational data model (§8, "Relational data model"), with plural snake_case table names. The diagram MUST be drawn in the diagram tool [SCF-C-21], and its export MUST be embedded next to the text form in §8 (Q27). | SCF-AC-4.1 (ER diagram), SCF-AC-7.4 (ER diagram included) |
+| SCF-F-23 | Versioned migrations | The relational schema MUST be defined in one schema definition, in the shared package `db` (Q21), that holds exactly the tables and columns of the diagram of [SCF-F-22]. Every change to it MUST be a versioned migration in the repository, created from the schema definition by the planning command of the access layer [SCF-C-19]; the migrations MUST form one chain from the empty database to the current schema definition. An applied migration MUST NOT be edited. | SCF-AC-4.2 (Schema matches diagram) |
+| SCF-F-24 | Own users table | The relational schema MUST hold an own table `users` with exactly one row per user of the authentication library, in a 1:1 relation to that library's user table `auth_users` (Q22). The database itself MUST create the `users` row in the same transaction that inserts the `auth_users` row and MUST delete it with that row (Q23); a second `users` row for the same auth user MUST be rejected. | SCF-AC-4.3 (Own users table) |
+| SCF-F-25 | Seed data | One command MUST fill a migrated local database with the test data of §10, example 8: one user, one team with that user as owner, the team's root folder, and one folder inside it. A second run MUST change nothing (Q29). | SCF-AC-4.4 (Seed data) |
+| SCF-F-26 | Migrations at start | When the local stack starts, a one-shot container MUST apply all pending migrations once the relational database is healthy, list them first, and exit; every container that uses the relational database MUST start only after it completed successfully (Q25, [SCF-E-7], failed migration). | SCF-AC-4.5 (Migrations at start) |
 | SCF-F-27 | Release tag | Every release MUST be an annotated tag `v<MAJOR>.<MINOR>.<PATCH>` on `main` and a release on the git host that holds the changelog section of that version. | SCF-AC-6.3 (Release tags) |
 | SCF-F-28 | Project documentation | The README MUST contain: an architecture overview with a diagram of the four areas and all databases; a setup guide for the start with and without internet access; notes on operation and deployment; a link to the Definition of Done in `documentation/WORKFLOW.md`, named as binding; and licence notes for all used content and dependencies. | SCF-AC-7.1 (Architecture overview), SCF-AC-7.2 (Setup guide), SCF-AC-7.3 (Definition of Done), SCF-AC-7.5 (Licence notes) |
 
@@ -219,7 +220,111 @@ Unit routing table (defaults; every value is configuration, [SCF-NF-8]):
 
 Every unit serves its health endpoint internally at `/health` on its internal port.
 
-The relational data model itself (tables for users, teams, permissions, folders) is the entity-relationship diagram of [SCF-F-22]; this document fixes only the `users` table of [SCF-F-24].
+### Relational data model
+
+The entity-relationship diagram of [SCF-F-22] (Q24). Its text form below is binding for the schema definition of [SCF-F-23]: the acceptance tests compare the two table by table and column by column ([SCF-T-18], [SCF-T-19]). Types are the database's own column types; `PK` is the primary key, `FK` a foreign key, `UK` a unique column. Later features extend the model with migrations of their own and update this diagram in the same merge request.
+
+> **Human step (open):** the diagram has to be drawn in Vertabelo, the tool the school prescribes ([SCF-C-21]), exported as PNG to `documentation/images/er-diagram.png`, and embedded here. Until then the text form is the draft, and the acceptance test of the export is marked as open (`todo`) in [SCF-T-18].
+
+```mermaid
+erDiagram
+    auth_users ||--|| users : "has exactly one"
+    auth_users ||--o{ auth_sessions : "has"
+    auth_users ||--o{ auth_accounts : "has"
+    users ||--o{ team_members : "belongs to teams through"
+    teams ||--o{ team_members : "has"
+    teams ||--o{ folders : "owns"
+    folders |o--o{ folders : "contains"
+    folders ||--o{ folder_permissions : "grants"
+    users |o--o{ folder_permissions : "is granted"
+
+    auth_users {
+        text id PK
+        text name
+        text email UK
+        bool email_verified
+        text image
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    auth_sessions {
+        text id PK
+        text user_id FK
+        text token UK
+        timestamptz expires_at
+        text ip_address
+        text user_agent
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    auth_accounts {
+        text id PK
+        text user_id FK
+        text account_id
+        text provider_id
+        text access_token
+        text refresh_token
+        text id_token
+        timestamptz access_token_expires_at
+        timestamptz refresh_token_expires_at
+        text scope
+        text password
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    auth_verifications {
+        text id PK
+        text identifier
+        text value
+        timestamptz expires_at
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    users {
+        uuid id PK
+        text auth_user_id FK, UK
+        timestamptz created_at
+    }
+    teams {
+        uuid id PK
+        text name
+        timestamptz created_at
+    }
+    team_members {
+        uuid team_id PK, FK
+        uuid user_id PK, FK
+        text role
+        timestamptz created_at
+    }
+    folders {
+        uuid id PK
+        uuid team_id FK
+        uuid parent_id FK
+        text name
+        bool inherits_permissions
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    folder_permissions {
+        uuid id PK
+        uuid folder_id FK
+        uuid user_id FK
+        text role
+        text level
+        timestamptz created_at
+    }
+```
+
+Rules the diagram cannot show:
+
+| Table | Rule |
+| --- | --- |
+| `auth_users`, `auth_sessions`, `auth_accounts`, `auth_verifications` | The four core tables of the authentication library, under plural names (Q22). The library writes them; its own model and field names are mapped onto these names by its configuration in the identity unit. Its identifiers are text that the library generates. |
+| `users` | The own users table of [SCF-F-24]: exactly one row per `auth_users` row, created by the database when the `auth_users` row is inserted and deleted with it (Q23). The features add their own columns here, never to `auth_users`. |
+| `team_members` | `role` is one of `owner`, `admin`, `editor`, `viewer` (the roles of the teams concept, R7). |
+| `folders` | One tree per team. The root folder has no parent, and a team has at most one root folder. Names are unique among the children of one folder. `inherits_permissions` is `true` unless the folder overrides the inheritance of its parent's permissions. Deleting a folder deletes its subtree. |
+| `folder_permissions` | Granted either to one member (`user_id`) or to a team role (`role`), never both and never neither; `level` is one of `read`, `write`, `manage`. At most one permission per folder and member, and one per folder and role. |
+| all | Every foreign key deletes with its parent row. Own identifiers are UUIDs the database generates; time stamps are stored with time zone and default to the time of the insert. |
 
 ## 9. Error Conditions
 
@@ -231,7 +336,7 @@ The relational data model itself (tables for users, teams, permissions, folders)
 | SCF-E-4 | Commit message rejected | A commit message violates the commit format. | Locally the commit is rejected with the linter's reason; in CI the commit-message job fails and names the commit. | None. | SCF-AC-6.1 (Commit check) |
 | SCF-E-5 | Failed CI job | Any CI job fails. | The merge request cannot be merged until a new pipeline passes. | None. | SCF-AC-5.3 (Failing conditions), SCF-AC-5.5 (Visible status) |
 | SCF-E-6 | Secret found | The secret scan finds a secret in the staged changes. | The commit is rejected and the finding (file, line, rule) is printed. | None. | SCF-AC-2.2 (Configuration by environment) |
-| SCF-E-7 | Failed migration | A pending migration cannot be applied at the start of the local stack. | The unit that applies the migrations exits with a non-zero code and names the migration; units that depend on it do not start. | None. | SCF-AC-4.5 (Migrations at start) |
+| SCF-E-7 | Failed migration | A pending migration cannot be applied at the start of the local stack. | The migrating container exits with a non-zero code; its output names the pending migrations and the operation that failed. The run is rolled back as a whole, so the database stays at its previous version, and the containers that depend on it do not start. | None. | SCF-AC-4.5 (Migrations at start) |
 
 ## 10. Worked Examples
 
@@ -311,15 +416,30 @@ A failure inside the unit is answered with HTTP status 500 and `{ "code": "inter
 | `worker` | `ok` | |
 | `cms` | `ok` | |
 
+**Example 8 — seed data ([SCF-F-25]).** After the seed command on a migrated, empty database (fictitious values, no personal data; fixed identifiers, so a second run finds every row and adds nothing):
+
+| Table | Row |
+| --- | --- |
+| `auth_users` | `id` `seed-auth-user-1`, `name` `Demo Member`, `email` `demo@stash.local`, `email_verified` `true` |
+| `users` | one row with `auth_user_id` `seed-auth-user-1` (created by the database, [SCF-F-24]) |
+| `teams` | `id` `00000000-0000-4000-8000-000000000001`, `name` `Demo team` |
+| `team_members` | that team, that user, `role` `owner` |
+| `folders` | root folder `00000000-0000-4000-8000-000000000011` `Demo team` without parent; folder `00000000-0000-4000-8000-000000000012` `Documents` inside it |
+
+The seed user has no password and cannot log in yet; logging in arrives with the identity concept (R3), which also seeds a password if it needs one.
+
+**Example 9 — failed migration ([SCF-E-7]).** A table `teams` exists already in an otherwise empty database. The migrating container lists `20261027T1846_create_relational_schema` as the migration it will run, then stops with `MIGRATION.RUNNER_FAILED` and the operation that failed (adding the foreign key `folders_team_id_fkey`), exits with a non-zero code, and leaves no table of the migration behind.
+
 ## 11. Integration Points
 
 - `docs/security_next_js.md`: its pre-commit configuration, secret-scanner allowlist, and code-scanner rules are adopted as the starting configuration for [SCF-F-14].
 - GitLab project settings (`docs/git_workflow_commands.md` §2.3): "pipeline must succeed" is enabled once [SCF-F-15] is merged.
 - Later concepts add dependency checks to the health report of their unit ([SCF-F-7]) and their variables to the example configuration ([SCF-F-17]).
+- The identity concept (R3) configures the authentication library with the table and column names of §8 ("Relational data model") and adds its plugin tables with migrations of its own; the teams concept (R7) and the storage concept (R5) build on `teams`, `team_members`, `folders`, and `folder_permissions` and may change them with migrations.
 
 ## 12. Out of Scope
 
-Observability (R2), any feature logic — including the use of the data services beyond starting them —, deployment and TLS (R14), the pages the accessibility check covers (R4), who may see the status page (R3), and the content of the relational data model beyond the `users` table (the diagram of [SCF-F-22] is its source).
+Observability (R2), any feature logic — including the use of the data services beyond starting them —, deployment and TLS (R14), the pages the accessibility check covers (R4), who may see the status page (R3), and the tables of later features: audit log, quotas, files, share links, and the plugin tables of the authentication library (two-factor, passkeys) come with their concepts as migrations of their own.
 
 ## 13. Resolved Questions & ADRs
 
@@ -343,6 +463,15 @@ Verbatim rounds: [scaffolding.qa-log.md](scaffolding.qa-log.md). ADR: `documenta
 | Q14 | Requirements without a story | New story [SCF-US-8] (units reachable and visible) with five acceptance criteria; [SCF-AC-2.6] (invalid configuration) and [SCF-AC-2.7] (native start) added to [SCF-US-2] | Status page, health reports, proxy routing, configuration validation, and native start had requirements but no story |
 | Q15 | Test concept at the migration | One acceptance test per acceptance criterion in §17; unit tests stay in the track plans | The check accepts all criteria covered or no test table |
 | Q16 | Tracking issue | #111 | `WORKFLOW.md`: every concept branch has an issue |
+| Q21 | Home of the relational schema | Shared package `db` (`packages/db`): schema definition, migrations, seed, database client; the empty scaffold in `apps/web` moves there | `identity`, `storage`, and `web` all use the schema; one package keeps one migration chain |
+| Q22 | Tables of the authentication library | Its four core tables are part of the schema, under the plural names `auth_users`, `auth_sessions`, `auth_accounts`, `auth_verifications` | One migration chain for the whole database; the school's plural rule holds for every table |
+| Q23 | How the 1:1 relation is kept | A database trigger creates the `users` row with the `auth_users` row; delete cascades; a unique foreign key | Holds for every way the library creates a user (registration, first OAuth login) and is atomic |
+| Q24 | Scope of the data model in R1 | `users`, `teams`, `team_members`, `folders`, `folder_permissions` besides the four auth tables (§8) | The story names users, teams, permissions, and folders; later features add their tables |
+| Q25 | Applying migrations at start | A one-shot container `db-migrate`; the units that use the database wait for its success | One place applies migrations; no unit races another |
+| Q26 | Command names of Prisma 8 | `prisma migration plan` creates, `prisma db migrate` applies; [SCF-AC-4.5] names `prisma db migrate` | Prisma 8 has no `migrate dev` or `migrate deploy` any more |
+| Q27 | Diagram tool | Text form (Mermaid) in §8 as the binding draft; the Vertabelo export follows as a human step | Vertabelo needs a human account; the text form can be tested |
+| Q28 | Tests against the database | A real PostgreSQL named by `TEST_DATABASE_URL`, one temporary database per test; a PostgreSQL service in the CI job `test`; skipped without the variable | The trigger and the migrations can only be proven on the real database |
+| Q29 | Seed data | Fixed, fictitious rows of §10, example 8, idempotent | Repeatable local starts; no personal data |
 
 Assumptions A1–A10: see the question log. Assumptions of the migration, stated on 2026-10-13 and not rejected — where a story and the earlier concept disagreed, the story decides, because it is the higher level (P-GOAL-3):
 
@@ -358,6 +487,9 @@ Assumptions A1–A10: see the question log. Assumptions of the migration, stated
 | A18 | Branch | `concept/migrate-scaffolding`. |
 | A19 | Address of the API description | `web` serves it, because `/api/docs` falls under the prefix `/` of the routing table. |
 | A20 | Capability index | `STACK.md` gets one index table of all capabilities; the tables of the track sections stay unchanged, so open merge requests on them do not conflict. |
+| A21 | Owner of [SCF-US-4] | `trutscf1` implements the story since 2026-10-27 (#41, taken over from `tschudea07`, who reviews it as owner of the Identity & CI track); the module specification of the package `db` stands in §16 of this document, not in the track plan. |
+| A22 | Commit scope | The new package gets the commit scope `db` (`WORKFLOW.md`, `commitlint.config.ts`). |
+| A23 | Columns of the auth tables | The columns of the four auth tables are those of the authentication library's core schema, in snake_case; the identity concept may add columns with a migration. |
 
 Changes decided in [public-content.md](public-content.md) (its Q17 and Q18) and carried out here: [SCF-NF-1] allows `degraded` because of a non-essential check, and [SCF-F-8] and [SCF-U-1] show the names of the failed checks.
 
@@ -391,6 +523,7 @@ repository root        workspace, root tasks, shared lint / format / type config
 ├── packages/contracts shared contracts: health, configuration helper, error response, OpenAPI generation
 ├── packages/ui        shared user-interface components
 ├── packages/config    shared type configuration
+├── packages/db        relational schema definition, migrations, seed, database client (Q21)
 └── tests              acceptance tests of this document (§17)
 ```
 
@@ -403,7 +536,7 @@ The slices and their issues stand in the story files (P-DOC-6); this table only 
 | SCF-US-1 Set up the monorepo | Platform & cms |
 | SCF-US-2 Local development environment with Docker Compose | Platform & cms; each owner adds the container build of their unit |
 | SCF-US-3 Shared contracts with Zod and OpenAPI | Contracts, storage & worker |
-| SCF-US-4 Data model and Prisma schema | Identity & CI |
+| SCF-US-4 Data model and Prisma schema | Identity & CI; implemented by `trutscf1` since 2026-10-27 (A21) |
 | SCF-US-5 CI pipeline with quality and security checks | Identity & CI |
 | SCF-US-6 Conventional Commits and generated changelog | Identity & CI (hooks, changelog draft, release job; #44); Platform & cms merges the release |
 | SCF-US-7 Project documentation and Definition of Done | shared by all four |
@@ -430,7 +563,24 @@ Each owner writes the "Plan" section of their plan file (module specification in
 
 ### Module Specifications
 
-n/a — written per track in the plan files named in the table above, so that every owner specifies their own modules (Q13).
+Written per track in the plan files named in the table above, so that every owner specifies their own modules (Q13). One exception: the package `db` of [SCF-US-4] is specified here, because its implementer is not the owner of its track (A21).
+
+**Package `db`** — traces to [SCF-F-22] to [SCF-F-26], [SCF-E-7]; requires the relational database [SCF-C-8] and the access layer [SCF-C-19].
+
+```text
+schema definition      tables, columns, keys, and checks of §8 ("Relational data model")
+migrations             chain of migration packages, the first from the empty database;
+                       each created by the planning command from the schema definition.
+                       The first one also creates the trigger of [SCF-F-24]:
+                         after insert on auth_users: insert users(auth_user_id = new.id)
+migrate:deploy         list the pending migrations; apply them in one transaction;
+                       exit 0, or exit non-zero with the failed operation ([SCF-E-7])
+seed(databaseUrl)      in one transaction, insert the rows of §10, example 8,
+                       each "on conflict do nothing"; the users row follows from the trigger
+client(databaseUrl)    database client typed by the schema definition, for the units
+container db-migrate   build: workspace with this package's dependencies;
+                       run migrate:deploy against DATABASE_URL, then exit
+```
 
 ### Pipeline Flow
 
@@ -491,6 +641,7 @@ The seams at which the acceptance tests of §17 run (P-DES-2):
 - **Reverse proxy**: HTTP requests to the proxied paths of the started local stack.
 - **Status page**: the rendered page of `web`, with the health endpoints of the units stubbed.
 - **Command line**: the exit code and output of a command (unit start with a wrong configuration, commit check, seed, changelog draft).
+- **Relational database** (Q28): a PostgreSQL server named by `TEST_DATABASE_URL`. Each test creates an empty database of its own, applies the migrations with the command of the migrating container, works on it with plain SQL — an insert into `auth_users` is exactly what the authentication library does when it creates a user — and drops it afterwards.
 
 ### Requirement Traceability Matrix
 
@@ -536,11 +687,11 @@ One test per acceptance criterion; test names in code carry the `AC` ID. On `dev
 | SCF-T-15 | API description is generated and served | SCF-AC-3.3, SCF-F-10 | the contracts package with one HTTP contract | the generation command runs and `/api/docs` is requested | the generated description names that contract, and the response of `/api/docs` equals the generated file |
 | SCF-T-16 | Errors have one format | SCF-AC-3.4, SCF-F-21, SCF-NF-4 | an endpoint of a unit | a request with an invalid body and a request that fails inside the unit are sent | the responses are those of §10, example 6: an ErrorResponse with status 400 and one with status 500, without stack trace, database statement, host, or port |
 | SCF-T-17 | Breaking contract change fails typecheck | SCF-AC-3.5, SCF-NF-7 | a contract field that a unit reads | the field is removed from the contract | `typecheck` exits with a non-zero code and names the unit's file |
-| SCF-T-18 | Diagram uses plural table names | SCF-AC-4.1, SCF-F-22 | the entity-relationship diagram in the project documentation | its table names are read | every table name is a plural noun, and the tables `users`, `teams`, and `folders` exist |
-| SCF-T-19 | Schema and migrations match | SCF-AC-4.2, SCF-F-23 | the schema definition and the migration files | the migrations are applied to an empty database and compared with the schema definition | no difference remains, and every table of the diagram exists |
-| SCF-T-20 | Users table mirrors the auth users | SCF-AC-4.3, SCF-F-24 | an empty database with the migrations applied | a user is created through the authentication library | the table `users` holds exactly one row that references that user |
-| SCF-T-21 | Seed creates test data | SCF-AC-4.4, SCF-F-25 | a fresh local database with the migrations applied | the seed command runs | at least one user, one team, and one folder exist |
-| SCF-T-22 | Migrations run at the start | SCF-AC-4.5, SCF-F-26, SCF-E-7 | the local stack with an empty relational database, and once more with a migration that cannot be applied | the stack starts | first run: all migrations are applied before `identity` reports `ok`; second run: the migrating container exits with a non-zero code and names the migration, and `identity` does not start |
+| SCF-T-18 | Diagram uses plural table names | SCF-AC-4.1, SCF-F-22 | the entity-relationship diagram in §8 | its table names are read, and the embedded export is looked for | every table name is a plural snake_case noun, the tables `users`, `teams`, and `folders` exist, and the Vertabelo export is embedded (open until the human step of §8 is done) |
+| SCF-T-19 | Schema and migrations match | SCF-AC-4.2, SCF-F-23 | the diagram, the schema definition, and the migrations | the schema definition is compared with the diagram, the migration chain is read, and the migrations are applied to an empty database | tables and columns with their types are the same in diagram and schema definition; the chain starts empty and ends at the schema definition; the migrated database matches the schema definition strictly |
+| SCF-T-20 | Users table mirrors the auth users | SCF-AC-4.3, SCF-F-24 | an empty database with the migrations applied | a row is inserted into `auth_users` as the authentication library does, a second `users` row for it is tried, and the auth user is deleted | `users` holds exactly one row for it, the second row is rejected, and the row is gone after the delete |
+| SCF-T-21 | Seed creates test data | SCF-AC-4.4, SCF-F-25 | a fresh local database with the migrations applied | the seed command runs twice | the rows of §10, example 8 exist exactly once: one user, one team with that user as owner, the root folder and `Documents` inside it |
+| SCF-T-22 | Migrations run at the start | SCF-AC-4.5, SCF-F-26, SCF-E-7 | the stack definition; an empty database; a database with a table in the way | the stack definition is read; the command of the migrating container runs on each database | `db-migrate` runs that command once `postgres` is healthy, and every other service that uses the database waits for its success; the empty database is migrated; on the other one the command exits non-zero, names the migration and the failed operation, and leaves no table behind (§10, example 9) |
 | SCF-T-23 | Pipeline runs on every change | SCF-AC-5.1, SCF-F-15 | the pipeline definition | its rules are evaluated for a push to a feature branch, to `dev`, to `main`, a merge request, and a push with an open merge request | each case starts exactly one pipeline |
 | SCF-T-24 | Pipeline holds all jobs | SCF-AC-5.2, SCF-F-15 | the pipeline definition | its jobs are listed | it holds lint, typecheck, test, build, commit-message check, accessibility check, secret scan, code scan, dependency audit, and container image scan |
 | SCF-T-25 | Failing job blocks the merge | SCF-AC-5.3, SCF-NF-6, SCF-E-5 | a merge request with a lint error, one with a failing test, and one with a dependency of severity high | their pipelines run | each pipeline fails, and none of the merge requests can be merged |
@@ -562,15 +713,15 @@ One test per acceptance criterion; test names in code carry the `AC` ID. On `dev
 
 ### Integration Tests
 
-n/a — the acceptance tests [SCF-T-8], [SCF-T-22], and [SCF-T-36] already run against the started local stack; a further end-to-end scenario follows with the first feature.
+n/a — the acceptance tests [SCF-T-8] and [SCF-T-36] already run against the started local stack, and [SCF-T-19] to [SCF-T-22] against a real relational database; a further end-to-end scenario follows with the first feature.
 
 ### Synthetic Test Data Strategy
 
-The values of §10 are the test data: the two health reports, the configuration output, the commit messages, the changelog draft, the two error responses, and the status table. Tests keep them as data next to the test, not inside the test code. The seed data of [SCF-F-25] is specified in the plan of the Identity & CI track.
+The values of §10 are the test data: the two health reports, the configuration output, the commit messages, the changelog draft, the two error responses, and the status table. Tests keep them as data next to the test, not inside the test code. The seed data of [SCF-F-25] is §10, example 8; the seed command and its test read it from one data file of the package `db`.
 
 ### CI Test Constraints
 
-Tests that read the repository run in the `test` job without network. Tests that need the started local stack ([SCF-T-8], [SCF-T-12], [SCF-T-22], [SCF-T-36]) run where a container runtime is available; until the pipeline offers one, they are run locally and their result is stated in the merge request. No test calls a service on the internet.
+Tests that read the repository run in the `test` job without network. The database tests of [SCF-US-4] run in the same job against its PostgreSQL service (Q28); its credentials are throwaway values of the job. Tests that need the started local stack ([SCF-T-8], [SCF-T-12], [SCF-T-36]) run where a container runtime is available; until the pipeline offers one, they are run locally and their result is stated in the merge request. No test calls a service on the internet.
 
 ### Test Coverage Matrix & Untested Justifications
 

@@ -44,7 +44,7 @@ Every capability of `concepts/scaffolding.md` §7 and where its technology stand
 | SCF-C-18 | Virus scanner | _open_ — ClamAV per `SCF-AC-2.1` | `schauby1` |
 | SCF-C-19 | Database access layer | section 3 (row "Database access layer") | `tschudea07` |
 | SCF-C-20 | Accessibility checker | section 3 (row "Accessibility check in CI") | `tschudea07` |
-| SCF-C-21 | Data model diagram tool | _open_ — Vertabelo per `SCF-AC-4.1` | `tschudea07` |
+| SCF-C-21 | Data model diagram tool | section 3 (row "Data model diagram tool") | `tschudea07` |
 
 ## 1. Platform — `trutscf1`
 
@@ -66,7 +66,7 @@ Module mapping (folder layout), set by #38:
 | --- | --- | --- |
 | `apps/web` | `@stash/web` | Unit `web` (Next.js app) |
 | `apps/identity`, `apps/storage`, `apps/worker`, `apps/cms` | `@stash/<unit>` | The other four units; empty until their issues |
-| `packages/contracts`, `packages/ui`, `packages/config` | `@stash/<name>` | Shared packages; `config` holds the TypeScript base config |
+| `packages/contracts`, `packages/ui`, `packages/config`, `packages/db` | `@stash/<name>` | Shared packages; `config` holds the TypeScript base config, `db` the relational schema, migrations, and seed (#41) |
 | `tests/` | `@stash/tests` | Acceptance tests that run at the repository root |
 
 Build/run commands (root): `pnpm install`, `pnpm dev`, `pnpm run lint`, `pnpm run typecheck`, `pnpm run build`, `pnpm test`. Configuration & secrets: _open_.
@@ -86,7 +86,8 @@ Type mapping (neutral type → concrete type) and error mapping (`E-x` → concr
 | Capability | Technology | Version constraint | Notes |
 | --- | --- | --- | --- |
 | SCF-C-4 HTTP server framework (`identity`) | _open_ | | |
-| Database access layer (`identity`) | _open_ | | |
+| SCF-C-19 database access layer (package `db`, used by every unit with the relational database) | Prisma ORM 8 with its PostgreSQL target; contract in Prisma Schema Language `packages/db/src/prisma/contract.prisma`, migrations in `packages/db/migrations/app`; `pg` for the seed and the database tests | `prisma` 8.0.0-rc.19, `@prisma/orm-postgres` 8.0.0-rc.13, `@prisma/cli-engine` 0.6.2, exact; `pg` 8.22.0 | School minimum Prisma ≥ 8. Create a migration: `prisma contract emit`, then `prisma migration plan --name <snake_slug>` in `packages/db` (offline, no database needed); a hand-made step (the trigger of SCF-F-24) is added to the planned `migration.ts` and written with `node migrations/app/<dir>/migration.ts`. Apply: `pnpm db:migrate` (`prisma db migrate --show && prisma db migrate`, one transaction); container `db-migrate` from `packages/db/Dockerfile`. Seed: `pnpm db:seed`. Time columns are `TimestamptzString` (text on read), because the `Temporal` codec needs Node.js ≥ 26.8. Auth library tables: model and field names mapped to `auth_users`, `auth_sessions`, `auth_accounts`, `auth_verifications` in snake_case by its configuration (identity concept). Database tests: `TEST_DATABASE_URL`, passed through by Turborepo; CI job `test` has a `postgres:18-alpine` service. Set by #41 (`trutscf1`, A21). |
+| SCF-C-21 data model diagram tool | Vertabelo (Redgate) | – | Prescribed by `docs/anforderungen_software_projekte.md`. The text form in `concepts/scaffolding.md` §8 is binding until the export `documentation/images/er-diagram.png` is embedded (human step). Set by #41. |
 | SCF-C-9 CI service | GitLab CI | – | Q4. `.gitlab-ci.yml`: one pipeline per change (merge request pipeline while an MR is open, otherwise branch pipeline); lint, typecheck, test, build in parallel on the `node` image of the version in `.tool-versions`; 10-minute job timeout; pnpm store cached by lockfile, Turborepo cache per job, shared by all branches (SCF-US-5) |
 | SCF-C-10 secret scanner, code scanner, dependency auditor, container image scanner | Gitleaks, Semgrep, `pnpm audit`, Trivy | Gitleaks 8.30.0, Semgrep 1.148.0, Trivy 0.69.3 | From `docs/security_next_js.md`: `.gitleaks.toml`, `.semgrep.yml` (registry rule sets passed with `--config`, `.claude/` ignored), `.pre-commit-config.yaml` locally and the same files in CI. `pnpm audit --prod --audit-level=high`. Trivy scans every image of `docker-compose.yml` with `--ignore-unfixed`; accepted upstream findings in `.trivyignore`, each with reason and expiry (SCF-US-5) |
 | Accessibility check in CI | axe with Playwright | Playwright 1.63.0 (pinned; equals the CI image tag), `@axe-core/playwright` | `tests/accessibility/axe-check.ts` against the built web client; fails on a critical violation. Pages are added there with R4 (`../qa-log.md`, Q27) |
