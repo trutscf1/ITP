@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@import "../src/tokens.css";
+
+/* Tailwind generates the utilities the components use. */
+@source "../src";
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+}

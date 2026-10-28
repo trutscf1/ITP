@@ -1,0 +1,76 @@
+/*
+ * Design tokens of @stash/ui — the single source for colour, spacing, and
+ * type values (DSA-F-1). The @theme block holds the base values, which are
+ * the light theme; Tailwind CSS 4 turns them into utilities. Every other
+ * theme overrides the colour tokens on [data-theme] (DSA-F-2).
+ */
+@theme {
+  --color-background: #ffffff;
+  --color-surface: #f5f5f5;
+  --color-foreground: #1a1a1a;
+  --color-muted: #525252;
+  --color-accent: #1d4ed8;
+  --color-accent-foreground: #ffffff;
+  --color-border: #d4d4d4;
+
+  /* Not named xs to xl: Tailwind CSS 4 looks up max-w-xs in --spacing-* before the container sizes,
+     so these names would shrink max-w-* to a few pixels. */
+  --spacing-tight: 0.25rem;
+  --spacing-snug: 0.5rem;
+  --spacing-base: 1rem;
+  --spacing-roomy: 1.5rem;
+  --spacing-loose: 2.5rem;
+
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.75rem;
+
+  --radius-md: 0.5rem;
+}
+
+/* The dark: variant follows the chosen dark themes, not the system setting. */
+@custom-variant dark (&:where(
+    [data-theme="dark"],
+    [data-theme="dark"] *,
+    [data-theme="night"],
+    [data-theme="night"] *
+  ));
+
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-background: #121212;
+  --color-surface: #1e1e1e;
+  --color-foreground: #ededed;
+  --color-muted: #a3a3a3;
+  --color-accent: #60a5fa;
+  --color-accent-foreground: #0a0a0a;
+  --color-border: #3a3a3a;
+}
+
+[data-theme="sepia"] {
+  color-scheme: light;
+  --color-background: #f4ecd8;
+  --color-surface: #ebe0c4;
+  --color-foreground: #3b2f1e;
+  --color-muted: #5f4b32;
+  --color-accent: #8a4b08;
+  --color-accent-foreground: #ffffff;
+  --color-border: #d6c7a1;
+}
+
+[data-theme="night"] {
+  color-scheme: dark;
+  --color-background: #000000;
+  --color-surface: #0d0d0d;
+  --color-foreground: #c8c8c8;
+  --color-muted: #8f8f8f;
+  --color-accent: #7aa2c8;
+  --color-accent-foreground: #000000;
+  --color-border: #262626;
+}
