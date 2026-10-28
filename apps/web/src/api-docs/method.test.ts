@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import * as apiDocs from "../app/api/docs/route.ts";
+import { DELETE, PATCH, POST, PUT } from "../app/api/docs/route.ts";
 
 describe("M6 methods of /api/docs", () => {
-  for (const method of ["POST", "PUT", "PATCH", "DELETE"] as const) {
+  const handlers = { POST, PUT, PATCH, DELETE };
+  for (const [method, handler] of Object.entries(handlers)) {
     it(`W-21 SCF-AC-3.4: ${method} /api/docs gives 405 method-not-allowed with Allow`, async () => {
-      const handler = apiDocs[method];
       const response = await handler(
         new Request("http://localhost/api/docs", { method }),
       );
