@@ -58,9 +58,9 @@ Every capability of `concepts/scaffolding.md` §7 and `concepts/public-content.m
 | SCF-C-1 workspace & task runner | pnpm workspaces, Turborepo | pnpm 10 (`packageManager`); Turborepo 2 | One lockfile at the root; every unit and package provides the tasks `dev`, `build`, `lint`, `typecheck`, `test` (SCF-F-12), and each runs across the workspace through `turbo run`. Set by #38 and #102. |
 | Shared lint / format / type configuration | Biome (lint, format); shared TypeScript base config | Biome 2.4; `@stash/config` | `biome.json` at the root, generated Prisma files excluded, `noExplicitAny` set to `error`; `packages/config/tsconfig.base.json` with `strict`, extended by every unit including `web`. Set by #38 and #102. |
 | SCF-C-13 unit test runner (shared) | Node.js test runner (`node --test`), TypeScript by type stripping | Node.js 24 | Provisional, for the acceptance tests (`tests/`, the workspace package `@stash/tests`) and the unit tests of every package; the owner may replace it. Browser end-to-end runner: section 4. |
-| SCF-C-7 container runtime & stack | _open_ | | |
-| SCF-C-6 reverse proxy | _open_ | | |
-| SCF-C-8 relational database | _open_ | | |
+| SCF-C-7 container runtime & stack | Docker, Docker Compose | Compose v2; images pinned to a tag (`postgres:18-alpine`, `redis:8.8-alpine`, `mongo:8.0`, `couchdb:3.5`, `chrislusf/seaweedfs:4.51`, `clamav/clamav:1.5`, `axllent/mailpit:v1.32`, `caddy:2.11-alpine`); each image except PostgreSQL pinned to a minor version (PostgreSQL to the major version the school requirements name) | SCF-US-2. `docker-compose.yml`: every setting from `.env` (documented in `.env.example`, secrets as `${NAME:?…}` without a default), a health check per service, `depends_on` with `service_healthy`; data services published on `127.0.0.1` only. `web` is built from `docker/web.Dockerfile` (Node.js as in `.tool-versions`), a temporary stop-gap that M9 of the track plan Web replaces with `apps/web/Dockerfile`; its health check requests `/` until `/health` exists. Mailpit replaces outgoing e-mail; OAuth and captcha are off by default (SCF-NF-2); ClamAV starts with the definitions of its image (`CLAMAV_NO_FRESHCLAMD`). The tests are `tests/docker-compose.test.ts`. |
+| SCF-C-6 reverse proxy | Caddy | `caddy:2.11-alpine` | One origin on `PROXY_PORT`, plain HTTP (TLS with R14); routes in `docker/Caddyfile`, only `/` to `web` until the other units run; `/proxy-health` is answered by the proxy for its health check. |
+| SCF-C-8 relational database | PostgreSQL | 18 (`postgres:18-alpine`) | Data in the volume `postgres-data` mounted at `/var/lib/postgresql` (PostgreSQL 18 layout). Prisma is set up by SCF-US-4. |
 | SCF-C-5 content management system | _open_ | | |
 | SCF-C-12 changelog draft generator | _open_ | | |
 
@@ -79,7 +79,7 @@ Build/run commands (root): `pnpm install`, `pnpm dev`, `pnpm run lint`, `pnpm ru
 
 | Capability | Technology | Version constraint | Notes |
 | --- | --- | --- | --- |
-| SCF-C-2 schemas & OpenAPI generation | _open_ | | |
+| SCF-C-2 schemas & OpenAPI generation | Zod, `@asteasolutions/zod-to-openapi` | Zod 4.6.7, zod-to-openapi 8.5.0, both pinned exactly (the lockfile and `package.json` agree); OpenAPI 3.1 | Package `packages/contracts` (`@stash/contracts`; SCF-AC-3.1 still says `@nimbus/contracts`, a correction listed in `concepts/scaffolding.track-web.md`). One schema file per contract (`health.ts`, `errors.ts`), each exporting `<name>Schema` and its inferred type; every schema file imports `z` from `zod.ts`, which adds `.openapi()`. Source files import with `.ts` extensions, and `tsc` rewrites them for `dist/`. `pnpm --filter @stash/contracts openapi:generate [file]` writes the description, by default to `packages/contracts/dist/openapi.json` (not committed); `build` writes the same file, so it exists wherever the package is built. That default is the one `web` reads through `OPENAPI_FILE` (track Web, M6). Errors: `errorReplies` holds status and body per code of the concept §8, and `toErrorResponse(error)` maps a Zod failure to `validation-failed` and anything else to `internal-error`. Units import schemas from the package and do not depend on Zod themselves. Set by #40 (SCF-US-3). |
 | SCF-C-4 HTTP server framework (`storage`) | _open_ | | |
 | `worker` runtime | _open_ | | |
 
