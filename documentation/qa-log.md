@@ -846,9 +846,43 @@ Renumbered at the merge of `dev` into `chore/status-schwaigc-2026-10-28` on 2026
 
 > **Answer:** Commented line in `.env.example` and one line in the README quick start (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
 
-## Round 31 — 2026-10-28 — review (`schwaigc`, open MRs after the merges of !7 and !9)
+## Round 31 — 2026-10-27 — delivery (`trutscf1` (agent), implement #138, doc-check rule `AC-TEST`)
 
-`trutscf1` merged !7 and !9 on 2026-10-28 and replaced !23 by !26 (same code, commit messages that pass). Provisional numbers (P-TEAM-5); round 29 at first, moved behind rounds 29 and 30 of `trutscf1` at the merge of `dev` after !26 and !17.
+Decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions); each question names the options and the chosen one, the recommendation of the agent.
+
+❓ **Q140** - **Schwere von AC-TEST**: Wann ist ein Akzeptanzkriterium ohne Test mit seiner ID ein Fehler, damit `dev` grün bleibt? Options: Nach Stand und MR-Slice / Immer Fehler / Immer Warnung
+
+➡️ Nach Stand und MR-Slice — error once the feature is `in dev` or `released`, and for the criteria the MR's slice delivers (`--pending-branch feature/<n>-…` and `#<n>` in the slice's _Issue_ cell); warning while the feature is `in progress`; nothing for `idea`, `concept`, `ready`. Story files carry no status, and the merge history names stories, not slices (a slice MR names its story), so the merge history is not used; merged slices of a feature in progress show as warnings on `dev`
+
+> **Answer:** decided by the agent: Nach Stand und MR-Slice (Recommended)
+
+❓ **Q141** - **Was zählt als Testname**: Options: Erster String von describe/it/test/suite in Testdateien / Jede Erwähnung der ID in Testdateien / Nur it/test
+
+➡️ Erster String von describe/it/test/suite in Testdateien — `*.test.*` and `*.spec.*` under `tests/`, `apps/`, `packages/`, also `test.describe` and `.only`; not `.skip`, `.todo`, comments, or other strings; `node_modules`, build output, and dot folders are skipped
+
+> **Answer:** decided by the agent: Erster String von describe/it/test/suite in Testdateien (Recommended)
+
+❓ **Q142** - **Ausnahme**: Darf eine Untested-Begründung im Konzept (§17, _ID, Reason_) ein Kriterium vom Fehler befreien? Options: Senkt auf Warnung / Keine Ausnahme / Hebt die Meldung auf
+
+➡️ Senkt auf Warnung — the gap stays visible, and an MR written before Definition of Done item 16 can still pass with a written reason
+
+> **Answer:** decided by the agent: Senkt auf Warnung (Recommended)
+
+❓ **Q143** - **Issue ohne AC-IDs**: #138 hat keine Akzeptanzkriterien mit IDs und keine Story-Datei. Options: Kriterien im MR entwerfen, Commits mit [no-req] / Story-Datei anlegen / Ohne Kriterien
+
+➡️ Kriterien im MR entwerfen, Commits mit [no-req] — the MR description holds the drafted criteria for the issue description; the tests name the rule instead of an `AC` ID
+
+> **Answer:** decided by the agent: Kriterien im MR entwerfen, Commits mit [no-req] (Recommended)
+
+❓ **Q144** - **Definition of Done 15 und 16**: Die Punkte stehen erst in !15 (nicht auf `dev`). Options: Punkt 1 und CI/CD hier, Punkt 16 nach dem zweiten Merge / Auf !15 aufsetzen / Punkte hier anlegen
+
+➡️ Punkt 1 und CI/CD hier, Punkt 16 nach dem zweiten Merge — this MR names the rule in item 1 and in "CI/CD"; whichever of !15 and this MR is merged second drops "once built; until then the reviewer checks it by hand" from item 16
+
+> **Answer:** decided by the agent: Punkt 1 und CI/CD hier, Punkt 16 nach dem zweiten Merge (Recommended)
+
+## Round 32 — 2026-10-28 — review (`schwaigc`, open MRs after the merges of !7 and !9)
+
+`trutscf1` merged !7 and !9 on 2026-10-28 and replaced !23 by !26 (same code, commit messages that pass). Provisional numbers (P-TEAM-5); round 29 at first, moved behind the rounds of `trutscf1` at the merges of `dev` after !26, !17, !20, and !19 (now round 32).
 
 ❓ **Q165** - **Re-Approvals**: !19, !20 (nur `dev`-Merge und Logs), !25 (unverändert, umgezielt auf !26), !26 (ersetzt !23, identischer Contracts-Code). Welche approven? Options (multi): !26 approven / !19 re-approven / !20 re-approven / !25 re-approven
 
@@ -867,3 +901,21 @@ Renumbered at the merge of `dev` into `chore/status-schwaigc-2026-10-28` on 2026
 ➡️ Ja — branch `chore/status-schwaigc-2026-10-28`, reviewer `trutscf1`
 
 > **Answer:** Ja, Status-MR (Recommended)
+
+❓ **Q175** - **!20**: nochmals nur `dev` hineingemergt, Approve weg. Erneut approven nach grüner Pipeline? Options: Ja, nach grüner Pipeline / Nein
+
+➡️ Ja — not possible: `trutscf1` had merged !20 at 15:20 already; the approval call failed (401)
+
+> **Answer:** Ja, nach grüner Pipeline (Recommended)
+
+❓ **Q176** - **Hinweise an `trutscf1`**: auf !28 (Q80–Q86 von !26 auf Q168–Q174 umnummeriert) und auf !25 (auf `dev` umzielen, Q155–Q159 kollidieren)? Options (multi): Hinweis auf !28 / Hinweis auf !25
+
+➡️ both posted
+
+> **Answer:** Hinweis auf !28, Hinweis auf !25
+
+❓ **Q177** - **Fehlposts auf !20**: der Kommentar „Re-approved at `5cd769c0`“ wurde durch Wiederholungen dreimal auf das schon gemergte !20 gepostet, ohne Approve. Löschen? Options: Alle drei löschen / Zwei löschen, einen lassen / Stehen lassen
+
+➡️ Alle drei löschen — deleted
+
+> **Answer:** Alle drei löschen (Recommended)
