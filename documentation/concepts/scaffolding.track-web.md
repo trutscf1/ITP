@@ -37,9 +37,9 @@ Requested from other tracks (one issue each, listed under "Issues"):
 | Track | Path | What `web` needs |
 | --- | --- | --- |
 | Platform & cms | `docker-compose.yml`, reverse proxy | a service `web` built from `apps/web/Dockerfile`, health check on `/health`, proxy route `/` → `web:3000`; services named like the units (SCF-F-4, SCF-F-20) |
-| Platform & cms | `.env.example` | the variables of M1 with the container values, and a comment with the values for the native start (SCF-F-17) |
-| Platform & cms | `turbo.json` | the task `test` depends on `^build`, so `@stash/contracts` is built before the tests of `web` import it |
-| Contracts, storage & worker | `packages/contracts` | the export path of the contracts folder `web` (`@stash/contracts/web`), the signature of the configuration helper (M1), the output path of the generated API description (M6) |
+| Platform & cms | `.env.example` | the variables of M1 with the container values, and a comment with the values for the native start (SCF-F-17); `OPENAPI_FILE` added as a commented line with #40 |
+| Platform & cms | `turbo.json` | the task `test` depends on `^build`, so `@stash/contracts` is built before the tests of `web` import it; done with #40 |
+| Contracts, storage & worker | `packages/contracts` | the export path of the contracts folder `web` (`@stash/contracts/web`), the signature of the configuration helper (M1), the output path of the generated API description (M6); export path and output path done with #40, the configuration helper is still open (M1 holds a local stand-in) |
 | Identity & CI | `tests/accessibility/axe-check.ts` | `/status` in the page list of the shared check |
 
 ## Issues
@@ -72,8 +72,10 @@ apps/web/
 ├── src/app/page.tsx                 M8  placeholder start page (no third-party logo)
 ├── src/app/health/route.ts          M2
 ├── src/app/status/page.tsx          M5  thin page: calls M4, renders M5's table
-├── src/app/api/docs/route.ts        M6
+├── src/app/api/docs/route.ts        M6  thin: connection(), configuration, then src/api-docs
 ├── src/app/api/[...path]/route.ts   M6  404 ErrorResponse for unknown /api paths
+├── src/api-docs/api-docs.ts         M6  serveApiDocs(file): the file unchanged, or 500
+├── src/errors.ts                    M6  errorResponse(code): ErrorResponse from errorReplies
 ├── src/status/query.ts              M3
 ├── src/status/collect.ts            M4
 ├── src/status/table.ts              M5  table component without JSX (React createElement)
@@ -185,7 +187,7 @@ GET /api/docs
 GET|POST|… /api/<any other path> -> 404, ErrorResponse { code: "not-found", message: "The requested resource does not exist." }
 ```
 
-The path to the file is `config.OPENAPI_FILE`, read per request, so a test points it at the fixture or at a missing file and the image points it at its own copy (M9). `web` never edits or rebuilds the file; it serves what the generation command of the contracts core wrote ([SCF-F-10]). The error message names no path ([SCF-NF-4]); the cause goes to the log. HTML pages keep the normal not-found page; [SCF-F-21] applies to the HTTP endpoints under `/api` (Q59). `/health` is an HTTP endpoint as well: it builds the report from the configuration only, so it has no failure of its own, but an unexpected exception is caught in the handler and answered with the 500 above, and `/health` and `/api/docs` answer a method other than GET and HEAD with 405, `{ code: "method-not-allowed", message: "The method is not allowed for this path." }`, and the header `Allow: GET, HEAD` (A6, W-21). Until the generation command exists, the route is tested against the fixture `apps/web/src/api-docs/fixture.openapi.json`.
+The path to the file is `config.OPENAPI_FILE`, read per request, so a test points it at the fixture or at a missing file and the image points it at its own copy (M9). `web` never edits or rebuilds the file; it serves what the generation command of the contracts core wrote ([SCF-F-10]). The error message names no path ([SCF-NF-4]); the cause goes to the log. HTML pages keep the normal not-found page; [SCF-F-21] applies to the HTTP endpoints under `/api` (Q59). `/health` is an HTTP endpoint as well: it builds the report from the configuration only, so it has no failure of its own, but an unexpected exception is caught in the handler and answered with the 500 above, and `/health` and `/api/docs` answer a method other than GET and HEAD with 405, `{ code: "method-not-allowed", message: "The method is not allowed for this path." }`, and the header `Allow: GET, HEAD` (A6, W-21). The tests use the fixture `apps/web/src/api-docs/fixture.openapi.json`. `connection()` throws outside a request of Next.js, so `route.ts` only awaits it, loads the configuration (M1; an invalid one gives the 500 above), and hands the path to `serveApiDocs(file)` in `src/api-docs/api-docs.ts`, which W-13 and W-15 call directly; the handlers of the other methods and of `[...path]` are called directly (W-16, W-21). Route files import `next/server.js`, because `node --test` resolves no import without an extension.
 Traces to: SCF-F-10, SCF-F-21, SCF-NF-4, SCF-AC-3.3, SCF-AC-3.4. Requires: generation command and its output path (contracts core), ErrorResponse.
 
 #### M7 — Start command
@@ -229,7 +231,7 @@ Traces to: SCF-F-1, SCF-F-20, SCF-NF-1, SCF-AC-2.1, SCF-AC-2.4. Requires: worksp
 
 1. **Slice 1 of SCF-US-8** — M8 (page frame), M1, M2, M7, M9; requests for compose, proxy, `.env.example`, `turbo.json`, and the contracts export path.
 2. **Slice 2 of SCF-US-8** — M3, M4, M5; acceptance tests SCF-T-39 and SCF-T-40; request for the page list of the shared accessibility check.
-3. **M6** — once the generation command of SCF-US-3 (#40) is merged; the 404 route for `/api` comes with it.
+3. **M6** — once the generation command of SCF-US-3 (#40) is merged; the 404 route for `/api` comes with it. Delivered with #40 on 2026-10-28, together with M1 (moved ahead, because M6 reads `OPENAPI_FILE`; Q179), the export path `@stash/contracts/web`, the task `test` after `^build` in `turbo.json`, and the build of the workspace packages in the stop-gap image `docker/web.Dockerfile`; slice 1 of SCF-US-8 keeps M2, M7, M8, M9.
 
 Not in this track: `apps/web/src/prisma` from the first scaffold of `dev` stays untouched; it belongs to the relational schema of SCF-US-4 (Identity & CI track), which decides where it moves (A5 of Q47).
 

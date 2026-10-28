@@ -877,3 +877,25 @@ Decided by the agent on the owner's standing instruction of 2026-10-27 (work wit
 ➡️ Punkt 1 und CI/CD hier, Punkt 16 nach dem zweiten Merge — this MR names the rule in item 1 and in "CI/CD"; whichever of !15 and this MR is merged second drops "once built; until then the reviewer checks it by hand" from item 16
 
 > **Answer:** decided by the agent: Punkt 1 und CI/CD hier, Punkt 16 nach dem zweiten Merge (Recommended)
+
+## Round 32 — 2026-10-28 — delivery (`schwaigc`, implement #40: `/api/docs`)
+
+Provisional numbers (P-TEAM-5): Q165 to Q177 are on `chore/status-schwaigc-2026-10-28` (!28); these follow them.
+
+❓ **Q178** - **Nächstes**: Reviews sind erledigt. Womit bei den Sprint-1-Aufgaben weitermachen? Options: #40: Route /api/docs (M6) / #103: Offline-Start-Test (SCF-T-8) / Beides nacheinander / Nichts, für heute fertig
+
+➡️ #40 — `/engineering-human implement #40` on `feature/40-api-docs-route`
+
+> **Answer:** #40: Route /api/docs (M6) (Recommended)
+
+❓ **Q179** - **Umfang für #40/M6**: M6 braucht `OPENAPI_FILE` aus M1, und M1 ist noch nicht gebaut. Wie schneiden? Options: M6 + M1 vorziehen / Nur M6, Pfad direkt aus env / Erst Slice 1 von SCF-US-8
+
+➡️ M6 + M1 vorziehen — M1 in `packages/contracts/src/web/config.ts` with a local stand-in for the configuration helper, export `@stash/contracts/web`, unit-test setup of `web` (A1, A2); slice 1 of SCF-US-8 keeps M2, M7, M8, M9
+
+> **Answer:** M6 + M1 vorziehen (Recommended)
+
+❓ **Q180** - **Reviewer**: Der Export `@stash/contracts/web` ändert `packages/contracts/package.json` (Contracts-Track). Wer reviewt? Options: trutscf1 / schauby1 / tschudea07
+
+➡️ trutscf1
+
+> **Answer:** trutscf1 (Recommended)
