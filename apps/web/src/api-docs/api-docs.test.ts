@@ -14,4 +14,18 @@ describe("M6 API description at /api/docs", () => {
     const body = Buffer.from(await response.arrayBuffer());
     assert.deepEqual(body, readFileSync(fixture));
   });
+
+  it("W-15 SCF-AC-3.4: a missing file gives 500 internal-error and names no path", async () => {
+    const missing = join(import.meta.dirname, "missing", "openapi.json");
+    const response = await serveApiDocs(missing);
+    assert.equal(response.status, 500);
+    assert.equal(response.headers.get("content-type"), "application/json");
+    const text = await response.text();
+    assert.deepEqual(JSON.parse(text), {
+      code: "internal-error",
+      message: "The request could not be processed.",
+    });
+    assert.ok(!text.includes("missing"), "the body names the path");
+    assert.ok(!text.includes("openapi.json"), "the body names the file");
+  });
 });
