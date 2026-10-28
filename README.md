@@ -163,6 +163,12 @@ The repository is public, so all content must be licence-free. Licences of what 
 | `@axe-core/playwright` | MPL-2.0 | accessibility tests |
 | PostgreSQL 18 (Docker image) | PostgreSQL Licence | relational database, runs as a container |
 | MongoDB 8.0 (Docker image) | SSPL | metadata database, runs as a container; not part of the delivered source |
+| Redis 8.8 (Docker image) | RSALv2, SSPLv1, or AGPLv3, at the user's choice | sessions and cache, runs as a container |
+| CouchDB 3.5 (Docker image) | Apache-2.0 | offline sync database, runs as a container |
+| SeaweedFS 4.51 (Docker image) | Apache-2.0 | object storage, runs as a container |
+| ClamAV 1.5 (Docker image) | GPL-2.0 | virus scanner, runs as a container; not part of the delivered source |
+| Mailpit 1.32 (Docker image) | MIT | catches all outgoing e-mail of the local stack |
+| Caddy 2.11 (Docker image) | Apache-2.0 | reverse proxy of the local stack |
 | Geist and Geist Mono fonts | SIL Open Font Licence 1.1 | loaded by the starter layout |
 | `next.svg` and `vercel.svg` in `apps/web/public/` | logos of Vercel (third party), shipped with the Next.js starter | **to be replaced** by own assets before the final submission; `file.svg`, `globe.svg`, and `window.svg` of the starter are unused and to be deleted |
 
