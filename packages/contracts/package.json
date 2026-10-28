@@ -5,14 +5,26 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
   "scripts": {
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
-    "build": "tsc",
+    "build": "tsc && node src/generate-openapi.ts",
     "dev": "tsc --watch --preserveWatchOutput",
-    "test": "node --test"
+    "test": "node --test",
+    "openapi:generate": "node src/generate-openapi.ts"
+  },
+  "dependencies": {
+    "@asteasolutions/zod-to-openapi": "8.5.0",
+    "zod": "4.6.7"
   },
   "devDependencies": {
-    "@stash/config": "workspace:*"
+    "@stash/config": "workspace:*",
+    "@types/node": "^24"
   }
 }

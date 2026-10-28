@@ -33,6 +33,8 @@ The vertical slices that deliver this story. One slice is delivered by the story
 | --- | --- | --- | --- |
 | 1 — whole story | SCF-AC-3.1, SCF-AC-3.2, SCF-AC-3.3, SCF-AC-3.4, SCF-AC-3.5 | — | #40 |
 
+Slice 1 arrives in two merge requests: the contracts package with the schemas, the error format, and the generation command (track Contracts, storage & worker), then the route `/api/docs` that serves the generated file (track Web, module M6 of [scaffolding.track-web.md](../../concepts/scaffolding.track-web.md)). #40 is closed with the second one.
+
 - **Story issue:** #40
 - **Weight:** 3
 - **Depends on:** SCF-US-1 (Set up the monorepo, #38)

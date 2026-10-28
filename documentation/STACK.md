@@ -79,7 +79,7 @@ Build/run commands (root): `pnpm install`, `pnpm dev`, `pnpm run lint`, `pnpm ru
 
 | Capability | Technology | Version constraint | Notes |
 | --- | --- | --- | --- |
-| SCF-C-2 schemas & OpenAPI generation | _open_ | | |
+| SCF-C-2 schemas & OpenAPI generation | Zod, `@asteasolutions/zod-to-openapi` | Zod 4.6.7, zod-to-openapi 8.5.0, both pinned exactly (the lockfile and `package.json` agree); OpenAPI 3.1 | Package `packages/contracts` (`@stash/contracts`; SCF-AC-3.1 still says `@nimbus/contracts`, a correction listed in `concepts/scaffolding.track-web.md`). One schema file per contract (`health.ts`, `errors.ts`), each exporting `<name>Schema` and its inferred type; every schema file imports `z` from `zod.ts`, which adds `.openapi()`. Source files import with `.ts` extensions, and `tsc` rewrites them for `dist/`. `pnpm --filter @stash/contracts openapi:generate [file]` writes the description, by default to `packages/contracts/dist/openapi.json` (not committed); `build` writes the same file, so it exists wherever the package is built. That default is the one `web` reads through `OPENAPI_FILE` (track Web, M6). Errors: `errorReplies` holds status and body per code of the concept §8, and `toErrorResponse(error)` maps a Zod failure to `validation-failed` and anything else to `internal-error`. Units import schemas from the package and do not depend on Zod themselves. Set by #40 (SCF-US-3). |
 | SCF-C-4 HTTP server framework (`storage`) | _open_ | | |
 | `worker` runtime | _open_ | | |
 
