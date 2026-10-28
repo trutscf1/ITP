@@ -13,7 +13,7 @@ One user story of [Public content: landing page, help center, changelog, legal p
 
 | ID | Title | As a | I want | so that | Priority |
 | --- | --- | --- | --- | --- | --- |
-| PUB-US-2 | Public landing page | visitor | to see on a landing page what Nimbus offers | I can decide whether to register | Should |
+| PUB-US-2 | Public landing page | visitor | to see on a landing page what stash offers | I can decide whether to register | Should |
 
 ## Acceptance criteria
 
@@ -36,4 +36,4 @@ The vertical slices that deliver this story. One slice is delivered by the story
 
 - **Story issue:** #79
 - **Weight:** 3
-- **Depends on:** DSA-US-1 (Design system with design tokens and four themes, #68), PUB-US-1 (Set up the headless CMS with Strapi, #78)
+- **Depends on:** DSA-US-1 (Design system with design tokens and four themes, #68), PUB-US-1 (Set up the headless CMS with Strapi, #78), slice 3 (delivery by web)
