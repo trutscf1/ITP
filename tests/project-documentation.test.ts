@@ -42,22 +42,30 @@ function licenceLabel(name: string): string | undefined {
   if (name.startsWith("@types/") || name.startsWith("@stash/")) {
     return undefined;
   }
-  if (name === "@axe-core/playwright" || name === "@tailwindcss/postcss") {
+  if (
+    name === "@axe-core/playwright" ||
+    name === "@tailwindcss/postcss" ||
+    name === "@tailwindcss/vite"
+  ) {
     return name;
   }
   if (name === "prisma" || name.startsWith("@prisma/")) return "Prisma";
   if (name.startsWith("@commitlint/")) return "commitlint";
+  if (name === "storybook" || name.startsWith("@storybook/"))
+    return "Storybook";
   const labels: Record<string, string> = {
     "@asteasolutions/zod-to-openapi": "zod-to-openapi",
     "@biomejs/biome": "Biome",
     dotenv: "dotenv",
     next: "Next.js",
     playwright: "Playwright",
+    "radix-ui": "Radix UI",
     react: "React",
     "react-dom": "React",
     tailwindcss: "Tailwind CSS",
     turbo: "Turborepo",
     typescript: "TypeScript",
+    vite: "Vite",
     yaml: "yaml",
     zod: "Zod",
   };

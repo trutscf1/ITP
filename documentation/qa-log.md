@@ -336,7 +336,7 @@ Result: 10 minutes of review time were recorded on !4 for `trutscf1` on the owne
 
 ## Round 14 — 2026-10-20 — delivery (`schwaigc`, plan of the R1 track Web)
 
-The MRs !5, !7, !9 wait for reviews; the next task of `schwaigc` is chosen. The merge round before it (provisional Q42 and Q43) is on `feature/106-contrast-and-storybook` (!9) and is renumbered when !9 reaches `dev` (P-TEAM-5).
+The MRs !5, !7, !9 wait for reviews; the next task of `schwaigc` is chosen. The merge round before it (provisional Q42 and Q43, now Q80 and Q81) is on `feature/106-contrast-and-storybook` (!9) and is renumbered when !9 reaches `dev` (P-TEAM-5).
 
 ❓ **Q45** - **Nächster Task**: Die MRs sind merge-fertig und warten auf Reviews. Womit soll ich bei deinen Tasks anfangen? Options: R1 Track-Web-Plan / R6 Web-Client grillen / R4 Rest grillen / Shared #39/#40/#103
 
@@ -516,7 +516,255 @@ The pipeline of !19 (2026-10-27) failed in `dependency-audit` (Next.js 16.3.8: G
 
 > **Answer:** Ausnahme in .trivyignore bis 2026-11-23 (Recommended)
 
-## Round 22 — 2026-10-27 — delivery (`trutscf1`, agent: revise !16)
+## Round 22 — 2026-10-13 — delivery (`schwaigc`, implement #68)
+
+Renumbered at the merge of `dev` into `feature/68-design-tokens-and-themes` on 2026-10-27 (P-TEAM-5): these questions were asked as Q34 to Q40 on 2026-10-13, and `dev` had used those numbers since. Moved to round 22 at the merge of `dev` after !24 (round 21 of `trutscf1`).
+
+❓ **Q72** - **Themes**: Welche vier Themes soll DSA-AC-1.2 liefern (neben Hell und Dunkel)? Hoher Kontrast gehört zu DSA-US-2 und zählt hier nicht. Options: Hell, Dunkel, Sepia, Nacht / Hell, Dunkel, System, Sepia / Hell, Dunkel, Ozean, Wald
+
+➡️ Hell, Dunkel, Sepia, Nacht
+
+> **Answer:** Hell, Dunkel, Sepia, Nacht (Recommended)
+
+❓ **Q73** - **Speichern**: DSA-AC-1.2 verlangt 'im Profil gespeichert', aber ein Benutzerprofil gibt es erst mit Identity (R3). Wie liefert Slice 1 das? Options: Cookie jetzt, Profil später / localStorage jetzt, Profil später / Auf Identity warten
+
+➡️ Cookie jetzt, Profil später
+
+> **Answer:** Cookie jetzt, Profil später (Recommended)
+
+❓ **Q74** - **Commits**: Du willst viele einzelne Commits. Wie fein? Options: Ein Commit pro Schritt / Ein Commit pro AC
+
+➡️ Ein Commit pro Schritt
+
+> **Answer:** Ein Commit pro Schritt (Recommended)
+
+❓ **Q75** - **Seams**: An welchen Schnittstellen teste ich #68 (node --test, Tests tragen die AC-ID)? (1) `tokens.css` in `@stash/ui`: jedes der vier Themes definiert denselben Token-Satz wie die Basis (AC-1.1/1.2); (2) `theme.ts` in `@stash/ui`: Theme-Namen, Cookie lesen/schreiben, `applyTheme` setzt `data-theme` am Wurzelelement (AC-1.2); (3) Struktur: `@stash/ui` hängt von Radix und Tailwind 4 ab, der ThemeSwitcher nutzt Radix, web lädt die Tokens (AC-1.3). Browser-Klicktest bleibt bei WEB-US-4. Options: Alle drei Seams / Nur (1) und (2) / Zusätzlich Render-Test
+
+➡️ Alle drei Seams
+
+> **Answer:** Alle drei Seams (Recommended)
+
+❓ **Q76** - **Stufe R4**: Sobald R4 auf 'in progress' steht, verlangt doc-check in §17 des Konzepts einen Test für jedes der 16 Akzeptanzkriterien von DSA-US-1 bis -3 (sonst Fehler, die CI wird rot). Gebaut und getestet sind nur AC-1.1 bis 1.3; der Rest des Konzepts ist ungegrillt. Wie lösen wir das? Options: §17 jetzt schreiben / Stufe 'concept' lassen
+
+➡️ §17 jetzt schreiben
+
+> **Answer:** §17 jetzt schreiben (Recommended)
+
+❓ **Q77** - **Push & MR**: Branch feature/68-design-tokens-and-themes (22 Commits, alles grün) pushen und das MR nach dev öffnen? Ohne GITLAB_TOKEN nur per git-Push-Option; Label und Beschreibung folgen per API. Options: Pushen + MR per Push-Option / Erst Token setzen / Nur pushen / Noch nichts
+
+➡️ Pushen + MR per Push-Option
+
+> **Answer:** Pushen + MR per Push-Option (Recommended)
+
+❓ **Q78** - **Issues**: Darf ich ein neues Issue für DSA-US-1 Slice 3 anlegen, die Beschreibung von #68 an die Story-Datei angleichen und bei #102 die Zeile „Lint für Root-Dateien“ korrigieren? Options: Ja, alle drei / Nein
+
+➡️ Ja, alle drei
+
+> **Answer:** Ja, alle drei (Recommended)
+
+## Round 23 — 2026-10-20 — review (`schwaigc`, !14 approved; reviews of !15, !16, !17)
+
+Rounds 23 to 27 were renumbered at the merges of `dev` on 2026-10-27 behind round 20 of `trutscf1` and round 21 of the security fix !24 (P-TEAM-5).
+
+Provisional numbers (P-TEAM-5): Q44 to Q66 of this day are on `concept/scaffolding-track-web` (!14); these follow them. `trutscf1` approved !14 at `0818a6c`. !15, !16, and !17 of `trutscf1` had no reviewer and red pipelines; each was checked in a clean worktree.
+
+❓ **Q67** - **Merge !14**: Der Autor darf seinen MR nicht selbst mergen (`docs/` §4). Wie vorgehen? Options: trutscf1 mergen lassen / Trotzdem selbst mergen / Later
+
+➡️ trutscf1 mergen lassen — request posted on !14
+
+> **Answer:** trutscf1 mergen lassen (Recommended)
+
+❓ **Q68** - **Reviews**: Welche MRs von trutscf1 reviewen? Options: !16 Shared Contracts / !17 Docker Compose / !15 Meilensteinplan
+
+➡️ alle drei — changes requested on each (commit messages or image scan, conflicts with `dev`; !16 also `ErrorResponse` against `scaffolding.md` §8 and example 6)
+
+> **Answer:** !16 Shared Contracts (Recommended), !17 Docker Compose, !15 Meilensteinplan
+
+❓ **Q69** - **/api/docs**: Bei jeder Anfrage aus den Contracts erzeugen (!16) oder die generierte Datei ausliefern (Plan M6)? Options: !16 übernehmen, Plan anpassen / Plan M6 beibehalten
+
+➡️ !16 übernehmen, Plan anpassen — M6 of the track plan Web changes after !14 is merged; !16 adds the test of SCF-T-15
+
+> **Answer:** !16 übernehmen, Plan anpassen (Recommended)
+
+❓ **Q70** - **web-Image**: `docker/web.Dockerfile` aus !17 als Übergang oder ohne web mergen? Options: Als Übergang ok / Ohne web mergen
+
+➡️ Als Übergang ok — replaced by M9 (`apps/web/Dockerfile`) in SCF-US-8 slice 1
+
+> **Answer:** Als Übergang ok (Recommended)
+
+❓ **Q71** - **Merge !14**: concept/scaffolding-track-web → dev, Head 0818a6c, approved by trutscf1; the author merging is against `docs/` §4. Options: Merge now / No / Later / I merge myself
+
+➡️ Merge now — merged as `ab985fa` by `schwaigc` (the author), branch kept; #113 closed and set to `status::done`. Deviation from `docs/anforderungen_software_projekte.md` §4, decided by `schwaigc`
+
+> **Answer:** Merge now
+
+## Round 24 — 2026-10-13 — delivery (`schwaigc`, implement #106)
+
+Renumbered at the merge of `dev` on 2026-10-27 (P-TEAM-5): asked as Q41.
+
+❓ **Q79** - **Nächstes Issue**: An welchem deiner Sprint-1-Issues (status::ready) soll ich weiterarbeiten? Options: #106 DSA-US-1 Slice 2 / #102 SCF-US-1 Slice 2 / #103 SCF-US-2 Slice 2 / #39 oder #40 (Shared)
+
+➡️ #106 DSA-US-1 Slice 2
+
+> **Answer:** #106 DSA-US-1 Slice 2 (Recommended)
+
+## Round 25 — 2026-10-20 — delivery (`schwaigc`, merge the assigned MRs)
+
+Renumbered at the merge of `dev` on 2026-10-27 (P-TEAM-5): Q80 and Q81 were asked as Q42 and Q43.
+
+Open MRs of `schwaigc` (author: !5, !7, !9; reviewer: !6) checked against P-MR-2/3: none is approved, !5 and !7 have an unresolved review thread of `tschudea07`, !9 has a conflict with `dev`, the pipeline of !6 fails on conflict markers in its branch. The author does not merge their own MR (P-MR-2), so nothing was merged in this round.
+
+❓ **Q80** - **Eigene MRs (!5, !7, !9)**: Merge-fertig machen (dev einarbeiten, Konflikte lösen, Checks frisch laufen lassen, pushen, Kommentar an tschudea07), gemergt wird erst nach dem Approval? Options: Merge-fertig machen / Nur einarbeiten, kein Kommentar / Nichts anfassen
+
+➡️ Merge-fertig machen
+
+> **Answer:** Merge-fertig machen (Recommended)
+
+❓ **Q81** - **MR !6 public-content**: Die Pipeline schlägt wegen Konfliktmarkern fehl (ROADMAP-DETAILS.md, qa-log.md), dazu ein neuer Konflikt mit dev. Wie umgehen? Options: Nur Kommentar / Ich fixe den Branch / Nichts tun
+
+➡️ Nur Kommentar
+
+> **Answer:** Nur Kommentar (Recommended)
+
+## Round 26 — 2026-10-27 — review (`schwaigc`, open MRs)
+
+Open MRs: !5, !7, !9 of `schwaigc` (none approved; !7 and !9 in conflict with `dev`); !15 to !19 of `trutscf1` with `schwaigc` as reviewer. !15 and !16 have no commit since the review of 2026-10-20 and are left as they are. Every pipeline fails in `dependency-audit` (and `container-scan` on `dev`) because of the `next` advisories on `dev` itself, so nothing is mergeable (P-MR-3). The questions were asked as Q72 and Q73, before the merge of `dev` moved the questions of #68 to Q72 to Q78 (P-TEAM-5).
+
+❓ **Q82** - **Reviews posten**: Welche Review-Ergebnisse soll ich auf GitLab als Kommentar posten (unter deinem Account schwaigc)? Options: !19 Kommentar + Approve / !18 Kommentar + Approve / !17 Kommentar (changes requested)
+
+➡️ alle drei — !19 approved (inbox of `trutscf1`); !18 approved (all seven findings of the review of 2026-10-20 fixed); changes requested on !17 (job `test` fails on SCF-AC-1.5, quick start over 30 lines since `b44d10d`)
+
+> **Answer:** !19 Kommentar + Approve (Recommended), !18 Kommentar + Approve, !17 Kommentar (changes requested)
+
+❓ **Q83** - **!7/!9**: Soll ich die Konflikte von !7 und !9 mit dev jetzt auflösen und pushen? Options: Ja, !7 und !9 / Nur !7 / Später
+
+➡️ Ja, !7 und !9 — `dev` merged into !7 (questions of #68 moved to Q72–Q78, product name in DSA-US-1), !7 merged into !9 (questions moved to Q79–Q81)
+
+> **Answer:** Ja, !7 und !9 (Recommended)
+
+❓ **Q84** - **Force-Push !7**: Die zwei neuen Commits auf feature/68 verletzen commitlint (Body-Zeilen über 100 Zeichen, Scope `design-system`); mit identischem Inhalt neu geschrieben. Ersetzen per `--force-with-lease`? Options: Force-with-lease erlauben / Ohne Force, Job bleibt rot / Nichts mehr pushen
+
+➡️ Force-with-lease erlauben — `de53cac` replaced by `3a344f6` on `feature/68-design-tokens-and-themes` (same tree); !9 pushed at `5e35b87`
+
+> **Answer:** Force-with-lease erlauben (Recommended)
+
+❓ **Q85** - **Review !20**: doc-check-Regel AC-TEST (trutscf1). Inhaltlich ok, offen: Konflikt mit dev, Pipeline nur wegen dev rot. Wie posten? Options: Kommentar + Approve / Nur Kommentar / Nichts posten
+
+➡️ Kommentar + Approve — !20 approved; `dev` must be merged in before the merge. The new rule gives no error on !5, !7, or !9
+
+> **Answer:** Kommentar + Approve (Recommended)
+
+❓ **Q86** - **Zeit #68 / !7**: Wie viel Zeit hast du heute für !7 gebraucht? Options: 30m / 15m / 45m / 1h
+
+➡️ 30m — booked on #68 by `schwaigc` (total 1h 20m)
+
+> **Answer:** 30m (Recommended)
+
+❓ **Q87** - **Zeit #106 / !9**: Wie viel Zeit hast du heute für !9 gebraucht? Options: 30m / 15m / 45m / 1h
+
+➡️ 15m — booked on #106 (total 1h 5m)
+
+> **Answer:** 15m
+
+❓ **Q88** - **Zeit Reviews !17 und !18**: Wie viel Zeit pro Review? Options: je 20m / je 10m / je 30m / !17 15m, !18 30m
+
+➡️ je 10m — booked on !17 and !18
+
+> **Answer:** je 10m
+
+❓ **Q89** - **Zeit Reviews !19 und !20**: Wie viel Zeit pro Review? Options: !19 10m, !20 20m / je 10m / je 20m / !19 15m, !20 30m
+
+➡️ !19 10m, !20 20m — booked on the MRs
+
+> **Answer:** !19 10m, !20 20m (Recommended)
+
+## Round 27 — 2026-10-27 — delivery (`schwaigc`, second review round of the day)
+
+New since round 25: !21, !23, !24 of `trutscf1` with `schwaigc` as reviewer; revisions of !17 and !20; !19 in conflict with `dev`. Numbers Q152 to Q158 continue behind Q151 of !24 (provisional, P-TEAM-5).
+
+❓ **Q152** - **!24 Security-Fix**: Next.js 16.4.2 und gosu-CVE in `.trivyignore`; Pipeline komplett grün, lokal alles sauber. Review posten? Options: Kommentar + Approve / Nur Kommentar / Nichts tun
+
+➡️ Kommentar + Approve — review posted on !24 and approved; not merged
+
+> **Answer:** Kommentar + Approve (Recommended)
+
+❓ **Q153** - **!20**: Seit dem Approve nur `dev` hineingemergt, Approve dadurch weg. Erneut approven? Options: Re-Approve + kurzer Kommentar / Nichts tun
+
+➡️ Re-Approve + kurzer Kommentar — posted and approved; a note on !19 asks `trutscf1` to merge `dev` (conflict in `ROADMAP-DETAILS.md`)
+
+> **Answer:** Re-Approve + kurzer Kommentar (Recommended)
+
+❓ **Q154** - **!17**: Revision mit grünem `test`-Job; `trutscf1` bittet um einen echten `docker compose up`. Wie vorgehen? Options: Voll re-reviewen inkl. Docker / Re-Review ohne Docker / Später
+
+➡️ Re-Review ohne Docker
+
+> **Answer:** Re-Review ohne Docker
+
+❓ **Q155** - **Neue MRs**: !21 (Milestone-Plan), !23 (Shared Contracts), !19 (Konflikt). Welche jetzt? Options (multi): !23 reviewen / !21 reviewen / !19 Hinweis auf Konflikt
+
+➡️ all three
+
+> **Answer:** !23 reviewen, !21 reviewen, !19 Hinweis auf Konflikt
+
+❓ **Q156** - **!17 Re-Review**: Blocker behoben, 179/179 Tests, eine lange Kommentarzeile im Dockerfile offen (low). Posten? Options: Kommentar + Approve / Nur Kommentar / Nicht posten
+
+➡️ Kommentar + Approve — posted and approved; SCF-T-8 stays open on #103
+
+> **Answer:** Kommentar + Approve (Recommended)
+
+❓ **Q157** - **!23 Shared Contracts**: alle Checks grün; should-fix: geteilte `errorReplies`-Bodies sind veränderbar. Posten? Options: Kommentar + Approve / Changes requested / Nicht posten
+
+➡️ Kommentar + Approve — posted and approved, the freeze point as not blocking
+
+> **Answer:** Kommentar + Approve (Recommended)
+
+❓ **Q158** - **!21 Milestone-Plan**: Sprint-2-Zeile und `team/schwaigc/STATUS.md` nennen #109, #2, #112 in Sprint 2, GitLab hat Sprint 3/3/5; R5-Konzept fälschlich `schwaigc`. Wie reviewen? Options: Changes requested / Kommentar + Approve / Nicht posten
+
+➡️ Changes requested — posted, not approved; GitLab milestones are the reference
+
+> **Answer:** Changes requested (Recommended)
+
+## Round 28 — 2026-10-27 — delivery (`schwaigc`, third review round of the day)
+
+After the merges of !24 and !5 by `trutscf1`: `dev` merged into !7 (`qa-log.md` conflict, the round of #68 moved to 22 behind round 21 of !24) and !7 into !9 (the merge of `dev` into !9 made on GitLab had dropped round 21 of !24; the file is rebuilt from !7 plus the rounds of !9, now 23 to 28). The licence test of !5 (SCF-AC-7.5) required Radix UI on !7 and Storybook, Vite, and `@tailwindcss/vite` on !9; added to the README and the label map. Pipelines of !7 and !9 green.
+
+❓ **Q159** - **!23**: Approve durch Merge von `dev` und Lizenzzeilen weg; `c8f327e` hat eine Body-Zeile über 100 Zeichen (`commit-messages` rot). Wie vorgehen? Options: Kommentar, kein Re-Approve / Kommentar + Re-Approve / Nichts tun
+
+➡️ Kommentar, kein Re-Approve — note posted on !23
+
+> **Answer:** Kommentar, kein Re-Approve (Recommended)
+
+❓ **Q160** - **!25 Regeneration-Probe**: fünf Lücken sauber übernommen; Hinweise zu `toErrorResponse` und zu Q155–Q159. Posten? Options: Kommentar + Approve / Nur Kommentar / Nichts tun
+
+➡️ Kommentar + Approve — posted and approved; not merged
+
+> **Answer:** Kommentar + Approve (Recommended)
+
+❓ **Q161** - **Re-Approve !7 und !9**: Die Pushes haben die Approvals von `trutscf1` zurückgesetzt (bei !9 auch seinen Auto-Merge). Kommentar mit der Bitte um Re-Approve? Options: Ja, auf beiden posten / Nein
+
+➡️ Ja — notes posted on !7 and !9 with what changed and the request to approve again
+
+> **Answer:** Ja, auf beiden posten (Recommended)
+
+❓ **Q162** - **Zeit #68 / #106**: Nachziehen von `dev` und Lizenz-Fixes auf !7 und !9? Options: je 20m / je 15m / je 30m
+
+➡️ je 15m — booked on #68 (total 1h 35m) and #106 (total 1h 20m)
+
+> **Answer:** je 15m
+
+❓ **Q163** - **Zeit !24, !20, !19**? Options: !24 20m, !20 5m, !19 5m / !24 15m, !20 5m, !19 5m / !24 30m, !20 10m, !19 5m
+
+➡️ !24 15m, !20 5m, !19 5m — booked on the MRs
+
+> **Answer:** !24 15m, !20 5m, !19 5m
+
+❓ **Q164** - **Zeit !17, !23, !21, !25**? Options: !17 15m, !23 30m, !21 20m, !25 15m / je 15m / !17 20m, !23 45m, !21 30m, !25 20m
+
+➡️ read as "je 15m" (assumption A: the answer "15m" means 15 minutes for each review) — booked on the MRs
+
+> **Answer:** 15m
+
+## Round 29 — 2026-10-27 — delivery (`trutscf1`, agent: revise !16)
 
 `schwaigc` requested changes on !16 on 2026-10-20: the job `commit-messages` fails (two headers over 120 characters), ErrorResponse contradicts `concepts/scaffolding.md` §8 and §10 example 6, conflicts with `dev`, a test for SCF-T-15, and caret ranges. Every question below was decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions), each with the recommended option.
 
