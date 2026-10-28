@@ -515,3 +515,49 @@ The pipeline of !19 (2026-10-27) failed in `dependency-audit` (Next.js 16.3.8: G
 ➡️ Ausnahme in .trivyignore bis 2026-11-23 — no newer clean tag of either image exists (checked in the Dockerfiles of `docker-library/postgres` and `docker-library/mongo` on 2026-10-27), and replacing the images is SCF-US-2 slice 2 (#103). Reason and expiry as the file demands (SCF-AC-5.3). Decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions).
 
 > **Answer:** Ausnahme in .trivyignore bis 2026-11-23 (Recommended)
+
+## Round 22 — 2026-10-13 — delivery (`schwaigc`, implement #68)
+
+Renumbered at the merge of `dev` into `feature/68-design-tokens-and-themes` on 2026-10-27 (P-TEAM-5): these questions were asked as Q34 to Q40 on 2026-10-13, and `dev` had used those numbers since. Moved to round 22 at the merge of `dev` after !24 (round 21 of `trutscf1`).
+
+❓ **Q72** - **Themes**: Welche vier Themes soll DSA-AC-1.2 liefern (neben Hell und Dunkel)? Hoher Kontrast gehört zu DSA-US-2 und zählt hier nicht. Options: Hell, Dunkel, Sepia, Nacht / Hell, Dunkel, System, Sepia / Hell, Dunkel, Ozean, Wald
+
+➡️ Hell, Dunkel, Sepia, Nacht
+
+> **Answer:** Hell, Dunkel, Sepia, Nacht (Recommended)
+
+❓ **Q73** - **Speichern**: DSA-AC-1.2 verlangt 'im Profil gespeichert', aber ein Benutzerprofil gibt es erst mit Identity (R3). Wie liefert Slice 1 das? Options: Cookie jetzt, Profil später / localStorage jetzt, Profil später / Auf Identity warten
+
+➡️ Cookie jetzt, Profil später
+
+> **Answer:** Cookie jetzt, Profil später (Recommended)
+
+❓ **Q74** - **Commits**: Du willst viele einzelne Commits. Wie fein? Options: Ein Commit pro Schritt / Ein Commit pro AC
+
+➡️ Ein Commit pro Schritt
+
+> **Answer:** Ein Commit pro Schritt (Recommended)
+
+❓ **Q75** - **Seams**: An welchen Schnittstellen teste ich #68 (node --test, Tests tragen die AC-ID)? (1) `tokens.css` in `@stash/ui`: jedes der vier Themes definiert denselben Token-Satz wie die Basis (AC-1.1/1.2); (2) `theme.ts` in `@stash/ui`: Theme-Namen, Cookie lesen/schreiben, `applyTheme` setzt `data-theme` am Wurzelelement (AC-1.2); (3) Struktur: `@stash/ui` hängt von Radix und Tailwind 4 ab, der ThemeSwitcher nutzt Radix, web lädt die Tokens (AC-1.3). Browser-Klicktest bleibt bei WEB-US-4. Options: Alle drei Seams / Nur (1) und (2) / Zusätzlich Render-Test
+
+➡️ Alle drei Seams
+
+> **Answer:** Alle drei Seams (Recommended)
+
+❓ **Q76** - **Stufe R4**: Sobald R4 auf 'in progress' steht, verlangt doc-check in §17 des Konzepts einen Test für jedes der 16 Akzeptanzkriterien von DSA-US-1 bis -3 (sonst Fehler, die CI wird rot). Gebaut und getestet sind nur AC-1.1 bis 1.3; der Rest des Konzepts ist ungegrillt. Wie lösen wir das? Options: §17 jetzt schreiben / Stufe 'concept' lassen
+
+➡️ §17 jetzt schreiben
+
+> **Answer:** §17 jetzt schreiben (Recommended)
+
+❓ **Q77** - **Push & MR**: Branch feature/68-design-tokens-and-themes (22 Commits, alles grün) pushen und das MR nach dev öffnen? Ohne GITLAB_TOKEN nur per git-Push-Option; Label und Beschreibung folgen per API. Options: Pushen + MR per Push-Option / Erst Token setzen / Nur pushen / Noch nichts
+
+➡️ Pushen + MR per Push-Option
+
+> **Answer:** Pushen + MR per Push-Option (Recommended)
+
+❓ **Q78** - **Issues**: Darf ich ein neues Issue für DSA-US-1 Slice 3 anlegen, die Beschreibung von #68 an die Story-Datei angleichen und bei #102 die Zeile „Lint für Root-Dateien“ korrigieren? Options: Ja, alle drei / Nein
+
+➡️ Ja, alle drei
+
+> **Answer:** Ja, alle drei (Recommended)

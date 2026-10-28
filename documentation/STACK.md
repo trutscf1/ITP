@@ -107,6 +107,10 @@ Type mapping (neutral type → concrete type) and error mapping (`E-x` → concr
 | Start command of `web` | `apps/web/scripts/start.ts`, run by Node.js with type stripping: checks the configuration, then starts Next.js (`dev`) or the standalone server (`start`) | Node.js 24 | Next.js alone rejects or ignores an invalid `PORT` without the output of SCF-E-1 (`../qa-log.md`, Q54). Set by #113. |
 | Font of `web` | Geist from the package `geist`, served as local files by `next/font/local` | `geist` exact, newest version older than 7 days (1.7.2 on 2026-10-20); SIL OFL 1.1 | No request to the internet at build or run time (SCF-NF-1, Q55). Set by #113. |
 | Container image of `web` | `apps/web/Dockerfile`, two stages on `node:24-alpine`, Next.js standalone output, user `node`, `HEALTHCHECK` on `/health` | `node:24-alpine` (Node.js ≥ 24.14) | Base image named by `docs/anforderungen_software_projekte.md`. Set by #113. |
+| DSA-F-1 design tokens | CSS custom properties in a Tailwind CSS `@theme` block (`packages/ui/src/tokens.css`, exported as `@stash/ui/tokens.css`) | Tailwind CSS 4 | The `@theme` values are the light theme; spacing tokens are named `tight`, `snug`, `base`, `roomy`, `loose` because Tailwind CSS 4 would let `xs` to `xl` replace the container sizes of `max-w-*` (tested in `tests/design-system.test.ts`); dark, sepia, and night override the colour tokens on `[data-theme]`. Set by #68. |
+| DSA-F-2 theme switching and memory | `data-theme` on `<html>`, cookie `stash-theme` (one year, `SameSite=Lax`) read by the root layout | – | `packages/ui/src/theme.ts`; the profile takes over with DSA-F-16. Set by #68. |
+| DSA-F-3 component primitives | Radix UI (`radix-ui`) styled with Tailwind CSS | `radix-ui` 1.6.7, React 19 | First component: the theme switcher (toggle group). Set by #68. |
+| Design-system tests | Node.js test runner on the token stylesheet, the theme helpers, and the package wiring (`tests/design-system.test.ts`, `tests/theme.test.ts`) | Node.js 24 | Rendering in a browser is left to SCF-C-13. |
 
 ## 5. Stack ADRs
 

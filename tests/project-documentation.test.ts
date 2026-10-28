@@ -52,6 +52,7 @@ function licenceLabel(name: string): string | undefined {
     dotenv: "dotenv",
     next: "Next.js",
     playwright: "Playwright",
+    "radix-ui": "Radix UI",
     react: "React",
     "react-dom": "React",
     tailwindcss: "Tailwind CSS",
