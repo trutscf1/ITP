@@ -877,3 +877,35 @@ Decided by the agent on the owner's standing instruction of 2026-10-27 (work wit
 ➡️ Punkt 1 und CI/CD hier, Punkt 16 nach dem zweiten Merge — this MR names the rule in item 1 and in "CI/CD"; whichever of !15 and this MR is merged second drops "once built; until then the reviewer checks it by hand" from item 16
 
 > **Answer:** decided by the agent: Punkt 1 und CI/CD hier, Punkt 16 nach dem zweiten Merge (Recommended)
+
+## Round 32 — 2026-10-29 — grill of the open issues of `trutscf1`
+
+Open issues and MRs of `trutscf1` on 2026-10-29: Sprint 1 #40, #41, #103, #126, #127, #147 (MRs !21, !22, !25, !27; !29 and !30 by `schwaigc`), bug #148, inbox items. Applied: P-GIT-1/2/3, P-VER-1, P-ROAD-1…4, P-MR-4…6 (`ask`, 1 approval, release `ask`), P-TEAM; no deviations. Assumptions: A55 Sprint 1 (milestone due 2026-11-02) before Sprint 2; A56 !25 targets `feature/40-contracts-zod-openapi`, which is already merged into `dev`, so its target becomes `dev`; A57 the local branch `concept/milestone-plan` is superseded by `concept/milestone-plan-2` (!21) and stays untouched; A58 this round is logged as round 32 from Q165 on the branch `chore/grill-trutscf1-2026-10-29`; A59 the inbox item "prioritize R2–R14 as must / should / could" is done by the cut order in !21.
+
+❓ **Q165** - **Veraltete MRs**: !21 (Milestone-Plan), !22 (R2-Konzept) und !27 (SCF-US-4 Prisma) haben Konflikte mit dev; !21/!22/!25 sind rot nur wegen dependency-audit/container-scan, was auf dev schon gefixt ist. Wie bringe ich sie auf Stand? Options: dev reinmergen (Recommended) / Nur !27 jetzt / Warten auf Reviewer
+
+> **Answer:** dev reinmergen (Recommended)
+
+❓ **Q166** - **Bug #148**: clamav/clamav:1.5 hat kein arm64-Image, docker compose up scheitert auf ARM-Macs. Welche Lösung? Options: platform: linux/amd64 (Recommended) / clamav/clamav-debian:1.5 / Override nur für ARM
+
+> **Answer:** platform: linux/amd64 (Recommended)
+
+❓ **Q167** - **Release v0.1.0**: Release v0.1.0 (#126) ist bis Mo 2026-11-02 fällig, aber #40 (!29), #103 (!30), #41 (!27), #127 (!25), #147 (!21) sind noch im Review. Was kommt in v0.1.0? Options: Was bis Montag gemergt ist (Recommended) / Nach Sprint-Review am 03.11. / v0.1.0 auslassen
+
+> **Answer:** Nach Sprint-Review am 03.11. — the release of Sprint 1 follows the sprint review on 2026-11-03, one day after the milestone due date.
+
+❓ **Q168** - **Reviews**: !29 (API-Docs-Route, zu #40) und !30 (Offline-Start-Check, zu #103) von schwaigc warten auf Review. Jetzt mit /engineering-human review prüfen, Ergebnis als MR-Kommentar nach Freigabe? Options: Beide reviewen (Recommended) / Nur !30 / Nicht jetzt
+
+> **Answer:** Beide reviewen (Recommended)
+
+❓ **Q169** - **Rolle Developer**: SCF-US-1 bis -4 sind für 'a developer' geschrieben, das ist keine Rolle in GOAL.md (doc-check warnt seit der Migration). Wie lösen? Options: R-6 Developer per ADR (Recommended) / Stories auf Operator R-2 / Als Enabler ohne Rolle
+
+> **Answer:** R-6 Developer per ADR (Recommended)
+
+❓ **Q170** - **GitLab-Merge-Einstellungen**: Offen seit 2026-09-29: laut docs/git_workflow_commands.md §2.3 Squash nie, 'delete source branch' aus, Pipeline muss grün sein, Diskussionen gelöst. Per API setzen? Options: Per API setzen (Recommended) / Ohne Pipeline-Pflicht / Noch nicht
+
+> **Answer:** Per API setzen (Recommended)
+
+❓ **Q171** - **Reihenfolge**: Reihenfolge für den Rest der Session nach dem Log-Commit? Options: Reviews, dann MRs, dann #148 (Recommended) / #148 zuerst / MRs zuerst
+
+> **Answer:** Reviews, dann MRs, dann #148 (Recommended)
