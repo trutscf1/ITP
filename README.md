@@ -9,7 +9,7 @@ The project goal, its target users, and its non-goals are in [documentation/GOAL
 Early scaffold. What exists today:
 
 - a pnpm and Turborepo workspace with the five units in `apps/` and the shared packages in `packages/`; the Next.js application is the `web` unit in `apps/web/` (App Router, React, Tailwind CSS, Biome, Prisma), the other units are empty
-- a `docker-compose.yml` that starts PostgreSQL 18 and MongoDB 8
+- a `docker-compose.yml` that starts PostgreSQL 18, Redis, MongoDB, CouchDB, SeaweedFS, ClamAV, Mailpit, a Caddy reverse proxy, and the `web` unit; the other four units join when their code runs
 - the project documentation in `documentation/`
 
 Everything else in the architecture below is planned. The current state of every feature is in [documentation/ROADMAP.md](documentation/ROADMAP.md) and [documentation/ROADMAP-DETAILS.md](documentation/ROADMAP-DETAILS.md).
@@ -22,7 +22,7 @@ Requirements: Docker with Docker Compose, Node.js 24 LTS, and pnpm.
 # 1. configuration: copy the example and set your own values
 cp .env.example .env
 
-# 2. start the databases (PostgreSQL 18, MongoDB 8)
+# 2. start the stack (data services, mail catcher, reverse proxy, web)
 docker compose up -d
 
 # 3. start the web application
@@ -30,7 +30,7 @@ pnpm install
 pnpm --filter @stash/web dev
 ```
 
-The web application then runs at <http://localhost:3000>. It reads the database connection from `DATABASE_URL`; put that variable into `apps/web/.env`, matching the PostgreSQL values of step 1.
+The stack serves the web application at <http://localhost:8080> (`PROXY_PORT`) and catches all e-mail in Mailpit at <http://localhost:8025>. The first start takes a few minutes. All settings come from `.env`; OAuth and captcha are off there, so the stack starts offline once the images are present. For hot reload, run step 3 against `docker compose up -d postgres` with the line `DATABASE_URL=postgresql://stash:change-me@localhost:5432/stash_db` in `apps/web/.env` (user, password, port, and database as in `.env`, host `localhost`).
 
 Checks:
 
@@ -44,7 +44,15 @@ node tools/doc-check.mjs documentation          # consistency check of the docum
 npx markdownlint-cli2 "documentation/**/*.md"   # markdown lint
 ```
 
-Once the images and dependencies are present locally, the project must start without internet access (school requirement).
+## Start without internet access
+
+The school requires that the application starts locally without internet access. What that needs today:
+
+1. Prepare once while online: `docker compose pull` (PostgreSQL and MongoDB images) and `pnpm install` (fills the local pnpm store).
+2. Afterwards, offline: `docker compose up -d`, `pnpm install --offline`, then start the web application as in the quick start.
+3. Settings that decide whether a feature may use the internet live in `.env` and are never hard-coded. Features that need the internet (login with GitHub, Google, or Microsoft, bot protection) must be switchable off there; they arrive with the identity feature (R3, [ROADMAP.md](documentation/ROADMAP.md)).
+
+Known gap: the starter layout loads its fonts through `next/font/google`, which fetches them at build time. A build without internet fails until the fonts are bundled locally.
 
 ## Architecture overview
 
@@ -78,6 +86,42 @@ flowchart LR
 
 The planned technology is listed in the project proposal ([docs/projektantrag.md](docs/projektantrag.md)); binding choices and versions are recorded in [documentation/STACK.md](documentation/STACK.md) as they are made. The units share their data shapes through one contracts package.
 
+## Data model
+
+Draft of the relational schema, derived from the project proposal (`docs/projektantrag.md`). Table names are plural, as the SQL style guide of the school demands. The binding diagram, created in Vertabelo, and the Prisma schema come with the story *Data model and Prisma schema* (`SCF-US-4`, [documentation/work-items/scaffolding/](documentation/work-items/scaffolding/)); they replace this draft. The application's own `users` table is in a 1:1 relation to the table of the authentication library.
+
+```mermaid
+erDiagram
+  auth_users ||--|| users : "1:1"
+  users ||--o{ team_members : joins
+  teams ||--o{ team_members : has
+  users ||--o{ folders : owns
+  folders ||--o{ folders : "parent of"
+  folders ||--o{ files : contains
+  folders ||--o{ folder_permissions : "is granted by"
+  teams ||--o{ folder_permissions : receives
+  users ||--o{ folder_permissions : receives
+  users ||--o{ share_links : creates
+  files ||--o{ share_links : "is shared by"
+  folders ||--o{ share_links : "is shared by"
+  users ||--o| storage_quotas : has
+  users ||--o{ audit_logs : causes
+```
+
+## Operation and deployment
+
+What exists today and what is planned (`documentation/ROADMAP.md`, R14 *Deployment*):
+
+| Topic | Today | Planned |
+| --- | --- | --- |
+| Start | `docker compose up -d` starts PostgreSQL and MongoDB; the web application is started by hand | One command starts every unit, the reverse proxy, and the databases |
+| Configuration | Variables in `.env` (copy of `.env.example`, never committed) | The same, for every unit |
+| Data | Named Docker volumes `postgres-data`, `postgres-etc`, `mongo-data`, and `mongo-config` | Backup and restore notes with the deployment |
+| Deployment | None | The GitLab CI pipeline deploys the whole stack to the team's own server when `main` is updated, TLS terminated by the reverse proxy |
+| Monitoring | None | Metrics, logs, and traces in Prometheus, Loki, Tempo, and Grafana (R2) |
+
+Releases are tagged `v<version>` on `main` and published as GitLab Releases; the rules are in [documentation/WORKFLOW.md](documentation/WORKFLOW.md), section *Releases*.
+
 ## Documentation
 
 | Where | What |
@@ -91,10 +135,42 @@ The planned technology is listed in the project proposal ([docs/projektantrag.md
 | [documentation/team/TEAM.md](documentation/team/TEAM.md) | Team members, roles, ownership |
 | [docs/](docs/) | The school's binding requirements and the project proposal |
 
+## Definition of Done
+
+The Definition of Done is binding for every issue and merge request: [documentation/WORKFLOW.md](documentation/WORKFLOW.md), section *Definition of Done*. It is kept only there so that it cannot drift; a merge request is merged only when every item holds.
+
 ## Working on the project
 
 Every change starts with an issue, happens on its own branch, and reaches `dev` through a merge request reviewed by another person; `main` only receives releases. The rules are in [documentation/WORKFLOW.md](documentation/WORKFLOW.md), the commands in [docs/git_workflow_commands.md](docs/git_workflow_commands.md). Sessions with Claude Code start with `/engineering-human` ([CLAUDE.md](CLAUDE.md)).
 
 ## Licence notes
 
-The repository is public, so all content must be licence-free. Licence notes for third-party content and dependencies are collected here as they are added; so far the project contains only the default assets of the Next.js starter in `apps/web/public/`.
+The repository is public, so all content must be licence-free. Licences of what the project uses today (the licence of a dependency is the one it declares; check again when a version changes):
+
+| Component | Licence | Use |
+| --- | --- | --- |
+| Next.js, React, Tailwind CSS (`@tailwindcss/postcss`, `@tailwindcss/vite`) | MIT | web application; `@tailwindcss/vite` builds the styles of Storybook |
+| Radix UI (`radix-ui`) | MIT | accessible primitives of the design system (`@stash/ui`) |
+| Storybook (`storybook`, `@storybook/react-vite`), Vite | MIT | component documentation of the design system (`packages/ui`) |
+| Zod, zod-to-openapi (`@asteasolutions/zod-to-openapi`) | MIT | shared contracts and the generated API description (`packages/contracts`) |
+| dotenv | BSD-2-Clause | reads the `.env` file in the web application |
+| Prisma | Apache-2.0 | database access |
+| TypeScript | Apache-2.0 | language |
+| Biome | MIT or Apache-2.0 | lint and format |
+| pnpm, Turborepo | MIT | package manager and task runner |
+| commitlint | MIT | checks commit messages |
+| yaml | ISC | reads the CI configuration in tests and scripts |
+| Playwright | Apache-2.0 | browser tests |
+| `@axe-core/playwright` | MPL-2.0 | accessibility tests |
+| PostgreSQL 18 (Docker image) | PostgreSQL Licence | relational database, runs as a container |
+| MongoDB 8.0 (Docker image) | SSPL | metadata database, runs as a container; not part of the delivered source |
+| Redis 8.8 (Docker image) | RSALv2, SSPLv1, or AGPLv3, at the user's choice | sessions and cache, runs as a container |
+| CouchDB 3.5 (Docker image) | Apache-2.0 | offline sync database, runs as a container |
+| SeaweedFS 4.51 (Docker image) | Apache-2.0 | object storage, runs as a container |
+| ClamAV 1.5 (Docker image) | GPL-2.0 | virus scanner, runs as a container; not part of the delivered source |
+| Mailpit 1.32 (Docker image) | MIT | catches all outgoing e-mail of the local stack |
+| Caddy 2.11 (Docker image) | Apache-2.0 | reverse proxy of the local stack |
+| Geist and Geist Mono fonts | SIL Open Font Licence 1.1 | loaded by the starter layout |
+| `next.svg` and `vercel.svg` in `apps/web/public/` | logos of Vercel (third party), shipped with the Next.js starter | **to be replaced** by own assets before the final submission; `file.svg`, `globe.svg`, and `window.svg` of the starter are unused and to be deleted |
+
+Open points: MongoDB's SSPL is not an OSI-approved licence, so the team decides whether the proposal's choice stays (issue #110); third-party content added later is entered here when it is added.
