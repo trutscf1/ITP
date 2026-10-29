@@ -1,21 +1,19 @@
-import { loadWebConfig } from "@stash/contracts/web";
+import { loadWebConfigValue } from "@stash/contracts/web";
 import { connection } from "next/server.js";
 import { serveApiDocs } from "../../../api-docs/api-docs.ts";
 import { errorResponse } from "../../../errors.ts";
 
 // GET /api/docs (M6). connection() marks the request dynamic, so `next build` never reads the
-// file; the path comes from OPENAPI_FILE on every request (A3). HEAD is answered from GET.
+// file; the path comes from OPENAPI_FILE on every request (A3). Only that variable is checked,
+// so an invalid other one cannot break this route (SCF-F-10). HEAD is answered from GET.
 export async function GET(_request: Request): Promise<Response> {
   await connection();
-  const result = loadWebConfig(process.env);
-  if (!result.ok) {
-    console.error(
-      "GET /api/docs: invalid configuration",
-      result.problems.map((problem) => problem.name),
-    );
+  const file = loadWebConfigValue(process.env, "OPENAPI_FILE");
+  if (!file.ok) {
+    console.error("GET /api/docs: invalid configuration", file.problem.name);
     return errorResponse("internal-error");
   }
-  return serveApiDocs(result.config.OPENAPI_FILE);
+  return serveApiDocs(file.value);
 }
 
 function methodNotAllowed(_request: Request): Response {
