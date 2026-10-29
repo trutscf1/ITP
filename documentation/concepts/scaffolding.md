@@ -203,10 +203,19 @@ DependencyCheck {
 }
 
 ErrorResponse {
-  code: string,                     // stable, machine-readable, e.g. "validation-failed"
+  code: enum(validation-failed|not-found|method-not-allowed|internal-error),  // stable, machine-readable
   message: string                   // one plain sentence for the caller; no internals (SCF-NF-4)
 }
 ```
+
+Every code has one HTTP status and one fixed message, never taken from the failure itself ([SCF-F-21], [SCF-NF-4]); a failed schema validation is `validation-failed`, every other failure inside a unit is `internal-error` (§10, example 6). A new code is added to this table first.
+
+| Code | HTTP status | Message |
+| --- | --- | --- |
+| `validation-failed` | 400 | The request body is not valid. |
+| `not-found` | 404 | The requested resource does not exist. |
+| `method-not-allowed` | 405 | The method is not allowed for this path. |
+| `internal-error` | 500 | The request could not be processed. |
 
 Unit routing table (defaults; every value is configuration, [SCF-NF-8]):
 

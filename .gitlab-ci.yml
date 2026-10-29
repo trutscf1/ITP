@@ -116,7 +116,7 @@ dependency-audit:
 
 # Every image of docker-compose.yml, scanned for known high and critical vulnerabilities that
 # have a fix; accepted exceptions with reason and expiry live in .trivyignore (SCF-AC-5.2,
-# SCF-AC-5.3).
+# SCF-AC-5.3). Every image is scanned before the job fails, so one run lists all findings.
 container-scan:
   stage: test
   image:
@@ -131,9 +131,14 @@ container-scan:
   script:
     - images=$(awk '/^[[:space:]]*image:/ {print $2}' docker-compose.yml)
     - |
+      failed=""
       for image in $images; do
-        trivy image --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --ignorefile .trivyignore --exit-code 1 "$image" || exit 1
+        trivy image --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --ignorefile .trivyignore --exit-code 1 "$image" || failed="$failed $image"
       done
+      if [ -n "$failed" ]; then
+        echo "Images with findings:$failed"
+        exit 1
+      fi
 
 # Secrets in the history of the checked-out commit (SCF-F-15, docs/security_next_js.md).
 secret-scan:

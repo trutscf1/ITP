@@ -1,32 +1,202 @@
+# Local stack (SCF-US-2, slice 1): the data services, the reverse proxy, and `web`, started by
+# one `docker compose up`. Every setting comes from `.env` (SCF-AC-2.2); `.env.example` lists
+# every variable. Every service has a health check, and a service starts only after the
+# services it depends on are healthy (SCF-AC-2.4). The units `identity`, `storage`, `worker`,
+# and `cms` join when their code runs (documentation/concepts/scaffolding.md, SCF-F-1).
 services:
-  
+  # Relational database (SCF-C-8).
   postgres:
-    image: postgres:18
-    container_name: stash_db
+    image: postgres:18-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: stash_db
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
     networks:
       - backend
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "127.0.0.1:${POSTGRES_PORT:?set POSTGRES_PORT in .env}:5432"
     volumes:
-      - postgres-etc:/etc
+      # PostgreSQL 18 keeps its data in a versioned folder below /var/lib/postgresql.
       - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
-  mongodb:
-    hostname: mongodb
-    image: mongo:8.0
+  # Sessions, cache, and the job queue.
+  redis:
+    image: redis:8.8-alpine
+    restart: unless-stopped
+    command: ["sh", "-c", "exec redis-server --requirepass \"$$REDIS_PASSWORD\""]
     environment:
-      - MONGODB_INITDB_ROOT_USERNAME=${MONGO_USER}
-      - MONGODB_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?set REDIS_PASSWORD in .env}
+      # Read by redis-cli, so the health check does not put the password on a command line.
+      REDISCLI_AUTH: ${REDIS_PASSWORD:?set REDIS_PASSWORD in .env}
+    networks:
+      - backend
     ports:
-      - 27017:27017
+      - "127.0.0.1:${REDIS_PORT:?set REDIS_PORT in .env}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  # File metadata.
+  mongodb:
+    image: mongo:8.0
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:?set MONGO_USER in .env}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:?set MONGO_PASSWORD in .env}
+    networks:
+      - backend
+    ports:
+      - "127.0.0.1:${MONGO_PORT:?set MONGO_PORT in .env}:27017"
     volumes:
       - mongo-data:/data/db
       - mongo-config:/data/configdb
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval \"db.adminCommand('ping').ok\" | grep -q 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  # Synchronisation for the offline mode.
+  couchdb:
+    image: couchdb:3.5
+    restart: unless-stopped
+    environment:
+      COUCHDB_USER: ${COUCHDB_USER:?set COUCHDB_USER in .env}
+      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD:?set COUCHDB_PASSWORD in .env}
+    networks:
+      - backend
+    ports:
+      - "127.0.0.1:${COUCHDB_PORT:?set COUCHDB_PORT in .env}:5984"
+    volumes:
+      - couchdb-data:/opt/couchdb/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://127.0.0.1:5984/_up"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # Object storage with an S3 interface. The master answers on 9333 once the server is up.
+  seaweedfs:
+    image: chrislusf/seaweedfs:4.51
+    restart: unless-stopped
+    command: ["server", "-dir=/data", "-filer", "-s3"]
+    networks:
+      - backend
+    ports:
+      - "127.0.0.1:${SEAWEEDFS_S3_PORT:?set SEAWEEDFS_S3_PORT in .env}:8333"
+    volumes:
+      - seaweedfs-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO /dev/null http://127.0.0.1:9333/cluster/status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # Virus scanner. The image brings its own health check script; the first start loads the
+  # virus definitions, which takes a while.
+  clamav:
+    image: clamav/clamav:1.5
+    restart: unless-stopped
+    environment:
+      # "true" keeps the scanner from downloading definitions, so it starts offline with the
+      # ones in the image (SCF-AC-2.3); set "false" to update them while online.
+      CLAMAV_NO_FRESHCLAMD: ${CLAMAV_NO_FRESHCLAMD:?set CLAMAV_NO_FRESHCLAMD in .env}
+    networks:
+      - backend
+    volumes:
+      - clamav-data:/var/lib/clamav
+    healthcheck:
+      test: ["CMD", "clamdcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 180s
+
+  # Local replacement for outgoing e-mail (SCF-AC-2.3): catches every message; the inbox is
+  # at http://localhost:${MAILPIT_UI_PORT}.
+  mailpit:
+    image: axllent/mailpit:v1.32
+    restart: unless-stopped
+    networks:
+      - backend
+    ports:
+      - "127.0.0.1:${MAILPIT_UI_PORT:?set MAILPIT_UI_PORT in .env}:8025"
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  # The `web` unit (Next.js). docker/web.Dockerfile is a temporary stop-gap; M9 of the track plan
+  # Web (documentation/concepts/scaffolding.track-web.md) replaces it with apps/web/Dockerfile.
+  web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+    restart: unless-stopped
+    environment:
+      PORT: ${WEB_PORT:?set WEB_PORT in .env}
+      HOSTNAME: 0.0.0.0
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      # External services are switched off by default; e-mail goes to mailpit (SCF-AC-2.3).
+      OAUTH_ENABLED: ${OAUTH_ENABLED:?set OAUTH_ENABLED in .env}
+      CAPTCHA_ENABLED: ${CAPTCHA_ENABLED:?set CAPTCHA_ENABLED in .env}
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - frontend
+      - backend
+    healthcheck:
+      # `/` until `web` has `/health`: `/` becomes a redirect with R11 (public content), and M9
+      # moves this check to `/health`.
+      test: ["CMD-SHELL", "wget -qO /dev/null http://127.0.0.1:$${PORT}/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # Reverse proxy: one origin for the browser (SCF-F-4). Routes for the other units are added
+  # in docker/Caddyfile as they join the stack.
+  proxy:
+    image: caddy:2.11-alpine
+    restart: unless-stopped
+    environment:
+      WEB_PORT: ${WEB_PORT:?set WEB_PORT in .env}
+    depends_on:
+      web:
+        condition: service_healthy
+    networks:
+      - frontend
+    ports:
+      - "${PROXY_PORT:?set PROXY_PORT in .env}:80"
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - proxy-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO /dev/null http://127.0.0.1:80/proxy-health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
 
   # Applies the pending migrations of the relational schema once and exits (SCF-F-26, SCF-E-7).
   # Every service that uses the relational database depends on it with
@@ -50,6 +220,10 @@ networks:
 
 volumes:
   postgres-data:
-  postgres-etc:
+  redis-data:
   mongo-data:
   mongo-config:
+  couchdb-data:
+  seaweedfs-data:
+  clamav-data:
+  proxy-data:
