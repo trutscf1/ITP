@@ -1,18 +1,45 @@
 # Offline check of the local stack: SCF-T-8 (SCF-AC-2.3, start without internet).
 # Added on top of docker-compose.yml, it turns both networks into internal ones, so no container
 # has a route to the internet, and drops the published host ports, so the check runs next to
-# another stack. Pull the images and build `web` first while online (the "images present" of
-# SCF-T-8), then start with the example configuration unchanged:
+# another stack. `!reset` needs Docker Compose 2.24 or later. tests/docker-compose.test.ts checks
+# that this file lists every service with published ports and every network of the stack.
+#
+# 1. While online, pull the images and build `web` (the "images present" of SCF-T-8):
 #
 #   docker compose -p stash-offline-check --env-file .env.example pull
 #   docker compose -p stash-offline-check --env-file .env.example build web
-#   docker compose -p stash-offline-check --env-file .env.example \
-#     -f docker-compose.yml -f docker/compose.offline-check.yml \
-#     up -d --pull never --no-build --wait
-#   docker compose -p stash-offline-check ps        # every service running and healthy
-#   docker compose -p stash-offline-check down -v   # remove containers and volumes
 #
-# On an ARM machine, clamav/clamav:1.5 needs `platform: linux/amd64` until #148 is decided.
+# 2. Start with the example configuration unchanged. Every later command uses the same options:
+#
+#   C="docker compose -p stash-offline-check --env-file .env.example \
+#     -f docker-compose.yml -f docker/compose.offline-check.yml"
+#   $C up -d --pull never --no-build --wait
+#   $C ps                                   # every service running and healthy
+#
+# 3. Probe from inside the stack. The host cannot reach the proxy, because no port is published,
+#    so the requests run in the proxy container. Expected output after each `#`:
+#
+#   $C exec -T web sh -c 'wget -q -T 5 -O /dev/null https://gitlab.com && echo REACHABLE || echo NO-INTERNET'
+#                                           # NO-INTERNET (no name resolution)
+#   $C exec -T web sh -c 'wget -q -T 5 -O /dev/null http://1.1.1.1 && echo REACHABLE || echo NO-INTERNET'
+#                                           # NO-INTERNET (no route)
+#   $C exec -T web sh -c 'echo $OAUTH_ENABLED $CAPTCHA_ENABLED $SMTP_HOST'
+#                                           # false false mailpit
+#   $C exec -T web sh -c 'nc -z -w 3 mailpit 1025 && echo SMTP-OK'
+#                                           # SMTP-OK
+#   $C exec -T clamav sh -c 'pgrep freshclam || echo NO-FRESHCLAM'
+#                                           # NO-FRESHCLAM (scans with the definitions of the image)
+#   $C exec -T proxy wget -q -S -O /dev/null http://127.0.0.1:80/ 2>&1 | grep HTTP/
+#                                           # HTTP/1.1 200 OK
+#   $C exec -T proxy wget -q -O - http://127.0.0.1:80/api/docs | grep -o '"openapi": "[^"]*"'
+#                                           # "openapi": "3.1.0" (needs !29 in the build)
+#
+# 4. Remove containers and volumes:
+#
+#   $C down -v
+#
+# In zsh, write `${=C}` instead of `$C`, or define a function `C() { docker compose … "$@"; }`.
+# On an ARM machine, clamav/clamav:1.5 runs as linux/amd64 (#148).
 networks:
   frontend:
     internal: true
