@@ -1,0 +1,17 @@
+# Reverse proxy of the local stack (SCF-F-4): one origin, routed by path prefix. `web` serves
+# `/`. The prefixes /api/identity, /api/storage, and /cms are added when the units run.
+{
+	admin off
+	auto_https off
+}
+
+:80 {
+	# Answered by the proxy itself, for its health check.
+	handle /proxy-health {
+		respond "ok" 200
+	}
+
+	handle {
+		reverse_proxy web:{$WEB_PORT}
+	}
+}

@@ -139,7 +139,7 @@ Every document and every ID-bearing row descends from the project goal `G-1` in 
 
 A short pass run at the Phase 1 start (feature vs. goal), the Phase 4 gate, the end of Phase 5, every merge, and every Phase 8 sweep, or on demand via `/engineering-human check`:
 
-1. Run `node tools/doc-check.mjs` (see [Machine-Readable Contract](#machine-readable-contract)). It lists every orphan, dangling reference, coverage gap (rule 4), malformed or duplicate ID, and contract violation. The CI runs the same script on every MR.
+1. Run `node tools/doc-check.mjs` (see [Machine-Readable Contract](#machine-readable-contract)). It lists every orphan, dangling reference, coverage gap (rule 4, including acceptance criteria without a test in the code, rule `AC-TEST`), malformed or duplicate ID, and contract violation. The CI runs the same script on every MR.
 2. Read each row next to its parent and the non-goals; list every contradiction as *child ID — parent ID — conflict in one sentence*. This is the semantic part no script can do.
 3. Fix or defer every finding of steps 1 and 2.
 4. Record the result in the MR description. The gate passes only with an empty list, or with each entry resolved or explicitly deferred with rationale.
@@ -272,10 +272,23 @@ The check script recognizes a table by its header row. Keep these headers exactl
 | `NA` | An `n/a` without a reason | error |
 | `WI` | Work-item tree broken: a `feature` or `story` whose `id-prefix` matches no concept, a `concept` field naming another file, a story file not listed in its folder's `feature.md` or without one, a story file with not exactly one story, an acceptance criterion of another story; a warning for stories still in a concept document (move them on the next change, P-DOC-5) | error / warning |
 | `STATUS` | Only with `--status`: a ROADMAP stage that does not match the git history, or a position row that names an already merged branch (see below) | error |
+| `AC-TEST` | An acceptance criterion whose ID no test name in the code carries (see below) | error / warning |
 
 Legacy concept documents are checked for frontmatter only. Output is plain text for people, or JSON with `--json` for tools; the exit code is `1` when an error is found.
 
 **Status against git (`--status`).** A story counts as merged when a merge commit on the checked-out branch names its ID — the MR title carries it (P-MR-1), and GitLab and GitHub both write the title into the merge commit. It counts as released when a `v*` tag contains that merge. From this the script derives the stage each concept's feature must have: all stories in a tag → `released`; all merged → `in dev`; some merged → `in progress`; none merged → `concept`, `ready`, or `in progress`. In an MR pipeline, `--pending-title` and `--pending-branch` count the MR as merged, because the MR carries the status for the state after the merge (P-ROAD-4). The check needs the full history and the tags; a shallow clone is an error.
+
+**Acceptance criteria against the tests in code (`AC-TEST`).** `COVER` checks that §17 plans a test for every acceptance criterion; `AC-TEST` checks that the code has one (rule 4 above, Definition of Done item 1 in `WORKFLOW.md`). The script reads every test file next to `documentation/`: files named `*.test.*` or `*.spec.*` with a `.js`, `.jsx`, `.ts`, `.tsx`, `.mjs`, `.cjs`, `.mts`, or `.cts` extension under `tests/`, `apps/`, and `packages/`, skipping `node_modules`, `dist`, `build`, `out`, `coverage`, `storybook-static`, and every folder whose name starts with a dot. A test name is the first string argument of `describe`, `it`, `test`, `suite`, or `test.describe`, also with `.only`; an acceptance criterion counts as tested when a test name carries its ID (`it("QE-AC-3.2 refuses a duplicate question", …)`). Skipped (`.skip`) and `.todo` tests, comments, and other strings do not count. The severity follows the state of the work, so that `dev` stays green while a feature is still being built:
+
+| Situation | Severity |
+| --- | --- |
+| The feature's ROADMAP stage is `in dev` or `released` | error |
+| The merge request delivers the criterion: `--pending-branch` is `feature/<n>-…` or `fix/<n>-…`, and `#<n>` stands in the *Issue* cell of a slice whose *Delivers* names the criterion | error |
+| The feature is `in progress` and neither of the above holds | warning |
+| The feature is `idea`, `concept`, or `ready` | no finding |
+| An error case, but an untested justification of the concept (§17, *ID, Reason*) names the criterion | warning |
+
+The CI passes the merge request's source branch, so every MR must bring the tests of the criteria its slice delivers; merged slices of a feature still in progress show as warnings on `dev` until the feature reaches `in dev`.
 
 ---
 
