@@ -1,6 +1,6 @@
 // Seed command (SCF-F-25): fills a migrated local database with one user, one team with that
 // user as owner, the team's root folder, and one folder inside it. Running it again changes
-// nothing. Usage: pnpm db:seed (DATABASE_URL from the environment or the root .env).
+// nothing. Usage: pnpm db:seed (DATABASE_URL from the environment, or built from the PostgreSQL values of the root .env).
 import "./env.ts";
 import pg from "pg";
 import { seedData } from "./seed-data.ts";
@@ -49,7 +49,9 @@ export async function seed(connectionString: string): Promise<void> {
 if (import.meta.main) {
   const url = process.env.DATABASE_URL;
   if (!url) {
-    console.error("DATABASE_URL: missing — set it in .env or the environment");
+    console.error(
+      "DATABASE_URL: missing — set the POSTGRES_ values in .env, or DATABASE_URL in the environment",
+    );
     process.exit(1);
   }
   await seed(url);

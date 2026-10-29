@@ -30,7 +30,7 @@ pnpm install && pnpm db:migrate && pnpm db:seed
 pnpm --filter @stash/web dev
 ```
 
-The stack serves the web application at <http://localhost:8080> (`PROXY_PORT`) and catches all e-mail in Mailpit at <http://localhost:8025>. The first start takes a few minutes. All settings come from `.env`; OAuth and captcha are off there, so the stack starts offline once the images are present. Step 3 runs the web application with hot reload at <http://localhost:3000>; `pnpm db:migrate` and `pnpm db:seed` read the database connection from `DATABASE_URL` in `.env`, which must match the PostgreSQL values of step 1 with the host `localhost`.
+The stack serves the web application at <http://localhost:8080> (`PROXY_PORT`) and catches all e-mail in Mailpit at <http://localhost:8025>. The first start takes a few minutes. All settings come from `.env`; OAuth and captcha are off there, so the stack starts offline once the images are present. Step 3 runs the web application with hot reload at <http://localhost:3000>; `pnpm db:migrate` and `pnpm db:seed` build the database connection `DATABASE_URL` from the PostgreSQL values in `.env` with the host `localhost`.
 
 Checks:
 

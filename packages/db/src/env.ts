@@ -1,9 +1,14 @@
 // Loads the .env of the repository root, so the commands of this package read the same
-// configuration as the local stack (SCF-F-17), whichever folder they are started from.
+// configuration as the local stack (SCF-F-17), whichever folder they are started from, and
+// derives DATABASE_URL from its PostgreSQL values when the environment does not set it.
 import { fileURLToPath } from "node:url";
 import { config } from "dotenv";
+import { databaseUrl } from "./database-url.ts";
 
 config({
   path: fileURLToPath(new URL("../../../.env", import.meta.url)),
   quiet: true,
 });
+
+const url = databaseUrl(process.env);
+if (url) process.env.DATABASE_URL = url;
