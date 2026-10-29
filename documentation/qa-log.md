@@ -909,3 +909,7 @@ Open issues and MRs of `trutscf1` on 2026-10-29: Sprint 1 #40, #41, #103, #126, 
 ❓ **Q171** - **Reihenfolge**: Reihenfolge für den Rest der Session nach dem Log-Commit? Options: Reviews, dann MRs, dann #148 (Recommended) / #148 zuerst / MRs zuerst
 
 > **Answer:** Reviews, dann MRs, dann #148 (Recommended)
+
+❓ **Q172** - **Rolle Developer, Nachtrag zu Q169**: ADR-0004 (2026-10-06) hat schon entschieden 'keine Developer-Rolle, interne Stories sind für den Operator R-2' und STO-US-1/BGP-US-1 so umformuliert; für SCF-US-1–4 war das Umformulieren bei der R1-Migration vorgesehen. Bleibt es bei R-6? Options: ADR-0004 folgen (Recommended) / Doch R-6 Developer
+
+> **Answer:** ADR-0004 folgen (Recommended) — replaces the answer to Q169, which was asked without naming ADR-0004. SCF-US-1 to SCF-US-4 name the operator; their acceptance criteria and tests are unchanged; the open issues #40 and #41 carry the new story sentence, the closed issues #38 and #39 stay as they are.

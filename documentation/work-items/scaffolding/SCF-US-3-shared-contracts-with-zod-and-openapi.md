@@ -13,7 +13,7 @@ One user story of [Scaffolding & shared contracts](feature.md) and the acceptanc
 
 | ID | Title | As a | I want | so that | Priority |
 | --- | --- | --- | --- | --- | --- |
-| SCF-US-3 | Shared contracts with Zod and OpenAPI | developer | to define API contracts and validation rules once in a shared package | client and server validate with the same rules and contract breaks show up early | Must |
+| SCF-US-3 | Shared contracts with Zod and OpenAPI | operator | to define API contracts and validation rules once in a shared package | client and server validate with the same rules and contract breaks show up early | Must |
 
 ## Acceptance criteria
 

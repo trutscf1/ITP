@@ -14,10 +14,8 @@ New tasks and ideas for this developer land here first, before anyone plans them
 - [2026-10-06] Revoke the two project access tokens used until 2026-10-06 (Project → Settings → Access tokens). The other three team members each create an own personal access token (`docs/agents/issue-tracker.md`, "Access").
 - [2026-10-06] Team review of the drafts in `GOAL.md` (roles R-1…R-3, success signals G-1.S1…S3) and of the *Serves* column in `ROADMAP.md`; only the wording of G-1 is confirmed.
 - [2026-10-06] Promote the feature issues #87–#100 to group epics (`/promote`); needs a membership in the group, which `trutscf1` does not have — ask the teacher or a group owner.
-- [2026-09-29] Set the merge settings per `docs/git_workflow_commands.md` §2.3 (squash never, "delete source branch" off, pipeline must succeed, discussions resolved) and the GitHub mirror (§18). Not chosen on 2026-10-06 (`qa-log.md`, Q14); the default branch is already `dev`.
+- [2026-09-29] Set up the GitHub mirror per `docs/git_workflow_commands.md` §18. The merge settings of §2.3 are set since 2026-10-29 (`qa-log.md`, Q170).
 - [2026-10-06] Owners review what was proposed for them on 2026-10-06: the cut of the six Sprint 1 stories into two slices each (#102–#107), the labels of #1–#3, the scope and estimate of #2 Corporate Identity, and the `README.md`.
 - [2026-10-06] In the MR that delivers PUB-US-3 (help center and changelog): add the release step "a content editor writes and publishes the changelog entry in the team's installation" to `WORKFLOW.md`, "Releases" (`concepts/public-content.md` §15, Q19).
-- [2026-09-29] Prioritize R2–R14 as must / should / could before Sprint 2 planning (capacity ≈ 350 h vs. ≈ 490 h estimated, `ROADMAP.md` "Capacity").
 - [2026-09-29] R1: each owner writes the "Plan" section of their track file (`concepts/scaffolding.track-*.md`) before their first MR.
 - [2026-10-13] After !6 (public content) is merged: update its references to `scaffolding.md` §7 to §8, and mark the two changes of its §15 that the migration carried out (`SCF-NF-1`, `SCF-F-8`, `SCF-U-1`) as done.
-- [2026-10-13] The stories `SCF-US-1` to `SCF-US-4` are written for "a developer", which is no role of `GOAL.md`; `doc-check` warns about it since the migration. Decide with the team whether the stories name the operator or a role is added by ADR.
