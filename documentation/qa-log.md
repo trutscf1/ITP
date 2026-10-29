@@ -953,3 +953,9 @@ Provisional numbers (P-TEAM-5): these follow Q185 of round 33. Since round 33, `
 ➡️ !25 re-approved with the note about its target branch; note on !21 that point 1 is still open
 
 > **Answer:** !25 re-approve, !21 Hinweis (Recommended)
+
+❓ **Q192** - **Merge !33**: fix/148-clamav-on-arm → dev, approved by schwaigc, pipeline green, no open threads, author trutscf1. Merge? Options: Merge now / No / Later / I merge myself
+
+➡️ Merge now — merged at `ea738e1`, branch deleted, #148 closed by hand with `status::done`; `dev` merged into this branch (one-line conflict in `ROADMAP-DETAILS.md`)
+
+> **Answer:** Merge now
