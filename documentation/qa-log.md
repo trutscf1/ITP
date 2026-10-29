@@ -913,3 +913,31 @@ Open issues and MRs of `trutscf1` on 2026-10-29: Sprint 1 #40, #41, #103, #126, 
 ❓ **Q172** - **Rolle Developer, Nachtrag zu Q169**: ADR-0004 (2026-10-06) hat schon entschieden 'keine Developer-Rolle, interne Stories sind für den Operator R-2' und STO-US-1/BGP-US-1 so umformuliert; für SCF-US-1–4 war das Umformulieren bei der R1-Migration vorgesehen. Bleibt es bei R-6? Options: ADR-0004 folgen (Recommended) / Doch R-6 Developer
 
 > **Answer:** ADR-0004 folgen (Recommended) — replaces the answer to Q169, which was asked without naming ADR-0004. SCF-US-1 to SCF-US-4 name the operator; their acceptance criteria and tests are unchanged; the open issues #40 and #41 carry the new story sentence, the closed issues #38 and #39 stay as they are.
+
+## Round 34 — 2026-10-29 — delivery (`trutscf1`, agent: reviews of !29 and !30, update of !27)
+
+Rounds 32 (this session) and 33 (implement #41, on !27) come before this one. The reviews ran as `/engineering-human review` with the two axes of `/code-review` (standards and spec). Assumption A60: `tests/` and the compose tests belong to the Platform track (A25), so the agent adapts them in !27.
+
+❓ **Q173** - **SCF-AC-2.4 vs. SCF-F-26**: Nach dem Merge von dev in !27 scheitern 2 Tests aus !17: 'jeder Container hat einen Health-Check' und 'jede Abhängigkeit wartet auf healthy'. db-migrate ist laut SCF-F-26 (Q25) ein Einmal-Container, auf den man mit service_completed_successfully wartet. Wie auflösen? Options: AC-2.4 präzisieren (Recommended) / Dummy-Health-Check / Migration in web
+
+➡️ AC-2.4 präzisieren — SCF-AC-2.4, SCF-F-20, and SCF-T-9 exempt a one-shot container (`restart: "no"`) from the health check; its dependents wait until it completed successfully; the compose tests follow in !27
+
+> **Answer:** AC-2.4 präzisieren (Recommended)
+
+❓ **Q174** - **DATABASE_URL in .env.example**: !27 setzt DATABASE_URL (localhost) in die Root-.env für pnpm db:migrate/seed; der Test aus !17 verlangt, dass jede Variable aus .env.example in docker-compose.yml vorkommt, und User/Passwort stehen dann doppelt. Wie lösen? Options: Aus POSTGRES_* bauen (Recommended) / Test lockern / Compose nutzt sie auch
+
+➡️ Aus POSTGRES_* bauen — `packages/db/src/database-url.ts` builds the connection with the host `localhost` when the environment sets no `DATABASE_URL`; `.env.example` keeps it only as a commented override (SCF-AC-7.2)
+
+> **Answer:** Aus POSTGRES_* bauen (Recommended)
+
+❓ **Q175** - **Review !29 posten**: Urteil 'changes requested', 4 Must-fix: .env.example fehlt 7 Variablen; W-1 trägt fälschlich SCF-AC-2.6; /api/docs prüft die ganze Config pro Request; Plan widerspricht sich (Testability-Liste). Fremde Pfade: Platform-Dateien stimme ich als Owner zu, packages/contracts/package.json braucht OK von schauby1. Options: So posten (Recommended) / Als Approve mit Notizen / Nicht posten
+
+➡️ So posten — review comment posted on !29, no approval
+
+> **Answer:** So posten (Recommended)
+
+❓ **Q176** - **Review !30 posten**: Urteil 'changes requested', 3 Must-fix: Probe-Befehle fehlen (Check nicht wiederholbar); Branchname chore/ statt feature/ als Abweichung notieren; Q183 Zeitbuchung widerspricht Antwort (+ Bestätigung, dass kein Agent gebucht hat). Plus Follow-up-Issue, dass container-scan das gebaute web-Image nicht scannt. Options: Posten + Follow-up-Issue (Recommended) / Nur posten / Approve mit Notizen
+
+➡️ Posten + Follow-up-Issue — review comment posted on !30; issue #149 (Sprint 2, `tschudea07`, `type::bug`) for the images the stack builds
+
+> **Answer:** Posten + Follow-up-Issue (Recommended)
