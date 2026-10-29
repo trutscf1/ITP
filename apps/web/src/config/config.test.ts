@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { loadWebConfig } from "@stash/contracts/web";
+import { loadWebConfig, loadWebConfigValue } from "@stash/contracts/web";
 
 describe("M1 configuration of web", () => {
-  it("W-1 SCF-AC-2.6: an environment without any variable gives every default", () => {
+  it("W-1 M1: an environment without any variable gives every default", () => {
     assert.deepEqual(loadWebConfig({}), {
       ok: true,
       config: {
@@ -17,5 +17,25 @@ describe("M1 configuration of web", () => {
         OPENAPI_FILE: "../../packages/contracts/dist/openapi.json",
       },
     });
+  });
+
+  it("W-22 SCF-F-10: reading one variable ignores an invalid value of another", () => {
+    assert.deepEqual(
+      loadWebConfigValue({ CMS_HEALTH_URL: "ftp://cms" }, "OPENAPI_FILE"),
+      { ok: true, value: "../../packages/contracts/dist/openapi.json" },
+    );
+  });
+
+  it("W-22 SCF-F-10: reading one variable reports its own invalid value", () => {
+    assert.deepEqual(
+      loadWebConfigValue({ OPENAPI_FILE: "x".repeat(513) }, "OPENAPI_FILE"),
+      {
+        ok: false,
+        problem: {
+          name: "OPENAPI_FILE",
+          reason: "expected 1 to 512 characters",
+        },
+      },
+    );
   });
 });

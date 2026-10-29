@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { DELETE, GET, PATCH, POST, PUT } from "../app/api/[...path]/route.ts";
+import { DELETE, GET, PATCH, POST, PUT } from "./route.ts";
 
 describe("M6 errors under /api", () => {
   const handlers = { GET, POST, PUT, PATCH, DELETE };
