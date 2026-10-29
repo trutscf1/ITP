@@ -12,6 +12,7 @@ type Service = {
   image?: string;
   build?: unknown;
   environment?: Record<string, string> | string[];
+  restart?: string;
   healthcheck?: Healthcheck;
   depends_on?: Record<string, { condition?: string }>;
 };
@@ -150,7 +151,12 @@ describe("SCF-AC-2.2 Configuration by environment", () => {
 describe("SCF-AC-2.4 Health checks", () => {
   const services = readCompose().services;
 
+  // A one-shot service (`restart: "no"`, such as db-migrate of SCF-F-26) exits after its run,
+  // so it has no health check; its dependents wait until it completed successfully (SCF-F-20).
+  const oneShot = (name: string) => services[name]?.restart === "no";
+
   for (const [name, service] of Object.entries(services)) {
+    if (oneShot(name)) continue;
     it(`SCF-AC-2.4 gives the service ${name} a health check`, () => {
       assert.ok(service.healthcheck?.test, `${name} has no healthcheck.test`);
     });
@@ -167,13 +173,16 @@ describe("SCF-AC-2.4 Health checks", () => {
     assert.equal(services.proxy?.depends_on?.web?.condition, "service_healthy");
   });
 
-  it("SCF-AC-2.4 lets every dependency of every service wait for health", () => {
+  it("SCF-AC-2.4 lets every dependency of every service wait for health or a one-shot service's successful end", () => {
     const weak: string[] = [];
     for (const [name, service] of Object.entries(services)) {
       for (const [dependency, rule] of Object.entries(
         service.depends_on ?? {},
       )) {
-        if (rule.condition !== "service_healthy") {
+        const expected = oneShot(dependency)
+          ? "service_completed_successfully"
+          : "service_healthy";
+        if (rule.condition !== expected) {
           weak.push(`${name} -> ${dependency}`);
         }
       }
