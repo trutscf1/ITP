@@ -13,7 +13,7 @@
     "typecheck": "tsc --noEmit",
     "build": "node -e \"console.log('nothing to build')\"",
     "dev": "node -e \"console.log('nothing to run')\"",
-    "test": "node --test",
+    "test": "node --test \"src/**/*.test.ts\"",
     "contract:emit": "prisma contract emit",
     "migration:plan": "prisma migration plan --name",
     "migrate": "prisma db migrate",
