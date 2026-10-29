@@ -80,8 +80,8 @@ apps/web/
 ├── src/status/collect.ts            M4
 ├── src/status/table.ts              M5  table component without JSX (React createElement)
 ├── src/health.ts                    M2  ownReport(config)
-└── src/**/*.test.ts                 unit tests W-1 to W-21
-packages/contracts/src/web/config.ts M1  WebConfig and loadWebConfig
+└── src/**/*.test.ts                 unit tests W-1 to W-22
+packages/contracts/src/web/config.ts M1  WebConfig, loadWebConfig, loadWebConfigValue
 ```
 
 The route files are thin: they call the module and turn its result into a response. Logic lives in `.ts` files without JSX, so the unit tests import it with `node --test` and type stripping, which compiles no JSX (F3 of the review). Imports between these files are relative with the `.ts` extension, as in `tests/`; the `@/` alias is used only in route files.
@@ -106,9 +106,12 @@ ConfigProblem { name: string, reason: string }        // never the value
 
 loadWebConfig(environment: map<string, string>) -> ok(WebConfig) | failed(list<ConfigProblem>)
   return configurationHelper(WebConfig, environment)
+
+loadWebConfigValue(environment: map<string, string>, name) -> ok(value) | failed(ConfigProblem)
+  check only the variable name, with the same default and reason as above
 ```
 
-A variable that is missing or empty takes its default. A value outside its range is a problem with the reasons `expected an integer between 1 and 65535`, `expected an integer between 1 and 60000`, `expected 1 to 64 characters`, `expected 1 to 512 characters`, `expected an http or https URL`. `OPENAPI_FILE` names the generated API description (M6); its default is the assumed output path of the generation command and is corrected when the contracts core (#8) fixes the path. The defaults of the four URLs are the container addresses (service name = unit name, Q58); the native start ([SCF-F-3]) sets the four URLs to `http://localhost:<port>/health` with the ports of §8. `loadWebConfig` only returns; printing and exiting are M7's job.
+A variable that is missing or empty takes its default. A value outside its range is a problem with the reasons `expected an integer between 1 and 65535`, `expected an integer between 1 and 60000`, `expected 1 to 64 characters`, `expected 1 to 512 characters`, `expected an http or https URL`. `OPENAPI_FILE` names the generated API description (M6); its default is the assumed output path of the generation command and is corrected when the contracts core (#8) fixes the path. The defaults of the four URLs are the container addresses (service name = unit name, Q58); the native start ([SCF-F-3]) sets the four URLs to `http://localhost:<port>/health` with the ports of §8. `loadWebConfig` only returns; printing and exiting are M7's job. `loadWebConfigValue` serves a handler that needs one value at request time (M6): an invalid other variable does not break it, because the whole check runs at startup in M7 ([SCF-F-11]); W-22 tests it.
 
 Until the configuration helper of the contracts core exists, `config.ts` holds a local function with the same signature; it is replaced, not kept, when the helper is merged.
 Traces to: SCF-F-11, SCF-F-17, SCF-NF-8, SCF-E-1. Requires: configuration helper (contracts core), export path `@stash/contracts/web`.
@@ -187,7 +190,7 @@ GET /api/docs
 GET|POST|… /api/<any other path> -> 404, ErrorResponse { code: "not-found", message: "The requested resource does not exist." }
 ```
 
-The path to the file is `config.OPENAPI_FILE`, read per request, so a test points it at the fixture or at a missing file and the image points it at its own copy (M9). `web` never edits or rebuilds the file; it serves what the generation command of the contracts core wrote ([SCF-F-10]). The error message names no path ([SCF-NF-4]); the cause goes to the log. HTML pages keep the normal not-found page; [SCF-F-21] applies to the HTTP endpoints under `/api` (Q59). `/health` is an HTTP endpoint as well: it builds the report from the configuration only, so it has no failure of its own, but an unexpected exception is caught in the handler and answered with the 500 above, and `/health` and `/api/docs` answer a method other than GET and HEAD with 405, `{ code: "method-not-allowed", message: "The method is not allowed for this path." }`, and the header `Allow: GET, HEAD` (A6, W-21). The tests use the fixture `apps/web/src/api-docs/fixture.openapi.json`. `connection()` throws outside a request of Next.js, so `route.ts` only awaits it, loads the configuration (M1; an invalid one gives the 500 above), and hands the path to `serveApiDocs(file)` in `src/api-docs/api-docs.ts`, which W-13 and W-15 call directly; the handlers of the other methods and of `[...path]` are called directly (W-16, W-21). Route files import `next/server.js`, because `node --test` resolves no import without an extension.
+The path to the file is `config.OPENAPI_FILE`, read per request, so a test points it at the fixture or at a missing file and the image points it at its own copy (M9). `web` never edits or rebuilds the file; it serves what the generation command of the contracts core wrote ([SCF-F-10]). The error message names no path ([SCF-NF-4]); the cause goes to the log. HTML pages keep the normal not-found page; [SCF-F-21] applies to the HTTP endpoints under `/api` (Q59). `/health` is an HTTP endpoint as well: it builds the report from the configuration only, so it has no failure of its own, but an unexpected exception is caught in the handler and answered with the 500 above, and `/health` and `/api/docs` answer a method other than GET and HEAD with 405, `{ code: "method-not-allowed", message: "The method is not allowed for this path." }`, and the header `Allow: GET, HEAD` (A6, W-21). The tests use the fixture `apps/web/src/api-docs/fixture.openapi.json`. `connection()` throws outside a request of Next.js, so `route.ts` only awaits it, reads only `OPENAPI_FILE` with `loadWebConfigValue` (M1; an invalid value gives the 500 above, an invalid other variable is ignored), and hands the path to `serveApiDocs(file)` in `src/api-docs/api-docs.ts`, which W-13 and W-15 call directly, W-13 once with the fixture and once with the default `OPENAPI_FILE` against the output of the contracts build (SCF-T-15); the handlers of the other methods and of `[...path]` are called directly (W-16, W-21). Route files import `next/server.js`, because `node --test` resolves no import without an extension.
 Traces to: SCF-F-10, SCF-F-21, SCF-NF-4, SCF-AC-3.3, SCF-AC-3.4. Requires: generation command and its output path (contracts core), ErrorResponse.
 
 #### M7 — Start command
@@ -241,7 +244,8 @@ The seams of the unit tests, in addition to those of `scaffolding.md` §16:
 
 - **Stub units**: an HTTP server on port 0 per test, answering with a fixed status and body, slowly, with a redirect, or not at all (W-4 to W-11, W-17, W-18).
 - **Refused connection**: a port that was opened and closed again, so nothing listens (W-8).
-- **Route handlers called directly** with a request object, without starting Next.js (W-3, W-13, W-15, W-16).
+- **Route handlers called directly** with a request object, without starting Next.js (W-3, W-16, W-21). A handler that awaits `connection()` cannot run outside Next.js, so its work sits in a function that the tests call instead: `serveApiDocs(file)` for `/api/docs` (W-13, W-15).
+- **Configuration from a given environment object**, never from `process.env` (W-1, W-22).
 - **Table component** rendered to a string with React's server renderer (W-12).
 - **Start command** run as a child process with a given environment; exit code and output are read (W-2, W-14).
 - **Build output**: the prerender manifest of `next build` (W-19).
@@ -254,7 +258,7 @@ Taken from `scaffolding.md` §10 and the acceptance criteria of SCF-US-8. These 
 
 | Case | Module | Covers | Given | When | Then |
 | --- | --- | --- | --- | --- | --- |
-| W-1 | M1 | SCF-AC-2.6, SCF-F-11, SCF-F-17 | an environment without any of the variables of M1 | the configuration is loaded | every value is its default |
+| W-1 | M1 | SCF-F-11, SCF-F-17 | an environment without any of the variables of M1 | the configuration is loaded | every value is its default |
 | W-2 | M7 | SCF-AC-2.6, SCF-E-1 | `PORT=abc` | the start command runs | it exits with 1 and prints the output of §10, example 3, for the unit `web`: `Invalid configuration for unit "web":` and, indented by two spaces, `PORT: expected an integer between 1 and 65535`; the output does not hold `abc`, and no port is opened |
 | W-3 | M2 | SCF-AC-8.1, SCF-AC-8.2, SCF-NF-4 | `APP_VERSION=0.1.0` | `/health` of `web` is requested | the report is `{ unit: "web", version: "0.1.0", status: "ok", checks: [] }` and holds no host or port |
 | W-4 | M3 | SCF-AC-8.4, SCF-F-8 | a stub that answers with §10, example 1 | `identity` is queried | the row is `identity`, `ok`, no failed checks |
@@ -275,6 +279,7 @@ Taken from `scaffolding.md` §10 and the acceptance criteria of SCF-US-8. These 
 | W-19 | Rendering rule | SCF-AC-8.4, SCF-U-3 | the output of `next build` with every unit address pointing to a closed port | the prerender manifest is read | it lists none of `/health`, `/status`, `/api/docs`, and the build made no request to a unit |
 | W-20 | M8 | SCF-NF-1 | the source of the layout | it is read | it imports no font from `next/font/google`, and neither `public/` nor `src/app/` holds a file of the create-next-app template (the five `.svg` files, `favicon.ico`) |
 | W-21 | M2, M6 | SCF-AC-3.4, SCF-F-21 | `/health` | it is requested with POST | the response is 405 with `{ code: "method-not-allowed", message: "The method is not allowed for this path." }` and the header `Allow: GET, HEAD` |
+| W-22 | M1 | SCF-F-10, SCF-F-11 | `CMS_HEALTH_URL=ftp://cms`, then `OPENAPI_FILE` of 513 characters | `OPENAPI_FILE` is read alone | first its default, then the problem `OPENAPI_FILE: expected 1 to 512 characters` |
 
 ## Assumptions
 
