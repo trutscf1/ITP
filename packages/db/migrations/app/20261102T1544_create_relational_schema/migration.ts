@@ -1,6 +1,6 @@
 #!/usr/bin/env -S node
-import type { Contract as End } from '../../snapshots/a152857d1789b34376ee046c5a2fffb95bd7e2a150bbcda57020625ee7bf682c/contract';
-import endContract from '../../snapshots/a152857d1789b34376ee046c5a2fffb95bd7e2a150bbcda57020625ee7bf682c/contract.json' with { type: 'json' };
+import type { Contract as End } from '../../snapshots/d53d54568adb82119e7091260de3c25ea0dcc6de2123ef822f99d0e9922600ad/contract';
+import endContract from '../../snapshots/d53d54568adb82119e7091260de3c25ea0dcc6de2123ef822f99d0e9922600ad/contract.json' with { type: 'json' };
 import {
   Migration,
   MigrationCLI,
@@ -10,6 +10,7 @@ import {
   lit,
   primaryKey,
   rawSql,
+  sql,
 } from '@prisma/orm-postgres/migration';
 
 // SCF-F-24: every row of auth_users gets exactly one row in users, whichever way the
@@ -69,7 +70,7 @@ export default class M extends Migration<never, End> {
           col('account_id', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('created_at', 'timestamptz', {
             notNull: true,
-            default: fn('now()'),
+            default: fn(sql`now()`),
             codecRef: { codecId: 'pg/timestamptz-string@1' },
           }),
           col('id', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
@@ -83,7 +84,7 @@ export default class M extends Migration<never, End> {
           col('scope', 'text', { codecRef: { codecId: 'pg/text@1' } }),
           col('updated_at', 'timestamptz', {
             notNull: true,
-            default: fn('now()'),
+            default: fn(sql`now()`),
             codecRef: { codecId: 'pg/timestamptz-string@1' },
           }),
           col('user_id', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
@@ -96,7 +97,7 @@ export default class M extends Migration<never, End> {
         columns: [
           col('created_at', 'timestamptz', {
             notNull: true,
-            default: fn('now()'),
+            default: fn(sql`now()`),
             codecRef: { codecId: 'pg/timestamptz-string@1' },
           }),
           col('expires_at', 'timestamptz', {
@@ -108,7 +109,7 @@ export default class M extends Migration<never, End> {
           col('token', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('updated_at', 'timestamptz', {
             notNull: true,
-            default: fn('now()'),
+            default: fn(sql`now()`),
             codecRef: { codecId: 'pg/timestamptz-string@1' },
           }),
           col('user_agent', 'text', { codecRef: { codecId: 'pg/text@1' } }),
@@ -122,7 +123,7 @@ export default class M extends Migration<never, End> {
         columns: [
           col('created_at', 'timestamptz', {
             notNull: true,
-            default: fn('now()'),
+            default: fn(sql`now()`),
             codecRef: { codecId: 'pg/timestamptz-string@1' },
           }),
           col('email', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
@@ -136,7 +137,7 @@ export default class M extends Migration<never, End> {
           col('name', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('updated_at', 'timestamptz', {
             notNull: true,
-            default: fn('now()'),
+            default: fn(sql`now()`),
             codecRef: { codecId: 'pg/timestamptz-string@1' },
           }),
         ],
@@ -148,7 +149,7 @@ export default class M extends Migration<never, End> {
         columns: [
           col('created_at', 'timestamptz', {
             notNull: true,
-            default: fn('now()'),
+            default: fn(sql`now()`),
             codecRef: { codecId: 'pg/timestamptz-string@1' },
           }),
           col('expires_at', 'timestamptz', {
@@ -159,7 +160,7 @@ export default class M extends Migration<never, End> {
           col('identifier', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('updated_at', 'timestamptz', {
             notNull: true,
-            default: fn('now()'),
+            default: fn(sql`now()`),
             codecRef: { codecId: 'pg/timestamptz-string@1' },
           }),
           col('value', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
@@ -172,13 +173,13 @@ export default class M extends Migration<never, End> {
         columns: [
           col('created_at', 'timestamptz', {
             notNull: true,
-            default: fn('now()'),
+            default: fn(sql`now()`),
             codecRef: { codecId: 'pg/timestamptz-string@1' },
           }),
           col('folder_id', 'uuid', { notNull: true, codecRef: { codecId: 'pg/uuid@1' } }),
           col('id', 'uuid', {
             notNull: true,
-            default: fn('gen_random_uuid()'),
+            default: fn(sql`gen_random_uuid()`),
             codecRef: { codecId: 'pg/uuid@1' },
           }),
           col('level', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
@@ -189,15 +190,15 @@ export default class M extends Migration<never, End> {
           primaryKey(['id']),
           checkExpression(
             'folder_permissions_level_check_12e36959',
-            "\"level\" IN ('read', 'write', 'manage')",
+            sql`"level" IN ('read', 'write', 'manage')`,
           ),
           checkExpression(
             'folder_permissions_member_or_role_b68863bf',
-            '(user_id IS NULL) <> (role IS NULL)',
+            sql`(user_id IS NULL) <> (role IS NULL)`,
           ),
           checkExpression(
             'folder_permissions_role_check_c3e07ca3',
-            "\"role\" IN ('owner', 'admin', 'editor', 'viewer')",
+            sql`"role" IN ('owner', 'admin', 'editor', 'viewer')`,
           ),
         ],
       }),
@@ -207,12 +208,12 @@ export default class M extends Migration<never, End> {
         columns: [
           col('created_at', 'timestamptz', {
             notNull: true,
-            default: fn('now()'),
+            default: fn(sql`now()`),
             codecRef: { codecId: 'pg/timestamptz-string@1' },
           }),
           col('id', 'uuid', {
             notNull: true,
-            default: fn('gen_random_uuid()'),
+            default: fn(sql`gen_random_uuid()`),
             codecRef: { codecId: 'pg/uuid@1' },
           }),
           col('inherits_permissions', 'bool', {
@@ -225,7 +226,7 @@ export default class M extends Migration<never, End> {
           col('team_id', 'uuid', { notNull: true, codecRef: { codecId: 'pg/uuid@1' } }),
           col('updated_at', 'timestamptz', {
             notNull: true,
-            default: fn('now()'),
+            default: fn(sql`now()`),
             codecRef: { codecId: 'pg/timestamptz-string@1' },
           }),
         ],
@@ -237,7 +238,7 @@ export default class M extends Migration<never, End> {
         columns: [
           col('created_at', 'timestamptz', {
             notNull: true,
-            default: fn('now()'),
+            default: fn(sql`now()`),
             codecRef: { codecId: 'pg/timestamptz-string@1' },
           }),
           col('role', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
@@ -248,7 +249,7 @@ export default class M extends Migration<never, End> {
           primaryKey(['team_id', 'user_id']),
           checkExpression(
             'team_members_role_check_c3e07ca3',
-            "\"role\" IN ('owner', 'admin', 'editor', 'viewer')",
+            sql`"role" IN ('owner', 'admin', 'editor', 'viewer')`,
           ),
         ],
       }),
@@ -258,12 +259,12 @@ export default class M extends Migration<never, End> {
         columns: [
           col('created_at', 'timestamptz', {
             notNull: true,
-            default: fn('now()'),
+            default: fn(sql`now()`),
             codecRef: { codecId: 'pg/timestamptz-string@1' },
           }),
           col('id', 'uuid', {
             notNull: true,
-            default: fn('gen_random_uuid()'),
+            default: fn(sql`gen_random_uuid()`),
             codecRef: { codecId: 'pg/uuid@1' },
           }),
           col('name', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
@@ -277,12 +278,12 @@ export default class M extends Migration<never, End> {
           col('auth_user_id', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('created_at', 'timestamptz', {
             notNull: true,
-            default: fn('now()'),
+            default: fn(sql`now()`),
             codecRef: { codecId: 'pg/timestamptz-string@1' },
           }),
           col('id', 'uuid', {
             notNull: true,
-            default: fn('gen_random_uuid()'),
+            default: fn(sql`gen_random_uuid()`),
             codecRef: { codecId: 'pg/uuid@1' },
           }),
         ],
@@ -359,7 +360,7 @@ export default class M extends Migration<never, End> {
         table: 'folders',
         index: 'folders_one_root_per_team_4ec77325',
         columns: ['team_id'],
-        extras: { where: 'parent_id IS NULL', unique: true },
+        extras: { where: sql`parent_id IS NULL`, unique: true },
       }),
       this.createIndex({
         schema: 'public',

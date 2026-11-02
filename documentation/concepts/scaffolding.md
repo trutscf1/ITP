@@ -437,7 +437,7 @@ A failure inside the unit is answered with HTTP status 500 and `{ "code": "inter
 
 The seed user has no password and cannot log in yet; logging in arrives with the identity concept (R3), which also seeds a password if it needs one.
 
-**Example 9 — failed migration ([SCF-E-7]).** A table `teams` exists already in an otherwise empty database. The migrating container lists `20261027T1846_create_relational_schema` as the migration it will run, then stops with `MIGRATION.RUNNER_FAILED` and the operation that failed (adding the foreign key `folders_team_id_fkey`), exits with a non-zero code, and leaves no table of the migration behind.
+**Example 9 — failed migration ([SCF-E-7]).** A table `teams` exists already in an otherwise empty database. The migrating container lists `20261102T1544_create_relational_schema` as the migration it will run, then stops with `MIGRATION.EXECUTION_FAILED` and the operation that failed (adding the foreign key `folders_team_id_fkey`), exits with a non-zero code, and leaves no table of the migration behind.
 
 ## 11. Integration Points
 

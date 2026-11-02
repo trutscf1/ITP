@@ -43,7 +43,8 @@ function diagramTables(): Map<string, Table> {
   return tables;
 }
 
-type StorageColumn = { nativeType: string };
+/** A column of the emitted contract; Prisma 8 names its type `pg/<type>` (ADR-0006). */
+type StorageColumn = { dataType: string };
 type Contract = {
   storage: {
     storageHash: string;
@@ -124,7 +125,7 @@ describe("SCF-AC-4.2 Schema matches diagram", () => {
       assert.deepEqual(
         Object.fromEntries(
           Object.entries(schemaColumns)
-            .map(([column, c]) => [column, c.nativeType])
+            .map(([column, c]) => [column, c.dataType.replace("pg/", "")])
             .sort(),
         ),
         Object.fromEntries(

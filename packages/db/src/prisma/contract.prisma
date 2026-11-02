@@ -129,7 +129,7 @@ model Folder {
 
   @@unique([parentId, name])
   @@index([teamId])
-  @@index([teamId], where: "parent_id IS NULL", unique: true, name: "folders_one_root_per_team")
+  @@index([teamId], where: sql`parent_id IS NULL`, unique: true, name: "folders_one_root_per_team")
   @@map("folders")
 }
 
@@ -146,6 +146,6 @@ model FolderPermission {
 
   @@unique([folderId, userId])
   @@unique([folderId, role])
-  @@check(expression: "(user_id IS NULL) <> (role IS NULL)", name: "folder_permissions_member_or_role")
+  @@check(expression: sql`(user_id IS NULL) <> (role IS NULL)`, name: "folder_permissions_member_or_role")
   @@map("folder_permissions")
 }

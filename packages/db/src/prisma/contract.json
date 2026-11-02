@@ -935,80 +935,83 @@
               "columns": {
                 "access_token": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": true
                 },
                 "access_token_expires_at": {
                   "codecId": "pg/timestamptz-string@1",
-                  "nativeType": "timestamptz",
+                  "dataType": "pg/timestamptz",
                   "nullable": true
                 },
                 "account_id": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": false
                 },
                 "created_at": {
                   "codecId": "pg/timestamptz-string@1",
+                  "dataType": "pg/timestamptz",
                   "default": {
                     "expression": "now()",
                     "kind": "function"
                   },
-                  "nativeType": "timestamptz",
                   "nullable": false
                 },
                 "id": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": false
                 },
                 "id_token": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": true
                 },
                 "password": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": true
                 },
                 "provider_id": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": false
                 },
                 "refresh_token": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": true
                 },
                 "refresh_token_expires_at": {
                   "codecId": "pg/timestamptz-string@1",
-                  "nativeType": "timestamptz",
+                  "dataType": "pg/timestamptz",
                   "nullable": true
                 },
                 "scope": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": true
                 },
                 "updated_at": {
                   "codecId": "pg/timestamptz-string@1",
+                  "dataType": "pg/timestamptz",
                   "default": {
                     "expression": "now()",
                     "kind": "function"
                   },
-                  "nativeType": "timestamptz",
                   "nullable": false
                 },
                 "user_id": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": false
                 }
               },
               "foreignKeys": [
                 {
+                  "index": {
+                    "name": "auth_accounts_user_id_idx_6c952402"
+                  },
                   "onDelete": "cascade",
                   "source": {
                     "columns": [
@@ -1047,55 +1050,58 @@
               "columns": {
                 "created_at": {
                   "codecId": "pg/timestamptz-string@1",
+                  "dataType": "pg/timestamptz",
                   "default": {
                     "expression": "now()",
                     "kind": "function"
                   },
-                  "nativeType": "timestamptz",
                   "nullable": false
                 },
                 "expires_at": {
                   "codecId": "pg/timestamptz-string@1",
-                  "nativeType": "timestamptz",
+                  "dataType": "pg/timestamptz",
                   "nullable": false
                 },
                 "id": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": false
                 },
                 "ip_address": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": true
                 },
                 "token": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": false
                 },
                 "updated_at": {
                   "codecId": "pg/timestamptz-string@1",
+                  "dataType": "pg/timestamptz",
                   "default": {
                     "expression": "now()",
                     "kind": "function"
                   },
-                  "nativeType": "timestamptz",
                   "nullable": false
                 },
                 "user_agent": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": true
                 },
                 "user_id": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": false
                 }
               },
               "foreignKeys": [
                 {
+                  "index": {
+                    "name": "auth_sessions_user_id_idx_6c952402"
+                  },
                   "onDelete": "cascade",
                   "source": {
                     "columns": [
@@ -1140,49 +1146,49 @@
               "columns": {
                 "created_at": {
                   "codecId": "pg/timestamptz-string@1",
+                  "dataType": "pg/timestamptz",
                   "default": {
                     "expression": "now()",
                     "kind": "function"
                   },
-                  "nativeType": "timestamptz",
                   "nullable": false
                 },
                 "email": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": false
                 },
                 "email_verified": {
                   "codecId": "pg/bool@1",
+                  "dataType": "pg/bool",
                   "default": {
                     "kind": "literal",
                     "value": false
                   },
-                  "nativeType": "bool",
                   "nullable": false
                 },
                 "id": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": false
                 },
                 "image": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": true
                 },
                 "name": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": false
                 },
                 "updated_at": {
                   "codecId": "pg/timestamptz-string@1",
+                  "dataType": "pg/timestamptz",
                   "default": {
                     "expression": "now()",
                     "kind": "function"
                   },
-                  "nativeType": "timestamptz",
                   "nullable": false
                 }
               },
@@ -1205,40 +1211,40 @@
               "columns": {
                 "created_at": {
                   "codecId": "pg/timestamptz-string@1",
+                  "dataType": "pg/timestamptz",
                   "default": {
                     "expression": "now()",
                     "kind": "function"
                   },
-                  "nativeType": "timestamptz",
                   "nullable": false
                 },
                 "expires_at": {
                   "codecId": "pg/timestamptz-string@1",
-                  "nativeType": "timestamptz",
+                  "dataType": "pg/timestamptz",
                   "nullable": false
                 },
                 "id": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": false
                 },
                 "identifier": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": false
                 },
                 "updated_at": {
                   "codecId": "pg/timestamptz-string@1",
+                  "dataType": "pg/timestamptz",
                   "default": {
                     "expression": "now()",
                     "kind": "function"
                   },
-                  "nativeType": "timestamptz",
                   "nullable": false
                 },
                 "value": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": false
                 }
               },
@@ -1281,30 +1287,30 @@
               "columns": {
                 "created_at": {
                   "codecId": "pg/timestamptz-string@1",
+                  "dataType": "pg/timestamptz",
                   "default": {
                     "expression": "now()",
                     "kind": "function"
                   },
-                  "nativeType": "timestamptz",
                   "nullable": false
                 },
                 "folder_id": {
                   "codecId": "pg/uuid@1",
-                  "nativeType": "uuid",
+                  "dataType": "pg/uuid",
                   "nullable": false
                 },
                 "id": {
                   "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
                   "default": {
                     "expression": "gen_random_uuid()",
                     "kind": "function"
                   },
-                  "nativeType": "uuid",
                   "nullable": false
                 },
                 "level": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": false,
                   "valueSet": {
                     "entityKind": "valueSet",
@@ -1315,7 +1321,7 @@
                 },
                 "role": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": true,
                   "valueSet": {
                     "entityKind": "valueSet",
@@ -1326,12 +1332,15 @@
                 },
                 "user_id": {
                   "codecId": "pg/uuid@1",
-                  "nativeType": "uuid",
+                  "dataType": "pg/uuid",
                   "nullable": true
                 }
               },
               "foreignKeys": [
                 {
+                  "index": {
+                    "name": "folder_permissions_folder_id_idx_61252c35"
+                  },
                   "onDelete": "cascade",
                   "source": {
                     "columns": [
@@ -1349,6 +1358,9 @@
                   }
                 },
                 {
+                  "index": {
+                    "name": "folder_permissions_user_id_idx_6c952402"
+                  },
                   "onDelete": "cascade",
                   "source": {
                     "columns": [
@@ -1408,58 +1420,61 @@
               "columns": {
                 "created_at": {
                   "codecId": "pg/timestamptz-string@1",
+                  "dataType": "pg/timestamptz",
                   "default": {
                     "expression": "now()",
                     "kind": "function"
                   },
-                  "nativeType": "timestamptz",
                   "nullable": false
                 },
                 "id": {
                   "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
                   "default": {
                     "expression": "gen_random_uuid()",
                     "kind": "function"
                   },
-                  "nativeType": "uuid",
                   "nullable": false
                 },
                 "inherits_permissions": {
                   "codecId": "pg/bool@1",
+                  "dataType": "pg/bool",
                   "default": {
                     "kind": "literal",
                     "value": true
                   },
-                  "nativeType": "bool",
                   "nullable": false
                 },
                 "name": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": false
                 },
                 "parent_id": {
                   "codecId": "pg/uuid@1",
-                  "nativeType": "uuid",
+                  "dataType": "pg/uuid",
                   "nullable": true
                 },
                 "team_id": {
                   "codecId": "pg/uuid@1",
-                  "nativeType": "uuid",
+                  "dataType": "pg/uuid",
                   "nullable": false
                 },
                 "updated_at": {
                   "codecId": "pg/timestamptz-string@1",
+                  "dataType": "pg/timestamptz",
                   "default": {
                     "expression": "now()",
                     "kind": "function"
                   },
-                  "nativeType": "timestamptz",
                   "nullable": false
                 }
               },
               "foreignKeys": [
                 {
+                  "index": {
+                    "name": "folders_team_id_idx_d177da93"
+                  },
                   "onDelete": "cascade",
                   "source": {
                     "columns": [
@@ -1477,6 +1492,9 @@
                   }
                 },
                 {
+                  "index": {
+                    "name": "folders_parent_id_idx_ab33b399"
+                  },
                   "onDelete": "cascade",
                   "source": {
                     "columns": [
@@ -1546,16 +1564,16 @@
               "columns": {
                 "created_at": {
                   "codecId": "pg/timestamptz-string@1",
+                  "dataType": "pg/timestamptz",
                   "default": {
                     "expression": "now()",
                     "kind": "function"
                   },
-                  "nativeType": "timestamptz",
                   "nullable": false
                 },
                 "role": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": false,
                   "valueSet": {
                     "entityKind": "valueSet",
@@ -1566,17 +1584,20 @@
                 },
                 "team_id": {
                   "codecId": "pg/uuid@1",
-                  "nativeType": "uuid",
+                  "dataType": "pg/uuid",
                   "nullable": false
                 },
                 "user_id": {
                   "codecId": "pg/uuid@1",
-                  "nativeType": "uuid",
+                  "dataType": "pg/uuid",
                   "nullable": false
                 }
               },
               "foreignKeys": [
                 {
+                  "index": {
+                    "name": "team_members_team_id_idx_d177da93"
+                  },
                   "onDelete": "cascade",
                   "source": {
                     "columns": [
@@ -1594,6 +1615,9 @@
                   }
                 },
                 {
+                  "index": {
+                    "name": "team_members_user_id_idx_6c952402"
+                  },
                   "onDelete": "cascade",
                   "source": {
                     "columns": [
@@ -1641,25 +1665,25 @@
               "columns": {
                 "created_at": {
                   "codecId": "pg/timestamptz-string@1",
+                  "dataType": "pg/timestamptz",
                   "default": {
                     "expression": "now()",
                     "kind": "function"
                   },
-                  "nativeType": "timestamptz",
                   "nullable": false
                 },
                 "id": {
                   "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
                   "default": {
                     "expression": "gen_random_uuid()",
                     "kind": "function"
                   },
-                  "nativeType": "uuid",
                   "nullable": false
                 },
                 "name": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": false
                 }
               },
@@ -1676,30 +1700,35 @@
               "columns": {
                 "auth_user_id": {
                   "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "dataType": "pg/text",
                   "nullable": false
                 },
                 "created_at": {
                   "codecId": "pg/timestamptz-string@1",
+                  "dataType": "pg/timestamptz",
                   "default": {
                     "expression": "now()",
                     "kind": "function"
                   },
-                  "nativeType": "timestamptz",
                   "nullable": false
                 },
                 "id": {
                   "codecId": "pg/uuid@1",
+                  "dataType": "pg/uuid",
                   "default": {
                     "expression": "gen_random_uuid()",
                     "kind": "function"
                   },
-                  "nativeType": "uuid",
                   "nullable": false
                 }
               },
               "foreignKeys": [
                 {
+                  "index": {
+                    "unique": [
+                      "auth_user_id"
+                    ]
+                  },
                   "onDelete": "cascade",
                   "source": {
                     "columns": [
@@ -1756,11 +1785,13 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "a152857d1789b34376ee046c5a2fffb95bd7e2a150bbcda57020625ee7bf682c"
+    "storageHash": "d53d54568adb82119e7091260de3c25ea0dcc6de2123ef822f99d0e9922600ad"
   },
   "capabilities": {
     "postgres": {
       "distinctOn": true,
+      "forKeyShare": true,
+      "forNoKeyUpdate": true,
       "jsonAgg": true,
       "lateral": true,
       "limit": true,
@@ -1771,9 +1802,14 @@
       "checkConstraint": true,
       "defaultInInsert": true,
       "enums": true,
+      "forShare": true,
+      "forUpdate": true,
       "insertOnConflictSkip": true,
       "insertOnConflictWithoutTarget": true,
       "lateral": true,
+      "lockNowait": true,
+      "lockOf": true,
+      "lockSkipLocked": true,
       "returning": true,
       "scalarList": true
     }

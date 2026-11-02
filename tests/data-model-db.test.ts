@@ -211,7 +211,7 @@ describe("SCF-AC-4.5 Migrations at start", { skip }, () => {
     const run = migrateDeploy(url);
     assert.notEqual(run.status, 0, "the command succeeded");
     assert.match(run.output, /create_relational_schema/);
-    assert.match(run.output, /MIGRATION\.RUNNER_FAILED/);
+    assert.match(run.output, /MIGRATION\.EXECUTION_FAILED/);
     assert.deepEqual(
       await query(
         url,
