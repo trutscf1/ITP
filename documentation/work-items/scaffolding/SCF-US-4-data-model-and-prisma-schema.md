@@ -13,7 +13,7 @@ One user story of [Scaffolding & shared contracts](feature.md) and the acceptanc
 
 | ID | Title | As a | I want | so that | Priority |
 | --- | --- | --- | --- | --- | --- |
-| SCF-US-4 | Data model and Prisma schema | developer | a documented relational data model with versioned migrations | users, teams, permissions, and folders are stored consistently | Must |
+| SCF-US-4 | Data model and Prisma schema | operator | a documented relational data model with versioned migrations | users, teams, permissions, and folders are stored consistently | Must |
 
 ## Acceptance criteria
 
