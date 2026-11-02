@@ -1211,3 +1211,95 @@ Assumption A69: the plan follows GitLab, as `schwaigc` prefers. The Sprint 2 row
 ➡️ Jetzt alles nachziehen — every sprint row of `ROADMAP.md` follows the GitLab milestones of 2026-11-02 for all four people; `team/trutscf1/STATUS.md` names Sprint 3 for #78, #81, #107 and Sprint 4 for #79, #80; the whole load table is recounted as of 2026-11-02: 288 points against 276 (was 297), Sprint 2 65 against 44, Sprint 4 37 against 24
 
 > **Answer:** Jetzt alles nachziehen (Recommended)
+
+## Round 47 — 2026-10-29 — grill of the open issues of `trutscf1`
+
+Renumbered at the merge of `dev` into `chore/grill-trutscf1-2026-10-29-2` on 2026-11-02 (P-TEAM-5): rounds 47 and 48 and Q234 to Q245 were asked as rounds 32 and 34 and Q165 to Q176, which !28 and !30 brought to `dev` first.
+
+Open issues and MRs of `trutscf1` on 2026-10-29: Sprint 1 #40, #41, #103, #126, #127, #147 (MRs !21, !22, !25, !27; !29 and !30 by `schwaigc`), bug #148, inbox items. Applied: P-GIT-1/2/3, P-VER-1, P-ROAD-1…4, P-MR-4…6 (`ask`, 1 approval, release `ask`), P-TEAM; no deviations. Assumptions: A55 Sprint 1 (milestone due 2026-11-02) before Sprint 2; A56 !25 targets `feature/40-contracts-zod-openapi`, which is already merged into `dev`, so its target becomes `dev`; A57 the local branch `concept/milestone-plan` is superseded by `concept/milestone-plan-2` (!21) and stays untouched; A58 this round is logged as round 32 from Q234 on the branch `chore/grill-trutscf1-2026-10-29`; A59 the inbox item "prioritize R2–R14 as must / should / could" is done by the cut order in !21.
+
+❓ **Q234** - **Veraltete MRs**: !21 (Milestone-Plan), !22 (R2-Konzept) und !27 (SCF-US-4 Prisma) haben Konflikte mit dev; !21/!22/!25 sind rot nur wegen dependency-audit/container-scan, was auf dev schon gefixt ist. Wie bringe ich sie auf Stand? Options: dev reinmergen (Recommended) / Nur !27 jetzt / Warten auf Reviewer
+
+> **Answer:** dev reinmergen (Recommended)
+
+❓ **Q235** - **Bug #148**: clamav/clamav:1.5 hat kein arm64-Image, docker compose up scheitert auf ARM-Macs. Welche Lösung? Options: platform: linux/amd64 (Recommended) / clamav/clamav-debian:1.5 / Override nur für ARM
+
+> **Answer:** platform: linux/amd64 (Recommended)
+
+❓ **Q236** - **Release v0.1.0**: Release v0.1.0 (#126) ist bis Mo 2026-11-02 fällig, aber #40 (!29), #103 (!30), #41 (!27), #127 (!25), #147 (!21) sind noch im Review. Was kommt in v0.1.0? Options: Was bis Montag gemergt ist (Recommended) / Nach Sprint-Review am 03.11. / v0.1.0 auslassen
+
+> **Answer:** Nach Sprint-Review am 03.11. — the release of Sprint 1 follows the sprint review on 2026-11-03, one day after the milestone due date.
+
+❓ **Q237** - **Reviews**: !29 (API-Docs-Route, zu #40) und !30 (Offline-Start-Check, zu #103) von schwaigc warten auf Review. Jetzt mit /engineering-human review prüfen, Ergebnis als MR-Kommentar nach Freigabe? Options: Beide reviewen (Recommended) / Nur !30 / Nicht jetzt
+
+> **Answer:** Beide reviewen (Recommended)
+
+❓ **Q238** - **Rolle Developer**: SCF-US-1 bis -4 sind für 'a developer' geschrieben, das ist keine Rolle in GOAL.md (doc-check warnt seit der Migration). Wie lösen? Options: R-6 Developer per ADR (Recommended) / Stories auf Operator R-2 / Als Enabler ohne Rolle
+
+> **Answer:** R-6 Developer per ADR (Recommended)
+
+❓ **Q239** - **GitLab-Merge-Einstellungen**: Offen seit 2026-09-29: laut docs/git_workflow_commands.md §2.3 Squash nie, 'delete source branch' aus, Pipeline muss grün sein, Diskussionen gelöst. Per API setzen? Options: Per API setzen (Recommended) / Ohne Pipeline-Pflicht / Noch nicht
+
+> **Answer:** Per API setzen (Recommended)
+
+❓ **Q240** - **Reihenfolge**: Reihenfolge für den Rest der Session nach dem Log-Commit? Options: Reviews, dann MRs, dann #148 (Recommended) / #148 zuerst / MRs zuerst
+
+> **Answer:** Reviews, dann MRs, dann #148 (Recommended)
+
+❓ **Q241** - **Rolle Developer, Nachtrag zu Q238**: ADR-0004 (2026-10-06) hat schon entschieden 'keine Developer-Rolle, interne Stories sind für den Operator R-2' und STO-US-1/BGP-US-1 so umformuliert; für SCF-US-1–4 war das Umformulieren bei der R1-Migration vorgesehen. Bleibt es bei R-6? Options: ADR-0004 folgen (Recommended) / Doch R-6 Developer
+
+> **Answer:** ADR-0004 folgen (Recommended) — replaces the answer to Q238, which was asked without naming ADR-0004. SCF-US-1 to SCF-US-4 name the operator; their acceptance criteria and tests are unchanged; the open issues #40 and #41 carry the new story sentence, the closed issues #38 and #39 stay as they are.
+
+## Round 48 — 2026-10-29 — delivery (`trutscf1`, agent: reviews of !29 and !30, update of !27)
+
+Rounds 47 (this session) and 49 (implement #41, on !27) come before this one. The reviews ran as `/engineering-human review` with the two axes of `/code-review` (standards and spec). Assumption A60: `tests/` and the compose tests belong to the Platform track (A25), so the agent adapts them in !27.
+
+❓ **Q242** - **SCF-AC-2.4 vs. SCF-F-26**: Nach dem Merge von dev in !27 scheitern 2 Tests aus !17: 'jeder Container hat einen Health-Check' und 'jede Abhängigkeit wartet auf healthy'. db-migrate ist laut SCF-F-26 (Q25) ein Einmal-Container, auf den man mit service_completed_successfully wartet. Wie auflösen? Options: AC-2.4 präzisieren (Recommended) / Dummy-Health-Check / Migration in web
+
+➡️ AC-2.4 präzisieren — SCF-AC-2.4, SCF-F-20, and SCF-T-9 exempt a one-shot container (`restart: "no"`) from the health check; its dependents wait until it completed successfully; the compose tests follow in !27
+
+> **Answer:** AC-2.4 präzisieren (Recommended)
+
+❓ **Q243** - **DATABASE_URL in .env.example**: !27 setzt DATABASE_URL (localhost) in die Root-.env für pnpm db:migrate/seed; der Test aus !17 verlangt, dass jede Variable aus .env.example in docker-compose.yml vorkommt, und User/Passwort stehen dann doppelt. Wie lösen? Options: Aus POSTGRES_* bauen (Recommended) / Test lockern / Compose nutzt sie auch
+
+➡️ Aus POSTGRES_* bauen — `packages/db/src/database-url.ts` builds the connection with the host `localhost` when the environment sets no `DATABASE_URL`; `.env.example` keeps it only as a commented override (SCF-AC-7.2)
+
+> **Answer:** Aus POSTGRES_* bauen (Recommended)
+
+❓ **Q244** - **Review !29 posten**: Urteil 'changes requested', 4 Must-fix: .env.example fehlt 7 Variablen; W-1 trägt fälschlich SCF-AC-2.6; /api/docs prüft die ganze Config pro Request; Plan widerspricht sich (Testability-Liste). Fremde Pfade: Platform-Dateien stimme ich als Owner zu, packages/contracts/package.json braucht OK von schauby1. Options: So posten (Recommended) / Als Approve mit Notizen / Nicht posten
+
+➡️ So posten — review comment posted on !29, no approval
+
+> **Answer:** So posten (Recommended)
+
+❓ **Q245** - **Review !30 posten**: Urteil 'changes requested', 3 Must-fix: Probe-Befehle fehlen (Check nicht wiederholbar); Branchname chore/ statt feature/ als Abweichung notieren; Q183 Zeitbuchung widerspricht Antwort (+ Bestätigung, dass kein Agent gebucht hat). Plus Follow-up-Issue, dass container-scan das gebaute web-Image nicht scannt. Options: Posten + Follow-up-Issue (Recommended) / Nur posten / Approve mit Notizen
+
+➡️ Posten + Follow-up-Issue — review comment posted on !30; issue #149 (Sprint 2, `tschudea07`, `type::bug`) for the images the stack builds
+
+> **Answer:** Posten + Follow-up-Issue (Recommended)
+
+## Round 40 — 2026-11-02 — review (`trutscf1` (agent), open MRs of `schwaigc` and `tschudea07` at the end of Sprint 1)
+
+Question numbers continue after Q210, the highest number on any open branch (!34); they stay provisional until merged into `dev` (P-TEAM-5). Fresh checks in clean worktrees: !29 at `aa8636dc3` 284 of 284 tests pass, !30 at `63f54d068` 270 of 270; lint, `biome ci`, typecheck, `doc-check` and `--status` (0 errors, 39 warnings as on `dev`), markdownlint, and commitlint clean on both. A dry run of the merges showed that every MR after the first conflicts in `qa-log.md` and `ROADMAP-DETAILS.md`; the project resets approvals on push.
+
+❓ **Q211** - **Reviews posten**: Welche Review-Kommentare posten und das MR approven? Options (multi): !28 posten + approven / !29 posten + approven / !30 posten + approven / !34 posten + approven
+
+➡️ all four — review comments posted and approved at the heads above; !29 still needs the agreement of `schauby1` to the export `./web`, and !29 goes before !30; nothing merged
+
+> **Answer:** !28 posten + approven, !29 posten + approven, !30 posten + approven, !34 posten + approven
+
+❓ **Q212** - **Log-Konflikte**: Nach dem ersten Merge kollidieren die übrigen MRs in qa-log.md und ROADMAP-DETAILS.md. Wer merged dev in die Branches? Options: Autor:innen (Recommended) / Ich löse sie / Nur approven
+
+➡️ Autor:innen — `schwaigc` and `tschudea07` merge `dev` into their own branches (keep both sides, the later branch renumbers its round); `trutscf1` approves again after each push
+
+> **Answer:** Autor:innen (Recommended)
+
+## Round 50 — 2026-11-02 — merge conflicts of the open MRs of `trutscf1` (`trutscf1` (agent))
+
+`dev` was merged into !21, !22, !27, and !32 after !28, !29, and !30; identifiers that those MRs brought to `dev` first were renumbered on the later branches (P-TEAM-5, notes in rounds 44, 47, and 49). The drive C: was full during the session; the agent listed the largest consumers read-only (Docker data 76 GB, old agent worktrees 24 GB, npm cache 23 GB, WSL 17 GB, pnpm store 13 GB) and deleted only its own temporary worktree `wt29`.
+
+❓ **Q246** - **Speicher freigeben**: Was davon soll ich aufräumen? (Alles andere fasse ich nicht an.) Options (multi): npm-Cache leeren (Recommended) / Alte Worktrees entfernen / pnpm-Store bereinigen / Docker später selbst
+
+➡️ Docker später selbst — nothing cleaned up by the agent; `trutscf1` restarts Docker Desktop and prunes it. Asked as Q221 in the pop-up, a number already taken by the renumbered questions of !21, hence logged as Q246.
+
+> **Answer:** Docker später selbst

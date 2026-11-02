@@ -13,7 +13,7 @@ One user story of [Scaffolding & shared contracts](feature.md) and the acceptanc
 
 | ID | Title | As a | I want | so that | Priority |
 | --- | --- | --- | --- | --- | --- |
-| SCF-US-2 | Local development environment with Docker Compose | developer | to start all services locally with a single `docker compose up` | I can develop without manual setup and without internet access | Must |
+| SCF-US-2 | Local development environment with Docker Compose | operator | to start all services locally with a single `docker compose up` | I can run the system without manual setup and without internet access | Must |
 
 ## Acceptance criteria
 

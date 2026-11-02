@@ -47,3 +47,5 @@ Carried over from `ROADMAP-DETAILS.md` at the switch to team mode on 2026-10-06;
 | Question | Waiting for (handle) | Since |
 | --- | --- | --- |
 | Public content Q12–Q14: operator named in the team's legal pages, lawful basis for editor accounts, review of the legal templates ([question log](../../concepts/public-content.qa-log.md)) | school management, asked by `trutscf1` | 2026-10-06 |
+| !29 (#40): agreement to the export `./web` in `packages/contracts/package.json`, then merge !29 before !30 (both approved by `trutscf1` and `tschudea07`) | schauby1 | 2026-11-02 |
+| !28, !30, !34: merge `dev` into the branch after the first of them is merged (conflicts in `qa-log.md`, `ROADMAP-DETAILS.md`); `trutscf1` approves again after the push | schwaigc, tschudea07 | 2026-11-02 |
