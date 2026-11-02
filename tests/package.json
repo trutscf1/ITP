@@ -12,6 +12,9 @@
   },
   "devDependencies": {
     "@stash/config": "workspace:*",
-    "@types/node": "^24"
+    "@stash/db": "workspace:*",
+    "@types/node": "^24",
+    "@types/pg": "8.20.4",
+    "pg": "8.22.0"
   }
 }

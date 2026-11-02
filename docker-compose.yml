@@ -164,6 +164,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
     networks:
       - frontend
       - backend
@@ -199,6 +201,22 @@ services:
       timeout: 5s
       retries: 5
       start_period: 5s
+
+  # Applies the pending migrations of the relational schema once and exits (SCF-F-26, SCF-E-7).
+  # Every service that uses the relational database depends on it with
+  # `condition: service_completed_successfully`. Needs the health check of `postgres` (!17).
+  db-migrate:
+    build:
+      context: .
+      dockerfile: packages/db/Dockerfile
+    restart: "no"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - backend
 
 networks:
   frontend:

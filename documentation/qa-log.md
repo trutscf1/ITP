@@ -972,6 +972,20 @@ Review of !15 by `schwaigc` (2026-10-20, changes requested): the job `commit-mes
 
 > **Answer:** Beim Sprint-2-Planning am 03.11., DSA-US-3 als Option nennen (Recommended), decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions). `ROADMAP.md` records it below the load table; the GitLab milestones are not changed.
 
+## Round 49 — 2026-10-27 — delivery (`trutscf1`, agent: implement #41)
+
+Renumbered at the merge of `dev` into `feature/41-data-model-and-prisma-schema` on 2026-11-02 (P-TEAM-5): asked as round 33, which a round of `schwaigc` (!28) took on `dev` first.
+
+Concept questions of this issue are in `concepts/scaffolding.qa-log.md`, round 6 (Q21–Q29). The questions below were **decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)**; no pop-up was shown.
+
+Shown with the round: the Docker engine on the developer machine did not answer (HTTP 500), so the migration was planned offline with `prisma migration plan` (Prisma 8 needs no database for it) and applied and tested against a local PostgreSQL 18 started from the binaries of the npm package `embedded-postgres`, outside the repository.
+
+❓ **Q120** - **Merge Request veröffentlichen**: Branch pushen und MR nach dev mit „Closes #41", Assignee trutscf1, Reviewer tschudea07 öffnen? Options: Veröffentlichen (Recommended) / Nur pushen / Lokal lassen
+
+➡️ Veröffentlichen — the MR states that it depends on !17 (#39)
+
+> **Answer:** Veröffentlichen (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
 ## Round 32 — 2026-11-02 — delivery (`tschudea07` (agent), review !27 and !22)
 
 Question numbers continue after Q203, the highest number on any open branch (Q183–Q193 are taken by !30, up to Q203 by !21); they stay provisional until merged into `dev` (P-TEAM-5).
@@ -1303,3 +1317,65 @@ Question numbers continue after Q210, the highest number on any open branch (!34
 ➡️ Docker später selbst — nothing cleaned up by the agent; `trutscf1` restarts Docker Desktop and prunes it. Asked as Q221 in the pop-up, a number already taken by the renumbered questions of !21, hence logged as Q246.
 
 > **Answer:** Docker später selbst
+
+## Round 41 — 2026-11-02 — revise !27 (`trutscf1` (agent), review of `tschudea07`)
+
+Question numbers continue after Q212, the highest number on any open branch (!32); rounds 32 to 40 are taken on `dev` or open branches. Both stay provisional until merged into `dev` (P-TEAM-5). The review of `tschudea07` (2026-11-02) asks for three must-fix and five should-fix points. Facts checked before asking: npm has no stable Prisma 8 (`latest` of `prisma` is `8.0.0-rc.29`); the Vertabelo diagram is SCF-AC-4.1 of SCF-US-4, while #109 (SCF-US-7 slice 2, `schwaigc`, Sprint 3) only embeds it (SCF-AC-7.4); an active `TEST_DATABASE_URL` line would break the test that every variable of `.env.example` is used in `docker-compose.yml` (SCF-AC-2.2).
+
+Assumptions (P-GRILL-4):
+
+- **A62**: `STACK.md` §1 (SCF-C-7) names the exception of Q173: a one-shot container (`restart: "no"`) has no health check, and its dependents wait with `service_completed_successfully`.
+- **A63**: `docker-compose.yml` uses `${POSTGRES_DB}` without a default everywhere.
+- **A64**: One way to run the schema commands, the package scripts of `packages/db`: `contract:emit`, `migration:plan`, `migrate` (show, then apply; replaces `migrate:deploy`), `seed`; `CLAUDE.md`, `STACK.md`, the Dockerfile, the tests, and concept §16 follow.
+- **A65**: `database-url.ts` also encodes `POSTGRES_DB`, with a unit test.
+- **A66**: The merge commit `0e26b287c` with the default subject cannot be rewritten without a force-push; the reply says so, and later merges follow the convention.
+- **A67**: The story role (operator in #41, developer in the story file) comes with !32 (ADR-0004); a check that a child folder has its parent's `team_id` becomes a follow-up issue in Sprint 2.
+- **A68**: `dev` is merged into the branch (conflicts only in `qa-log.md` and `ROADMAP-DETAILS.md`); afterwards every test runs fresh against `postgres:18-alpine` in Docker.
+
+❓ **Q213** - **!27 Vertabelo (SCF-AC-4.1)**: Das Diagramm fehlt; #109 (schwaigc, Sprint 3) bettet es nur ein (SCF-AC-7.4) und hängt von SCF-US-4 ab. Wie lösen? Options: Slice 2 + Part of #41 (Recommended) / Ich zeichne es jetzt / In #109 verschieben
+
+➡️ Slice 2 + Part of #41 — !27 becomes `Part of #41`; slice 1 delivers SCF-AC-4.2 to SCF-AC-4.5, the new slice 2 "ER diagram in Vertabelo" delivers SCF-AC-4.1 (`trutscf1`, Sprint 2); #109 embeds the diagram afterwards
+
+> **Answer:** Slice 2 + Part of #41 (Recommended)
+
+❓ **Q214** - **!27 Prisma RC**: Auf npm gibt es kein stabiles Prisma 8 (latest = 8.0.0-rc.29); die Schule verlangt 'prisma ORM >= 8'. Wie dokumentieren? Options: ADR-0006 (Recommended) / ADR + Lehrer-OK / Auf neuesten RC heben
+
+➡️ Newest consistent 8.x release candidate, recorded in ADR-0006 — CLI and ORM packages are chosen so that they share one toolchain version, pinned exactly; the upgrade to the stable 8.0.0 is its own issue
+
+> **Answer:** 8 wird bald der neue standard, also nutze die aktuellste version mit prisma 8.x.x halte das auch als adr fest
+
+❓ **Q215** - **!27 TEST_DATABASE_URL in .env.example**: Eine aktive Zeile bricht den Test 'jede Variable aus .env.example wird in docker-compose.yml verwendet' (SCF-AC-2.2). Wie? Options: Auskommentierte Zeile (Recommended) / Aktive Zeile + Testausnahme
+
+➡️ Auskommentierte Zeile — `# TEST_DATABASE_URL=postgresql://stash:change-me@localhost:5432/stash_test` next to `DATABASE_URL`, like `DATABASE_URL` and `OPENAPI_FILE`
+
+> **Answer:** Auskommentierte Zeile (Recommended)
+
+❓ **Q216** - **!22 Gewichte**: Die Story-Dateien sagen 8 (OBS-US-1) / 5 (OBS-US-2), GitLab #82/#83 sagen 5 / 3. Welche Zahl gilt? Options: Story-Dateien 8/5 (Recommended) / GitLab 5/3
+
+➡️ Story-Dateien 8/5 — applied on !22 (`concept/observability`) and on GitLab #82 and #83; asked in this round together with the questions of !27
+
+> **Answer:** Story-Dateien 8/5 (Recommended)
+
+## Round 43 — 2026-11-02 — publish the revisions of !21, !22, and !27 (`trutscf1` (agent))
+
+Rounds 41 (revise !27, this branch) and 42 (revise !21, on `concept/milestone-plan-2`) come first. Q218 was asked in this round and is logged with round 42 on `concept/milestone-plan-2`, because it changes only that branch. Assumption A75: the answer to Q219 means "stay on Prisma 8": `prisma` 8.0.0-rc.27 is a Prisma 8 version, no stable 8.0.0 exists yet, and the seven-day rule `minimumReleaseAge` of `pnpm-workspace.yaml` stays as it is.
+
+❓ **Q217** - **Veröffentlichen**: Was soll ich auf GitLab tun (Entwürfe im Scratchpad unter replies/)? Options (multi): !27 komplett / !21 komplett / !22 komplett / #82/#83 anpassen
+
+➡️ all four — issues #151 (SCF-US-4 slice 2: ER diagram in Vertabelo, blocks #109) and #152 (one folder tree per team) created in Sprint 2 for `trutscf1`; placeholders replaced; !21, !22, !27 pushed with new descriptions and replies; #82 and #83 renamed (no technology names) with weights 8 and 5
+
+> **Answer:** !27 komplett, !21 komplett, !22 komplett, #82/#83 anpassen
+
+Q218 (own rows of the milestone plan, answered "Jetzt alles nachziehen (Recommended)") is logged in round 42.
+
+❓ **Q219** - **Prisma-Version**: Die 7-Tage-Regel (minimumReleaseAge) blockiert rc.28/rc.29. Bleibt es bei rc.27? Options: rc.27 lassen (Recommended) / Ausnahme für Prisma
+
+➡️ A75 — `prisma` 8.0.0-rc.27 with `@prisma/orm-postgres` 8.0.0-rc.20 stays (ADR-0006); the seven-day rule is not changed
+
+> **Answer:** nutze prisma 8
+
+❓ **Q220** - **Laufwerk C: voll**: (0,01 GB frei): Docker hängt deshalb. Wie vorgehen? Options: Verbraucher auflisten (Recommended) / Ich kümmere mich selbst
+
+➡️ Verbraucher auflisten — read-only list of the largest consumers for `trutscf1`; nothing deleted without a decision
+
+> **Answer:** Verbraucher auflisten (Recommended)

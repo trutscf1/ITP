@@ -30,7 +30,17 @@ function readJson(path: string): {
 const workspaceManifests = [
   "package.json",
   ...["apps", "packages"].flatMap((folder) =>
-    ["web", "identity", "storage", "worker", "cms", "contracts", "ui", "config"]
+    [
+      "web",
+      "identity",
+      "storage",
+      "worker",
+      "cms",
+      "contracts",
+      "ui",
+      "config",
+      "db",
+    ]
       .map((name) => `${folder}/${name}/package.json`)
       .filter((path) => existsSync(join(root, path))),
   ),
@@ -58,6 +68,7 @@ function licenceLabel(name: string): string | undefined {
     "@biomejs/biome": "Biome",
     dotenv: "dotenv",
     next: "Next.js",
+    pg: "node-postgres",
     playwright: "Playwright",
     "radix-ui": "Radix UI",
     react: "React",

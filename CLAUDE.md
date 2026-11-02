@@ -91,13 +91,15 @@ Available now:
 ```bash
 pnpm install                                            # install the workspace
 pnpm run lint                                           # root tasks through Turborepo; likewise typecheck and build
-pnpm test                                               # acceptance tests (tests/)
+pnpm test                                               # acceptance tests (tests/); database tests need TEST_DATABASE_URL
+pnpm db:migrate                                         # apply the migrations of packages/db (DATABASE_URL)
+pnpm db:seed                                            # local test data (DATABASE_URL)
 node tools/doc-check.mjs                                # consistency check of documentation/
 npx markdownlint-cli2 "documentation/**/*.md"           # markdown lint
 ```
 
 ## Tooling notes
 
-- Prisma migrations are created only with `pnpm prisma migrate dev --name <name>`; applied migrations are never edited.
+- Prisma 8 migrations are created only from the contract in `packages/db`, through its package scripts: `pnpm --filter @stash/db run contract:emit`, then `pnpm --filter @stash/db run migration:plan <snake_slug>`; they are applied with `pnpm db:migrate` (the script `migrate`). Applied migrations are never edited. Prisma 8 has no `migrate dev` or `migrate deploy` (`documentation/STACK.md` §3).
 - `pnpm-lock.yaml` conflicts are resolved by `pnpm install`, never by hand.
 - Secrets live in `.env` (ignored); every new variable goes into `.env.example` in the same commit.
