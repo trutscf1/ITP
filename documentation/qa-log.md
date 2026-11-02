@@ -1405,3 +1405,29 @@ Instruction of `schwaigc`, verbatim: "reviewe alle mr von trutscf1". Only !36 (`
 **Q247 - Review !36:** trutscf1 hat nur ein offenes MR, !36 (Release dev → main, v0.1.0). Befund: nicht merge-bereit. 1) Pipeline rot: commitlint scheitert an 3 alten Commits von schauby1. 2) Kein CHANGELOG-Abschnitt 0.1.0, daran würde der Tag-Release-Job scheitern. 3) Titel und Beschreibung ohne Release-Notes. 4) !17, !19, !20, !21, !22, !27 und !32 wurden ohne Review gemergt (DoD 8). 5) #41 ist noch offen. Den Entwurf als Kommentar auf !36 posten?
 
 Answer: "Posten (Recommended)". The review was posted on !36 without an approval.
+
+## Round 53 — 2026-11-02 — red pipeline of the release MR !36 (`trutscf1` (agent))
+
+Instruction of `trutscf1`, verbatim: "repariere die pipeline auf main, bzw alle fehler die auftreten."
+
+Finding: no pipeline runs on `main` itself; the red one is the merge request pipeline of !36 (`dev` → `main`), job `commit-messages` only. The default branch is `dev`, so in a merge request into `main` the diff base is the first commit and commitlint checks the whole history; the three commits from before the workflow fail. Numbers provisional per P-TEAM-5.
+
+**Q248 - Fix-Weg:** Die rote Pipeline betrifft den Release-MR !36 (dev → main), Job commit-messages. commitlint prüft dort die ganze Historie und scheitert an 3 alten Commits von vor dem Workflow (setup, feat: added prisma, added mongoDB to docker stack). schwaigc hat dafür schon !37 offen (commitlint ignoriert genau diese 3 Messages, Test + WORKFLOW.md, Pipeline grün). Wie gehen wir vor?
+
+Answer: "!37 reviewen + mergen (Recommended)".
+
+**Q249 - Umfang:** Das Review von schwaigc auf !36 nennt weitere Release-Blocker: kein CHANGELOG-Abschnitt 0.1.0 (der Tag-Job release-notes würde scheitern) und Titel/Beschreibung von !36 ohne Release-Notes (Titel ist derzeit eine docs-Commit-Subject). Sollen die mit erledigt werden?
+
+Answer: "Ja, Release vorbereiten (Recommended)".
+
+**Q250 - Review !37 posten:** Ergebnis: merge-bereit, alle Checks frisch grün, test-Commit vor fix-Commit (DoD 15). Zwei nicht blockierende Hinweise: der lokale Hook akzeptiert auch neue Commits mit exakt diesen Messages; kein Issue zum MR, SCF-F-13 im Konzept nennt die Ausnahme nicht. Kommentar posten und !37 approven?
+
+Answer: "Posten + approven (Recommended)". The review was posted on !37 with an approval.
+
+**Q251 - Merge !37:** alle Akzeptanzkriterien und DoD-Punkte erfüllt, Pipeline grün, 0 offene Threads, 1 Approval. Jetzt in dev mergen?
+
+Answer: "Merge". Merged at `d5dc9db`; the new pipeline of !36 is green in all eleven jobs.
+
+**Q252 - Release-Vorbereitung veröffentlichen:** CHANGELOG-Abschnitt `0.1.0` auf `chore/release-v0.1.0`, MR nach dev mit "Part of #126", #126 auf status::in-progress, !36 umbenennen auf "Release v0.1.0" mit den Release-Notes. Ausführen?
+
+Answer: "Alles ausführen (Recommended)".
