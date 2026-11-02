@@ -1445,3 +1445,23 @@ Answer: "Merge".
 **Q254 - Release-Merge !36 (dev → main) als v0.1.0:** Version laut WORKFLOW Sprint 1 = v0.1.0 (MINOR, P-VER-2). Approved von schwaigc, keine Blocker in der Pre-Release-Prüfung. Nach dem Merge von !38 warten, bis die Pipeline von !36 grün ist, dann nach main mergen, annotierten Tag v0.1.0 setzen und das GitLab Release veröffentlichen. Mergen?
 
 Answer: "Merge". Both merge requests had already been merged on GitLab as `trutscf1` while the agent's merge call failed on a short SHA: !38 at `eb57a7c`, !36 at `5abe070` with a green pipeline on `main`. The agent set the annotated tag `v0.1.0` on `5abe070`; the tag pipeline publishes the GitLab Release.
+
+Instruction of `trutscf1`, verbatim: "Ein paar branches sind von mir im repository graph offen geblieben (trutscf1 oder MK-fabschn, kümmere dich darum, dass diese verschwinden - also nicht mehr sichtbar sind oder irgenwie in dev landen, damit wir einen schönen repo graph haben, wo kein einziger branch verloren geht (schauby ist egal)"
+
+Inventory: six remote branches of `trutscf1` (`MK-fabschn`) had commits outside `dev`. A1: `main` is merged back into `dev` after the release, so `dev` holds the release merge.
+
+**Q255 - Ersetzte Branches:** chore/grill-trutscf1-2026-10-29 und feature/40-shared-contracts (Inhalt 1:1 schon in dev) sowie concept/milestone-plan (!15 geschlossen, ersetzt durch milestone-plan-2) und feature/40-shared-contracts-zod-openapi (!16 geschlossen, ersetzt durch !26). Wie sollen sie aus dem Graph verschwinden?
+
+Answer: "Mit -s ours an dev binden (Recommended)". Superseded by Q258: these four branches hold ten commits that the commit check of today rejects.
+
+**Q256 - Probe #127:** Die Regenerationsprobe (#127, status::review) liegt nur auf feature/40-contracts-zod-openapi, weil !25 erst nach dem Merge von !26 in den Feature-Branch kam. Wie kommt sie nach dev?
+
+Answer: "Mit -s ours anbinden".
+
+**Q257 - concept/migrate-scaffolding:** 5 Konzept-Commits vom 20.10. wurden nach dem Merge von !13 gepusht und nie reviewt; dev hat sich seither stark verändert (9 Konflikt-Hunks). Was tun?
+
+Answer: "-s ours + Inbox-Eintrag (Recommended)".
+
+**Q258 - Vier Branches mit alten, nicht konformen Commits** (chore/grill-trutscf1-2026-10-29 !31, feature/40-shared-contracts !23, concept/milestone-plan !15, feature/40-shared-contracts-zod-openapi !16, alle MRs geschlossen und nie gemergt): Ein Anbinden an dev würde commit-messages in diesem MR und im nächsten Release-MR rot machen (10 Commits). Wie weiter?
+
+Answer: "Remote löschen (Recommended)". Before deleting, the agent checked that the head of each branch is the head of its merge request (`refs/merge-requests/<n>/head`), so every commit stays reachable through the closed merge request. The four remote branches were deleted; `feature/40-contracts-zod-openapi` and `concept/migrate-scaffolding` are recorded in `dev` with the strategy "ours" (content of `dev` unchanged).
