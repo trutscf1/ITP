@@ -941,3 +941,19 @@ Rounds 32 (this session) and 33 (implement #41, on !27) come before this one. Th
 ➡️ Posten + Follow-up-Issue — review comment posted on !30; issue #149 (Sprint 2, `tschudea07`, `type::bug`) for the images the stack builds
 
 > **Answer:** Posten + Follow-up-Issue (Recommended)
+
+## Round 40 — 2026-11-02 — review (`trutscf1` (agent), open MRs of `schwaigc` and `tschudea07` at the end of Sprint 1)
+
+Question numbers continue after Q210, the highest number on any open branch (!34); they stay provisional until merged into `dev` (P-TEAM-5). Fresh checks in clean worktrees: !29 at `aa8636dc3` 284 of 284 tests pass, !30 at `63f54d068` 270 of 270; lint, `biome ci`, typecheck, `doc-check` and `--status` (0 errors, 39 warnings as on `dev`), markdownlint, and commitlint clean on both. A dry run of the merges showed that every MR after the first conflicts in `qa-log.md` and `ROADMAP-DETAILS.md`; the project resets approvals on push.
+
+❓ **Q211** - **Reviews posten**: Welche Review-Kommentare posten und das MR approven? Options (multi): !28 posten + approven / !29 posten + approven / !30 posten + approven / !34 posten + approven
+
+➡️ all four — review comments posted and approved at the heads above; !29 still needs the agreement of `schauby1` to the export `./web`, and !29 goes before !30; nothing merged
+
+> **Answer:** !28 posten + approven, !29 posten + approven, !30 posten + approven, !34 posten + approven
+
+❓ **Q212** - **Log-Konflikte**: Nach dem ersten Merge kollidieren die übrigen MRs in qa-log.md und ROADMAP-DETAILS.md. Wer merged dev in die Branches? Options: Autor:innen (Recommended) / Ich löse sie / Nur approven
+
+➡️ Autor:innen — `schwaigc` and `tschudea07` merge `dev` into their own branches (keep both sides, the later branch renumbers its round); `trutscf1` approves again after each push
+
+> **Answer:** Autor:innen (Recommended)
