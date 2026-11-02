@@ -19,7 +19,9 @@
       "@/*": ["./src/*"]
     },
     "types": ["node"],
-    "declaration": false
+    "declaration": false,
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true
   },
   "include": [
     "next-env.d.ts",

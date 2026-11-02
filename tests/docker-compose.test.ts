@@ -232,6 +232,35 @@ describe("SCF-AC-2.3 Start without internet", () => {
     );
   });
 
+  it("SCF-AC-2.3 lets the offline check drop every published port and cut every network off", () => {
+    const stack = parse(readText("docker-compose.yml")) as Compose & {
+      services: Record<string, { ports?: unknown }>;
+      networks: Record<string, unknown>;
+    };
+    const check = parse(readText("docker/compose.offline-check.yml"), {
+      customTags: [
+        { tag: "!reset", collection: "seq", resolve: () => "reset" },
+      ],
+    }) as {
+      services: Record<string, { ports?: unknown }>;
+      networks: Record<string, { internal?: boolean }>;
+    };
+    const published = Object.keys(stack.services)
+      .filter((name) => stack.services[name]?.ports !== undefined)
+      .sort();
+    assert.deepEqual(Object.keys(check.services).sort(), published);
+    for (const name of published) {
+      assert.equal(check.services[name]?.ports, "reset", name);
+    }
+    assert.deepEqual(
+      Object.keys(check.networks).sort(),
+      Object.keys(stack.networks).sort(),
+    );
+    for (const [name, network] of Object.entries(check.networks)) {
+      assert.equal(network.internal, true, name);
+    }
+  });
+
   it("SCF-AC-2.3 never makes a service pull its image at start", () => {
     const pulling = Object.entries(services).filter(
       ([, service]) =>

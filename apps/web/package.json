@@ -11,10 +11,11 @@
     "format": "biome format --write",
     "contract:emit": "prisma contract emit",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "node --test"
+    "test": "node --test \"src/**/*.test.ts\""
   },
   "dependencies": {
     "@prisma/orm-postgres": "8.0.0-rc.13",
+    "@stash/contracts": "workspace:*",
     "@stash/ui": "workspace:*",
     "dotenv": "^18.0.4",
     "next": "16.4.2",

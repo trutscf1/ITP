@@ -18,8 +18,10 @@ WORKDIR /app
 
 COPY --chown=node:node . .
 
+# `run build` on `@stash/web...` builds the workspace packages of web first (in order), so the
+# API description of `@stash/contracts` exists for `/api/docs` (M6).
 RUN pnpm install --frozen-lockfile --filter @stash/web... \
- && pnpm --filter @stash/web exec next build
+ && pnpm --filter @stash/web... run build
 
 EXPOSE 3000
 CMD ["pnpm", "--filter", "@stash/web", "exec", "next", "start"]
