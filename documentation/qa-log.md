@@ -986,6 +986,18 @@ Shown with the round: the Docker engine on the developer machine did not answer 
 
 > **Answer:** Veröffentlichen (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
 
+## Round 39 — 2026-10-27 — delivery (`trutscf1`, agent: open the Phase 4 review gate of R2, #114)
+
+Concept work of _Observability baseline_ (R2) is logged in `concepts/observability.qa-log.md` (Q1–Q34). Assumption stated with the round, not rejected:
+
+- **A1**: Phases 1–6 are complete in the branch, so the merge request says `Closes #114`; cutting the issues (`tickets`) follows after the merge.
+
+❓ **Q130** - **Publish the review gate**: Shall I push `concept/observability` and open the merge request to `dev` with assignee `trutscf1` and reviewer `tschudea07`, who signs off the Phase 4 gate in place of the PM approver `trutscf1`, the author (P-MR-2)? Options: Push and open the MR / Push only / Commit locally only
+
+➡️ Push and open the MR — merge request `concept/observability` → `dev`, not merged by the agent
+
+> **Answer:** Push and open the MR (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions); to be confirmed by trutscf1 in the MR
+
 ## Round 32 — 2026-11-02 — delivery (`tschudea07` (agent), review !27 and !22)
 
 Question numbers continue after Q203, the highest number on any open branch (Q183–Q193 are taken by !30, up to Q203 by !21); they stay provisional until merged into `dev` (P-TEAM-5).
@@ -1379,3 +1391,9 @@ Q218 (own rows of the milestone plan, answered "Jetzt alles nachziehen (Recommen
 ➡️ Verbraucher auflisten — read-only list of the largest consumers for `trutscf1`; nothing deleted without a decision
 
 > **Answer:** Verbraucher auflisten (Recommended)
+
+## Round 51 — 2026-11-02 — merge the open MRs of `trutscf1` without a review (`trutscf1` (agent))
+
+Instruction of `trutscf1`, verbatim: "du hast die erlaubnis ohne approven in dev zu mergen, merge meine also hinein und behebe immer den merge conflict. vergesse nicht mir heute bei allen issues ein 20min time spend einzutragen"
+
+No question was asked: the owner gave the merge instruction directly. The agent named the deviation before merging: `docs/git_workflow_commands.md` says "A person other than the merge request author reviews and merges", and P-MR-2, P-MR-3, and Definition of Done item 8 need the review of another person. The merges are recorded as a deviation in `ROADMAP-DETAILS.md`. !21 had already been merged by `trutscf1` at 17:19. The agent did not book time: 20 minutes on every issue would not be time spent on them, the final presentation reports hours per person against what was achieved (`docs/anforderungen_software_projekte.md`), and agents never book time (P-TIME-1, as in the review of !30, Q183). `trutscf1` books his own time with `/spend`.

@@ -34,4 +34,4 @@ The vertical slices that deliver this story. One slice is delivered by the story
 
 - **Story issue:** #84
 - **Weight:** 3
-- **Depends on:** OBS-US-2 (Grafana dashboards and alerts, #83)
+- **Depends on:** OBS-US-2 (Operations dashboards and alerts, #83)

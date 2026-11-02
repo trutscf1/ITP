@@ -11,6 +11,7 @@ New tasks and ideas for this developer land here first, before anyone plans them
 
 ## Open
 
+- [2026-10-27] Concept *Observability baseline* (R2) §15: in the MR of OBS-US-1 slice 1 add the removal of the trace headers to the routing table of `concepts/scaffolding.md` §8 (SCF-F-4), and in the MR of OBS-US-2 slice 5 the row `/observability` with its session check (changed on 2026-11-02); in the MR of slice 2 add the package `telemetry` to SCF-F-18, SCF-T-1, the §16 module tree, and `tests/monorepo.test.ts`; in the MR of OBS-US-2 slice 5 add the operator role and login name of `identity` to PUB-F-22 (privacy template) in `concepts/public-content.md`.
 - [2026-10-06] Revoke the two project access tokens used until 2026-10-06 (Project → Settings → Access tokens). The other three team members each create an own personal access token (`docs/agents/issue-tracker.md`, "Access").
 - [2026-10-06] Team review of the drafts in `GOAL.md` (roles R-1…R-3, success signals G-1.S1…S3) and of the *Serves* column in `ROADMAP.md`; only the wording of G-1 is confirmed.
 - [2026-10-06] Promote the feature issues #87–#100 to group epics (`/promote`); needs a membership in the group, which `trutscf1` does not have — ask the teacher or a group owner.

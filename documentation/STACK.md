@@ -20,7 +20,7 @@ Every row traces to the capability IDs (`SCF-C-x`, later other prefixes) that de
 
 ## Capability index
 
-Every capability of `concepts/scaffolding.md` §7 and `concepts/public-content.md` §7 and where its technology stands. The index only points to the track sections; it holds no technology of its own, except the capabilities added on 2026-10-13 that no section maps yet. Their owner moves the row into the own section when the technology is chosen.
+Every capability of `concepts/scaffolding.md` §7, `concepts/public-content.md` §7, and `concepts/observability.md` §7 and where its technology stands. The index only points to the track sections; it holds no technology of its own, except the capabilities added on 2026-10-13 that no section maps yet. Their owner moves the row into the own section when the technology is chosen.
 
 | ID | Capability | Technology | Owner |
 | --- | --- | --- | --- |
@@ -49,6 +49,13 @@ Every capability of `concepts/scaffolding.md` §7 and `concepts/public-content.m
 | PUB-C-2 | Password hashing | to be chosen by the owner | `trutscf1` |
 | PUB-C-3 | Safe rich text rendering | to be chosen by the owner | `trutscf1` |
 | PUB-C-4 | Accessibility check of public pages | section 3 (SCF-C-20, row "Accessibility check in CI"); the pages are added by the owner of `web` | `tschudea07` |
+| OBS-C-1 | Instrumentation library | section 1 | `trutscf1` |
+| OBS-C-2 | Telemetry collector | section 1 | `trutscf1` |
+| OBS-C-3 | Metric store | section 1 | `trutscf1` |
+| OBS-C-4 | Log store | section 1 | `trutscf1` |
+| OBS-C-5 | Trace store | section 1 | `trutscf1` |
+| OBS-C-6 | Dashboard tool | section 1 | `trutscf1` |
+| OBS-C-7 | Session check in the reverse proxy | section 1 | `trutscf1` |
 
 ## 1. Platform — `trutscf1`
 
@@ -63,6 +70,13 @@ Every capability of `concepts/scaffolding.md` §7 and `concepts/public-content.m
 | SCF-C-8 relational database | PostgreSQL | 18 (`postgres:18-alpine`) | Data in the volume `postgres-data` mounted at `/var/lib/postgresql` (PostgreSQL 18 layout). Prisma is set up by SCF-US-4. |
 | SCF-C-5 content management system | _open_ | | |
 | SCF-C-12 changelog draft generator | _open_ | | |
+| OBS-C-1 instrumentation library | OpenTelemetry SDK for Node.js with the HTTP instrumentation; W3C Trace Context propagator; OTLP over HTTP exporters for metrics, logs, and traces | OpenTelemetry JS 2.x (stable packages) and the matching experimental packages; exact versions pinned in `packages/telemetry` | Package `@stash/telemetry` (`packages/telemetry`, `concepts/observability.md` §16, M1–M5). Neutral attribute names of §8 map to the semantic conventions: `route` → `http.route`, `method` → `http.request.method`, `status code` → `http.response.status_code`, `unit` → resource `service.name`, `version` → resource `service.version`, `peer unit` → `server.address` of the called unit, `queue` → `messaging.destination.name`, `job name` → `messaging.operation.name`, `job id` → `messaging.message.id`, `error type` → `error.type`. Metric names of §8 are kept; the metric store shows them with `_` instead of `.`. Default `TELEMETRY_ENDPOINT`: `http://collector:4318`. To be confirmed in slice 2 of OBS-US-1. |
+| OBS-C-2 telemetry collector | OpenTelemetry Collector Contrib (receiver `otlp`; processors `attributes`, `transform`, `redaction`, `batch`, `memory_limiter`; exporters to the three stores) | Collector Contrib ≥ 0.120, exact image tag pinned in the stack definition | Container `collector` in profile `observability`, internal network only. Memory limit 192 MB. Slice 1 of OBS-US-1. |
+| OBS-C-3 metric store | Prometheus with its OTLP receiver; alert rules as Prometheus rule files rendered by the configuration step; offline rule test with `promtool test rules` | Prometheus 3.x, exact image tag pinned | Retention by `--storage.tsdb.retention.time` from `OBS_METRICS_RETENTION_DAYS`. Memory limit 384 MB. Alert rules are data-source managed and read-only in Grafana. |
+| OBS-C-4 log store | Grafana Loki with OTLP ingestion; labels `service_name` and `level` | Loki 3.x, exact image tag pinned | Retention by the compactor from `OBS_LOGS_RETENTION_DAYS`. Memory limit 320 MB. |
+| OBS-C-5 trace store | Grafana Tempo with OTLP ingestion | Tempo 2.x, exact image tag pinned | Block retention from `OBS_TRACES_RETENTION_DAYS`. Memory limit 256 MB. |
+| OBS-C-6 dashboard tool | Grafana with file provisioning of data sources and dashboards, served from the sub-path `/observability`, authentication by proxy header (`auth.proxy`) | Grafana ≥ 12, exact image tag pinned in slice 1 of OBS-US-1 | Settings for OBS-F-9 (`allowUiUpdates: false`), OBS-F-10 and OBS-F-27 (`auth.proxy` with the header of OBS-C-7; `auth.anonymous` with role Viewer only while OBS-F-24 binds the port to `127.0.0.1`; `disable_login_form`, `users.allow_sign_up` off), OBS-NF-1 (`analytics.reporting_enabled`, `check_for_updates` off, no plugins). Links of OBS-F-7: Loki derived field `traceId` → Tempo, Tempo trace-to-logs → Loki. Memory limit 256 MB; configuration step (`node:24-alpine`) 64 MB — 1472 MB in total (OBS-NF-8). The images of the profile are scanned by `container-scan` (#149, SCF-NF-6). |
+| OBS-C-7 session check in the reverse proxy | Caddy `forward_auth` to the session check of `identity` | `caddy:2.11-alpine` (SCF-C-6) | For OBS-F-27: header `X-Stash-Operator`, removed from every incoming request; active with TLS (R14). The address in `identity` is set by R3. |
 
 Module mapping (folder layout), set by #38:
 

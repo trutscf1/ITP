@@ -66,7 +66,7 @@ About 53 h per person, about 213 h for the team in total; this replaces the earl
 
 **R1 — Scaffolding & shared contracts** (shared). Monorepo with the four areas, shared contract package for request/response schemas and the generated API description, one-command local start, CI with lint and tests, pre-commit security hooks (`docs/security_next_js.md`), ER diagram for the relational schema. Creates `documentation/STACK.md`. Risk: many services in the local stack; the app must still start without internet access (school rule).
 
-**R2 — Observability baseline** (`trutscf1`). Metrics, logs, and traces from every service into one dashboard stack, set up early so every later feature is instrumented from its first slice. Risk: four extra operational services.
+**R2 — Observability baseline** (`trutscf1`). Metrics, logs, and traces from every service into one dashboard stack, set up early so every later feature is instrumented from its first slice. Its first slices need only R1; the login of operators through `identity` waits for R3 and TLS of R14, and the trace through a job and the panels and alerts of uploads, queues, and storage wait for R5 and R9 (`concepts/observability.md` §16). Risk: four extra operational services.
 
 **R3 — Identity** (`tschudea07`). Registration and login by e-mail, external login via GitHub, Google, Microsoft, MFA via TOTP and passkeys. Own user table 1:1 with the auth library's table, rate limiting, bot protection, secure password hashing (school rules). Risk: external login and bot protection need internet, so both must be switchable off by configuration for offline start.
 
