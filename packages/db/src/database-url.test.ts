@@ -31,6 +31,13 @@ describe("SCF-AC-2.2 connection of the schema commands", () => {
     );
   });
 
+  it("SCF-AC-2.2 encodes the database name, so special characters stay part of it", () => {
+    assert.equal(
+      databaseUrl({ ...postgres, POSTGRES_DB: "stash db?x#1" }),
+      "postgresql://stash:change-me@localhost:5432/stash%20db%3Fx%231",
+    );
+  });
+
   it("SCF-AC-2.2 gives no connection while a PostgreSQL value is missing", () => {
     assert.equal(
       databaseUrl({ ...postgres, POSTGRES_DB: undefined }),
