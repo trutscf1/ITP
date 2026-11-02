@@ -19,73 +19,21 @@ services:
     volumes:
       # PostgreSQL 18 keeps its data in a versioned folder below /var/lib/postgresql.
       - postgres-data:/var/lib/postgresql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
-  # Sessions, cache, and the job queue.
-  redis:
-    image: redis:8.8-alpine
-    restart: unless-stopped
-    command: ["sh", "-c", "exec redis-server --requirepass \"$$REDIS_PASSWORD\""]
+      
+  mongo:
+    image: mongo:9
+    restart: always
     environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD:?set REDIS_PASSWORD in .env}
-      # Read by redis-cli, so the health check does not put the password on a command line.
-      REDISCLI_AUTH: ${REDIS_PASSWORD:?set REDIS_PASSWORD in .env}
-    networks:
-      - backend
-    ports:
-      - "127.0.0.1:${REDIS_PORT:?set REDIS_PORT in .env}:6379"
-    volumes:
-      - redis-data:/data
-    healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping | grep -q PONG"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 5s
-
-  # File metadata.
-  mongodb:
-    image: mongo:8.0
-    restart: unless-stopped
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:?set MONGO_USER in .env}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:?set MONGO_PASSWORD in .env}
-    networks:
-      - backend
-    ports:
-      - "127.0.0.1:${MONGO_PORT:?set MONGO_PORT in .env}:27017"
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     volumes:
       - mongo-data:/data/db
-      - mongo-config:/data/configdb
+    networks:
+      - backend
     healthcheck:
       test: ["CMD-SHELL", "mongosh --quiet --eval \"db.adminCommand('ping').ok\" | grep -q 1"]
       interval: 10s
       timeout: 10s
-      retries: 5
-      start_period: 20s
-
-  # Synchronisation for the offline mode.
-  couchdb:
-    image: couchdb:3.5
-    restart: unless-stopped
-    environment:
-      COUCHDB_USER: ${COUCHDB_USER:?set COUCHDB_USER in .env}
-      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD:?set COUCHDB_PASSWORD in .env}
-    networks:
-      - backend
-    ports:
-      - "127.0.0.1:${COUCHDB_PORT:?set COUCHDB_PORT in .env}:5984"
-    volumes:
-      - couchdb-data:/opt/couchdb/data
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fs http://127.0.0.1:5984/_up"]
-      interval: 10s
-      timeout: 5s
       retries: 5
       start_period: 20s
 
@@ -144,6 +92,33 @@ services:
       timeout: 5s
       retries: 5
       start_period: 5s
+  
+  valkey:
+    image: valkey/valkey:9.1-alpine
+    command: valkey-server --port 6379 --requirepass ${VALKEY_PASSWORD}
+    volumes:
+      - valkey-data:/data
+    networks:
+      - backend
+
+  couchdb:
+    image: couchdb:3.5
+    restart: unless-stopped
+    environment:
+      COUCHDB_USER: ${COUCHDB_USER:?set COUCHDB_USER in .env}
+      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD:?set COUCHDB_PASSWORD in .env}
+    networks:
+      - backend
+    ports:
+      - "127.0.0.1:${COUCHDB_PORT:?set COUCHDB_PORT in .env}:5984"
+    volumes:
+      - couchdb-data:/opt/couchdb/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://127.0.0.1:5984/_up"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
   # The `web` unit (Next.js). docker/web.Dockerfile is a temporary stop-gap; M9 of the track plan
   # Web (documentation/concepts/scaffolding.track-web.md) replaces it with apps/web/Dockerfile.
@@ -208,7 +183,7 @@ volumes:
   postgres-data:
   redis-data:
   mongo-data:
-  mongo-config:
+  valkey-data:
   couchdb-data:
   seaweedfs-data:
   clamav-data:

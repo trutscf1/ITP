@@ -1,0 +1,138 @@
+services:
+  
+  postgres:
+    image: postgres:18-alpine
+    container_name: stash_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: stash_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - backend
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres-etc:/etc
+      - postgres-data:/var/lib/postgresql
+      
+  mongo:
+    image: mongo:9
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - backend
+    ports:
+      - ${MONGO_PORT}:27017
+
+  master:
+    image: chrislusf/seaweedfs # use a remote image
+    ports:
+      - 9333:9333
+      - 19333:19333
+      - 9324:9324
+    command: 'master -ip=master -ip.bind=0.0.0.0 -metricsPort=9324'
+    volumes:
+      - seaweed-master:/data
+    networks:
+      - backend
+  volume:
+    image: chrislusf/seaweedfs # use a remote image
+    ports:
+      - 8080:8080
+      - 18080:18080
+      - 9325:9325
+    command: 'volume -ip=volume -master="master:9333" -ip.bind=0.0.0.0 -port=8080 -metricsPort=9325'
+    depends_on:
+      - master
+    volumes:
+      - seaweed-volume:/data
+    networks:
+      - backend
+  filer:
+    image: chrislusf/seaweedfs # use a remote image
+    ports:
+      - 8888:8888
+      - 18888:18888
+      - 9326:9326
+    command: 'filer -ip=filer -master="master:9333" -ip.bind=0.0.0.0 -metricsPort=9326'
+    tty: true
+    stdin_open: true
+    depends_on:
+      - master
+      - volume
+    volumes:
+      - seaweed-filer:/data
+    networks:
+      - backend
+  s3:
+    image: chrislusf/seaweedfs # use a remote image
+    ports:
+      - 8333:8333
+      - 9327:9327
+    command: 's3 -filer="filer:8888" -ip.bind=0.0.0.0 -metricsPort=9327'
+    depends_on:
+      - master
+      - volume
+      - filer
+    volumes:
+      - seaweed-s3:/data
+    networks:
+      - backend
+  webdav:
+    image: chrislusf/seaweedfs # use a remote image
+    ports:
+      - 7333:7333
+    command: 'webdav -filer="filer:8888"'
+    depends_on:
+      - master
+      - volume
+      - filer
+    volumes:
+      - seaweed-webdav:/data
+    networks:
+      - backend
+  
+  valkey:
+    image: valkey/valkey:9.1-alpine
+    command: valkey-server --port 6379 --requirepass ${VALKEY_PASSWORD}
+    volumes:
+      - valkey-data:/data
+    networks:
+      - backend
+    ports:
+      - ${VALKEY_PORT}:6379
+
+  couchdb:
+    image: apache/couchdb:3.5.0
+    environment:
+      - COUCHDB_USER=${COUCHDB_USER}
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
+    volumes:
+      - couchdb-data:/opt/couchdb/data
+    networks:
+      - backend
+    ports:
+      - ${COUCHDB_INDEXER_ADMIN_PORT}:9100
+      - ${COUCHDB_REST_API_PORT}:5984
+      - ${COUCHDB_EPMD_PORT}:4369
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  postgres-data:
+  postgres-etc:
+  mongo-data:
+  seaweed-master:
+  seaweed-volume:
+  seaweed-filer:
+  seaweed-s3:
+  seaweed-webdav:
+  valkey-data:
+  couchdb-data:
