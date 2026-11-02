@@ -959,3 +959,13 @@ Provisional numbers (P-TEAM-5): these follow Q185 of round 33. Since round 33, `
 ➡️ Merge now — merged at `ea738e1`, branch deleted, #148 closed by hand with `status::done`; `dev` merged into this branch (one-line conflict in `ROADMAP-DETAILS.md`)
 
 > **Answer:** Merge now
+
+## Round 35 — 2026-11-02 — delivery (`schwaigc`, end of Sprint 1)
+
+Provisional numbers (P-TEAM-5): these follow Q192 of round 34. No reaction to !29 and !30 since 2026-10-29; Sprint 1 ends today.
+
+❓ **Q193** - **Sprint-Ende heute**: #40 und #103 hängen am Re-Review von trutscf1. Was tun? Options: Re-Review anfragen / Mit Sprint 2 (#116) beginnen / Beides / Nichts
+
+➡️ Re-Review anfragen — comments on !29 and !30 asking `trutscf1` for a review again, and on !29 a reminder to `schauby1` about the export `./web`
+
+> **Answer:** Re-Review anfragen (Recommended)
