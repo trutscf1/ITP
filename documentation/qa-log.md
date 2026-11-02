@@ -877,3 +877,25 @@ Decided by the agent on the owner's standing instruction of 2026-10-27 (work wit
 ➡️ Punkt 1 und CI/CD hier, Punkt 16 nach dem zweiten Merge — this MR names the rule in item 1 and in "CI/CD"; whichever of !15 and this MR is merged second drops "once built; until then the reviewer checks it by hand" from item 16
 
 > **Answer:** decided by the agent: Punkt 1 und CI/CD hier, Punkt 16 nach dem zweiten Merge (Recommended)
+
+## Round 32 — 2026-11-02 — delivery (`tschudea07` (agent), review !27 and !22)
+
+Question numbers continue after Q182 of the open MRs !29 and !30; they stay provisional until merged into `dev` (P-TEAM-5).
+
+❓ **Q183** - **Review !27**: SCF-US-4 (#41); tests 284 of 285 pass (1 todo: Vertabelo export); must fix: `Closes #41` although SCF-AC-4.1 is open, Prisma only `8.0.0-rc`, `TEST_DATABASE_URL` missing in `.env.example`. Options: Request changes / Comment + approve / Show the text first
+
+➡️ Request changes — review comment posted on !27, no approval; approval once the three must-fix points are done
+
+> **Answer:** Request changes (Recommended)
+
+❓ **Q184** - **Review !22**: Phase 4 gate of R2, all 32 decisions made by the agent; open: Q4 vs `G-1.S1`, Q12 without TLS, Q22 vs Argon2id, OBS-AC-1.4 vs OBS-F-4, technology names, gate already holds Phase 5. Options: Request changes / Comment + approve / Show the text first
+
+➡️ Request changes — review comment posted on !22, gate not signed off
+
+> **Answer:** Request changes (Recommended)
+
+❓ **Q185** - **Status MR**: Status update of `tschudea07` on `chore/status-tschudea07-2026-11-02` pushen und MR nach `dev` öffnen? Options: Push + open MR / Keep local only
+
+➡️ Push + open MR — reviewer `trutscf1`, no merge
+
+> **Answer:** Push + open MR (Recommended)
