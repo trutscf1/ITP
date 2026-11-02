@@ -935,3 +935,41 @@ Question numbers continue after Q203, the highest number on any open branch (Q18
 ➡️ Post + approve both — re-review comments posted and both MRs approved; not merged
 
 > **Answer:** Post + approve both (Recommended)
+
+## Round 41 — 2026-11-02 — revise !27 (`trutscf1` (agent), review of `tschudea07`)
+
+Question numbers continue after Q212, the highest number on any open branch (!32); rounds 32 to 40 are taken on `dev` or open branches. Both stay provisional until merged into `dev` (P-TEAM-5). The review of `tschudea07` (2026-11-02) asks for three must-fix and five should-fix points. Facts checked before asking: npm has no stable Prisma 8 (`latest` of `prisma` is `8.0.0-rc.29`); the Vertabelo diagram is SCF-AC-4.1 of SCF-US-4, while #109 (SCF-US-7 slice 2, `schwaigc`, Sprint 3) only embeds it (SCF-AC-7.4); an active `TEST_DATABASE_URL` line would break the test that every variable of `.env.example` is used in `docker-compose.yml` (SCF-AC-2.2).
+
+Assumptions (P-GRILL-4):
+
+- **A62**: `STACK.md` §1 (SCF-C-7) names the exception of Q173: a one-shot container (`restart: "no"`) has no health check, and its dependents wait with `service_completed_successfully`.
+- **A63**: `docker-compose.yml` uses `${POSTGRES_DB}` without a default everywhere.
+- **A64**: One way to run the schema commands, the package scripts of `packages/db`: `contract:emit`, `migration:plan`, `migrate` (show, then apply; replaces `migrate:deploy`), `seed`; `CLAUDE.md`, `STACK.md`, the Dockerfile, the tests, and concept §16 follow.
+- **A65**: `database-url.ts` also encodes `POSTGRES_DB`, with a unit test.
+- **A66**: The merge commit `0e26b287c` with the default subject cannot be rewritten without a force-push; the reply says so, and later merges follow the convention.
+- **A67**: The story role (operator in #41, developer in the story file) comes with !32 (ADR-0004); a check that a child folder has its parent's `team_id` becomes a follow-up issue in Sprint 2.
+- **A68**: `dev` is merged into the branch (conflicts only in `qa-log.md` and `ROADMAP-DETAILS.md`); afterwards every test runs fresh against `postgres:18-alpine` in Docker.
+
+❓ **Q213** - **!27 Vertabelo (SCF-AC-4.1)**: Das Diagramm fehlt; #109 (schwaigc, Sprint 3) bettet es nur ein (SCF-AC-7.4) und hängt von SCF-US-4 ab. Wie lösen? Options: Slice 2 + Part of #41 (Recommended) / Ich zeichne es jetzt / In #109 verschieben
+
+➡️ Slice 2 + Part of #41 — !27 becomes `Part of #41`; slice 1 delivers SCF-AC-4.2 to SCF-AC-4.5, the new slice 2 "ER diagram in Vertabelo" delivers SCF-AC-4.1 (`trutscf1`, Sprint 2); #109 embeds the diagram afterwards
+
+> **Answer:** Slice 2 + Part of #41 (Recommended)
+
+❓ **Q214** - **!27 Prisma RC**: Auf npm gibt es kein stabiles Prisma 8 (latest = 8.0.0-rc.29); die Schule verlangt 'prisma ORM >= 8'. Wie dokumentieren? Options: ADR-0006 (Recommended) / ADR + Lehrer-OK / Auf neuesten RC heben
+
+➡️ Newest consistent 8.x release candidate, recorded in ADR-0006 — CLI and ORM packages are chosen so that they share one toolchain version, pinned exactly; the upgrade to the stable 8.0.0 is its own issue
+
+> **Answer:** 8 wird bald der neue standard, also nutze die aktuellste version mit prisma 8.x.x halte das auch als adr fest
+
+❓ **Q215** - **!27 TEST_DATABASE_URL in .env.example**: Eine aktive Zeile bricht den Test 'jede Variable aus .env.example wird in docker-compose.yml verwendet' (SCF-AC-2.2). Wie? Options: Auskommentierte Zeile (Recommended) / Aktive Zeile + Testausnahme
+
+➡️ Auskommentierte Zeile — `# TEST_DATABASE_URL=postgresql://stash:change-me@localhost:5432/stash_test` next to `DATABASE_URL`, like `DATABASE_URL` and `OPENAPI_FILE`
+
+> **Answer:** Auskommentierte Zeile (Recommended)
+
+❓ **Q216** - **!22 Gewichte**: Die Story-Dateien sagen 8 (OBS-US-1) / 5 (OBS-US-2), GitLab #82/#83 sagen 5 / 3. Welche Zahl gilt? Options: Story-Dateien 8/5 (Recommended) / GitLab 5/3
+
+➡️ Story-Dateien 8/5 — applied on !22 (`concept/observability`) and on GitLab #82 and #83; asked in this round together with the questions of !27
+
+> **Answer:** Story-Dateien 8/5 (Recommended)
