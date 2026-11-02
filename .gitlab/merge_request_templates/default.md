@@ -34,5 +34,6 @@ To be completed by a person other than the author. The merge itself follows the 
 
 - [ ] All acceptance criteria of the issue are met
 - [ ] Definition of Done (`documentation/WORKFLOW.md`) is fully met
+- [ ] Test first: a `test(...)` commit with the `AC` ID comes before the first code commit (DoD item 15)
 - [ ] Title, description, and commit subjects are understandable without looking up IDs
 - [ ] Content comment left on this MR

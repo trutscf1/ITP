@@ -13,7 +13,7 @@ One user story of [Scaffolding & shared contracts](feature.md) and the acceptanc
 
 | ID | Title | As a | I want | so that | Priority |
 | --- | --- | --- | --- | --- | --- |
-| SCF-US-1 | Set up the monorepo | developer on the team | a uniformly set up monorepo with pnpm and Turborepo | all four areas build, lint, and test the same way | Must |
+| SCF-US-1 | Set up the monorepo | operator | a uniformly set up monorepo with pnpm and Turborepo | all four areas build, lint, and test the same way | Must |
 
 ## Acceptance criteria
 

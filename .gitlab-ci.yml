@@ -66,6 +66,16 @@ test:
   stage: test
   cache:
     - *pnpm-store
+  # The tests of the relational schema create their own databases on this server
+  # (SCF-US-4, documentation/concepts/scaffolding.md §17). Throwaway credentials of the job.
+  services:
+    - name: postgres:18-alpine
+      alias: postgres
+  variables:
+    POSTGRES_DB: stash
+    POSTGRES_USER: stash
+    POSTGRES_PASSWORD: change-me
+    TEST_DATABASE_URL: postgresql://stash:change-me@postgres:5432/stash
   script:
     - pnpm test
 

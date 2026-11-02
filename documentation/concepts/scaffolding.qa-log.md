@@ -185,3 +185,71 @@ Later in the same session the owner asked to make the pipeline green again. Show
 > **Answer:** Nachrichten umbrechen (Recommended)
 
 Result: the message bodies of the commits on the branch were rewrapped at 100 characters, with unchanged content and unchanged files, and the branch was replaced with a forced push. This revises the answer to Q19.
+
+## Round 6 — 2026-10-27 — data model of SCF-US-4 (trutscf1, agent)
+
+Notes: `/engineering-human implement 41` on `feature/41-data-model-and-prisma-schema`. Issue #41 was taken over by `trutscf1` from `tschudea07` on 2026-10-27; nothing had been started. The concept named the requirements `SCF-F-22` to `SCF-F-26` but left open where the schema lives, how the 1:1 relation is kept, which tables the model holds, how migrations run at start, and what the seed contains. Every question of this round was **decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)**, each with its recommended option; no pop-up was shown.
+
+Shown with the round: Prisma 8 (`8.0.0-rc.19`, pinned by the first scaffold in `apps/web`) is a new architecture — a contract in Prisma Schema Language, `prisma migration plan` to create and `prisma db migrate` to apply migrations; `prisma migrate dev` and `prisma migrate deploy` no longer exist. The authentication library writes its own four core tables (user, session, account, verification) and lets their names be configured.
+
+Assumptions stated with the round:
+
+- **A21**: `trutscf1` implements `SCF-US-4`; `tschudea07` reviews it as owner of the Identity & CI track. The module specification of the package stands in §16 of the concept, because the track plan is edited only by its owner.
+- **A22**: The new package gets the commit scope `db` (`WORKFLOW.md`, `commitlint.config.ts`).
+- **A23**: The columns of the four auth tables are those of the library's core schema, in snake_case; the identity concept may add columns with a migration.
+
+❓ **Q21** - **Ort des Schemas**: Wo sollen Schema, Migrationen und Seed liegen? Options: Neues Paket packages/db (Recommended) / In apps/identity / In apps/web lassen
+
+➡️ Neues Paket packages/db — the empty scaffold in `apps/web` moves there and is removed from `web`.
+
+> **Answer:** Neues Paket packages/db (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q22** - **Tabellen der Auth-Bibliothek**: Wie kommen die Tabellen der Authentifizierungsbibliothek ins Schema? Options: Im selben Schema mit Pluralnamen auth_users, auth_sessions, auth_accounts, auth_verifications (Recommended) / Eigene Migrationen der Bibliothek mit Singularnamen / Nur auth_users jetzt
+
+➡️ Im selben Schema mit Pluralnamen
+
+> **Answer:** Im selben Schema mit Pluralnamen (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q23** - **1:1-Beziehung**: Wie wird garantiert, dass jeder Auth-User genau eine Zeile in users hat? Options: Datenbank-Trigger beim Insert, Cascade beim Löschen, eindeutiger Fremdschlüssel (Recommended) / Hook der Bibliothek im identity-Unit / Nur eindeutiger Fremdschlüssel, Zeile legt die Anwendung an
+
+➡️ Datenbank-Trigger beim Insert
+
+> **Answer:** Datenbank-Trigger beim Insert, Cascade beim Löschen, eindeutiger Fremdschlüssel (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q24** - **Umfang des Datenmodells**: Welche Tabellen gehören jetzt ins Modell? Options: users, teams, team_members, folders, folder_permissions plus die Auth-Tabellen (Recommended) / Nur users, teams, folders / Zusätzlich Dateien, Quotas, Audit-Log
+
+➡️ users, teams, team_members, folders, folder_permissions plus die Auth-Tabellen
+
+> **Answer:** users, teams, team_members, folders, folder_permissions plus die Auth-Tabellen (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q25** - **Migrationen beim Start**: Wer wendet die Migrationen beim Start des Stacks an? Options: Eigener Einmal-Container db-migrate, Units warten auf seinen Erfolg (Recommended) / Jede Unit beim eigenen Start / Manuell per Befehl
+
+➡️ Eigener Einmal-Container db-migrate
+
+> **Answer:** Eigener Einmal-Container db-migrate, Units warten auf seinen Erfolg (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q26** - **Prisma-8-Befehle**: SCF-AC-4.5 nennt `prisma migrate deploy`, das es in Prisma 8 nicht mehr gibt. Wie damit umgehen? Options: Kriterium auf `prisma db migrate` ändern, CLAUDE.md anpassen (Recommended) / Auf Prisma 7 zurückgehen / Kriterium so lassen
+
+➡️ Kriterium auf `prisma db migrate` ändern
+
+> **Answer:** Kriterium auf `prisma db migrate` ändern, CLAUDE.md anpassen (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions). Prisma 7 would break the school minimum of Prisma 8.
+
+❓ **Q27** - **ER-Diagramm**: Wie entsteht das Diagramm, solange niemand Vertabelo bedient hat? Options: Textform (Mermaid) in §8 als verbindlicher Entwurf, Vertabelo-Export als menschlicher Schritt (Recommended) / Warten, bis der Export da ist / Nur Mermaid, ohne Vertabelo
+
+➡️ Textform (Mermaid) in §8 als verbindlicher Entwurf
+
+> **Answer:** Textform (Mermaid) in §8 als verbindlicher Entwurf, Vertabelo-Export als menschlicher Schritt (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q28** - **Tests gegen die Datenbank**: Wie werden Trigger, Migrationen und Seed getestet? Options: Echte PostgreSQL über TEST_DATABASE_URL, eigene Datenbank pro Test, PostgreSQL-Service im CI-Job test (Recommended) / Nur statische Tests / Eingebettete Datenbank im Test
+
+➡️ Echte PostgreSQL über TEST_DATABASE_URL
+
+> **Answer:** Echte PostgreSQL über TEST_DATABASE_URL, eigene Datenbank pro Test, PostgreSQL-Service im CI-Job test (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q29** - **Seed-Daten**: Welche Testdaten legt der Seed an? Options: Feste, erfundene Zeilen, mehrfach ausführbar (Recommended) / Zufällige Daten pro Lauf / Daten aus einer Datei, die jeder anpasst
+
+➡️ Feste, erfundene Zeilen, mehrfach ausführbar
+
+> **Answer:** Feste, erfundene Zeilen, mehrfach ausführbar (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+Result: written into `scaffolding.md` (§4 `SCF-F-22` to `SCF-F-26`, §8 "Relational data model", §9 `SCF-E-7`, §10 examples 8 and 9, §11, §12, §13, §16, §17), into the story file (`SCF-AC-4.5`), `STACK.md` §3, `WORKFLOW.md` (scope `db`), and `CLAUDE.md` (Prisma 8 commands). Open human step: the Vertabelo drawing and its export (§8).

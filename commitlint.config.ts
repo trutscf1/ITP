@@ -38,6 +38,7 @@ const config: UserConfig = {
         "contracts",
         "ui",
         "config",
+        "db",
         "deps",
         "ci",
         "repo",

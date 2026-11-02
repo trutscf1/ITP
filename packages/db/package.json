@@ -1,0 +1,34 @@
+{
+  "name": "@stash/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/prisma/db.ts",
+    "./seed": "./src/seed.ts",
+    "./seed-data": "./src/seed-data.ts"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "typecheck": "tsc --noEmit",
+    "build": "node -e \"console.log('nothing to build')\"",
+    "dev": "node -e \"console.log('nothing to run')\"",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "contract:emit": "prisma contract emit",
+    "migration:plan": "prisma migration plan --name",
+    "migrate": "prisma db migrate --show && prisma db migrate",
+    "seed": "node src/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/orm-postgres": "8.0.0-rc.20",
+    "dotenv": "^18.0.4",
+    "pg": "8.22.0"
+  },
+  "devDependencies": {
+    "@prisma/cli-engine": "0.9.0",
+    "@stash/config": "workspace:*",
+    "@types/node": "^24",
+    "@types/pg": "8.20.4",
+    "prisma": "8.0.0-rc.27"
+  }
+}
