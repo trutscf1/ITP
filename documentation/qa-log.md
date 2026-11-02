@@ -1465,3 +1465,17 @@ Answer: "-s ours + Inbox-Eintrag (Recommended)".
 **Q258 - Vier Branches mit alten, nicht konformen Commits** (chore/grill-trutscf1-2026-10-29 !31, feature/40-shared-contracts !23, concept/milestone-plan !15, feature/40-shared-contracts-zod-openapi !16, alle MRs geschlossen und nie gemergt): Ein Anbinden an dev würde commit-messages in diesem MR und im nächsten Release-MR rot machen (10 Commits). Wie weiter?
 
 Answer: "Remote löschen (Recommended)". Before deleting, the agent checked that the head of each branch is the head of its merge request (`refs/merge-requests/<n>/head`), so every commit stays reachable through the closed merge request. The four remote branches were deleted; `feature/40-contracts-zod-openapi` and `concept/migrate-scaffolding` are recorded in `dev` with the strategy "ours" (content of `dev` unchanged).
+
+## Round 55 — 2026-11-02 — GitHub mirror (`trutscf1` (agent))
+
+Instruction of `trutscf1`, verbatim: "nun mirror mir dieses repo noch auf meine github account"
+
+**Q259 - Sichtbarkeit GitHub-Repo:** CLAUDE.md sagt "the repository is public, so all content must be licence-free", das GitLab-Projekt selbst ist aber private. Wie soll das GitHub-Repo sichtbar sein?
+
+Answer: "Private". `trutscf1` created the repository `trutscf1/ITP` as public; the visibility stays the owner's decision.
+
+**Q260 - Zugang gamgamstyle:** docs §18 verlangt, dem GitHub-User gamgamstyle die Rolle Reporter zu geben. Bei einem Repo in einem persönlichen GitHub-Account gibt es keine Nur-Lese-Rolle. Was soll passieren?
+
+Answer: "Als Collaborator einladen (Recommended)". Invitation sent; on a personal account a collaborator can push.
+
+The first mirror entered on GitLab failed with "Invalid username or token. Password authentication is not supported for Git operations". The agent checked the token of `trutscf1` (scope `repo`, push access to `trutscf1/ITP`), replaced the mirror with one that carries the token in its URL, all branches (not only protected ones), and ran the first sync: 34 branches and the tag `v0.1.0`, the same as on GitLab.
