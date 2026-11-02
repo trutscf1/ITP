@@ -1431,3 +1431,17 @@ Answer: "Merge". Merged at `d5dc9db`; the new pipeline of !36 is green in all el
 **Q252 - Release-Vorbereitung veröffentlichen:** CHANGELOG-Abschnitt `0.1.0` auf `chore/release-v0.1.0`, MR nach dev mit "Part of #126", #126 auf status::in-progress, !36 umbenennen auf "Release v0.1.0" mit den Release-Notes. Ausführen?
 
 Answer: "Alles ausführen (Recommended)".
+
+## Round 54 — 2026-11-02 — release `v0.1.0` (`trutscf1` (agent))
+
+Instruction of `trutscf1`, verbatim: "ist nun approved, merge in main"
+
+Pre-release check by hand (the skill `pre-release-review` is not installed): no blocker. First release, `main` held only the first commit, nothing is deployed yet (R14), so the first migration meets no existing database; secrets only in `.env.example`. Risk for the notes: the accepted findings in `.trivyignore` expire on 2026-11-23.
+
+**Q253 - Merge !38:** "Release v0.1.0: add the changelog section of the first release" (CHANGELOG 0.1.0, Teil von #126): approved von schwaigc, Pipeline grün, 0 offene Threads. Jetzt in dev mergen (Merge-Commit, Branch bleibt)?
+
+Answer: "Merge".
+
+**Q254 - Release-Merge !36 (dev → main) als v0.1.0:** Version laut WORKFLOW Sprint 1 = v0.1.0 (MINOR, P-VER-2). Approved von schwaigc, keine Blocker in der Pre-Release-Prüfung. Nach dem Merge von !38 warten, bis die Pipeline von !36 grün ist, dann nach main mergen, annotierten Tag v0.1.0 setzen und das GitLab Release veröffentlichen. Mergen?
+
+Answer: "Merge". Both merge requests had already been merged on GitLab as `trutscf1` while the agent's merge call failed on a short SHA: !38 at `eb57a7c`, !36 at `5abe070` with a green pipeline on `main`. The agent set the annotated tag `v0.1.0` on `5abe070`; the tag pipeline publishes the GitLab Release.
