@@ -108,9 +108,11 @@ services:
       start_period: 15s
 
   # Virus scanner. The image brings its own health check script; the first start loads the
-  # virus definitions, which takes a while.
+  # virus definitions, which takes a while. The image exists for amd64 only, so ARM machines
+  # (Apple Silicon) run it emulated; it starts more slowly there (#148).
   clamav:
     image: clamav/clamav:1.5
+    platform: linux/amd64
     restart: unless-stopped
     environment:
       # "true" keeps the scanner from downloading definitions, so it starts offline with the
