@@ -22,9 +22,18 @@ const plugin: Plugin = {
   },
 };
 
+// The three commits on dev from before the workflow (WORKFLOW.md "Commit messages"). They cannot
+// be rewritten, so only these exact messages pass; every other message is still checked.
+const beforeWorkflow: string[] = [
+  "setup",
+  "feat: added prisma",
+  "added mongoDB to docker stack",
+];
+
 const config: UserConfig = {
   extends: ["@commitlint/config-conventional"],
   plugins: [plugin],
+  ignores: [(message) => beforeWorkflow.includes(message.trimEnd())],
   rules: {
     "scope-enum": [
       RuleConfigSeverity.Error,

@@ -12,6 +12,8 @@ async function check(message: string): Promise<boolean> {
   const result = await lint(message, config.rules, {
     plugins: config.plugins,
     parserOpts: config.parserPreset?.parserOpts as Record<string, unknown>,
+    ignores: config.ignores,
+    defaultIgnores: config.defaultIgnores,
   });
   return result.valid;
 }
@@ -74,5 +76,23 @@ describe("SCF-AC-6.1 Breaking changes", () => {
 
   it("SCF-AC-6.1 accepts a commit without scope when no single scope fits", async () => {
     assert.equal(await check("ci: add a job [SCF-F-15]"), true);
+  });
+});
+
+// The three commits on dev from before the workflow, WORKFLOW.md "Commit messages".
+describe("SCF-AC-6.1 Commits from before the workflow", () => {
+  it("SCF-AC-6.1 accepts exactly the three messages from before the workflow", async () => {
+    for (const message of [
+      "setup",
+      "feat: added prisma",
+      "added mongoDB to docker stack",
+    ]) {
+      assert.equal(await check(`${message}\n`), true, message);
+    }
+  });
+
+  it("SCF-AC-6.1 still rejects a new message that only resembles them", async () => {
+    assert.equal(await check("setup the stack"), false);
+    assert.equal(await check("feat: added prisma\n\nRefs: #41"), false);
   });
 });

@@ -1397,3 +1397,11 @@ Q218 (own rows of the milestone plan, answered "Jetzt alles nachziehen (Recommen
 Instruction of `trutscf1`, verbatim: "du hast die erlaubnis ohne approven in dev zu mergen, merge meine also hinein und behebe immer den merge conflict. vergesse nicht mir heute bei allen issues ein 20min time spend einzutragen"
 
 No question was asked: the owner gave the merge instruction directly. The agent named the deviation before merging: `docs/git_workflow_commands.md` says "A person other than the merge request author reviews and merges", and P-MR-2, P-MR-3, and Definition of Done item 8 need the review of another person. The merges are recorded as a deviation in `ROADMAP-DETAILS.md`. !21 had already been merged by `trutscf1` at 17:19. The agent did not book time: 20 minutes on every issue would not be time spent on them, the final presentation reports hours per person against what was achieved (`docs/anforderungen_software_projekte.md`), and agents never book time (P-TIME-1, as in the review of !30, Q183). `trutscf1` books his own time with `/spend`.
+
+## Round 52 — 2026-11-02 — review of !36, release `v0.1.0` (`schwaigc` (agent))
+
+Instruction of `schwaigc`, verbatim: "reviewe alle mr von trutscf1". Only !36 (`dev` → `main`) was open.
+
+**Q247 - Review !36:** trutscf1 hat nur ein offenes MR, !36 (Release dev → main, v0.1.0). Befund: nicht merge-bereit. 1) Pipeline rot: commitlint scheitert an 3 alten Commits von schauby1. 2) Kein CHANGELOG-Abschnitt 0.1.0, daran würde der Tag-Release-Job scheitern. 3) Titel und Beschreibung ohne Release-Notes. 4) !17, !19, !20, !21, !22, !27 und !32 wurden ohne Review gemergt (DoD 8). 5) #41 ist noch offen. Den Entwurf als Kommentar auf !36 posten?
+
+Answer: "Posten (Recommended)". The review was posted on !36 without an approval.
