@@ -12,5 +12,6 @@ export function databaseUrl(env: Environment): string | undefined {
   }
   const user = encodeURIComponent(POSTGRES_USER);
   const password = encodeURIComponent(POSTGRES_PASSWORD);
-  return `postgresql://${user}:${password}@localhost:${POSTGRES_PORT}/${POSTGRES_DB}`;
+  const database = encodeURIComponent(POSTGRES_DB);
+  return `postgresql://${user}:${password}@localhost:${POSTGRES_PORT}/${database}`;
 }
