@@ -32,7 +32,7 @@ The vertical slices that deliver this story. One slice is delivered by the story
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
 | 1 — Schema, migrations, seed, migrating at start | SCF-AC-4.2, SCF-AC-4.3, SCF-AC-4.4, SCF-AC-4.5 | — | #41 |
-| 2 — ER diagram in Vertabelo | SCF-AC-4.1 (human step: draw the diagram of `scaffolding.md` §8 in Vertabelo, export it, embed it) | slice 1 | #SLICE2 |
+| 2 — ER diagram in Vertabelo | SCF-AC-4.1 (human step: draw the diagram of `scaffolding.md` §8 in Vertabelo, export it, embed it) | slice 1 | #151 |
 
 - **Story issue:** #41
 - **Weight:** 5 (slice 1: 4, slice 2: 1)

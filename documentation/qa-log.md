@@ -973,3 +973,29 @@ Assumptions (P-GRILL-4):
 ➡️ Story-Dateien 8/5 — applied on !22 (`concept/observability`) and on GitLab #82 and #83; asked in this round together with the questions of !27
 
 > **Answer:** Story-Dateien 8/5 (Recommended)
+
+## Round 43 — 2026-11-02 — publish the revisions of !21, !22, and !27 (`trutscf1` (agent))
+
+Rounds 41 (revise !27, this branch) and 42 (revise !21, on `concept/milestone-plan-2`) come first. Q218 was asked in this round and is logged with round 42 on `concept/milestone-plan-2`, because it changes only that branch. Assumption A75: the answer to Q219 means "stay on Prisma 8": `prisma` 8.0.0-rc.27 is a Prisma 8 version, no stable 8.0.0 exists yet, and the seven-day rule `minimumReleaseAge` of `pnpm-workspace.yaml` stays as it is.
+
+❓ **Q217** - **Veröffentlichen**: Was soll ich auf GitLab tun (Entwürfe im Scratchpad unter replies/)? Options (multi): !27 komplett / !21 komplett / !22 komplett / #82/#83 anpassen
+
+➡️ all four — issues #151 (SCF-US-4 slice 2: ER diagram in Vertabelo, blocks #109) and #152 (one folder tree per team) created in Sprint 2 for `trutscf1`; placeholders replaced; !21, !22, !27 pushed with new descriptions and replies; #82 and #83 renamed (no technology names) with weights 8 and 5
+
+> **Answer:** !27 komplett, !21 komplett, !22 komplett, #82/#83 anpassen
+
+❓ **Q218** - **!21 deine eigenen Zeilen**: see round 42
+
+> **Answer:** Jetzt alles nachziehen (Recommended)
+
+❓ **Q219** - **Prisma-Version**: Die 7-Tage-Regel (minimumReleaseAge) blockiert rc.28/rc.29. Bleibt es bei rc.27? Options: rc.27 lassen (Recommended) / Ausnahme für Prisma
+
+➡️ A75 — `prisma` 8.0.0-rc.27 with `@prisma/orm-postgres` 8.0.0-rc.20 stays (ADR-0006); the seven-day rule is not changed
+
+> **Answer:** nutze prisma 8
+
+❓ **Q220** - **Laufwerk C: voll**: (0,01 GB frei): Docker hängt deshalb. Wie vorgehen? Options: Verbraucher auflisten (Recommended) / Ich kümmere mich selbst
+
+➡️ Verbraucher auflisten — read-only list of the largest consumers for `trutscf1`; nothing deleted without a decision
+
+> **Answer:** Verbraucher auflisten (Recommended)

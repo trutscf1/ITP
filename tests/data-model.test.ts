@@ -101,7 +101,7 @@ describe("SCF-AC-4.1 ER diagram", () => {
   it(
     "SCF-T-18 the diagram drawn in Vertabelo is embedded as an export [SCF-F-22]",
     {
-      todo: "slice 2 of SCF-US-4 (#SLICE2): draw the diagram of §8 in Vertabelo and embed the export",
+      todo: "slice 2 of SCF-US-4 (#151): draw the diagram of §8 in Vertabelo and embed the export",
     },
     () => {
       assert.ok(

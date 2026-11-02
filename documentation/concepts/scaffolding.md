@@ -233,7 +233,7 @@ Every unit serves its health endpoint internally at `/health` on its internal po
 
 The entity-relationship diagram of [SCF-F-22] (Q24). Its text form below is binding for the schema definition of [SCF-F-23]: the acceptance tests compare the two table by table and column by column ([SCF-T-18], [SCF-T-19]). Types are the database's own column types; `PK` is the primary key, `FK` a foreign key, `UK` a unique column. Later features extend the model with migrations of their own and update this diagram in the same merge request.
 
-> **Human step (open):** the diagram has to be drawn in Vertabelo, the tool the school prescribes ([SCF-C-21]), exported as PNG to `documentation/images/er-diagram.png`, and embedded here. This is slice 2 of [SCF-US-4] (#SLICE2, `qa-log.md` Q213). Until then the text form is the draft, and the acceptance test of the export is marked as open (`todo`) in [SCF-T-18].
+> **Human step (open):** the diagram has to be drawn in Vertabelo, the tool the school prescribes ([SCF-C-21]), exported as PNG to `documentation/images/er-diagram.png`, and embedded here. This is slice 2 of [SCF-US-4] (#151, `qa-log.md` Q213). Until then the text form is the draft, and the acceptance test of the export is marked as open (`todo`) in [SCF-T-18].
 
 ```mermaid
 erDiagram
