@@ -4,8 +4,8 @@
 // plural snake_case as the SQL style guide demands.
 //
 // After a change (never edit an applied migration, SCF-F-23):
-//   pnpm --filter @stash/db exec prisma contract emit
-//   pnpm --filter @stash/db exec prisma migration plan --name <snake_slug>
+//   pnpm --filter @stash/db run contract:emit
+//   pnpm --filter @stash/db run migration:plan <snake_slug>
 
 enum team_role {
   @@type("pg/text@1")

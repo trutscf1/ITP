@@ -16,8 +16,7 @@
     "test": "node --test \"src/**/*.test.ts\"",
     "contract:emit": "prisma contract emit",
     "migration:plan": "prisma migration plan --name",
-    "migrate": "prisma db migrate",
-    "migrate:deploy": "prisma db migrate --show && prisma db migrate",
+    "migrate": "prisma db migrate --show && prisma db migrate",
     "seed": "node src/seed.ts"
   },
   "dependencies": {

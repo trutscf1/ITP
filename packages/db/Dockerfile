@@ -17,4 +17,4 @@ RUN pnpm install --frozen-lockfile --filter @stash/db...
 
 ENV CI=1 PRISMA_DISABLE_TELEMETRY=1
 WORKDIR /app/packages/db
-CMD ["pnpm", "run", "migrate:deploy"]
+CMD ["pnpm", "run", "migrate"]

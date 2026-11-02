@@ -50,15 +50,15 @@ function prisma(url: string, ...args: string[]) {
   return { status: run.status, output: `${run.stdout}${run.stderr}` };
 }
 
-/** The command of the migrating service (`migrate:deploy`), split at `&&` like the shell does. */
-function migrateDeploy(url: string) {
+/** The command of the migrating service (`migrate`), split at `&&` like the shell does. */
+function migrate(url: string) {
   const scripts = (
     JSON.parse(readFileSync(join(dbPackage, "package.json"), "utf8")) as {
       scripts: Record<string, string>;
     }
   ).scripts;
   let output = "";
-  for (const command of (scripts["migrate:deploy"] ?? "").split("&&")) {
+  for (const command of (scripts.migrate ?? "").split("&&")) {
     const [, ...args] = command.trim().split(/\s+/);
     const run = prisma(url, ...args);
     output += run.output;
@@ -108,7 +108,7 @@ async function query<R extends pg.QueryResultRow>(
 
 async function migratedDatabase(): Promise<string> {
   const url = await emptyDatabase();
-  const run = migrateDeploy(url);
+  const run = migrate(url);
   assert.equal(run.status, 0, run.output);
   return url;
 }
@@ -198,7 +198,7 @@ describe("SCF-AC-4.4 Seed data", { skip }, () => {
 describe("SCF-AC-4.5 Migrations at start", { skip }, () => {
   it("SCF-T-22 the command of the migrating service applies every migration to an empty database [SCF-F-26]", async () => {
     const url = await emptyDatabase();
-    const run = migrateDeploy(url);
+    const run = migrate(url);
     assert.equal(run.status, 0, run.output);
     const status = prisma(url, "db", "verify");
     assert.equal(status.status, 0, status.output);
@@ -208,7 +208,7 @@ describe("SCF-AC-4.5 Migrations at start", { skip }, () => {
     const url = await emptyDatabase();
     // A table in the way: the first migration cannot add its foreign keys.
     await query(url, "CREATE TABLE teams (x integer)");
-    const run = migrateDeploy(url);
+    const run = migrate(url);
     assert.notEqual(run.status, 0, "the command succeeded");
     assert.match(run.output, /create_relational_schema/);
     assert.match(run.output, /MIGRATION\.EXECUTION_FAILED/);

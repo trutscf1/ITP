@@ -582,13 +582,13 @@ migrations             chain of migration packages, the first from the empty dat
                        each created by the planning command from the schema definition.
                        The first one also creates the trigger of [SCF-F-24]:
                          after insert on auth_users: insert users(auth_user_id = new.id)
-migrate:deploy         list the pending migrations; apply them in one transaction;
+migrate                list the pending migrations; apply them in one transaction;
                        exit 0, or exit non-zero with the failed operation ([SCF-E-7])
 seed(databaseUrl)      in one transaction, insert the rows of §10, example 8,
                        each "on conflict do nothing"; the users row follows from the trigger
 client(databaseUrl)    database client typed by the schema definition, for the units
 container db-migrate   build: workspace with this package's dependencies;
-                       run migrate:deploy against DATABASE_URL, then exit
+                       run migrate against DATABASE_URL, then exit
 ```
 
 ### Pipeline Flow

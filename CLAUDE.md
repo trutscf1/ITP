@@ -100,6 +100,6 @@ npx markdownlint-cli2 "documentation/**/*.md"           # markdown lint
 
 ## Tooling notes
 
-- Prisma 8 migrations are created only from the contract in `packages/db`: `pnpm --filter @stash/db exec prisma contract emit`, then `pnpm --filter @stash/db exec prisma migration plan --name <snake_slug>`; they are applied with `pnpm db:migrate`. Applied migrations are never edited. Prisma 8 has no `migrate dev` or `migrate deploy` (`documentation/STACK.md` §3).
+- Prisma 8 migrations are created only from the contract in `packages/db`, through its package scripts: `pnpm --filter @stash/db run contract:emit`, then `pnpm --filter @stash/db run migration:plan <snake_slug>`; they are applied with `pnpm db:migrate` (the script `migrate`). Applied migrations are never edited. Prisma 8 has no `migrate dev` or `migrate deploy` (`documentation/STACK.md` §3).
 - `pnpm-lock.yaml` conflicts are resolved by `pnpm install`, never by hand.
 - Secrets live in `.env` (ignored); every new variable goes into `.env.example` in the same commit.

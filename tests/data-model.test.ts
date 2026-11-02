@@ -205,14 +205,14 @@ describe("SCF-AC-4.5 Migrations at start", () => {
     assert.equal(dependsOn?.postgres?.condition, "service_healthy");
 
     const dockerfile = readFileSync(join(dbPackage, "Dockerfile"), "utf8");
-    assert.match(dockerfile, /CMD \["pnpm", "run", "migrate:deploy"\]/);
+    assert.match(dockerfile, /CMD \["pnpm", "run", "migrate"\]/);
     const scripts = (
       JSON.parse(readFileSync(join(dbPackage, "package.json"), "utf8")) as {
         scripts: Record<string, string>;
       }
     ).scripts;
     assert.equal(
-      scripts["migrate:deploy"],
+      scripts.migrate,
       "prisma db migrate --show && prisma db migrate",
     );
   });
