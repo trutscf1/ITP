@@ -809,3 +809,105 @@ After the merges of !24 and !5 by `trutscf1`: `dev` merged into !7 (`qa-log.md` 
 ➡️ This MR changes neither `next` nor an image; a red `dependency-audit` or `container-scan` caused only by `dev` is accepted for now and named in the MR description (instruction of the main session of 2026-10-27)
 
 > **Answer:** In diesem MR nichts ändern (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+## Round 30 — 2026-10-27 — delivery (`trutscf1` (agent), revise !17 after the review of `schwaigc`)
+
+`schwaigc` requested changes on !17 (SCF-US-2 slice 1, #39) on 2026-10-20: the container scan fails, conflicts with `dev`, the `web` image must be marked as a stop-gap, the health check of `web`, and the image pins. No question was asked: each one below was decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions); the answer is the recommended option.
+
+❓ **Q90** - **Image findings without a fixed image**: After moving every image to the newest tag of a pinned minor version, findings remain that no published image fixes yet (Go standard library in gosu and caddy, brotli and curl packages released after the images were built, Jackson and Jetty in the unused Nouveau server of couchdb). How to handle them? Options: `.trivyignore` with reason and expiry 2026-11-23 / Drop the affected services / Let the container scan fail
+
+➡️ `.trivyignore` with reason and expiry 2026-11-23 — same expiry as the existing entries (end of Sprint 2); this delivers SCF-AC-2.5
+
+> **Answer:** `.trivyignore` with reason and expiry 2026-11-23 (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q91** - **Container scan stops at the first image**: The job ended at couchdb and never scanned the images after it. Change the job? Options: Scan every image, then fail / Keep it
+
+➡️ Scan every image, then fail — one run lists all findings
+
+> **Answer:** Scan every image, then fail (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q92** - **Dependency audit fails on next 16.3.8**: Bump Next.js in !17? Options: No, the separate security MR does it / Yes, in !17
+
+➡️ No, the separate security MR does it — the coordinator assigned the Next.js update and the gosu tag of `postgres` to the branch `fix/next-and-image-security-2026-10-27`; !17 gets it with `dev`
+
+> **Answer:** No, the separate security MR does it (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q93** - **Close #103 with !17?** SCF-AC-2.5 is met by the green container scan (SCF-T-10); SCF-AC-2.3 is met by the configuration tests, but SCF-T-8 (start with the network disconnected) has not run. Options: Keep #103 open until SCF-T-8 has run / Close #103 now
+
+➡️ Keep #103 open until SCF-T-8 has run — the MR delivers SCF-AC-2.5 and names SCF-T-8 as the one open check
+
+> **Answer:** Keep #103 open until SCF-T-8 has run (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q94** - **Example for `DATABASE_URL`** (inbox, review of !1 to !3): where? Options: Commented line in `.env.example` and one line in the README quick start / Own `apps/web/.env.example`
+
+➡️ Commented line in `.env.example` and one line in the README quick start — the quick start stays within 30 lines (SCF-AC-1.5)
+
+> **Answer:** Commented line in `.env.example` and one line in the README quick start (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+## Round 31 — 2026-10-27 — delivery (`trutscf1` (agent), implement #138, doc-check rule `AC-TEST`)
+
+Decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions); each question names the options and the chosen one, the recommendation of the agent.
+
+❓ **Q140** - **Schwere von AC-TEST**: Wann ist ein Akzeptanzkriterium ohne Test mit seiner ID ein Fehler, damit `dev` grün bleibt? Options: Nach Stand und MR-Slice / Immer Fehler / Immer Warnung
+
+➡️ Nach Stand und MR-Slice — error once the feature is `in dev` or `released`, and for the criteria the MR's slice delivers (`--pending-branch feature/<n>-…` and `#<n>` in the slice's _Issue_ cell); warning while the feature is `in progress`; nothing for `idea`, `concept`, `ready`. Story files carry no status, and the merge history names stories, not slices (a slice MR names its story), so the merge history is not used; merged slices of a feature in progress show as warnings on `dev`
+
+> **Answer:** decided by the agent: Nach Stand und MR-Slice (Recommended)
+
+❓ **Q141** - **Was zählt als Testname**: Options: Erster String von describe/it/test/suite in Testdateien / Jede Erwähnung der ID in Testdateien / Nur it/test
+
+➡️ Erster String von describe/it/test/suite in Testdateien — `*.test.*` and `*.spec.*` under `tests/`, `apps/`, `packages/`, also `test.describe` and `.only`; not `.skip`, `.todo`, comments, or other strings; `node_modules`, build output, and dot folders are skipped
+
+> **Answer:** decided by the agent: Erster String von describe/it/test/suite in Testdateien (Recommended)
+
+❓ **Q142** - **Ausnahme**: Darf eine Untested-Begründung im Konzept (§17, _ID, Reason_) ein Kriterium vom Fehler befreien? Options: Senkt auf Warnung / Keine Ausnahme / Hebt die Meldung auf
+
+➡️ Senkt auf Warnung — the gap stays visible, and an MR written before Definition of Done item 16 can still pass with a written reason
+
+> **Answer:** decided by the agent: Senkt auf Warnung (Recommended)
+
+❓ **Q143** - **Issue ohne AC-IDs**: #138 hat keine Akzeptanzkriterien mit IDs und keine Story-Datei. Options: Kriterien im MR entwerfen, Commits mit [no-req] / Story-Datei anlegen / Ohne Kriterien
+
+➡️ Kriterien im MR entwerfen, Commits mit [no-req] — the MR description holds the drafted criteria for the issue description; the tests name the rule instead of an `AC` ID
+
+> **Answer:** decided by the agent: Kriterien im MR entwerfen, Commits mit [no-req] (Recommended)
+
+❓ **Q144** - **Definition of Done 15 und 16**: Die Punkte stehen erst in !15 (nicht auf `dev`). Options: Punkt 1 und CI/CD hier, Punkt 16 nach dem zweiten Merge / Auf !15 aufsetzen / Punkte hier anlegen
+
+➡️ Punkt 1 und CI/CD hier, Punkt 16 nach dem zweiten Merge — this MR names the rule in item 1 and in "CI/CD"; whichever of !15 and this MR is merged second drops "once built; until then the reviewer checks it by hand" from item 16
+
+> **Answer:** decided by the agent: Punkt 1 und CI/CD hier, Punkt 16 nach dem zweiten Merge (Recommended)
+
+## Round 35 — 2026-10-27 — delivery (`trutscf1`, agent: regeneration probe #127)
+
+Regeneration probe of sprint 1 (ADR-0005, `WORKFLOW.md` "Sprint cycle", step 5) for the contracts package of SCF-US-3, on the base `feature/40-shared-contracts` at `efa98916f`. The package was deleted and rebuilt from `concepts/scaffolding.md`, `STACK.md`, the track plans, the story file, and `tests/` only, then compared with the original. Every question below was decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions), each with the recommended option.
+
+❓ **Q186** - **Keep `package.json` and `tsconfig.json` of the package?** `STACK.md` §2 and the tests fix the name, the pinned versions, and the scripts `openapi:generate` and `build`, but not the exports, the module type, or the compiler options. Options: Delete and regenerate them too (Recommended) / Keep them
+
+➡️ Deleted and regenerated; the lockfile stayed unchanged, so the dependencies equal the original's. The manifest differs only in the order of its scripts, `tsconfig.json` only in an option without effect on the output (`erasableSyntaxOnly` instead of `allowImportingTsExtensions`); no gap
+
+> **Answer:** Delete and regenerate them too (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q187** - **Configuration helper in this probe?** Concept §16 counts the configuration helper to the contracts core, the story SCF-US-3 does not name it, and the traceability matrix puts SCF-F-11 under SCF-US-2. Options: Leave it out, as the story's scope, and state the scope in the story file (Recommended) / Build it as well
+
+➡️ Left out; the original holds no helper either. The story file now states the scope of the package in SCF-US-3
+
+> **Answer:** Leave it out and state the scope (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q188** - **Where do the export names and the content of the generated description go?** Options: `STACK.md` §2, next to `errorReplies` and `toErrorResponse` that stand there already (Recommended) / A new section in concept §16
+
+➡️ `STACK.md` §2: the list of exports and the content of the description (version, title, path, responses, components, examples); concept §8 gets "non-empty" for `name`, `version`, and `message`
+
+> **Answer:** `STACK.md` §2 (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q189** - **`@nimbus/contracts` in SCF-AC-3.1**: The criterion names a package the test does not accept; the correction was listed in `scaffolding.track-web.md` but never made. Options: Correct the story file and the copy in issue #40 (Recommended) / Leave it to the list of the Web track
+
+➡️ Story file corrected to `@stash/contracts`, the note in `STACK.md` §2 removed; the copy of SCF-AC-3.1 in the description of #40 is still to be updated (the agent was not permitted to edit the issue); the entry in the list of `scaffolding.track-web.md` (owner `schwaigc`) and `DSA-AC-1.1` (`@nimbus/ui`) stay for their owners
+
+> **Answer:** Correct the story file and the copy in #40 (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
+
+❓ **Q190** - **Where do the fixes go?** Options: Branch `docs/127-regeneration-probe-contracts` from `feature/40-shared-contracts`, MR into that branch, reviewer `schwaigc`; the regenerated code is discarded (Recommended) / Push to `feature/40-shared-contracts` directly
+
+➡️ Own branch and MR into `feature/40-shared-contracts` (instruction of the main session); only documents are committed
+
+> **Answer:** Own branch and MR (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)

@@ -1,0 +1,13 @@
+.git
+.claude
+**/node_modules
+**/.next
+**/dist
+.turbo
+.trivy-cache
+.pnpm-store
+.env
+.env.*
+!.env.example
+documentation
+docs

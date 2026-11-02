@@ -33,10 +33,12 @@ The vertical slices that deliver this story. One slice is delivered by the story
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
-| 1 — Data services, reverse proxy, and `web` start with one command | SCF-AC-2.2, SCF-AC-2.4 | — | #39 |
+| 1 — Data services, reverse proxy, and `web` start with one command | SCF-AC-2.2, SCF-AC-2.4 (SCF-AC-2.1 for the services that run today) | — | #39 |
 | 2 — Offline start and image scan | SCF-AC-2.3, SCF-AC-2.5 | 1 | #103 |
-| 3 — All units in the stack | SCF-AC-2.1 | 1, and the issue that makes each unit runnable | — |
+| 3 — All units in the stack | SCF-AC-2.1 (complete) | 1, and the issue that makes each unit runnable | — |
 | 4 — Configuration check and native start | SCF-AC-2.6, SCF-AC-2.7 | 1 | — |
+
+**Temporary `web` image.** Slice 1 builds `web` from `docker/web.Dockerfile`, a stop-gap accepted in the review of !17 so that `docker compose up` starts `web` before its owner's build exists. It ships the whole repository with its development dependencies and is not meant for a deployment; nobody builds on it. M9 (container build) of the [track plan Web](../../concepts/scaffolding.track-web.md) replaces it with `apps/web/Dockerfile` in slice 1 of SCF-US-8, deletes the stop-gap, and moves the health check of `web` from `/` to `/health`.
 
 - **Story issue:** #39
 - **Weight:** 5 (slice 1: 3, slice 2: 2; slices 3 and 4 not estimated yet)

@@ -19,7 +19,7 @@ One user story of [Scaffolding & shared contracts](feature.md) and the acceptanc
 
 | ID | Title | Given | When | Then |
 | --- | --- | --- | --- | --- |
-| SCF-AC-3.1 | Contracts package | The package `@nimbus/contracts` | A developer adds a request or response | Its Zod schema (Zod ≥ 4) lives in a file of its own in that package |
+| SCF-AC-3.1 | Contracts package | The package `@stash/contracts` | A developer adds a request or response | Its Zod schema (Zod ≥ 4) lives in a file of its own in that package |
 | SCF-AC-3.2 | Same schema on both sides | A form in the client and its API endpoint on the server | Both validate input | They import the same schema |
 | SCF-AC-3.3 | Generated OpenAPI | The contracts package | The OpenAPI specification is generated with `zod-to-openapi` | It is served at `/api/docs` |
 | SCF-AC-3.4 | Uniform error format | Any API endpoint | A request fails | The error response follows one common format without internal details (no stack trace, no SQL) |
@@ -34,6 +34,8 @@ The vertical slices that deliver this story. One slice is delivered by the story
 | 1 — whole story | SCF-AC-3.1, SCF-AC-3.2, SCF-AC-3.3, SCF-AC-3.4, SCF-AC-3.5 | — | #40 |
 
 Slice 1 arrives in two merge requests: the contracts package with the schemas, the error format, and the generation command (track Contracts, storage & worker), then the route `/api/docs` that serves the generated file (track Web, module M6 of [scaffolding.track-web.md](../../concepts/scaffolding.track-web.md)). #40 is closed with the second one.
+
+Scope of the contracts package in this story: the schemas of the HealthReport and the ErrorResponse (concept §8), the error replies, and the generation command. The configuration helper of the contracts core (concept §16) is not part of it; it comes with [SCF-F-11] (configuration validation) of SCF-US-2. The package's exports and the content of the generated description stand in `STACK.md` §2.
 
 - **Story issue:** #40
 - **Weight:** 3
