@@ -1019,3 +1019,9 @@ Question numbers continue after Q203, the highest number on any open branch (Q18
 No question asked in this round; provisional round number (P-TEAM-5). The review of `schwaigc` (2026-10-27, re-checked 2026-10-29) found that the Sprint 2 row and `team/schwaigc/STATUS.md` disagree with the GitLab milestones. Checked on GitLab on 2026-11-02: #109 and #2 are in Sprint 3, #112 in Sprint 5, the concept R4 (#116) belongs to `schwaigc` and the concept R5 (#117) to `schauby1`, both in Sprint 2. The milestone due dates on GitLab match the sprint table in `WORKFLOW.md`.
 
 Assumption A69: the plan follows GitLab, as `schwaigc` prefers. The Sprint 2 row drops #109 and #2 and names the concepts R4 (`schwaigc`) and R5 (`schauby1`); the Sprint 3 row lists #109 and #2; the STATUS line of `schwaigc` says "#109 and #2 carried over to Sprint 3, #112 to Sprint 5". Recounted from GitLab for `schwaigc`: Sprint 2 15 points (was 16), Sprint 3 17 (was 16); the team's Sprint 2 load is 69 against 44, the total stays 297 against 276.
+
+❓ **Q218** - **!21 deine eigenen Zeilen**: #78, #81, #107 sind auf GitLab in Sprint 3 (Plan: Sprint 2), #79/#80 in Sprint 4 (Plan: Sprint 3); die ganze Lasttabelle ist seit 20.10. veraltet. Was tun? Options: Jetzt alles nachziehen (Recommended) / Nur deine Zeilen / Bei Sprint-2-Planung
+
+➡️ Jetzt alles nachziehen — every sprint row of `ROADMAP.md` follows the GitLab milestones of 2026-11-02 for all four people; `team/trutscf1/STATUS.md` names Sprint 3 for #78, #81, #107 and Sprint 4 for #79, #80; the whole load table is recounted as of 2026-11-02: 288 points against 276 (was 297), Sprint 2 65 against 44, Sprint 4 37 against 24
+
+> **Answer:** Jetzt alles nachziehen (Recommended)

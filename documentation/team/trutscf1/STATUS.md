@@ -22,7 +22,7 @@ Session positions of one developer (P-TEAM-3). Precise enough that a fresh sessi
 | Offline mode: installable web app with sync and conflict handling (R12) | [concepts/offline-mode.md](../../concepts/offline-mode.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human offline-mode` |
 | Load tests & operations dashboards (R13) | [concepts/load-tests.md](../../concepts/load-tests.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human load-tests` |
 
-Sprint 1 (until 2026-11-02): #108 (carried over to Sprint 2: #78, #81, #107; shared: #38, #39, #40, #85). Next: Sprint 2 OBS-US-1/-2 (#82, #83) and the `AC-TEST` rule; plan in `ROADMAP.md`, chapter "Milestones".
+Sprint 1 (until 2026-11-02): #108 done; still open in Sprint 1: #126 (release v0.1.0), #127 (regeneration probe), #147 (this milestone plan); #78, #81, #107 carried over to Sprint 3, #79, #80 planned in Sprint 4 (GitLab milestones; shared: #38, #39, #40, #85). Next: Sprint 2 OBS-US-1/-2 (#82, #83) and the `AC-TEST` rule; plan in `ROADMAP.md`, chapter "Milestones".
 
 Tooling (state after the merge of `feature/138-doc-check-ac-test`): #138 done — `tools/doc-check.mjs` rule `AC-TEST` checks that every acceptance criterion has a test name carrying its ID (`MANIFEST.md`, "What the script checks"). Open: drop "once built; until then the reviewer checks it by hand" from Definition of Done item 16 once both this MR and !15 are on `dev` (`qa-log.md` Q144).
 
