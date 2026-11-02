@@ -74,7 +74,7 @@ The metrics, log entries, and traces a unit reports about its own running behavi
 *Avoid*: monitoring data, analytics
 
 **Observability stack**:
-The containers that collect, keep, and show telemetry: a collector, a metric store, a log store, a trace store, and a dashboard tool. It is infrastructure of the local stack, not a unit, and starts only when requested.
+The containers that collect, keep, and show telemetry: a collector, a metric store, a log store, a trace store, and a dashboard tool. It is infrastructure of the local stack, not a unit, and starts with it unless an operator switches its profile off.
 *Avoid*: monitoring stack, observability service
 
 **Trace**:

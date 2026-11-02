@@ -55,6 +55,7 @@ Every capability of `concepts/scaffolding.md` §7, `concepts/public-content.md` 
 | OBS-C-4 | Log store | section 1 | `trutscf1` |
 | OBS-C-5 | Trace store | section 1 | `trutscf1` |
 | OBS-C-6 | Dashboard tool | section 1 | `trutscf1` |
+| OBS-C-7 | Session check in the reverse proxy | section 1 | `trutscf1` |
 
 ## 1. Platform — `trutscf1`
 
@@ -74,7 +75,8 @@ Every capability of `concepts/scaffolding.md` §7, `concepts/public-content.md` 
 | OBS-C-3 metric store | Prometheus with its OTLP receiver; alert rules as Prometheus rule files rendered by the configuration step; offline rule test with `promtool test rules` | Prometheus 3.x, exact image tag pinned | Retention by `--storage.tsdb.retention.time` from `OBS_METRICS_RETENTION_DAYS`. Memory limit 384 MB. Alert rules are data-source managed and read-only in Grafana. |
 | OBS-C-4 log store | Grafana Loki with OTLP ingestion; labels `service_name` and `level` | Loki 3.x, exact image tag pinned | Retention by the compactor from `OBS_LOGS_RETENTION_DAYS`. Memory limit 320 MB. |
 | OBS-C-5 trace store | Grafana Tempo with OTLP ingestion | Tempo 2.x, exact image tag pinned | Block retention from `OBS_TRACES_RETENTION_DAYS`. Memory limit 256 MB. |
-| OBS-C-6 dashboard tool | Grafana with file provisioning of data sources, dashboards (`allowUiUpdates: false`), served from the sub-path `/observability` | Grafana ≥ 12, exact image tag pinned | `auth.anonymous` off, `users.allow_sign_up` off, brute-force login protection on, `analytics.reporting_enabled` and `check_for_updates` off, no plugins installed at start; admin from `OBS_ADMIN_USER` and `OBS_ADMIN_PASSWORD`. Data source links: Loki derived field `traceId` → Tempo, Tempo trace-to-logs → Loki. Memory limit 256 MB; configuration step (`node:24-alpine`) 64 MB — 1472 MB in total (OBS-NF-8). Every image must pass the image scan (SCF-NF-6). |
+| OBS-C-6 dashboard tool | Grafana with file provisioning of data sources and dashboards, served from the sub-path `/observability`, authentication by proxy header (`auth.proxy`) | Grafana ≥ 12, exact image tag pinned in slice 1 of OBS-US-1 | Settings for OBS-F-9 (`allowUiUpdates: false`), OBS-F-10 and OBS-F-27 (`auth.proxy` with the header of OBS-C-7; `auth.anonymous` with role Viewer only while OBS-F-24 binds the port to `127.0.0.1`; `disable_login_form`, `users.allow_sign_up` off), OBS-NF-1 (`analytics.reporting_enabled`, `check_for_updates` off, no plugins). Links of OBS-F-7: Loki derived field `traceId` → Tempo, Tempo trace-to-logs → Loki. Memory limit 256 MB; configuration step (`node:24-alpine`) 64 MB — 1472 MB in total (OBS-NF-8). The images of the profile are scanned by `container-scan` (#149, SCF-NF-6). |
+| OBS-C-7 session check in the reverse proxy | Caddy `forward_auth` to the session check of `identity` | `caddy:2.11-alpine` (SCF-C-6) | For OBS-F-27: header `X-Stash-Operator`, removed from every incoming request; active with TLS (R14). The address in `identity` is set by R3. |
 
 Module mapping (folder layout), set by #38:
 

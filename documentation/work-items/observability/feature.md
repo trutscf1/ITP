@@ -19,5 +19,5 @@ The parent work item of this feature: its user stories in the order they are bui
 
 In dependency order; each file holds the story, its acceptance criteria, and its slices.
 
-1. [OBS-US-1 OpenTelemetry instrumentation](OBS-US-1-opentelemetry-instrumentation.md) — every unit delivers metrics, log entries, and traces, without data that identifies a person
-2. [OBS-US-2 Grafana dashboards and alerts](OBS-US-2-grafana-dashboards-and-alerts.md) — operations dashboards and four alert rules behind a login
+1. [OBS-US-1 Telemetry of every unit](OBS-US-1-telemetry-of-every-unit.md) — every unit delivers metrics, log entries, and traces, without data that identifies a person
+2. [OBS-US-2 Operations dashboards and alerts](OBS-US-2-operations-dashboards-and-alerts.md) — operations dashboards and four alert rules behind the login of `identity`
