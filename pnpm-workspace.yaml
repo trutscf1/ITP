@@ -1,0 +1,18 @@
+packages:
+  - apps/*
+  - packages/*
+  - tests
+
+# Supply-chain hardening, required by the code scan (Semgrep p/nodejs, SCF-F-15):
+# no dependencies from git URLs or tarballs below the direct ones, no downgrade of a package's
+# trust level, and new versions only after seven days. An urgent security update younger than
+# that goes into minimumReleaseAgeExclude with a comment.
+blockExoticSubdeps: true
+trustPolicy: no-downgrade
+minimumReleaseAge: 10080
+
+# semver 6.3.1 (2023, the maintenance line used by Babel, which Storybook needs) has no
+# provenance, while an earlier release had; pnpm reads that as a trust downgrade. Reviewed
+# 2026-10-13: an old, widely used release, not a new publication. Exactly this version only.
+trustPolicyExclude:
+  - semver@6.3.1

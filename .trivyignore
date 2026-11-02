@@ -1,0 +1,84 @@
+# Known high and critical vulnerabilities in the third-party images of docker-compose.yml that
+# this repository cannot fix itself (SCF-AC-5.3). Every entry needs a reason and expires at the
+# end of Sprint 2; after that the container scan fails again until the image is replaced or the
+# entry is renewed with a new reason. SCF-US-2 slice 2 (#103, SCF-AC-2.5) moved every image to the
+# newest tag of its pinned version on 2026-10-27; the entries below are those no image fixes yet.
+# Found with Trivy 0.69.3 on 2026-10-13 and 2026-10-27, unfixed vulnerabilities are not reported
+# (--ignore-unfixed).
+
+# gosu in postgres:18-alpine and mongo:8.0 is built with an old Go standard library (and
+# golang.org/x/net); gosu only drops root privileges at container start and opens no network
+# connection. Upstream must rebuild it.
+CVE-2025-61726 exp:2026-11-23
+CVE-2025-61729 exp:2026-11-23
+CVE-2025-68121 exp:2026-11-23
+CVE-2026-25679 exp:2026-11-23
+CVE-2026-27145 exp:2026-11-23
+CVE-2026-32280 exp:2026-11-23
+CVE-2026-32281 exp:2026-11-23
+CVE-2026-32283 exp:2026-11-23
+CVE-2026-33811 exp:2026-11-23
+CVE-2026-33814 exp:2026-11-23
+CVE-2026-33818 exp:2026-11-23
+CVE-2026-39820 exp:2026-11-23
+CVE-2026-39821 exp:2026-11-23
+CVE-2026-39822 exp:2026-11-23
+CVE-2026-39836 exp:2026-11-23
+CVE-2026-42499 exp:2026-11-23
+CVE-2026-42504 exp:2026-11-23
+CVE-2026-56853 exp:2026-11-23
+CVE-2026-56858 exp:2026-11-23
+CVE-2026-56859 exp:2026-11-23
+CVE-2026-56860 exp:2026-11-23
+CVE-2026-56862 exp:2026-11-23
+CVE-2026-78667 exp:2026-11-23
+CVE-2026-78669 exp:2026-11-23
+CVE-2026-97031 exp:2026-11-23
+# Added 2026-10-27 (Trivy DB of that day): gosu 1.19 is built with Go 1.24.6 (crypto/x509, fixed in
+# Go 1.26.10 / 1.27.3). gosu 1.20 (2026-10-25) is not yet in any official postgres:18 (trixie, bookworm,
+# alpine) or mongo:8.0 image, so no newer clean tag exists; gosu opens no TLS connection and verifies no certificate.
+CVE-2026-111943 exp:2026-11-23
+
+# js-yaml in the Node.js tools bundled with mongo:8.0 (mongosh); the stack does not run mongosh.
+# Upstream must update it.
+CVE-2026-59869 exp:2026-11-23
+CVE-2026-84375 exp:2026-11-23
+GHSA-5p4m-2wfm-xmqj exp:2026-11-23
+
+# Go standard library (crypto/x509, certificate chains with untrusted intermediates) in gosu of
+# postgres:18-alpine and mongo:8.0 and in the caddy binary of caddy:2.11-alpine, the newest tags
+# on 2026-10-27; the fix needs a rebuild with Go 1.26.10. gosu opens no network connection, and
+# the local proxy serves plain HTTP and verifies no client or upstream certificate (TLS comes
+# with R14). Upstream must rebuild the images.
+CVE-2026-111943 exp:2026-11-23
+
+# brotli decoder (brotli-libs, libbrotli1) and curl/libcurl (HTTP/2 upload) in postgres:18-alpine,
+# couchdb:3.5, and caddy:2.11-alpine: the fixed Alpine and Debian packages came out after the
+# newest tags were built (2026-10-21 to 2026-10-26). The libraries are only pulled in by curl;
+# the stack runs locally, its health checks use curl only against 127.0.0.1, and no service
+# uploads over HTTP/2 or decodes brotli data from outside. Upstream must rebuild the images.
+CVE-2026-111497 exp:2026-11-23
+CVE-2026-92392 exp:2026-11-23
+
+# Jackson and Jetty in the Nouveau search server bundled with couchdb:3.5 (opt/couchdb/nouveau);
+# 3.5.3 of 2026-10-21 is the newest release and still ships them. CouchDB does not start Nouveau
+# (it is off by default, and the stack neither enables nor runs it), so the Java code is never
+# executed. Upstream must update the bundled libraries.
+CVE-2026-68494 exp:2026-11-23
+CVE-2026-89407 exp:2026-11-23
+CVE-2026-89425 exp:2026-11-23
+CVE-2026-54512 exp:2026-11-23
+CVE-2026-54513 exp:2026-11-23
+CVE-2026-68497 exp:2026-11-23
+CVE-2026-91776 exp:2026-11-23
+CVE-2026-91777 exp:2026-11-23
+CVE-2026-2332 exp:2026-11-23
+CVE-2026-10050 exp:2026-11-23
+# Added 2026-10-28: Guava (denial of service) in the same Nouveau server; fixed in Guava 33.7.2.
+CVE-2026-102554 exp:2026-11-23
+
+# go-jose v4.1.5 (denial of service when parsing JWKs with RSA keys) in the weed binary of
+# chrislusf/seaweedfs:4.51 and the caddy binary of caddy:2.11-alpine, found on 2026-10-28; fixed
+# in go-jose 4.1.6. Both services listen only on 127.0.0.1 in the local stack and parse no JWKs
+# from outside. Upstream must rebuild the images.
+CVE-2026-116587 exp:2026-11-23

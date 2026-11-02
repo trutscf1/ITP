@@ -1,0 +1,16 @@
+{
+  "name": "@stash/config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "tsconfig.base.json"
+  ],
+  "scripts": {
+    "dev": "node -e \"console.log('nothing to watch')\"",
+    "build": "node -e \"console.log('nothing to build')\"",
+    "lint": "biome check .",
+    "typecheck": "node -e \"console.log('nothing to check')\"",
+    "test": "node -e \"console.log('nothing to test')\""
+  }
+}

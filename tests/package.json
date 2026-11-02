@@ -1,0 +1,20 @@
+{
+  "name": "@stash/tests",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --test --watch \"**/*.test.ts\"",
+    "build": "node -e \"console.log('nothing to build')\"",
+    "lint": "biome check .",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test \"**/*.test.ts\""
+  },
+  "devDependencies": {
+    "@stash/config": "workspace:*",
+    "@stash/db": "workspace:*",
+    "@types/node": "^24",
+    "@types/pg": "8.20.4",
+    "pg": "8.22.0"
+  }
+}

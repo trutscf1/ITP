@@ -1,6 +1,13 @@
+---
+doc: concept
+format: legacy   # pre-engineering-human section numbers; migrated on the next change (P-DOC-5, ADR-0002)
+title: "Scaffolding & shared contracts"
+audience: [product, developer, reviewer, agent]
+id-prefix: "SCF"
+---
 # R1 Track: Platform & cms — Fabian Trutschnig
 
-Plan file of one track of `scaffolding.md` (§15, Q13). **Only Fabian edits this file.** Requirements, interfaces, and examples come from [scaffolding.md](scaffolding.md); this file never restates them, it references them by ID.
+Plan file of one track of `scaffolding.md` (§16, Q13). **Only Fabian edits this file.** Requirements, interfaces, and examples come from [scaffolding.md](scaffolding.md); this file never restates them, it references them by ID.
 
 ## Owned paths
 
@@ -20,14 +27,14 @@ Provides:
 
 - workspace root with the root tasks `dev`, `build`, `lint`, `typecheck`, `test` (SCF-F-12) — first MR in W1 (#6)
 - local stack: one command starts all five units, reverse proxy, relational database (SCF-F-2)
-- proxy routes exactly as in the routing table (§7, SCF-F-4)
+- proxy routes exactly as in the routing table (§8, SCF-F-4)
 - `cms` health endpoint (SCF-F-5)
 - release `dev` → `main` once per sprint
 
 Consumes (interface fixed in `scaffolding.md`; work is never blocked, stub until the code is merged):
 
-- HealthReport and configuration helper (§7, SCF-F-11) — code from the contracts core (#7)
-- each unit's container build in its unit folder, answering `/health` on the port of §7
+- HealthReport and configuration helper (§8, SCF-F-11) — code from the contracts core (#7)
+- each unit's container build in its unit folder, answering `/health` on the port of §8
 
 ## Issues (Sprint 1)
 
@@ -54,4 +61,4 @@ Neutral pseudocode and types per `MANIFEST.md` Phase 5; each module lists `Trace
 
 ### Test cases
 
-Taken from `scaffolding.md` §9 and the acceptance criteria of the issues above.
+Taken from `scaffolding.md` §10 and the acceptance criteria of the issues above.
