@@ -880,6 +880,98 @@ Decided by the agent on the owner's standing instruction of 2026-10-27 (work wit
 
 > **Answer:** decided by the agent: Punkt 1 und CI/CD hier, Punkt 16 nach dem zweiten Merge (Recommended)
 
+## Round 44 — 2026-10-20 — milestone plan (`trutscf1`)
+
+Renumbered at the merge of `dev` into `concept/milestone-plan-2` on 2026-11-02 (P-TEAM-5): rounds 44 to 46 and Q221 to Q233 were asked as rounds 36 to 38 and Q191 to Q203, which !30 brought to `dev` first; the references in `ROADMAP.md`, `ROADMAP-DETAILS.md`, and ADR-0005 follow.
+
+Planning of the sprints and milestones on the dates set by the team: Sprint 1 2026-11-03, Sprint 2 2026-11-24, Sprint 3 2027-01-12, Sprint 4 2027-01-26, Sprint 5 2027-02-23, Sprint 6 2027-03-16, final presentation 2027-04-06; each milestone ends one day earlier. Assumptions: A21 the dates are the review Tuesdays and the milestone due date is the Monday before; A22 school holidays as in `WORKFLOW.md` (to be corrected at sprint planning); A23 one story point is 0.75 h of human work.
+
+❓ **Q221** - **Konzept-Takt**: Wann entstehen die Konzepte (Phase 1–6, inkl. Test-Konzept §17) im Verhältnis zur Umsetzung? Options: Einen Sprint voraus (Recommended) / Alle Konzepte zuerst / Parallel pro Feature
+
+➡️ Also immer konzept und dann wenn ein sprint (=milestone) abgeschlossen ist wird daraus der komplette code generiert. Bedenke dass wir schüler sind und nur jeden sienstafg 200min arbeiten können und wenn ferien sind nicht. also heute am ende soll der erste milestone zum großteil abgeschlossen sein, damit wir den code generieren können
+
+> **Answer:** Other (free text, quoted above)
+
+❓ **Q222** - **TDD-Durchsetzung**: Wie streng wird 'erst Tests, dann Code' im Prozess verankert? Options: DoD + MR + ID-Check (Recommended) / Nur DoD + MR-Template / Zusätzlich CI-Reihenfolgeprüfung
+
+➡️ DoD + MR + ID-Check (Recommended)
+
+> **Answer:** DoD + MR + ID-Check (Recommended)
+
+❓ **Q223** - **Nachweis 'aus Markdown generierbar'**: Wie wird das Ziel am Ende belegt? Options: Regenerations-Probe (Recommended) / Nur Rückverfolgbarkeit / Probe nur im Sprint 6
+
+➡️ Regenerations-Probe (Recommended)
+
+> **Answer:** Regenerations-Probe (Recommended)
+
+❓ **Q224** - **GitLab veröffentlichen**: Meilensteine, Zuordnung von 76 Issues und 34 neue Issues auf GitLab anlegen? Options: Alles ausführen (Recommended) / Nur Meilensteine + Zuordnung / Noch nicht
+
+➡️ Alles ausführen (Recommended)
+
+> **Answer:** Alles ausführen (Recommended)
+
+❓ **Q225** - **Sprint 1 verkleinern**: 25 offene Issues, 5 MRs warten auf Review, etwa 13 Stories sind nicht begonnen; was bleibt in Sprint 1? Options: Nur Begonnenes + R1-Kern (Recommended) / Noch kleiner: nur Reviews / Wie geplant lassen
+
+➡️ Nur Begonnenes + R1-Kern (Recommended)
+
+> **Answer:** Nur Begonnenes + R1-Kern (Recommended); the user's remark before: "heute werden niemals die restlichen 25 issues fertig". Moved to Sprint 2: #56, #105, #78, #81, #107, #109, #112, #2, #3, #116, #117.
+
+## Round 45 — 2026-10-20 — grill of the Sprint 1 issues of `trutscf1`
+
+Issues #108 (concept Public content), #111 (concept R1), #39/#103, #40, #126, #147. Assumptions: A24 entry point is the open review findings, not a new concept; A25 `tests/` belongs to the Platform track (`trutscf1`), a unit's compose service name equals the unit name, and `@nimbus/*` in `SCF-AC-3.1` and `DSA-AC-1.1` becomes `@stash/*`; A26 for `PUB-C-1` to `PUB-C-3` the proposal applies (Strapi, its built-in password handling and rich-text checks) and "Strapi" stays in the titles and acceptance criteria; A27 the assumptions A21–A28 of the Scaffolding concept and A37–A54 of the Public content concept are accepted as a block.
+
+❓ **Q226** - **Barrierefreiheit in der Pipeline**: Das Erfolgssignal G-1.S2 verlangt 0 Verstöße, die gemeinsame axe-Prüfung schlägt aber nur bei kritischen fehl. Was gilt für SCF-T-40 und die CI? Options: Kritisch jetzt, 0 bis Release (Recommended) / Sofort 0 Verstöße / G-1.S2 aufweichen
+
+➡️ Kritisch jetzt, 0 bis Release (Recommended)
+
+> **Answer:** Kritisch jetzt, 0 bis Release (Recommended)
+
+❓ **Q227** - **AC-2.1 und die fehlenden Units**: identity, storage, worker, cms haben noch keinen Code. Wie wird SCF-AC-2.1 erfüllt? Options: Pro Unit in deren Story (Recommended) / Eigene Slice 3 mit Platzhaltern / AC-2.1 abschwächen
+
+➡️ Pro Unit in deren Story (Recommended)
+
+> **Answer:** Pro Unit in deren Story (Recommended)
+
+❓ **Q228** - **Sprint 2 überlastet**: Plan 70 gegen 44 Punkte, alle vier Mitglieder drüber. Was passiert mit Sprint 2? Options: Verschieben statt streichen (Recommended) / Streichreihenfolge jetzt anwenden / Erst im Sprint-Planning am 03.11.
+
+➡️ Verschieben statt streichen (Recommended)
+
+> **Answer:** Verschieben statt streichen (Recommended)
+
+❓ **Q229** - **Reihenfolge der nächsten Schritte**: Was soll die Stunde nach den Antworten zuerst liefern? Options: Tickets für Public Content (Recommended) / Zuerst Review von !16 und !17 / Zuerst Sprint-Plan fixen
+
+➡️ Tickets für Public Content (Recommended)
+
+> **Answer:** Tickets für Public Content (Recommended)
+
+❓ **Q230** - **Ticketbaum Public Content (R11)**: Passen Granularität, Gewichte, Abhängigkeiten und Meilensteine des Entwurfs (Feature #97; PUB-US-1 in drei Slices Sprint 3, PUB-US-4 Sprint 3, PUB-US-2 und -3 Sprint 4, PUB-US-5 Sprint 6)? Options: Musts zuerst (Recommended) / Alles in Sprint 2/3 / Baum ja, Meilensteine später
+
+➡️ Musts zuerst (Recommended)
+
+> **Answer:** Musts zuerst (Recommended)
+
+❓ **Q231** - **Gate**: Die Phasen 5/6 sind nur auf concept/public-content. Wie weiter, bevor Issues entstehen? Options: MR öffnen, danach Issues (Recommended) / Issues sofort, MR parallel / Erst Konzept nochmal prüfen
+
+➡️ MR öffnen, danach Issues (Recommended)
+
+> **Answer:** MR öffnen, danach Issues (Recommended). MR !18 opened (Closes #108); the issues of the tree are published after its review and merge.
+
+## Round 46 — 2026-10-27 — delivery (`trutscf1`, revise !15)
+
+Review of !15 by `schwaigc` (2026-10-20, changes requested): the job `commit-messages` fails on the scopes `roadmap` and `workflow` and on one subject with a capital letter; the question numbers collide with `dev` (Q34–Q66); please check the Sprint 2 overload and the Sprint 1 end date. Assumptions: A28 the pushed branch is not rewritten (no force-push), so its content is rebuilt on a new branch from `dev`; A29 the round of the milestone plan becomes round 21 (Q221–Q225) and the grilling round of the Sprint 1 issues becomes round 22 (Q226–Q231), behind `dev` (P-TEAM-5).
+
+❓ **Q232** - **Commit-Nachrichten von !15**: Die Header lassen sich ohne Force-Push nicht korrigieren. Wie weiter? Options: Neuer Branch mit korrigierten Commits, !15 schließen (Recommended) / Pipeline-Regel lockern / Force-Push
+
+➡️ Neuer Branch mit korrigierten Commits, !15 schließen (Recommended)
+
+> **Answer:** Neuer Branch mit korrigierten Commits, !15 schließen (Recommended), decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions). The twelve commits of `concept/milestone-plan` are re-created on `concept/milestone-plan-2` with the scope `repo` and a lower-case subject; the old branch stays unchanged.
+
+❓ **Q233** - **Sprint-2-Überlast**: Plan 70 gegen 44 Punkte. Jetzt Meilensteine verschieben oder beim Sprint-2-Planning entscheiden? Options: Beim Sprint-2-Planning am 03.11., DSA-US-3 als Option nennen (Recommended) / Jetzt verschieben / Offen lassen
+
+➡️ Beim Sprint-2-Planning am 03.11., DSA-US-3 als Option nennen (Recommended)
+
+> **Answer:** Beim Sprint-2-Planning am 03.11., DSA-US-3 als Option nennen (Recommended), decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions). `ROADMAP.md` records it below the load table; the GitLab milestones are not changed.
+
 ## Round 32 — 2026-11-02 — delivery (`tschudea07` (agent), review !27 and !22)
 
 Question numbers continue after Q203, the highest number on any open branch (Q183–Q193 are taken by !30, up to Q203 by !21); they stay provisional until merged into `dev` (P-TEAM-5).
@@ -1107,6 +1199,18 @@ Provisional numbers (P-TEAM-5): these follow Q195 of round 37. `trutscf1` approv
 ➡️ Merge now — conflict after !30 as expected: `dev` merged in, status of Sprint 1 brought up to date in this branch; merged after the approval is given again
 
 > **Answer:** Merge now
+
+## Round 42 — 2026-11-02 — revise !21 (`trutscf1` (agent), review of `schwaigc`)
+
+No question asked in this round; provisional round number (P-TEAM-5). The review of `schwaigc` (2026-10-27, re-checked 2026-10-29) found that the Sprint 2 row and `team/schwaigc/STATUS.md` disagree with the GitLab milestones. Checked on GitLab on 2026-11-02: #109 and #2 are in Sprint 3, #112 in Sprint 5, the concept R4 (#116) belongs to `schwaigc` and the concept R5 (#117) to `schauby1`, both in Sprint 2. The milestone due dates on GitLab match the sprint table in `WORKFLOW.md`.
+
+Assumption A69: the plan follows GitLab, as `schwaigc` prefers. The Sprint 2 row drops #109 and #2 and names the concepts R4 (`schwaigc`) and R5 (`schauby1`); the Sprint 3 row lists #109 and #2; the STATUS line of `schwaigc` says "#109 and #2 carried over to Sprint 3, #112 to Sprint 5". Recounted from GitLab for `schwaigc`: Sprint 2 15 points (was 16), Sprint 3 17 (was 16); the team's Sprint 2 load is 69 against 44, the total stays 297 against 276.
+
+❓ **Q218** - **!21 deine eigenen Zeilen**: #78, #81, #107 sind auf GitLab in Sprint 3 (Plan: Sprint 2), #79/#80 in Sprint 4 (Plan: Sprint 3); die ganze Lasttabelle ist seit 20.10. veraltet. Was tun? Options: Jetzt alles nachziehen (Recommended) / Nur deine Zeilen / Bei Sprint-2-Planung
+
+➡️ Jetzt alles nachziehen — every sprint row of `ROADMAP.md` follows the GitLab milestones of 2026-11-02 for all four people; `team/trutscf1/STATUS.md` names Sprint 3 for #78, #81, #107 and Sprint 4 for #79, #80; the whole load table is recounted as of 2026-11-02: 288 points against 276 (was 297), Sprint 2 65 against 44, Sprint 4 37 against 24
+
+> **Answer:** Jetzt alles nachziehen (Recommended)
 
 ## Round 47 — 2026-10-29 — grill of the open issues of `trutscf1`
 

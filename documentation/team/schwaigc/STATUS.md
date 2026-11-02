@@ -23,5 +23,4 @@ Sprint 1 (until 2026-11-02), GitLab issues: #68, #102, #106, #40, and #103 done 
 
 | Question | Waiting for (handle) | Since |
 | --- | --- | --- |
-| !21: Sprint 2 row and this file against the GitLab milestones of #109, #2, #112 (changes requested) | trutscf1 | 2026-10-27 |
 | !29 (merged): agreement to the export `./web` in `packages/contracts/package.json` (`scaffolding.md` §16, rule 1) | schauby1 | 2026-10-29 |

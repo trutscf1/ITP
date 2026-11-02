@@ -18,7 +18,7 @@ Session positions of one developer (P-TEAM-3). Precise enough that a fresh sessi
 | Background processing: thumbnails, virus scan, OCR, scheduled jobs (R9) | [concepts/background-processing.md](../../concepts/background-processing.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human background-processing` |
 | Full-text search (R10) | [concepts/search.md](../../concepts/search.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human search` |
 
-Sprint 1 (until 2026-10-26), GitLab issues: #56, #62 (shared: #38, #39, #40, #85).
+Sprint 1 (until 2026-11-02): (carried over to Sprint 2: #56, #105; shared: #38, #39, #40, #85); #62 moves to Sprint 3. Next: Sprint 2 STO-US-2, -5 (#57, #60); plan in `ROADMAP.md`, chapter "Milestones".
 
 ## Open questions waiting for others
 
