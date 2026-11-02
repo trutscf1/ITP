@@ -19,10 +19,12 @@ Session positions of one developer (P-TEAM-3). Precise enough that a fresh sessi
 | Share links with password and expiry (R8) | [concepts/share-links.md](../../concepts/share-links.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human share-links` |
 | Deployment: automatic deploy on push to `main`, TLS (R14) | [concepts/deployment.md](../../concepts/deployment.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human deployment` |
 
-Sprint 1 (until 2026-10-26), GitLab issues: #42, #44 (shared: #38, #39, #40, #85); #2 Corporate Identity.
+Sprint 1 (until 2026-11-02), GitLab issues: #42, #44, #102, #104 done; #41 in review (!27); shared: #38, #39, #85 done, #40 (!29) and #103 (!30) approved, waiting for the merge. #2 Corporate Identity moved to Sprint 3.
 
 ## Open questions waiting for others
 
 | Question | Waiting for (handle) | Since |
 | --- | --- | --- |
-| — | — | — |
+| !27 (#41, SCF-US-4): Vertabelo export, Prisma RC deviation, `.env.example` — then re-review and approval | trutscf1 | 2026-11-02 |
+| !22 (R2 Phase 4 gate): confirm Q4, Q12, Q22, Q31, fix OBS-AC-1.4 vs OBS-F-4 — then re-review | trutscf1 | 2026-11-02 |
+| !29 (#40): agreement to the export `./web` in `packages/contracts/package.json`; then merge !29 before !30 (both approved by `tschudea07`) | schauby1 | 2026-11-02 |

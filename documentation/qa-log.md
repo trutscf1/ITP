@@ -878,7 +878,53 @@ Decided by the agent on the owner's standing instruction of 2026-10-27 (work wit
 
 > **Answer:** decided by the agent: Punkt 1 und CI/CD hier, Punkt 16 nach dem zweiten Merge (Recommended)
 
-## Round 33 — 2026-10-28 — delivery (`schwaigc`, close #103: offline check SCF-T-8)
+## Round 32 — 2026-11-02 — delivery (`tschudea07` (agent), review !27 and !22)
+
+Question numbers continue after Q203, the highest number on any open branch (Q183–Q193 are taken by !30, up to Q203 by !21); they stay provisional until merged into `dev` (P-TEAM-5).
+
+❓ **Q204** - **Review !27**: SCF-US-4 (#41); tests 284 of 285 pass (1 todo: Vertabelo export); must fix: `Closes #41` although SCF-AC-4.1 is open, Prisma only `8.0.0-rc`, `TEST_DATABASE_URL` missing in `.env.example`. Options: Request changes / Comment + approve / Show the text first
+
+➡️ Request changes — review comment posted on !27, no approval; approval once the three must-fix points are done
+
+> **Answer:** Request changes (Recommended)
+
+❓ **Q205** - **Review !22**: Phase 4 gate of R2, all 32 decisions made by the agent; open: Q4 vs `G-1.S1`, Q12 without TLS, Q22 vs Argon2id, OBS-AC-1.4 vs OBS-F-4, technology names, gate already holds Phase 5. Options: Request changes / Comment + approve / Show the text first
+
+➡️ Request changes — review comment posted on !22, gate not signed off
+
+> **Answer:** Request changes (Recommended)
+
+❓ **Q206** - **Status MR**: Status update of `tschudea07` on `chore/status-tschudea07-2026-11-02` pushen und MR nach `dev` öffnen? Options: Push + open MR / Keep local only
+
+➡️ Push + open MR — reviewer `trutscf1`, no merge
+
+> **Answer:** Push + open MR (Recommended)
+
+❓ **Q207** - **Branch #42**: `feature/42-ci-pipeline` ist in `dev` gemergt; die Schulregeln verbieten das Löschen von Feature-Branches (`WORKFLOW.md`, Override von P-GIT-2). Options: Local only / Local + on GitLab / Don't delete
+
+➡️ Local only — local branch deleted, the branch on GitLab is kept for grading
+
+> **Answer:** Local only (Recommended)
+
+❓ **Q208** - **#40 und #103**: !29 und !30 (`schwaigc`) warten nur auf das Re-Review von `trutscf1`. Options: Review, approve if clean / Review comment only / Leave to `trutscf1`
+
+➡️ Review, approve if clean — both reviewed against the must-fix points of `trutscf1`, the ACs, and the DoD with fresh checks
+
+> **Answer:** Review, approve if clean (Recommended)
+
+❓ **Q209** - **#41**: !27 gehört `trutscf1`, Änderungen sind angefordert (Vertabelo-Export, Prisma-RC, `.env.example`). Options: Wait for `trutscf1` / I fix 3 + should-fix / I fix 2 + 3
+
+➡️ Wait for `trutscf1` — the author revises; `tschudea07` re-reviews afterwards
+
+> **Answer:** Wait for trutscf1 (Recommended)
+
+❓ **Q210** - **!29 und !30 freigeben**: alle Must-fix-Punkte erledigt, frisch grün (!29 284/284, !30 270/270); offen: Zustimmung von `schauby1` zum Export `./web`, !29 vor !30 mergen. Options: Post + approve both / Comment only / Post nothing
+
+➡️ Post + approve both — re-review comments posted and both MRs approved; not merged
+
+> **Answer:** Post + approve both (Recommended)
+
+## Round 35 — 2026-10-28 — delivery (`schwaigc`, close #103: offline check SCF-T-8)
 
 Provisional numbers (P-TEAM-5): Q165 to Q177 are on !28 and Q178 to Q180 on !29; these follow them. SCF-T-8 ran with internal networks (no route to the internet) and passed; `clamav/clamav:1.5` has no `arm64` image, so on this Apple Silicon machine it ran with `platform: linux/amd64` in a local override only.
 
@@ -914,9 +960,9 @@ Correction on 2026-10-29 (review of !30): the ➡️ line above does not follow 
 
 > **Answer:** 30m
 
-## Round 34 — 2026-10-29 — delivery (`schwaigc`, revise !29 and !30, reviews of !33, !25, !21)
+## Round 36 — 2026-10-29 — delivery (`schwaigc`, revise !29 and !30, reviews of !33, !25, !21)
 
-Provisional numbers (P-TEAM-5): these follow Q185 of round 33. Since round 33, `trutscf1` has asked for changes on !29 and !30, opened !33 (fix of #148), and merged `dev` into !21 and !25.
+Provisional numbers (P-TEAM-5): these follow Q185 of round 35. Since round 35, `trutscf1` has asked for changes on !29 and !30, opened !33 (fix of #148), and merged `dev` into !21 and !25.
 
 ❓ **Q186** - **Reihenfolge**: Womit anfangen? Options: Alles der Reihe nach / Nur !29 und !30 einarbeiten / Zuerst die Reviews für trutscf1 / Nichts jetzt
 
@@ -960,12 +1006,18 @@ Provisional numbers (P-TEAM-5): these follow Q185 of round 33. Since round 33, `
 
 > **Answer:** Merge now
 
-## Round 35 — 2026-11-02 — delivery (`schwaigc`, end of Sprint 1)
+## Round 37 — 2026-11-02 — delivery (`schwaigc`, end of Sprint 1)
 
-Provisional numbers (P-TEAM-5): these follow Q192 of round 34. No reaction to !29 and !30 since 2026-10-29; Sprint 1 ends today.
+Provisional numbers (P-TEAM-5): these follow Q192 of round 36. No reaction to !29 and !30 since 2026-10-29; Sprint 1 ends today.
 
 ❓ **Q193** - **Sprint-Ende heute**: #40 und #103 hängen am Re-Review von trutscf1. Was tun? Options: Re-Review anfragen / Mit Sprint 2 (#116) beginnen / Beides / Nichts
 
 ➡️ Re-Review anfragen — comments on !29 and !30 asking `trutscf1` for a review again, and on !29 a reminder to `schauby1` about the export `./web`
 
 > **Answer:** Re-Review anfragen (Recommended)
+
+❓ **Q194** - **Merge !34**: chore/status-tschudea07-2026-11-02 → dev, approved by trutscf1, pipeline green, no open threads, author tschudea07; then !28/!29/!30 need a dev merge and lose their approvals. Merge? Options: Merge now / No / Later / I merge myself
+
+➡️ Merge now — merged at `46ffef9`, branch deleted; `dev` merged into !28, !29, !30, their rounds renumbered behind round 32 of `tschudea07` (!28: 33, !29: 34, !30: 35 to 37). !29 and !30 were approved by `trutscf1` and `tschudea07` before; the approvals reset with this push, and they cannot be merged by their author (P-MR-2)
+
+> **Answer:** Merge now
