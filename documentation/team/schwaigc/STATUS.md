@@ -17,10 +17,11 @@ Session positions of one developer (P-TEAM-3). Precise enough that a fresh sessi
 | Design system & accessibility modes (R4) | [concepts/design-system.md](../../concepts/design-system.md) | 7, implement (slices 1 and 2 of DSA-US-1 in `dev`; rest of the concept still a draft) | — | — | Slice 3 (DSA-AC-1.6, theme in the profile) is #112 and waits for IDN-US-2 (#46). Grill the rest of the draft with `/engineering-human design-system` before DSA-US-2 |
 | Web client: dashboard, file browser, preview (R6) | [concepts/web-client.md](../../concepts/web-client.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/engineering-human web-client` |
 
-Sprint 1 (until 2026-10-26), GitLab issues: #68, #102, and #106 done (!7 and !9 merged on 2026-10-28, #85 with !5 on 2026-10-27; shared: #38, #39, #40); #2 Corporate Identity.
+Sprint 1 (until 2026-11-02), GitLab issues: #68, #102, #106, #40, and #103 done (!7 and !9 merged on 2026-10-28, !29 and !30 on 2026-11-02, #85 with !5 on 2026-10-27; shared: #38, #39); #2 Corporate Identity moves to Sprint 3. Next: Sprint 2 concept R4 (#116), then DSA-US-2 and DSA-US-3 (#71, #72); follow-up #150 in the backlog.
 
 ## Open questions waiting for others
 
 | Question | Waiting for (handle) | Since |
 | --- | --- | --- |
 | !21: Sprint 2 row and this file against the GitLab milestones of #109, #2, #112 (changes requested) | trutscf1 | 2026-10-27 |
+| !29 (merged): agreement to the export `./web` in `packages/contracts/package.json` (`scaffolding.md` §16, rule 1) | schauby1 | 2026-10-29 |
