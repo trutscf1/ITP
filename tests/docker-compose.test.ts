@@ -10,6 +10,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 type Healthcheck = { test?: string | string[] };
 type Service = {
   image?: string;
+  platform?: string;
   build?: unknown;
   environment?: Record<string, string> | string[];
   healthcheck?: Healthcheck;
@@ -82,6 +83,12 @@ describe("SCF-AC-2.1 One start command (slice 1: data services, reverse proxy, w
 
   it("SCF-AC-2.1 runs PostgreSQL 18 as postgres:18-alpine", () => {
     assert.equal(services.postgres?.image, "postgres:18-alpine");
+  });
+
+  // clamav/clamav:1.5 is published for amd64 only; ARM machines (Apple Silicon) run it emulated,
+  // so docker compose up does not stop at the pull there (#148).
+  it("SCF-AC-2.1 pins clamav to linux/amd64, so the stack also starts on ARM machines", () => {
+    assert.equal(services.clamav?.platform, "linux/amd64");
   });
 
   it("SCF-AC-2.1 builds web from a Dockerfile of the stack definition", () => {
@@ -223,6 +230,35 @@ describe("SCF-AC-2.3 Start without internet", () => {
       environmentOf(services.clamav ?? {}).CLAMAV_NO_FRESHCLAMD ?? "",
       /\$\{CLAMAV_NO_FRESHCLAMD/,
     );
+  });
+
+  it("SCF-AC-2.3 lets the offline check drop every published port and cut every network off", () => {
+    const stack = parse(readText("docker-compose.yml")) as Compose & {
+      services: Record<string, { ports?: unknown }>;
+      networks: Record<string, unknown>;
+    };
+    const check = parse(readText("docker/compose.offline-check.yml"), {
+      customTags: [
+        { tag: "!reset", collection: "seq", resolve: () => "reset" },
+      ],
+    }) as {
+      services: Record<string, { ports?: unknown }>;
+      networks: Record<string, { internal?: boolean }>;
+    };
+    const published = Object.keys(stack.services)
+      .filter((name) => stack.services[name]?.ports !== undefined)
+      .sort();
+    assert.deepEqual(Object.keys(check.services).sort(), published);
+    for (const name of published) {
+      assert.equal(check.services[name]?.ports, "reset", name);
+    }
+    assert.deepEqual(
+      Object.keys(check.networks).sort(),
+      Object.keys(stack.networks).sort(),
+    );
+    for (const [name, network] of Object.entries(check.networks)) {
+      assert.equal(network.internal, true, name);
+    }
   });
 
   it("SCF-AC-2.3 never makes a service pull its image at start", () => {
