@@ -1189,3 +1189,13 @@ Question numbers continue after Q210, the highest number on any open branch (!34
 ➡️ Autor:innen — `schwaigc` and `tschudea07` merge `dev` into their own branches (keep both sides, the later branch renumbers its round); `trutscf1` approves again after each push
 
 > **Answer:** Autor:innen (Recommended)
+
+## Round 50 — 2026-11-02 — merge conflicts of the open MRs of `trutscf1` (`trutscf1` (agent))
+
+`dev` was merged into !21, !22, !27, and !32 after !28, !29, and !30; identifiers that those MRs brought to `dev` first were renumbered on the later branches (P-TEAM-5, notes in rounds 44, 47, and 49). The drive C: was full during the session; the agent listed the largest consumers read-only (Docker data 76 GB, old agent worktrees 24 GB, npm cache 23 GB, WSL 17 GB, pnpm store 13 GB) and deleted only its own temporary worktree `wt29`.
+
+❓ **Q246** - **Speicher freigeben**: Was davon soll ich aufräumen? (Alles andere fasse ich nicht an.) Options (multi): npm-Cache leeren (Recommended) / Alte Worktrees entfernen / pnpm-Store bereinigen / Docker später selbst
+
+➡️ Docker später selbst — nothing cleaned up by the agent; `trutscf1` restarts Docker Desktop and prunes it. Asked as Q221 in the pop-up, a number already taken by the renumbered questions of !21, hence logged as Q246.
+
+> **Answer:** Docker später selbst
