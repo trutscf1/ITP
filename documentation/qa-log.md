@@ -924,6 +924,28 @@ Question numbers continue after Q203, the highest number on any open branch (Q18
 
 > **Answer:** Post + approve both (Recommended)
 
+## Round 34 — 2026-10-28 — delivery (`schwaigc`, implement #40: `/api/docs`)
+
+Provisional numbers (P-TEAM-5): Q165 to Q177 are on `chore/status-schwaigc-2026-10-28` (!28); these follow them.
+
+❓ **Q178** - **Nächstes**: Reviews sind erledigt. Womit bei den Sprint-1-Aufgaben weitermachen? Options: #40: Route /api/docs (M6) / #103: Offline-Start-Test (SCF-T-8) / Beides nacheinander / Nichts, für heute fertig
+
+➡️ #40 — `/engineering-human implement #40` on `feature/40-api-docs-route`
+
+> **Answer:** #40: Route /api/docs (M6) (Recommended)
+
+❓ **Q179** - **Umfang für #40/M6**: M6 braucht `OPENAPI_FILE` aus M1, und M1 ist noch nicht gebaut. Wie schneiden? Options: M6 + M1 vorziehen / Nur M6, Pfad direkt aus env / Erst Slice 1 von SCF-US-8
+
+➡️ M6 + M1 vorziehen — M1 in `packages/contracts/src/web/config.ts` with a local stand-in for the configuration helper, export `@stash/contracts/web`, unit-test setup of `web` (A1, A2); slice 1 of SCF-US-8 keeps M2, M7, M8, M9
+
+> **Answer:** M6 + M1 vorziehen (Recommended)
+
+❓ **Q180** - **Reviewer**: Der Export `@stash/contracts/web` ändert `packages/contracts/package.json` (Contracts-Track). Wer reviewt? Options: trutscf1 / schauby1 / tschudea07
+
+➡️ trutscf1
+
+> **Answer:** trutscf1 (Recommended)
+
 ## Round 35 — 2026-10-28 — delivery (`schwaigc`, close #103: offline check SCF-T-8)
 
 Provisional numbers (P-TEAM-5): Q165 to Q177 are on !28 and Q178 to Q180 on !29; these follow them. SCF-T-8 ran with internal networks (no route to the internet) and passed; `clamav/clamav:1.5` has no `arm64` image, so on this Apple Silicon machine it ran with `platform: linux/amd64` in a local override only.
@@ -1019,5 +1041,11 @@ Provisional numbers (P-TEAM-5): these follow Q192 of round 36. No reaction to !2
 ❓ **Q194** - **Merge !34**: chore/status-tschudea07-2026-11-02 → dev, approved by trutscf1, pipeline green, no open threads, author tschudea07; then !28/!29/!30 need a dev merge and lose their approvals. Merge? Options: Merge now / No / Later / I merge myself
 
 ➡️ Merge now — merged at `46ffef9`, branch deleted; `dev` merged into !28, !29, !30, their rounds renumbered behind round 32 of `tschudea07` (!28: 33, !29: 34, !30: 35 to 37). !29 and !30 were approved by `trutscf1` and `tschudea07` before; the approvals reset with this push, and they cannot be merged by their author (P-MR-2)
+
+> **Answer:** Merge now
+
+❓ **Q195** - **Merge !29**: feature/40-api-docs-route → dev, approved by trutscf1, pipeline green, no open threads; trutscf1 asks the author to merge it (deviation from P-MR-2); the agreement of schauby1 to the export `./web` is still missing; afterwards !30 and !28 need a dev merge. Merge? Options: Merge now / No / Later / I merge myself
+
+➡️ Merge now — merged at `19ded53` by its author on the request of the reviewer `trutscf1` ("bitte a einemergen"), branch kept; #40 closed by hand with `status::done`; `dev` merged into !30 and !28. The agent had deleted the branches of !33 and !34 at their merges against the rule "kept after merge" of `WORKFLOW.md`; both are restored at their last commits
 
 > **Answer:** Merge now
