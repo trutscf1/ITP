@@ -889,3 +889,49 @@ Concept work of _Observability baseline_ (R2) is logged in `concepts/observabili
 ➡️ Push and open the MR — merge request `concept/observability` → `dev`, not merged by the agent
 
 > **Answer:** Push and open the MR (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions); to be confirmed by trutscf1 in the MR
+
+## Round 32 — 2026-11-02 — delivery (`tschudea07` (agent), review !27 and !22)
+
+Question numbers continue after Q203, the highest number on any open branch (Q183–Q193 are taken by !30, up to Q203 by !21); they stay provisional until merged into `dev` (P-TEAM-5).
+
+❓ **Q204** - **Review !27**: SCF-US-4 (#41); tests 284 of 285 pass (1 todo: Vertabelo export); must fix: `Closes #41` although SCF-AC-4.1 is open, Prisma only `8.0.0-rc`, `TEST_DATABASE_URL` missing in `.env.example`. Options: Request changes / Comment + approve / Show the text first
+
+➡️ Request changes — review comment posted on !27, no approval; approval once the three must-fix points are done
+
+> **Answer:** Request changes (Recommended)
+
+❓ **Q205** - **Review !22**: Phase 4 gate of R2, all 32 decisions made by the agent; open: Q4 vs `G-1.S1`, Q12 without TLS, Q22 vs Argon2id, OBS-AC-1.4 vs OBS-F-4, technology names, gate already holds Phase 5. Options: Request changes / Comment + approve / Show the text first
+
+➡️ Request changes — review comment posted on !22, gate not signed off
+
+> **Answer:** Request changes (Recommended)
+
+❓ **Q206** - **Status MR**: Status update of `tschudea07` on `chore/status-tschudea07-2026-11-02` pushen und MR nach `dev` öffnen? Options: Push + open MR / Keep local only
+
+➡️ Push + open MR — reviewer `trutscf1`, no merge
+
+> **Answer:** Push + open MR (Recommended)
+
+❓ **Q207** - **Branch #42**: `feature/42-ci-pipeline` ist in `dev` gemergt; die Schulregeln verbieten das Löschen von Feature-Branches (`WORKFLOW.md`, Override von P-GIT-2). Options: Local only / Local + on GitLab / Don't delete
+
+➡️ Local only — local branch deleted, the branch on GitLab is kept for grading
+
+> **Answer:** Local only (Recommended)
+
+❓ **Q208** - **#40 und #103**: !29 und !30 (`schwaigc`) warten nur auf das Re-Review von `trutscf1`. Options: Review, approve if clean / Review comment only / Leave to `trutscf1`
+
+➡️ Review, approve if clean — both reviewed against the must-fix points of `trutscf1`, the ACs, and the DoD with fresh checks
+
+> **Answer:** Review, approve if clean (Recommended)
+
+❓ **Q209** - **#41**: !27 gehört `trutscf1`, Änderungen sind angefordert (Vertabelo-Export, Prisma-RC, `.env.example`). Options: Wait for `trutscf1` / I fix 3 + should-fix / I fix 2 + 3
+
+➡️ Wait for `trutscf1` — the author revises; `tschudea07` re-reviews afterwards
+
+> **Answer:** Wait for trutscf1 (Recommended)
+
+❓ **Q210** - **!29 und !30 freigeben**: alle Must-fix-Punkte erledigt, frisch grün (!29 284/284, !30 270/270); offen: Zustimmung von `schauby1` zum Export `./web`, !29 vor !30 mergen. Options: Post + approve both / Comment only / Post nothing
+
+➡️ Post + approve both — re-review comments posted and both MRs approved; not merged
+
+> **Answer:** Post + approve both (Recommended)
