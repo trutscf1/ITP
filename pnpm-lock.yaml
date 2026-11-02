@@ -62,6 +62,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@stash/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@stash/ui':
         specifier: workspace:*
         version: link:../../packages/ui
