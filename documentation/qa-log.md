@@ -766,45 +766,47 @@ After the merges of !24 and !5 by `trutscf1`: `dev` merged into !7 (`qa-log.md` 
 
 ## Round 29 — 2026-10-27 — delivery (`trutscf1`, agent: revise !16)
 
+Renumbered at the merge of `dev` into `chore/status-schwaigc-2026-10-28` on 2026-10-28 (P-TEAM-5): asked as Q80 to Q86, which !9 had brought to `dev` first.
+
 `schwaigc` requested changes on !16 on 2026-10-20: the job `commit-messages` fails (two headers over 120 characters), ErrorResponse contradicts `concepts/scaffolding.md` §8 and §10 example 6, conflicts with `dev`, a test for SCF-T-15, and caret ranges. Every question below was decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions), each with the recommended option.
 
-❓ **Q80** - **Commit-Header kürzen ohne Force-Push**: Force-Push ist gesperrt. Options: Neuer Branch `feature/40-shared-contracts` von `dev` mit sauberen Commits, neues MR, !16 schließen (Recommended) / Merge-Commit auf !16 (behebt den Job nicht, er prüft alle Commits)
+❓ **Q168** - **Commit-Header kürzen ohne Force-Push**: Force-Push ist gesperrt. Options: Neuer Branch `feature/40-shared-contracts` von `dev` mit sauberen Commits, neues MR, !16 schließen (Recommended) / Merge-Commit auf !16 (behebt den Job nicht, er prüft alle Commits)
 
 ➡️ New branch from `dev`, test commit before the `feat` commit, one requirement ID per header; `feature/40-shared-contracts-zod-openapi` stays untouched
 
 > **Answer:** Neuer Branch, neues MR, !16 schließen (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
 
-❓ **Q81** - **Route `/api/docs`**: Der gemergte Plan der Spur Web (M6) liest die generierte Datei über `OPENAPI_FILE` und kommt nach #40 (Order of work, Schritt 3); `apps/web` gehört `schwaigc`. Options: Route verlässt dieses MR, M6 liefert sie (Recommended) / Route nach M6 hier bauen (braucht M1, Pfad der Spur Web)
+❓ **Q169** - **Route `/api/docs`**: Der gemergte Plan der Spur Web (M6) liest die generierte Datei über `OPENAPI_FILE` und kommt nach #40 (Order of work, Schritt 3); `apps/web` gehört `schwaigc`. Options: Route verlässt dieses MR, M6 liefert sie (Recommended) / Route nach M6 hier bauen (braucht M1, Pfad der Spur Web)
 
 ➡️ The route leaves this MR; this MR provides what M6 requires: the generation command and its output path `packages/contracts/dist/openapi.json` (the default of `OPENAPI_FILE`, A3 of the track plan) and ErrorResponse. #40 stays open until M6 is merged (story file, slice 1)
 
 > **Answer:** Route verlässt dieses MR (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
 
-❓ **Q82** - **ErrorResponse**: Options: Flaches `{ code, message }` von §8 mit den vier Codes als Aufzählung und einer Tabelle Code → Status → Meldung in §8 (Recommended) / Verschachtelte Form mit `fields` und §8 ändern
+❓ **Q170** - **ErrorResponse**: Options: Flaches `{ code, message }` von §8 mit den vier Codes als Aufzählung und einer Tabelle Code → Status → Meldung in §8 (Recommended) / Verschachtelte Form mit `fields` und §8 ändern
 
 ➡️ §8 keeps its one block; `code` becomes `enum(validation-failed|not-found|method-not-allowed|internal-error)`, a table below it fixes status and message per code (the values of §10 example 6 and of M6/W-15/W-16/W-21 of the track Web)
 
 > **Answer:** Flaches Format von §8 mit Tabelle (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
 
-❓ **Q83** - **Versionsbereiche von zod und zod-to-openapi**: Options: Exakt pinnen (4.6.7, 8.5.0) (Recommended) / Caret lassen und in STACK.md begründen
+❓ **Q171** - **Versionsbereiche von zod und zod-to-openapi**: Options: Exakt pinnen (4.6.7, 8.5.0) (Recommended) / Caret lassen und in STACK.md begründen
 
 ➡️ Pinned exactly; STACK.md §2 says so
 
 > **Answer:** Exakt pinnen (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
 
-❓ **Q84** - **Wann entsteht die Datei der API-Beschreibung?** Options: `openapi:generate` und zusätzlich `build` schreiben `packages/contracts/dist/openapi.json` (Recommended) / Nur `openapi:generate`
+❓ **Q172** - **Wann entsteht die Datei der API-Beschreibung?** Options: `openapi:generate` und zusätzlich `build` schreiben `packages/contracts/dist/openapi.json` (Recommended) / Nur `openapi:generate`
 
 ➡️ Both; so the file exists for the native start, the tests of `web`, and the image (M9 builds `@stash/contracts`)
 
 > **Answer:** `openapi:generate` und `build` (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
 
-❓ **Q85** - **Antworten auf !16 posten und !16 schließen?** Options: Posten und schließen (Recommended) / Nicht posten
+❓ **Q173** - **Antworten auf !16 posten und !16 schließen?** Options: Posten und schließen (Recommended) / Nicht posten
 
 ➡️ Reply on !16 with the place of every fix in the new MR, then close !16; publishing needs no confirmation (override 6 waived by the owner)
 
 > **Answer:** Posten und schließen (Recommended) — decided by the agent on the owner's standing instruction of 2026-10-27 (work without questions)
 
-❓ **Q86** - **`dependency-audit` schlägt auf `dev` fehl**: `next` 16.3.8 hat seit 2026-10-22 zwei kritische und eine hohe Lücke (behoben ab 16.4.1). Options: In diesem MR nichts ändern, das Sicherheits-MR `fix/next-and-image-security-2026-10-27` behebt es für `dev` (Recommended) / `next` in diesem MR heben
+❓ **Q174** - **`dependency-audit` schlägt auf `dev` fehl**: `next` 16.3.8 hat seit 2026-10-22 zwei kritische und eine hohe Lücke (behoben ab 16.4.1). Options: In diesem MR nichts ändern, das Sicherheits-MR `fix/next-and-image-security-2026-10-27` behebt es für `dev` (Recommended) / `next` in diesem MR heben
 
 ➡️ This MR changes neither `next` nor an image; a red `dependency-audit` or `container-scan` caused only by `dev` is accepted for now and named in the MR description (instruction of the main session of 2026-10-27)
 
@@ -923,6 +925,46 @@ Question numbers continue after Q203, the highest number on any open branch (Q18
 ➡️ Post + approve both — re-review comments posted and both MRs approved; not merged
 
 > **Answer:** Post + approve both (Recommended)
+
+## Round 33 — 2026-10-28 — review (`schwaigc`, open MRs after the merges of !7 and !9)
+
+`trutscf1` merged !7 and !9 on 2026-10-28 and replaced !23 by !26 (same code, commit messages that pass). Provisional numbers (P-TEAM-5); round 29 at first, moved behind the rounds of `trutscf1` at the merges of `dev` after !26, !17, !20, and !19 (now round 32).
+
+❓ **Q165** - **Re-Approvals**: !19, !20 (nur `dev`-Merge und Logs), !25 (unverändert, umgezielt auf !26), !26 (ersetzt !23, identischer Contracts-Code). Welche approven? Options (multi): !26 approven / !19 re-approven / !20 re-approven / !25 re-approven
+
+➡️ all four — short note and approval on each; not merged
+
+> **Answer:** !26 approven, !19 re-approven, !20 re-approven, !25 re-approven
+
+❓ **Q166** - **!17**: Lizenztest kennt jedes Image, sechs Image-Lizenzen, `DATABASE_URL` als Kommentar, Guava und go-jose in `.trivyignore`; Redis 8.8 unter RSALv2/SSPLv1/AGPLv3 gehört in #110. Wie vorgehen? Options: Re-Approve mit Redis-Hinweis / Nur Kommentar / Nichts tun
+
+➡️ Re-Approve mit Redis-Hinweis — posted and approved
+
+> **Answer:** Re-Approve mit Redis-Hinweis (Recommended)
+
+❓ **Q167** - **Status-MR**: `team/schwaigc/STATUS.md` auf `dev` nennt !7, !9, !23 noch als wartend. Status-MR von `dev` aus? Options: Ja, Status-MR / Nein
+
+➡️ Ja — branch `chore/status-schwaigc-2026-10-28`, reviewer `trutscf1`
+
+> **Answer:** Ja, Status-MR (Recommended)
+
+❓ **Q175** - **!20**: nochmals nur `dev` hineingemergt, Approve weg. Erneut approven nach grüner Pipeline? Options: Ja, nach grüner Pipeline / Nein
+
+➡️ Ja — not possible: `trutscf1` had merged !20 at 15:20 already; the approval call failed (401)
+
+> **Answer:** Ja, nach grüner Pipeline (Recommended)
+
+❓ **Q176** - **Hinweise an `trutscf1`**: auf !28 (Q80–Q86 von !26 auf Q168–Q174 umnummeriert) und auf !25 (auf `dev` umzielen, Q155–Q159 kollidieren)? Options (multi): Hinweis auf !28 / Hinweis auf !25
+
+➡️ both posted
+
+> **Answer:** Hinweis auf !28, Hinweis auf !25
+
+❓ **Q177** - **Fehlposts auf !20**: der Kommentar „Re-approved at `5cd769c0`“ wurde durch Wiederholungen dreimal auf das schon gemergte !20 gepostet, ohne Approve. Löschen? Options: Alle drei löschen / Zwei löschen, einen lassen / Stehen lassen
+
+➡️ Alle drei löschen — deleted
+
+> **Answer:** Alle drei löschen (Recommended)
 
 ## Round 34 — 2026-10-28 — delivery (`schwaigc`, implement #40: `/api/docs`)
 
@@ -1047,5 +1089,21 @@ Provisional numbers (P-TEAM-5): these follow Q192 of round 36. No reaction to !2
 ❓ **Q195** - **Merge !29**: feature/40-api-docs-route → dev, approved by trutscf1, pipeline green, no open threads; trutscf1 asks the author to merge it (deviation from P-MR-2); the agreement of schauby1 to the export `./web` is still missing; afterwards !30 and !28 need a dev merge. Merge? Options: Merge now / No / Later / I merge myself
 
 ➡️ Merge now — merged at `19ded53` by its author on the request of the reviewer `trutscf1` ("bitte a einemergen"), branch kept; #40 closed by hand with `status::done`; `dev` merged into !30 and !28. The agent had deleted the branches of !33 and !34 at their merges against the rule "kept after merge" of `WORKFLOW.md`; both are restored at their last commits
+
+> **Answer:** Merge now
+
+## Round 38 — 2026-11-02 — delivery (`schwaigc`, merge !30 and !28 on the request of `trutscf1`)
+
+Provisional numbers (P-TEAM-5): these follow Q195 of round 37. `trutscf1` approved !30 and !28 again after the merge of `dev` and asked the author to merge them.
+
+❓ **Q196** - **Merge !30**: chore/103-offline-start-check → dev, trutscf1 approved, pipeline green, no open threads; author merge on the reviewer's request (P-MR-2 deviation). Merge? Options: Merge now / No / Later / I merge myself
+
+➡️ Merge now — merged at `e96db1f`, branch kept; #103 closed by hand with `status::done`
+
+> **Answer:** Merge now
+
+❓ **Q197** - **Merge !28**: chore/status-schwaigc-2026-10-28 → dev, trutscf1 approved, pipeline green; after !30 a conflict in the logs, then a merge of dev and one more approval. Merge? Options: Merge now / No / Later / I merge myself
+
+➡️ Merge now — conflict after !30 as expected: `dev` merged in, status of Sprint 1 brought up to date in this branch; merged after the approval is given again
 
 > **Answer:** Merge now
