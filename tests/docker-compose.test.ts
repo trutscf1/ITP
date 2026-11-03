@@ -122,8 +122,9 @@ describe("SCF-AC-2.2 Configuration by environment", () => {
 
   it("SCF-AC-2.2 uses every variable of .env.example in docker-compose.yml", () => {
     const used = new Set(referencedVariables(compose));
+    // COMPOSE_PROFILES is read by Docker Compose itself (OBS-F-5), not by a reference in the file.
     const unused = [...documentedVariables().keys()].filter(
-      (name) => !used.has(name),
+      (name) => name !== "COMPOSE_PROFILES" && !used.has(name),
     );
     assert.deepEqual(unused, []);
   });

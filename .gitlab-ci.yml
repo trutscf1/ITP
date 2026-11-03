@@ -129,7 +129,7 @@ container-scan:
       paths:
         - .trivy-cache
   script:
-    - images=$(awk '/^[[:space:]]*image:/ {print $2}' docker-compose.yml)
+    - images=$(awk '/^[[:space:]]*image:/ {print $2}' docker-compose.yml; awk '/^FROM / {print $2}' docker/observability/*.Dockerfile | sort -u)
     - |
       failed=""
       for image in $images; do
