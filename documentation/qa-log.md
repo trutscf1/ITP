@@ -1561,3 +1561,25 @@ Answer: "Node bumpen, Grafana ignorieren (Recommended)".
 The number Q280 is provisional until merged (P-TEAM-5).
 
 **A2 - Review of !44 by `tschudea07` (revise):** Points 1 to 6 were accepted. Fixed: the red pipeline (`docs`, `container-scan`, see A1); the IPv6 pattern now needs a boundary (`std::vector` is kept) and runs twice; an IPv4 address before a full stop is redacted; §8, M6, `STACK.md` (OBS-C-6, SCF-C-7), and `scaffolding.md` (SCF-F-4, §8) are updated in the same MR (P-GIT-5); the proxy test is filed under `OBS-AC-1.3`. Also done from the non-blocking notes: CI tests for the patterns, a test that no service outside the profile depends on it (OBS-E-4), the span status message is emptied, the collector version stands in the README. Not done, with reasons in the replies: one Dockerfile with `ARG` instead of three, the defaults in three places (`.env.example` documents them, SCF-F-11), structured log bodies (slice 2, OBS-AC-1.4).
+
+## Round 62 — 2026-11-03 — Slice 1 dashboards (#83) (trutscf1 (agent))
+
+Instruction of `trutscf1`, verbatim (coordinator): implement #83, slice 1 of OBS-US-2 ("dashboard tool on the server itself, stored files, and links"), on top of the open !44; build no alert rule (slice 2, #156). The agent could not ask questions; each gap is closed with a default (P-GRILL-4).
+
+**Q300 - Panels of slice 1:** The links of OBS-AC-2.2 sit on three panels of "Operations overview", but the dashboard belongs to slice 3. Which panels does slice 1 deliver?
+
+**A1 - Three panels now, three later:** Slice 1 stores the dashboard "Operations overview" with the three panels that carry the log link of OBS-F-7 (Requests per second, Server errors, Latency (95th percentile)), the time range last hour, refresh 30 seconds, and the unit selector. Slice 3 adds the panels "Upload throughput", "Waiting jobs", and "Storage usage" (they need the metrics of R5 and R9). Concept §16 says so.
+
+**Q301 - Proof of "cannot be saved":** The dashboard tool must refuse a save (OBS-F-9), but an anonymous Viewer cannot save anything anyway. How is the refusal proven?
+
+**A2 - Default administrator account in the test:** The test project uses the built-in account `admin` of the dashboard tool inside the container and shows that even it is refused (HTTP 400 "provisioned"). The account stays until slice 5 (login through `identity`, OBS-NF-6) switches the basic login off; until then the port is bound to `127.0.0.1` (OBS-F-24).
+
+**Q302 - Proof of the links between log entry and trace:** The derived fields of the log store data source are applied in the browser of the dashboard tool, not by its server.
+
+**A3 - Settings plus data, not a click:** The test proves the provisioned settings (derived field to the trace store, trace-to-logs query to the log store, panel link to the log store with unit and time range) and that a stored log entry carries the trace ID under a key that a derived field matches. Following the link in a browser is not automated; the reviewer can try it with the profile started.
+
+**A4 - Two keys for the trace ID:** The package `telemetry` is not built yet, so it is open whether the trace ID reaches the log store as the field of the OTLP record (`trace_id`) or as the attribute `traceId`. The log store data source provisions a derived field for each key; the trace-to-logs query uses `trace_id`. Slice 2 of OBS-US-1 removes one of them when the package exports its entries.
+
+**A5 - Issue text of #83 is outdated:** The description of #83 still has the five old criteria and the old story file name; the story file `OBS-US-2-operations-dashboards-and-alerts.md` is the source (P-DOC-6). The MR says so; the issue text is not changed here.
+
+The numbers Q300 to Q302 are provisional until merged (P-TEAM-5).

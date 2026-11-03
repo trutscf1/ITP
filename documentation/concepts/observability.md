@@ -595,6 +595,8 @@ The slices and their issues stand in the story files (P-DOC-6); this table only 
 | OBS-US-2 | 4 — storage, queue, and silent-unit alerts, after R5 and R9 | Platform & cms | M6 (thresholds), M9 (alert rules) |
 | OBS-US-2 | 5 — login through `identity` over HTTPS, after R3 and R14 | Platform & cms | M9 (proxy header), M10 (route, session check) |
 
+Slice 1 of `OBS-US-2` stores the dashboard "Operations overview" with the three panels that carry the log link of [OBS-F-7] ("Requests per second", "Server errors", "Latency (95th percentile)"); slice 3 adds the other three panels (round 62 of the question log, A1).
+
 The metrics of [OBS-F-21] to [OBS-F-23] are emitted by modules of R5 and R9 (§15); until then their panels show "No data" and their rules are normal. Slice 1 of `OBS-US-1` depends only on R1; the slices that wait for R3, R5, R9, or R14 say so in their story file (A19).
 
 ### Module Specifications
