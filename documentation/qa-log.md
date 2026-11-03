@@ -1493,3 +1493,41 @@ Answer: "Nur Lücken schließen"
 Answer: "Caddy überall, Abweichung dokumentieren (Recommended)"
 
 The question numbers are provisional until merged into `dev` (P-TEAM-5): round 56 (Q261 to Q263) is on `feature/82-observability-stack` and round 55 (Q259, Q260) on `chore/github-mirror`.
+
+## Round 58 — 2026-11-03 — Shared SonarQube server (`tschudea07` (agent))
+
+Instruction of `tschudea07`, verbatim: "/Users/andreas/Downloads/sonarqube-shared.zip bau das ein". The archive holds `compose.yaml`, `start.ps1`, and `README.md` of a SonarQube server shared by every project on one computer (port `127.0.0.1:9000`, Docker network `sonarqube-shared`). A1: developer handle `tschudea07` (git user; no `CLAUDE.local.md`). A2: no CI job, because the server listens on localhost only and GitLab CI cannot reach it.
+
+**Q266 - Umfang:** Was soll aus dem SonarQube-ZIP ins Repo?
+
+Answer: "Nur Projekt-Anbindung (Recommended)".
+
+**Q267 - Tracking:** Wie läuft die Änderung über GitLab?
+
+Answer: "Issue + Branch + MR (Recommended)".
+
+**Q268 - Coverage:** Soll der Scan schon Testabdeckung (lcov) mitliefern?
+
+Answer: "Erst ohne Coverage (Recommended)".
+
+**Q269 - Projekt-Key:** Unter welchem Key scannt das Projekt in den geteilten Server?
+
+Answer: "stash (Recommended)".
+
+**Q270 - Issue anlegen:** "Anbindung an den geteilten SonarQube-Server" (type::technical-improvement, status::in-progress, area::infrastructure, tschudea07, Sprint 2, weight 1, 1h) so veröffentlichen?
+
+Answer: "Veröffentlichen (Recommended)". Created as #153.
+
+**Q271 - Push + MR:** Branch feature/153-sonarqube pushen und das MR "feat(repo): scan into the shared SonarQube with pnpm sonar" nach dev öffnen (Closes #153; kein echter Scan gelaufen, weil der Server hier nicht läuft)?
+
+Answer: "Push + MR öffnen (Recommended)".
+
+Revision after the review of `trutscf1` (two passes on !41). Instruction of `tschudea07`, verbatim: "schau dir mr !41 an und ändere was von trutscf1 gefordert wird". Open points of the second pass: real scan not run, `.scannerwork/` not ignored, label `type::technical-improvement` missing in `WORKFLOW.md`, no `AC` IDs in #153. The shared server was running, so the agent ran `pnpm sonar` from a clean clone of this branch: `EXECUTION SUCCESS`, `QUALITY GATE STATUS: PASSED`, 93 files indexed. `.scannerwork/` added to `.gitignore` test-first.
+
+**Q275 - Label:** trutscf1 bemängelt, dass `type::technical-improvement` (auf #153) nicht in der Label-Tabelle von WORKFLOW.md steht. Das Label existiert auf GitLab bereits und wird auch von schwaigc auf #150 verwendet. Wie lösen?
+
+Answer: "In WORKFLOW.md aufnehmen (Recommended)".
+
+**Q276 - Veröffentlichen auf !41:** Commits pushen, MR-Beschreibung aktualisieren (echter Scan, Abschnitt „No story, no AC IDs“, Fragenummern Q266–Q271) und Antwort-Kommentar an trutscf1 zu allen vier Punkten posten?
+
+Answer: "Alles veröffentlichen (Recommended)".
