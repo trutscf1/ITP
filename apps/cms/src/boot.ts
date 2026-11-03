@@ -32,6 +32,12 @@ export async function boot(
   if (!loaded.ok) throw new InvalidConfigurationError(loaded.problems);
   const telemetry = startTelemetry("cms", unitVersion, loaded.config, options);
   telemetry.log.info("unit started", {});
-  await accept(telemetry);
+  try {
+    await accept(telemetry);
+  } catch (error) {
+    // The start entry must reach the collector although the unit failed to start.
+    await telemetry.shutdown();
+    throw error;
+  }
   return telemetry;
 }
