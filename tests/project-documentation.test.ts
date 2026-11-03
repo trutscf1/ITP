@@ -173,6 +173,9 @@ describe("SCF-AC-7.5 Licence notes", () => {
       clamav: "ClamAV",
       mailpit: "Mailpit",
       caddy: "Caddy",
+      node: "Node.js",
+      prometheus: "Prometheus",
+      grafana: "Grafana",
     };
     for (const [, image] of compose.matchAll(/image:\s*([\w./-]+):/g)) {
       const label = labels[image.split("/").at(-1) ?? image];
