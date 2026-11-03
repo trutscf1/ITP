@@ -378,6 +378,7 @@ Verbatim rounds: [identity.qa-log.md](identity.qa-log.md). ADR: [ADR-0007](../ad
 | Q11 | HTTP framework | Hono (`STACK.md` §3) | Small, TypeScript-first, supported by the library |
 | Q12 | Shared understanding | Confirmed | — |
 | Q13 | Pages in `web` | Slice 2 of each story, built by schwaigc | Tracks stay separate |
+| Q14 | Merge request | Reviewed by `trutscf1`; its approval is the Phase 4 gate | Most affected by §15 |
 
 **Open questions for the school management** (legal; not decided by the team or an agent):
 

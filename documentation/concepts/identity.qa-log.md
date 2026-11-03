@@ -103,3 +103,9 @@ Found while writing, stated with the next question, none rejected:
 **Q13 - Wer baut die Seiten (Registrieren, Login, Passwort zurücksetzen) in `apps/web`?** Das ist der Track von schwaigc; nach WORKFLOW wird eine Änderung im fremden Track als Issue an den Owner gestellt.
 
 Answer: "Slice für schwaigc (Recommended)".
+
+## Round 5 — 2026-11-03 — merge request (`tschudea07`)
+
+**Q14 - Konzept-MR:** Branch `concept/identity` pushen und MR nach dev öffnen (Part of #115; die Freigabe des MR ist das Phase-4-Gate)? Wer soll reviewen?
+
+Answer: "Push + MR, Review trutscf1 (Recommended)".
