@@ -12,7 +12,10 @@
         "label": "Unit",
         "type": "query",
         "datasource": { "type": "prometheus", "uid": "prometheus" },
-        "query": { "query": "label_values(unit_running, service_name)", "refId": "unit" },
+        "query": {
+          "query": "label_values(unit_running, service_name)",
+          "refId": "unit"
+        },
         "refresh": 2,
         "includeAll": true,
         "allValue": ".+",
