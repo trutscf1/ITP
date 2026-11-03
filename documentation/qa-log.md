@@ -1531,6 +1531,7 @@ Answer: "In WORKFLOW.md aufnehmen (Recommended)".
 **Q276 - Veröffentlichen auf !41:** Commits pushen, MR-Beschreibung aktualisieren (echter Scan, Abschnitt „No story, no AC IDs“, Fragenummern Q266–Q271) und Antwort-Kommentar an trutscf1 zu allen vier Punkten posten?
 
 Answer: "Alles veröffentlichen (Recommended)".
+
 ## Round 56 — 2026-11-03 — Start of Sprint 2, own issues (`trutscf1` (agent))
 
 Instruction of `trutscf1`, verbatim: "starte nun sprint 2 mit dem /engineering-human und /grill-me skill. schaue, wegen meinen docs und issues bezüglich opentelemetry, observability, ... beginne meine issues"
@@ -1548,3 +1549,13 @@ Answer: "#82 Slice 1, dann Slice 2 (Recommended)"
 Answer: "Ein Issue pro Session (Recommended)"
 
 The question numbers continue after Q258 of this branch; round 55 (Q259, Q260, mirror of the repository) is on `chore/github-mirror` and not yet in `dev`, so Q261 to Q263 are provisional until both are merged (P-TEAM-5).
+
+## Round 60 — 2026-11-03 — Container scan of !44 (`trutscf1` (agent))
+
+**Q280 - Container-Scan !44:** Der Job `container-scan` fand 4 HIGH-Funde in `node:24.14-alpine` (OpenSSL) und 16 Funde in `grafana/grafana:13.2.5` (gebündelte npm-Pakete); Grafana 13.2.5 ist der neueste Tag von 13.2. Wie soll ich vorgehen?
+
+Answer: "Node bumpen, Grafana ignorieren (Recommended)".
+
+**A1 - Node-Bump nicht möglich:** The bump did not help, so the agent fell back to the entries of the other option for node as well. `node:24.22-alpine` has 6 other HIGH findings (npm), `node:24.14-alpine3.22` has 17, and `node:24.14-alpine3.23` has the same 4 OpenSSL findings as `node:24.14-alpine`; checked locally with Trivy 0.69.3 on 2026-11-03. The two OpenSSL CVEs and the CVEs of Grafana are in `.trivyignore` with reason and expiry 2026-11-23, like the entries of the other images. `trutscf1` is asked to confirm A1 in the review of !44.
+
+The number Q280 is provisional until merged (P-TEAM-5).
