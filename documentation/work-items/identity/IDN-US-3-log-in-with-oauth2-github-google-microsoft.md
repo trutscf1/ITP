@@ -19,7 +19,7 @@ One user story of [Identity: accounts, external login, MFA](feature.md) and the 
 
 | ID | Title | Given | When | Then |
 | --- | --- | --- | --- | --- |
-| IDN-AC-3.1 | Provider buttons | The login page | It is shown | A login button is visible for each of the three providers that is configured in `.env`, and for no other |
+| IDN-AC-3.1 | Provider buttons | The login page | It is shown | A login button is visible for each of the three providers that is configured, and for no other |
 | IDN-AC-3.2 | Account on first login | A person without an account | They log in through an OAuth provider for the first time | The account is created together with its own `users` row |
 | IDN-AC-3.3 | Link and unlink | A member in the account settings | They link an OAuth provider to their existing account or unlink it | The link is created or removed |
 | IDN-AC-3.4 | Cancelled login | A person at the provider's page | They cancel the login | The login page shows an understandable message |

@@ -10,6 +10,10 @@ The shared words of this project, for everyone who writes or reads its documents
 
 ## Language
 
+**stash**:
+The name of the product: the self-hosted cloud storage platform this project builds. Stories and pages name the product only by this word.
+*Avoid*: Nimbus, the cloud, the app
+
 **Unit**:
 A separately running process of the system, built and started as its own container. There are exactly five: `web`, `identity`, `storage`, `worker`, `cms`.
 *Avoid*: service, app, microservice
@@ -88,3 +92,35 @@ A page of the dashboard tool that shows telemetry to operators. It is not the da
 **Alert rule**:
 A condition on telemetry that is checked at a fixed interval; while it holds, its alert is firing and shown in the alert list of the dashboard tool.
 *Avoid*: alarm, notification
+
+**Member**:
+A person with a confirmed account of an installation of stash (role `R-1` in `GOAL.md`).
+*Avoid*: user (alone), customer
+
+**Account**:
+The record by which `identity` knows a member: display name, e-mail address, whether the address is confirmed, and the member's credentials. One account belongs to exactly one member.
+*Avoid*: profile, login
+
+**Session**:
+The state of being logged in on one device, from a successful login until logout, expiry, or a password reset.
+*Avoid*: login (as a noun), token
+
+**Confirmation link**:
+The single-use link in the e-mail after registration that proves the member owns the e-mail address.
+*Avoid*: activation link, verification mail
+
+**Reset link**:
+The single-use link in the e-mail that lets a member set a new password.
+*Avoid*: recovery link
+
+**Lock**:
+A temporary block of logins from one IP address, or of the password login of one account, after too many failed logins.
+*Avoid*: ban, suspension
+
+**Bot check**:
+The check before registration and password reset that the request comes from a person, switched off when the system runs without internet.
+*Avoid*: captcha (in documents), robot test
+
+**Operator role**:
+The right of an account to open the operations dashboards; given to accounts whose address the operator lists in the configuration.
+*Avoid*: admin, superuser
