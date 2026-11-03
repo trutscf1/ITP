@@ -11,6 +11,7 @@ type Rule = { if?: string; when?: string };
 type Cache = { key?: string | { files?: string[] }; paths?: string[] };
 type Job = {
   image?: string | { name: string };
+  services?: (string | { name: string; alias?: string })[];
   stage?: string;
   needs?: string[];
   release?: { tag_name?: string; description?: string };
@@ -231,9 +232,8 @@ describe("SCF-AC-5.2 Pipeline steps", () => {
     assert.match(scriptOf("dependency-audit"), /pnpm audit --prod/);
   });
 
-  it("SCF-AC-5.2 scans every image of docker-compose.yml with Trivy", () => {
-    assert.match(imageOf("container-scan"), /^aquasec\/trivy:\d/);
-    assert.match(scriptOf("container-scan"), /docker-compose\.yml/);
+  it("SCF-AC-5.2 scans the images of the stack with the pinned Trivy version", () => {
+    assert.match(scriptOf("container-scan"), /aquasec\/trivy:\d+\.\d+\.\d+/);
     assert.match(scriptOf("container-scan"), /trivy image/);
   });
 
@@ -245,6 +245,33 @@ describe("SCF-AC-5.2 Pipeline steps", () => {
   it("SCF-F-15 runs the code scan with Semgrep", () => {
     assert.match(imageOf("code-scan"), /semgrep:\d/);
     assert.match(scriptOf("code-scan"), /--config \.semgrep\.yml/);
+  });
+});
+
+describe("SCF-AC-2.5 Clean images (SCF-NF-6, SCF-T-10)", () => {
+  it("SCF-AC-2.5 runs the container scan on a pinned Docker with a Docker daemon of the same version", () => {
+    const image = imageOf("container-scan");
+    assert.match(image, /^docker:\d+\.\d+\.\d+$/);
+    const services = (readJob("container-scan").services ?? []).map(
+      (service) => (typeof service === "string" ? service : service.name),
+    );
+    assert.ok(services.includes(`${image}-dind`), `no service ${image}-dind`);
+  });
+
+  it("SCF-AC-2.5 builds every image the stack builds, in every profile, before the scan", () => {
+    assert.match(
+      scriptOf("container-scan"),
+      /docker compose [^\n]*--profile "\*" [^\n]*build/,
+    );
+  });
+
+  it("SCF-AC-2.5 scans the image list of the stack definition, built and pulled images alike", () => {
+    const script = scriptOf("container-scan");
+    assert.match(
+      script,
+      /docker compose [^\n]*--profile "\*" [^\n]*config --images/,
+    );
+    assert.doesNotMatch(script, /awk/);
   });
 });
 
