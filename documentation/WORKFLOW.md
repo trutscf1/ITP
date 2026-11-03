@@ -68,6 +68,7 @@ Where `docs/` and a profile decision disagree, `docs/` wins.
 | --- | --- | --- |
 | P-GIT-2 (work branches are deleted after merge) | Feature, fix, concept, and chore branches are **never deleted** after merge. | School requirement (`docs/anforderungen_software_projekte.md` §2, §5): the per-branch history is graded. |
 | P-GIT-2 (`concept/…` branches need no issue) | Every `concept/…` branch has a `type::concept` issue. | School requirement: every change starts with an issue (§3). |
+| P-TIME-1 (AI agents never book time) | An agent may post a time entry (`/spend`) for a developer, but only after that developer has confirmed the entry. At the end of each issue the agent proposes duration and activity; the developer answers yes or names another duration; only then does the agent post it. The time is the developer's own working time, never the agent's, and the agent never books on its own initiative. | The school only requires that time is recorded (`docs/anforderungen_software_projekte.md` §6) and does not say who posts it, so `docs/` does not override P-TIME-1; this is a project decision. The developer stays responsible for the entry, and each entry is at most 50 minutes. |
 
 ## Deviations from the project proposal
 
@@ -161,7 +162,7 @@ Every sprint runs the same five steps; the exit criteria of each milestone are i
 
 ## Time tracking
 
-Record time on the issue or MR with `/spend` (§9): one entry per work session, **at most 50 minutes**, with the activity and the issue/MR reference. Review and MR work is recorded as well. Agents never book time (P-TIME-1).
+Record time on the issue or MR with `/spend` (§9): one entry per work session, **at most 50 minutes**, with the activity and the issue/MR reference. Review and MR work is recorded as well. Agents book time only for a developer and only after that developer confirmed the entry (deviation from P-TIME-1, see "Deviations from the profile"); a longer session is split into several entries of at most 50 minutes.
 
 ## Definition of Done
 
