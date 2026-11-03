@@ -1465,3 +1465,19 @@ Answer: "-s ours + Inbox-Eintrag (Recommended)".
 **Q258 - Vier Branches mit alten, nicht konformen Commits** (chore/grill-trutscf1-2026-10-29 !31, feature/40-shared-contracts !23, concept/milestone-plan !15, feature/40-shared-contracts-zod-openapi !16, alle MRs geschlossen und nie gemergt): Ein Anbinden an dev würde commit-messages in diesem MR und im nächsten Release-MR rot machen (10 Commits). Wie weiter?
 
 Answer: "Remote löschen (Recommended)". Before deleting, the agent checked that the head of each branch is the head of its merge request (`refs/merge-requests/<n>/head`), so every commit stays reachable through the closed merge request. The four remote branches were deleted; `feature/40-contracts-zod-openapi` and `concept/migrate-scaffolding` are recorded in `dev` with the strategy "ours" (content of `dev` unchanged).
+
+## Round 58 — 2026-11-03 — review of the open merge requests (`tschudea07` (agent))
+
+Instruction of `tschudea07`, verbatim: "review alle merrequest die man revien kann"
+
+Reviewable for `tschudea07`: !40 and !42 (author `trutscf1`, reviewer `tschudea07`). Not reviewed: !43 and !41 (own MRs), !35 (draft of `schauby1`). Both MRs: `doc-check` 0 errors (the same 29 warnings as `dev`), markdownlint 0 issues, pipeline green; no issue (`chore/`), so no acceptance criteria.
+
+**Q266 - Review !40 (GitHub-Mirror, trutscf1):** Das GitHub-Repo trutscf1/ITP ist öffentlich, obwohl Q259 mit „Private“ beantwortet wurde. Das GitLab-Projekt ist privat, also sind jetzt alle 34 Branches öffentlich. Dazu kommen: ein Token wurde im Chat geteilt und seine Rotation steht nirgends als offene Aufgabe, und die Collaborator-Rolle weicht von docs §18 (Reporter) ab, ohne Eintrag in WORKFLOW.md. Was soll ich auf !40 posten?
+
+Answer: "Änderungen anfordern (Recommended)". Posted as a resolvable thread on !40, no approval.
+
+**Q267 - Review !42 (Schulanforderungen, Caddy statt Traefik, trutscf1):** Inhaltlich in Ordnung, und Caddy passt zu deinem Konzept deployment.md. Kleine Punkte: Die Traefik-Zeile steht in der Tabelle „Deviations from the project proposal“, obwohl Traefik aus den Schulanforderungen kommt. Der Schlussabsatz der DoD ist missverständlich formuliert. DoD-Punkt 20 macht „Mobile-First (empfohlen)“ samt 320 px verpflichtend. Was soll ich auf !42 posten?
+
+Answer: "Kommentar + Approve (Recommended)". Posted as a plain comment (not blocking) and approved by `tschudea07`.
+
+The question numbers are provisional until merged into `dev` (P-TEAM-5): Q259 to Q265 sit on open branches. Q264 is used twice, on `feature/153-sonarqube` and on `chore/school-requirements-gaps`; the branch merged second renumbers.
