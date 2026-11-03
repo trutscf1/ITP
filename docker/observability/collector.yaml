@@ -47,12 +47,13 @@ processors:
         statements:
           - delete_matching_keys(log.attributes, "(?i)^(.*[._-])?(ip|client\\.address|remote\\.address|user_agent|user-agent|url|url\\.full|path|query|header|headers|email|name\\.first|name\\.last|member\\.id|user\\.id|file\\.name|folder\\.name)$")
           - set(log.attributes["level"], log.severity_text) where log.severity_text != ""
-          # E-mail address, then IPv4 address (twice, so that two addresses separated by one
-          # character are both found), then IPv6 address.
+          # E-mail address, then IPv4 address (twice in the text and in the attribute values, so
+          # that two addresses separated by one character are both found), then IPv6 address.
           - replace_pattern(log.body, "[^\\s@]+@[^\\s@]+\\.[^\\s@]+", "[redacted]")
           - replace_all_patterns(log.attributes, "value", "[^\\s@]+@[^\\s@]+\\.[^\\s@]+", "[redacted]")
           - replace_pattern(log.body, "(^|[^0-9.])(\\d{1,3}\\.){3}\\d{1,3}($|[^0-9.])", "$${1}[redacted]$${3}")
           - replace_pattern(log.body, "(^|[^0-9.])(\\d{1,3}\\.){3}\\d{1,3}($|[^0-9.])", "$${1}[redacted]$${3}")
+          - replace_all_patterns(log.attributes, "value", "(^|[^0-9.])(\\d{1,3}\\.){3}\\d{1,3}($|[^0-9.])", "$${1}[redacted]$${3}")
           - replace_all_patterns(log.attributes, "value", "(^|[^0-9.])(\\d{1,3}\\.){3}\\d{1,3}($|[^0-9.])", "$${1}[redacted]$${3}")
           - replace_pattern(log.body, "(?i)([0-9a-f]{1,4}:){7}[0-9a-f]{1,4}|([0-9a-f]{1,4}:){1,7}:([0-9a-f]{1,4}(:[0-9a-f]{1,4}){0,6})?|::([0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4}", "[redacted]")
           - replace_all_patterns(log.attributes, "value", "(?i)([0-9a-f]{1,4}:){7}[0-9a-f]{1,4}|([0-9a-f]{1,4}:){1,7}:([0-9a-f]{1,4}(:[0-9a-f]{1,4}){0,6})?|::([0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4}", "[redacted]")
