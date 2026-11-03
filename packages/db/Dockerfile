@@ -7,7 +7,12 @@
 # field. The build context is the repository root (.dockerignore keeps node_modules out).
 FROM node:24.14.0-alpine
 
-RUN corepack enable
+# The image carries no known high or critical vulnerability that has a fix (SCF-AC-2.5,
+# SCF-NF-6): the Alpine packages are upgraded to their fixed versions, and the npm bundled with
+# Node.js is removed, since the container runs pnpm through corepack and never npm.
+RUN apk upgrade --no-cache \
+  && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx \
+  && corepack enable
 USER node
 WORKDIR /app
 
