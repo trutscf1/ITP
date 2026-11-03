@@ -6,13 +6,18 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "dev": "tsc --watch --preserveWatchOutput",
-    "build": "tsc",
+    "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/main.js",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
-    "test": "node --test"
+    "test": "node --test \"src/**/*.test.ts\""
+  },
+  "dependencies": {
+    "@stash/telemetry": "workspace:*"
   },
   "devDependencies": {
-    "@stash/config": "workspace:*"
+    "@stash/config": "workspace:*",
+    "@types/node": "^24"
   }
 }
