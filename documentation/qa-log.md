@@ -1491,3 +1491,5 @@ Open merge requests of `tschudea07` with conflicts: !43 (`concept/identity`) and
 **Q274 - Push:** Die Merge-Commits (dev → Branch, ohne Force-Push) für !43 concept/identity (nur ROADMAP-DETAILS-Log, beide Einträge behalten) und !41 feature/153-sonarqube (Logs behalten; deine Sonar-Fragen Q259–Q264 kollidierten mit dev und wurden zu Runde 58, Q266–Q271) pushen?
 
 Answer: "Beide pushen (Recommended)". Asked in the pop-up as Q272; renumbered here because round 59 holds Q272 and Q273. Pushed as `0d6d8d04b` (!43) and `2d7f143f6` (!41).
+
+Follow-up of `tschudea07`, verbatim: "ich kann den MR !41 noch nicht mergen". Cause: !43 was merged into `dev` (`f76a77bb4`) after the first merge, and both branches had appended to `ROADMAP-DETAILS.md` and changed the same spot in `STACK.md` (SCF-C-10 on `dev`, the new SonarQube row below it on !41). `dev` merged into `feature/153-sonarqube` again (`944082f5e`): the SCF-C-10 row of `dev` kept with the SonarQube row below it, both log entries kept. `doc-check` 0 errors, markdownlint 0 issues; GitLab reports !41 free of conflicts.
