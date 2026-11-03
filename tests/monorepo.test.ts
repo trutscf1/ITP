@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 const units = ["web", "identity", "storage", "worker", "cms"] as const;
-const packages = ["contracts", "ui", "config"] as const;
+const packages = ["contracts", "ui", "config", "telemetry"] as const;
 
 function readJson(path: string): Record<string, unknown> {
   return JSON.parse(readFileSync(join(root, path), "utf8")) as Record<
