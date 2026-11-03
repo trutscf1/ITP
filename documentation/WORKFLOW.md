@@ -92,6 +92,7 @@ Every change starts with an issue (§3). Each issue has: description, acceptance
 | `type::concept` | Tracking issue for concept authoring on a `concept/…` branch, one per roadmap feature |
 | `type::request` | Raw incoming feature request; enters the concept process via the inbox (`/engineering-human triage`) |
 | `type::documentation` | Documentation work that belongs to no single story (project-specific) |
+| `type::technical-improvement` | Technical improvement, refactoring, or tooling that belongs to no story (project-specific); its acceptance criteria stand in the issue without `AC` IDs, and its tests name the issue number |
 | `status::backlog` | Not planned for a sprint yet (project-specific; first board column) |
 | `status::ready` / `status::in-progress` / `status::review` | Board columns |
 | `status::done` | Finished; set at the merge (project-specific; last board column) |

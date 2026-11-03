@@ -1521,3 +1521,13 @@ Answer: "Veröffentlichen (Recommended)". Created as #153.
 **Q271 - Push + MR:** Branch feature/153-sonarqube pushen und das MR "feat(repo): scan into the shared SonarQube with pnpm sonar" nach dev öffnen (Closes #153; kein echter Scan gelaufen, weil der Server hier nicht läuft)?
 
 Answer: "Push + MR öffnen (Recommended)".
+
+Revision after the review of `trutscf1` (two passes on !41). Instruction of `tschudea07`, verbatim: "schau dir mr !41 an und ändere was von trutscf1 gefordert wird". Open points of the second pass: real scan not run, `.scannerwork/` not ignored, label `type::technical-improvement` missing in `WORKFLOW.md`, no `AC` IDs in #153. The shared server was running, so the agent ran `pnpm sonar` from a clean clone of this branch: `EXECUTION SUCCESS`, `QUALITY GATE STATUS: PASSED`, 93 files indexed. `.scannerwork/` added to `.gitignore` test-first.
+
+**Q275 - Label:** trutscf1 bemängelt, dass `type::technical-improvement` (auf #153) nicht in der Label-Tabelle von WORKFLOW.md steht. Das Label existiert auf GitLab bereits und wird auch von schwaigc auf #150 verwendet. Wie lösen?
+
+Answer: "In WORKFLOW.md aufnehmen (Recommended)".
+
+**Q276 - Veröffentlichen auf !41:** Commits pushen, MR-Beschreibung aktualisieren (echter Scan, Abschnitt „No story, no AC IDs“, Fragenummern Q266–Q271) und Antwort-Kommentar an trutscf1 zu allen vier Punkten posten?
+
+Answer: "Alles veröffentlichen (Recommended)".
