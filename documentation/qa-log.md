@@ -1548,4 +1548,3 @@ Answer: "#82 Slice 1, dann Slice 2 (Recommended)"
 Answer: "Ein Issue pro Session (Recommended)"
 
 The question numbers continue after Q258 of this branch; round 55 (Q259, Q260, mirror of the repository) is on `chore/github-mirror` and not yet in `dev`, so Q261 to Q263 are provisional until both are merged (P-TEAM-5).
->>>>>>> origin/dev
