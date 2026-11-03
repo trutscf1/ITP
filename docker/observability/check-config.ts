@@ -17,15 +17,69 @@ type Variable = {
 };
 
 const variables: Variable[] = [
-  { name: "OBS_METRICS_RETENTION_DAYS", kind: "integer", fallback: "15", min: 1, max: 90 },
-  { name: "OBS_LOGS_RETENTION_DAYS", kind: "integer", fallback: "7", min: 1, max: 30 },
-  { name: "OBS_TRACES_RETENTION_DAYS", kind: "integer", fallback: "7", min: 1, max: 30 },
-  { name: "OBS_ALERT_ERROR_RATE_PERCENT", kind: "number", fallback: "5", min: 0.1, max: 100 },
-  { name: "OBS_ALERT_MIN_REQUESTS", kind: "integer", fallback: "20", min: 1, max: 100000 },
-  { name: "OBS_ALERT_STORAGE_PERCENT", kind: "number", fallback: "90", min: 1, max: 100 },
-  { name: "OBS_ALERT_QUEUE_MIN_WAITING", kind: "integer", fallback: "10", min: 1, max: 1000000 },
-  { name: "OBS_ALERT_SILENT_MINUTES", kind: "integer", fallback: "2", min: 1, max: 60 },
-  { name: "OBS_DASHBOARD_PORT", kind: "integer", fallback: "3300", min: 1024, max: 65535 },
+  {
+    name: "OBS_METRICS_RETENTION_DAYS",
+    kind: "integer",
+    fallback: "15",
+    min: 1,
+    max: 90,
+  },
+  {
+    name: "OBS_LOGS_RETENTION_DAYS",
+    kind: "integer",
+    fallback: "7",
+    min: 1,
+    max: 30,
+  },
+  {
+    name: "OBS_TRACES_RETENTION_DAYS",
+    kind: "integer",
+    fallback: "7",
+    min: 1,
+    max: 30,
+  },
+  {
+    name: "OBS_ALERT_ERROR_RATE_PERCENT",
+    kind: "number",
+    fallback: "5",
+    min: 0.1,
+    max: 100,
+  },
+  {
+    name: "OBS_ALERT_MIN_REQUESTS",
+    kind: "integer",
+    fallback: "20",
+    min: 1,
+    max: 100000,
+  },
+  {
+    name: "OBS_ALERT_STORAGE_PERCENT",
+    kind: "number",
+    fallback: "90",
+    min: 1,
+    max: 100,
+  },
+  {
+    name: "OBS_ALERT_QUEUE_MIN_WAITING",
+    kind: "integer",
+    fallback: "10",
+    min: 1,
+    max: 1000000,
+  },
+  {
+    name: "OBS_ALERT_SILENT_MINUTES",
+    kind: "integer",
+    fallback: "2",
+    min: 1,
+    max: 60,
+  },
+  {
+    name: "OBS_DASHBOARD_PORT",
+    kind: "integer",
+    fallback: "3300",
+    min: 1024,
+    max: 65535,
+  },
 ];
 
 /** The reason of one invalid variable, or undefined when the value is valid. */
@@ -45,12 +99,15 @@ function problemOf(variable: Variable, value: string): string | undefined {
  */
 export function checkConfig(
   environment: Record<string, string | undefined>,
-): { ok: true; values: Record<string, string> } | { ok: false; lines: string[] } {
+):
+  | { ok: true; values: Record<string, string> }
+  | { ok: false; lines: string[] } {
   const values: Record<string, string> = {};
   const lines: string[] = [];
   for (const variable of variables) {
     const given = environment[variable.name];
-    const value = given === undefined || given === "" ? variable.fallback : given;
+    const value =
+      given === undefined || given === "" ? variable.fallback : given;
     const problem = problemOf(variable, value);
     if (problem === undefined) {
       values[variable.name] = value;
@@ -72,10 +129,10 @@ function main(): number {
   const templateDir = process.env.OBS_TEMPLATE_DIR ?? "/obs";
   const outputDir = process.env.OBS_GENERATED_DIR ?? "/generated";
   const hours = Number(result.values.OBS_TRACES_RETENTION_DAYS) * 24;
-  const tempo = readFileSync(join(templateDir, "tempo.template.yaml"), "utf8").replace(
-    "__OBS_TRACES_RETENTION_HOURS__",
-    String(hours),
-  );
+  const tempo = readFileSync(
+    join(templateDir, "tempo.template.yaml"),
+    "utf8",
+  ).replace("__OBS_TRACES_RETENTION_HOURS__", String(hours));
   mkdirSync(outputDir, { recursive: true });
   writeFileSync(join(outputDir, "tempo.yaml"), tempo, { mode: 0o644 });
   return 0;
