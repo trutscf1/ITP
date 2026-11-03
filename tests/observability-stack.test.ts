@@ -106,6 +106,19 @@ describe("OBS-AC-1.5 Observability profile (OBS-F-5, OBS-T-5)", () => {
     }
   });
 
+  it("OBS-AC-1.5 lets no service outside the profile depend on a service of the profile, so an invalid configuration stops only the profile (OBS-E-4)", () => {
+    for (const [name, service] of Object.entries(services)) {
+      if (stackServices.includes(name)) continue;
+      for (const dependency of Object.keys(service.depends_on ?? {})) {
+        assert.equal(
+          stackServices.includes(dependency),
+          false,
+          `${name} depends on ${dependency}`,
+        );
+      }
+    }
+  });
+
   it("OBS-AC-1.5 starts the dashboard tool only after the three stores are healthy (OBS-F-5, OBS-NF-7)", () => {
     for (const store of ["prometheus", "loki", "tempo"]) {
       assert.equal(
@@ -263,6 +276,114 @@ describe("OBS-AC-1.2 Collector routing (OBS-F-2, OBS-F-29, OBS-NF-3, OBS-T-2, OB
   });
 });
 
+// The redaction patterns of the collector (concept §8, "Redaction patterns") run on RE2 in the
+// collector; these tests read the statements from collector.yaml and apply them with the pattern
+// engine of Node.js, which gives the same result for these patterns, so that CI proves them
+// without a container runtime (review of !44, points 2 and 3).
+describe("OBS-AC-1.2 Redaction patterns of the collector (OBS-F-29, OBS-T-32)", () => {
+  type Statement = { pattern: RegExp; replacement: string };
+  const lines = readText("docker/observability/collector.yaml").split(/\r?\n/);
+
+  function statements(kind: "body" | "attributes"): Statement[] {
+    const start =
+      kind === "body"
+        ? /^\s*- replace_pattern\(log\.body, "(.*)", "(.*)"\)\s*$/
+        : /^\s*- replace_all_patterns\(log\.attributes, "value", "(.*)", "(.*)"\)\s*$/;
+    const found: Statement[] = [];
+    for (const line of lines) {
+      const match = start.exec(line);
+      if (!match) continue;
+      let source = (match[1] as string).replace(/\\\\/g, "\\");
+      let flags = "";
+      if (source.startsWith("(?i)")) {
+        source = source.slice(4);
+        flags = "i";
+      }
+      found.push({
+        pattern: new RegExp(source, flags),
+        replacement: match[2] as string,
+      });
+    }
+    return found;
+  }
+
+  function redact(text: string, kind: "body" | "attributes" = "body"): string {
+    let result = text;
+    for (const { pattern, replacement } of statements(kind)) {
+      result = result.replace(pattern, (...groups: string[]) =>
+        replacement.replace(/\$\$\{(\d)\}/g, (_, n: string) => {
+          const value = groups[Number(n)];
+          return typeof value === "string" ? value : "";
+        }),
+      );
+    }
+    return result;
+  }
+
+  it("OBS-AC-1.2 redacts an IPv4 address that is followed by a full stop (OBS-F-29)", () => {
+    assert.equal(
+      redact("rejected request from 203.0.113.7."),
+      "rejected request from [redacted].",
+    );
+    assert.equal(
+      redact("peer 203.0.113.7. Next 198.51.100.9"),
+      "peer [redacted]. Next [redacted]",
+    );
+  });
+
+  it("OBS-AC-1.2 keeps a version number with five groups and redacts two IPv4 addresses separated by one character (OBS-F-29)", () => {
+    assert.equal(
+      redact("library 1.2.3.4.5 loaded"),
+      "library 1.2.3.4.5 loaded",
+    );
+    assert.equal(
+      redact("from 10.0.0.1,10.0.0.2"),
+      "from [redacted],[redacted]",
+    );
+    assert.equal(
+      redact("from 10.0.0.1,10.0.0.2", "attributes"),
+      "from [redacted],[redacted]",
+    );
+  });
+
+  it("OBS-AC-1.2 does not redact a C++ scope such as std::vector, a time, or a MAC address (OBS-F-29)", () => {
+    for (const kept of [
+      "std::vector overflow",
+      "Foo::bar failed",
+      "at 10:00:00 the job ran",
+      "device aa:bb:cc:dd:ee:ff",
+    ]) {
+      assert.equal(redact(kept), kept);
+    }
+  });
+
+  it("OBS-AC-1.2 redacts IPv6 addresses in the forms of the concept, also at the end of a sentence and in brackets (OBS-F-29)", () => {
+    assert.equal(redact("link fe80::1"), "link [redacted]");
+    assert.equal(redact("link fe80::1."), "link [redacted].");
+    assert.equal(redact("peer (2001:db8::ff00:42:8329)"), "peer ([redacted])");
+    assert.equal(
+      redact("peer 2001:0db8:0000:0000:0000:ff00:0042:8329 ok"),
+      "peer [redacted] ok",
+    );
+    assert.equal(redact("peer ::1"), "peer [redacted]");
+    assert.equal(redact("a fe80::1 fe80::2"), "a [redacted] [redacted]");
+  });
+
+  it("OBS-AC-1.2 applies the same patterns, in the same order, to the log message and to attribute values (OBS-F-29)", () => {
+    assert.deepEqual(
+      statements("attributes").map((s) => [s.pattern.source, s.replacement]),
+      statements("body").map((s) => [s.pattern.source, s.replacement]),
+    );
+  });
+
+  it("OBS-AC-1.2 empties the status message of a span, because it can carry an exception message (OBS-F-29, OBS-NF-2)", () => {
+    assert.match(
+      readText("docker/observability/collector.yaml"),
+      /set\(span\.status\.message, ""\)/,
+    );
+  });
+});
+
 describe("OBS-AC-1.5 Configuration step, check part (OBS-F-28, OBS-E-4, OBS-T-37)", () => {
   const script = join(root, "docker", "observability", "check-config.ts");
   const template = join(root, "docker", "observability", "tempo.template.yaml");
@@ -356,8 +477,10 @@ describe("OBS-AC-1.5 Configuration step, check part (OBS-F-28, OBS-E-4, OBS-T-37
   });
 });
 
-describe("OBS-AC-1.5 Proxy removes outside trace headers (OBS-F-16)", () => {
-  it("OBS-AC-1.5 removes traceparent, tracestate, and baggage from every incoming request before forwarding it (OBS-F-16)", () => {
+// OBS-F-16 derives from OBS-AC-1.3 (concept §4); the end-to-end proof of that criterion is OBS-T-3
+// in slice 7, this test covers the proxy part that slice 1 delivers.
+describe("OBS-AC-1.3 Proxy removes outside trace headers (OBS-F-16)", () => {
+  it("OBS-AC-1.3 removes traceparent, tracestate, and baggage from every incoming request before forwarding it (OBS-F-16)", () => {
     const caddyfile = readText("docker/Caddyfile");
     for (const header of ["traceparent", "tracestate", "baggage"]) {
       assert.match(
