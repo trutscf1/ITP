@@ -34,7 +34,7 @@ The vertical slices that deliver this story (concept §16, Q30). Slice 1 is deli
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
 | 1 — observability stack in the local stack, images pinned and scanned (`trutscf1`) | OBS-AC-1.2, OBS-AC-1.5 | — | #82 |
-| 2 — shared package `telemetry` (`trutscf1`) | OBS-AC-1.4, OBS-AC-1.6, OBS-AC-1.7 | — | — |
+| 2 — shared package `telemetry` (`trutscf1`) | OBS-AC-1.4, OBS-AC-1.6, OBS-AC-1.7 | — | #154 |
 | 3 — `cms` instrumented (`trutscf1`) | OBS-AC-1.1 | slices 1, 2 | — |
 | 4 — `web` instrumented (`schwaigc`) | OBS-AC-1.1 | slices 1, 2 | — |
 | 5 — `identity` instrumented (`tschudea07`) | OBS-AC-1.1 | slices 1, 2 | — |

@@ -1531,3 +1531,26 @@ Answer: "In WORKFLOW.md aufnehmen (Recommended)".
 **Q276 - Veröffentlichen auf !41:** Commits pushen, MR-Beschreibung aktualisieren (echter Scan, Abschnitt „No story, no AC IDs“, Fragenummern Q266–Q271) und Antwort-Kommentar an trutscf1 zu allen vier Punkten posten?
 
 Answer: "Alles veröffentlichen (Recommended)".
+
+## Round 61 — 2026-11-03 — Slice 2 telemetry package (#154) (trutscf1 (agent))
+
+Instruction of `trutscf1`, summarised: implement issue #154 (`OBS-US-1` slice 2, the shared package `telemetry`, modules M1 to M5 of `concepts/observability.md` §16) with `/engineering-human implement`. The agent could not ask pop-ups in this session; where the documents left a gap with a cheap default, it states an assumption (P-GRILL-4). `trutscf1` rejects an assumption by answering it in the review of the merge request.
+
+- **A1:** The OpenTelemetry SDK is not used (the choice `STACK.md` §1 left "to be confirmed in slice 2"). The package encodes OTLP over HTTP with JSON bodies itself and keeps no runtime dependency. Reasons: the SDK's logs packages are experimental (Definition of Done item 18), its exporters have their own queues instead of the bounded buffer of `OBS-E-1`, and the supply-chain rules of `pnpm-workspace.yaml` apply to every package. The protocol, and with it the collector of `OBS-C-2`, stays the same. Recorded in `STACK.md` §1.
+- **A2:** The logger also replaces e-mail and IP addresses in the message and the attribute values (the patterns of §8), not only the collector. Without it the criterion `OBS-AC-1.6` cannot be shown on standard output, where the unit still writes the entry. `OBS-F-14` and the modules M2 and M3 are extended in the concept; test case `OBS-T-40` is new.
+- **A3:** A log attribute key outside `[a-zA-Z0-9._-]` is written with `_`; a neutral name with a space is written in camel case (`job id` is `jobId`, as example 2 of §10 already shows). The text of `OBS-E-6` and test case `OBS-T-31` said `job id`, which the key rule of §8 does not allow; fixed in the concept.
+- **A4:** The package offers no framework glue. `startTelemetry(unit, version, config, options?)` returns `{ log, meter, jobs, tracer, http, flush, shutdown }`; a unit wraps its request handler in `http.serve({ method, path, route?, traceparent? }, handler)` and an outgoing call in `http.call`. The unit passes its route patterns (`/api/storage/files/{id}`) in `options.routes` or the pattern its framework matched; no match is `unmatched`. The request has no field for an address or a user agent, so `OBS-NF-2` holds by construction. The glue per framework is module M11 of each unit's slice.
+- **A5:** The name of an outgoing request span is `<METHOD> <peer unit>` (§8 names only request and job spans).
+- **A6:** The variables of `TelemetryConfig` go into `.env.example` with the example configuration of slice 1 (`OBS-F-5`, `SCF-F-17`), not here: nothing in the repository reads them yet, and the slice is open in another merge request.
+- **A7:** The new package gets the commit scope `telemetry` (`commitlint.config.ts`, `WORKFLOW.md`, one commit before the tests); the workspace test `tests/monorepo.test.ts` and `SCF-F-18`, `SCF-T-1`, and the tree of `scaffolding.md` §16 name it, as `observability.md` §15 required.
+- **A8:** The branch is `feature/154-telemetry-package-agent`: the name `feature/154-telemetry-package` already existed, checked out in another worktree of the same repository.
+
+**Q290 - Instrumentation library:** Which library instruments the units (`OBS-C-1`)? Decided by the agent as A1.
+
+Answer: none yet; assumption A1 stands until the review.
+
+**Q291 - Redaction of texts in the unit:** Must the unit already remove e-mail and IP addresses from message and values? Decided by the agent as A2.
+
+Answer: none yet; assumption A2 stands until the review.
+
+The question numbers are provisional until merged into `dev` (P-TEAM-5).
