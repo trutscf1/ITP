@@ -1,0 +1,38 @@
+# Exceptions for the image of the service web only (docker/web.Dockerfile, SCF-AC-2.5). The
+# container scan adds this file to .trivyignore when it scans that image (#149). Found with
+# Trivy 0.69.3 on 2026-11-03, unfixed vulnerabilities are not reported (--ignore-unfixed).
+# Every entry expires at the end of Sprint 2; #157 fixes the image, then this file is removed.
+
+# Alpine packages of the base image node:24.14.0-alpine (OpenSSL, musl, zlib); fixed versions
+# exist in Alpine. Fix requested in #157: upgrade the Alpine packages in the image.
+CVE-2026-14456 exp:2026-11-23
+CVE-2026-22184 exp:2026-11-23
+CVE-2026-28387 exp:2026-11-23
+CVE-2026-28388 exp:2026-11-23
+CVE-2026-28389 exp:2026-11-23
+CVE-2026-28390 exp:2026-11-23
+CVE-2026-31789 exp:2026-11-23
+CVE-2026-40200 exp:2026-11-23
+CVE-2026-45447 exp:2026-11-23
+
+# Packages of the npm bundled with Node.js (tar, minimatch, picomatch, pacote, sigstore,
+# ip-address); the stack runs pnpm through corepack, never npm. Fix requested in #157: remove
+# npm from the runtime image.
+CVE-2026-26960 exp:2026-11-23
+CVE-2026-26996 exp:2026-11-23
+CVE-2026-27903 exp:2026-11-23
+CVE-2026-27904 exp:2026-11-23
+CVE-2026-29786 exp:2026-11-23
+CVE-2026-31802 exp:2026-11-23
+CVE-2026-33671 exp:2026-11-23
+CVE-2026-48815 exp:2026-11-23
+CVE-2026-59873 exp:2026-11-23
+CVE-2026-59874 exp:2026-11-23
+CVE-2026-69192 exp:2026-11-23
+CVE-2026-73566 exp:2026-11-23
+CVE-2026-9496 exp:2026-11-23
+
+# Storybook 10.6.1, a development dependency that ends up in the image that ships. Fix requested
+# in #157: keep development dependencies out of the runtime image.
+CVE-2026-114125 exp:2026-11-23
+CVE-2026-114126 exp:2026-11-23
