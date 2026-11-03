@@ -14,8 +14,6 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
     networks:
       - backend
-    ports:
-      - "127.0.0.1:${POSTGRES_PORT:?set POSTGRES_PORT in .env}:5432"
     volumes:
       # PostgreSQL 18 keeps its data in a versioned folder below /var/lib/postgresql.
       - postgres-data:/var/lib/postgresql
@@ -44,8 +42,6 @@ services:
     command: ["server", "-dir=/data", "-filer", "-s3"]
     networks:
       - backend
-    ports:
-      - "127.0.0.1:${SEAWEEDFS_S3_PORT:?set SEAWEEDFS_S3_PORT in .env}:8333"
     volumes:
       - seaweedfs-data:/data
     healthcheck:
@@ -84,8 +80,6 @@ services:
     restart: unless-stopped
     networks:
       - backend
-    ports:
-      - "127.0.0.1:${MAILPIT_UI_PORT:?set MAILPIT_UI_PORT in .env}:8025"
     healthcheck:
       test: ["CMD", "/mailpit", "readyz"]
       interval: 10s
@@ -109,8 +103,6 @@ services:
       COUCHDB_PASSWORD: ${COUCHDB_PASSWORD:?set COUCHDB_PASSWORD in .env}
     networks:
       - backend
-    ports:
-      - "127.0.0.1:${COUCHDB_PORT:?set COUCHDB_PORT in .env}:5984"
     volumes:
       - couchdb-data:/opt/couchdb/data
     healthcheck:

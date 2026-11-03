@@ -29,74 +29,66 @@ services:
     ports:
       - ${MONGO_PORT}:27017
 
-  master:
-    image: chrislusf/seaweedfs # use a remote image
-    ports:
-      - 9333:9333
-      - 19333:19333
-      - 9324:9324
-    command: 'master -ip=master -ip.bind=0.0.0.0 -metricsPort=9324'
-    volumes:
-      - seaweed-master:/data
+  # Object storage with an S3 interface. The master answers on 9333 once the server is up.
+  seaweedfs:
+    image: chrislusf/seaweedfs:4.51
+    restart: unless-stopped
+    command: ["server", "-dir=/data", "-filer", "-s3"]
     networks:
       - backend
-  volume:
-    image: chrislusf/seaweedfs # use a remote image
     ports:
-      - 8080:8080
-      - 18080:18080
-      - 9325:9325
-    command: 'volume -ip=volume -master="master:9333" -ip.bind=0.0.0.0 -port=8080 -metricsPort=9325'
-    depends_on:
-      - master
+      - "127.0.0.1:${SEAWEEDFS_S3_PORT:?set SEAWEEDFS_S3_PORT in .env}:8333"
     volumes:
-      - seaweed-volume:/data
+      - seaweedfs-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO /dev/null http://127.0.0.1:9333/cluster/status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # Virus scanner. The image brings its own health check script; the first start loads the
+  # virus definitions, which takes a while. The image exists for amd64 only, so ARM machines
+  # (Apple Silicon) run it emulated; it starts more slowly there (#148).
+  clamav:
+    image: clamav/clamav:1.5
+    platform: linux/amd64
+    restart: unless-stopped
+    environment:
+      # "true" keeps the scanner from downloading definitions, so it starts offline with the
+      # ones in the image (SCF-AC-2.3); set "false" to update them while online.
+      CLAMAV_NO_FRESHCLAMD: ${CLAMAV_NO_FRESHCLAMD:?set CLAMAV_NO_FRESHCLAMD in .env}
     networks:
       - backend
-  filer:
-    image: chrislusf/seaweedfs # use a remote image
     ports:
-      - 8888:8888
-      - 18888:18888
-      - 9326:9326
-    command: 'filer -ip=filer -master="master:9333" -ip.bind=0.0.0.0 -metricsPort=9326'
-    tty: true
-    stdin_open: true
-    depends_on:
-      - master
-      - volume
+      - ${CLAMD_PORT}:3310
+      - ${CLAMAV_MILTER_PORT}:7357
     volumes:
-      - seaweed-filer:/data
+      - clamav-data:/var/lib/clamav
+    healthcheck:
+      test: ["CMD", "clamdcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 180s
+
+
+  # Local replacement for outgoing e-mail (SCF-AC-2.3): catches every message; the inbox is
+  # at http://localhost:${MAILPIT_UI_PORT}.
+  mailpit:
+    image: axllent/mailpit:v1.32
+    restart: unless-stopped
     networks:
       - backend
-  s3:
-    image: chrislusf/seaweedfs # use a remote image
     ports:
-      - 8333:8333
-      - 9327:9327
-    command: 's3 -filer="filer:8888" -ip.bind=0.0.0.0 -metricsPort=9327'
-    depends_on:
-      - master
-      - volume
-      - filer
-    volumes:
-      - seaweed-s3:/data
-    networks:
-      - backend
-  webdav:
-    image: chrislusf/seaweedfs # use a remote image
-    ports:
-      - 7333:7333
-    command: 'webdav -filer="filer:8888"'
-    depends_on:
-      - master
-      - volume
-      - filer
-    volumes:
-      - seaweed-webdav:/data
-    networks:
-      - backend
-  
+      - "127.0.0.1:${MAILPIT_UI_PORT:?set MAILPIT_UI_PORT in .env}:8025"
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
   valkey:
     image: valkey/valkey:9.1-alpine
     command: valkey-server --port 6379 --requirepass ${VALKEY_PASSWORD}
@@ -118,7 +110,7 @@ services:
       - backend
     ports:
       - ${COUCHDB_INDEXER_ADMIN_PORT}:9100
-      - ${COUCHDB_REST_API_PORT}:5984
+      - ${COUCHDB_PORT}:5984
       - ${COUCHDB_EPMD_PORT}:4369
 
 networks:
@@ -129,10 +121,7 @@ volumes:
   postgres-data:
   postgres-etc:
   mongo-data:
-  seaweed-master:
-  seaweed-volume:
-  seaweed-filer:
-  seaweed-s3:
-  seaweed-webdav:
+  seaweedfs-data:
   valkey-data:
   couchdb-data:
+  clamav-data:
