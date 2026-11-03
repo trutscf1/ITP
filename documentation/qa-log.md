@@ -1466,6 +1466,71 @@ Answer: "-s ours + Inbox-Eintrag (Recommended)".
 
 Answer: "Remote löschen (Recommended)". Before deleting, the agent checked that the head of each branch is the head of its merge request (`refs/merge-requests/<n>/head`), so every commit stays reachable through the closed merge request. The four remote branches were deleted; `feature/40-contracts-zod-openapi` and `concept/migrate-scaffolding` are recorded in `dev` with the strategy "ours" (content of `dev` unchanged).
 
+## Round 55 — 2026-11-02 — GitHub mirror (`trutscf1` (agent))
+
+Instruction of `trutscf1`, verbatim: "nun mirror mir dieses repo noch auf meine github account"
+
+**Q259 - Sichtbarkeit GitHub-Repo:** CLAUDE.md sagt "the repository is public, so all content must be licence-free", das GitLab-Projekt selbst ist aber private. Wie soll das GitHub-Repo sichtbar sein?
+
+Answer: "Private". `trutscf1` created the repository `trutscf1/ITP` as public; the visibility stays the owner's decision.
+
+**Q260 - Zugang gamgamstyle:** docs §18 verlangt, dem GitHub-User gamgamstyle die Rolle Reporter zu geben. Bei einem Repo in einem persönlichen GitHub-Account gibt es keine Nur-Lese-Rolle. Was soll passieren?
+
+Answer: "Als Collaborator einladen (Recommended)". Invitation sent; on a personal account a collaborator can push.
+
+The first mirror entered on GitLab failed with "Invalid username or token. Password authentication is not supported for Git operations". The agent checked the token of `trutscf1` (scope `repo`, push access to `trutscf1/ITP`), replaced the mirror with one that carries the token in its URL, all branches (not only protected ones), and ran the first sync: 34 branches and the tag `v0.1.0`, the same as on GitLab.
+
+## Round 57 — 2026-11-03 — Anchoring the school requirements (`trutscf1` (agent))
+
+Instruction of `trutscf1`, verbatim: "schau dass diese anforderungen alle fix verankert sind:" followed by the text of `docs/anforderungen_software_projekte.md`.
+
+**Q264 - Verankerung:** Wie sollen die Schulanforderungen aus `docs/anforderungen_software_projekte.md` dauerhaft verankert werden? Ich habe sie mit dem Text im Repo verglichen: Die eingefügten Anforderungen stehen dort wörtlich schon drin, aber nicht jede Zeile ist einem Dokument, einer Story oder einem DoD-Punkt zugeordnet.
+
+Answer: "Nur Lücken schließen"
+
+**Q265 - Reverse Proxy:** `deployment.md` (DEP-F-2) verlangt Traefik ≥ 3.6.10 mit Let's Encrypt, der lokale Stack und `STACK.md` (SCF-C-6, OBS-C-7) verwenden aber Caddy. Traefik ist in den Schulanforderungen nur eine „eventuelle Zusatzanforderung“. Wie soll das aufgelöst werden?
+
+Answer: "Caddy überall, Abweichung dokumentieren (Recommended)"
+
+The question numbers are provisional until merged into `dev` (P-TEAM-5): round 56 (Q261 to Q263) is on `feature/82-observability-stack` and round 55 (Q259, Q260) on `chore/github-mirror`.
+
+## Round 58 — 2026-11-03 — Shared SonarQube server (`tschudea07` (agent))
+
+Instruction of `tschudea07`, verbatim: "/Users/andreas/Downloads/sonarqube-shared.zip bau das ein". The archive holds `compose.yaml`, `start.ps1`, and `README.md` of a SonarQube server shared by every project on one computer (port `127.0.0.1:9000`, Docker network `sonarqube-shared`). A1: developer handle `tschudea07` (git user; no `CLAUDE.local.md`). A2: no CI job, because the server listens on localhost only and GitLab CI cannot reach it.
+
+**Q266 - Umfang:** Was soll aus dem SonarQube-ZIP ins Repo?
+
+Answer: "Nur Projekt-Anbindung (Recommended)".
+
+**Q267 - Tracking:** Wie läuft die Änderung über GitLab?
+
+Answer: "Issue + Branch + MR (Recommended)".
+
+**Q268 - Coverage:** Soll der Scan schon Testabdeckung (lcov) mitliefern?
+
+Answer: "Erst ohne Coverage (Recommended)".
+
+**Q269 - Projekt-Key:** Unter welchem Key scannt das Projekt in den geteilten Server?
+
+Answer: "stash (Recommended)".
+
+**Q270 - Issue anlegen:** "Anbindung an den geteilten SonarQube-Server" (type::technical-improvement, status::in-progress, area::infrastructure, tschudea07, Sprint 2, weight 1, 1h) so veröffentlichen?
+
+Answer: "Veröffentlichen (Recommended)". Created as #153.
+
+**Q271 - Push + MR:** Branch feature/153-sonarqube pushen und das MR "feat(repo): scan into the shared SonarQube with pnpm sonar" nach dev öffnen (Closes #153; kein echter Scan gelaufen, weil der Server hier nicht läuft)?
+
+Answer: "Push + MR öffnen (Recommended)".
+
+Revision after the review of `trutscf1` (two passes on !41). Instruction of `tschudea07`, verbatim: "schau dir mr !41 an und ändere was von trutscf1 gefordert wird". Open points of the second pass: real scan not run, `.scannerwork/` not ignored, label `type::technical-improvement` missing in `WORKFLOW.md`, no `AC` IDs in #153. The shared server was running, so the agent ran `pnpm sonar` from a clean clone of this branch: `EXECUTION SUCCESS`, `QUALITY GATE STATUS: PASSED`, 93 files indexed. `.scannerwork/` added to `.gitignore` test-first.
+
+**Q275 - Label:** trutscf1 bemängelt, dass `type::technical-improvement` (auf #153) nicht in der Label-Tabelle von WORKFLOW.md steht. Das Label existiert auf GitLab bereits und wird auch von schwaigc auf #150 verwendet. Wie lösen?
+
+Answer: "In WORKFLOW.md aufnehmen (Recommended)".
+
+**Q276 - Veröffentlichen auf !41:** Commits pushen, MR-Beschreibung aktualisieren (echter Scan, Abschnitt „No story, no AC IDs“, Fragenummern Q266–Q271) und Antwort-Kommentar an trutscf1 zu allen vier Punkten posten?
+
+Answer: "Alles veröffentlichen (Recommended)".
 ## Round 56 — 2026-11-03 — Start of Sprint 2, own issues (`trutscf1` (agent))
 
 Instruction of `trutscf1`, verbatim: "starte nun sprint 2 mit dem /engineering-human und /grill-me skill. schaue, wegen meinen docs und issues bezüglich opentelemetry, observability, ... beginne meine issues"
@@ -1483,3 +1548,4 @@ Answer: "#82 Slice 1, dann Slice 2 (Recommended)"
 Answer: "Ein Issue pro Session (Recommended)"
 
 The question numbers continue after Q258 of this branch; round 55 (Q259, Q260, mirror of the repository) is on `chore/github-mirror` and not yet in `dev`, so Q261 to Q263 are provisional until both are merged (P-TEAM-5).
+>>>>>>> origin/dev
