@@ -1,0 +1,48 @@
+# Data sources of the dashboard tool (OBS-C-6, OBS-F-9): the three stores on the internal network.
+# Provisioned from this file at every start; none can be edited in the dashboard tool.
+apiVersion: 1
+
+datasources:
+  - name: Metrics
+    uid: prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+
+  # A log entry with a trace ID links to its trace (OBS-F-7): the trace ID is stored as structured
+  # metadata of the entry, under the key of the OTLP field (trace_id) or of the attribute (traceId).
+  - name: Logs
+    uid: loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    editable: false
+    jsonData:
+      derivedFields:
+        - name: traceId
+          matcherType: label
+          matcherRegex: traceId
+          url: "${__value.raw}"
+          datasourceUid: tempo
+        - name: trace_id
+          matcherType: label
+          matcherRegex: trace_id
+          url: "${__value.raw}"
+          datasourceUid: tempo
+
+  # A trace links to the log entries with its trace ID (OBS-F-7).
+  - name: Traces
+    uid: tempo
+    type: tempo
+    access: proxy
+    url: http://tempo:3200
+    editable: false
+    jsonData:
+      tracesToLogsV2:
+        datasourceUid: loki
+        spanStartTimeShift: -1h
+        spanEndTimeShift: 1h
+        customQuery: true
+        query: '{service_name=~".+"} | trace_id="${__trace.traceId}"'

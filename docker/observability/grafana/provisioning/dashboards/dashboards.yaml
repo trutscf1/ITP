@@ -1,0 +1,12 @@
+# Provider of the operations dashboards (OBS-F-9): the folder is mounted read-only, and a change
+# made in the dashboard tool cannot be saved over the files.
+apiVersion: 1
+
+providers:
+  - name: operations
+    type: file
+    allowUiUpdates: false
+    disableDeletion: true
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/dashboards

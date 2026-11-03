@@ -350,8 +350,8 @@ services:
       retries: 10
       start_period: 20s
 
-  # Dashboard tool (OBS-C-6). Slice 1 starts it empty; data sources, dashboards, and alert rules
-  # come with OBS-US-2. Until TLS exists it is reachable on the server itself only, with
+  # Dashboard tool (OBS-C-6). Its data sources and the dashboard come from files (OBS-US-2, slice
+  # 1; docker/observability/grafana); the alert rules follow in slices 2 and 4. Until TLS exists it is reachable on the server itself only, with
   # read-only anonymous access (OBS-F-10, OBS-F-24). No login form, no self-registration, no
   # update check, no usage reporting, no plugin download (OBS-NF-1, OBS-NF-6).
   grafana:
@@ -384,6 +384,9 @@ services:
       - "127.0.0.1:${OBS_DASHBOARD_PORT:-3300}:3000"
     volumes:
       - grafana-data:/var/lib/grafana
+      # Data sources and operations dashboards as files of the repository (OBS-F-9).
+      - ./docker/observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./docker/observability/grafana/dashboards:/etc/grafana/dashboards:ro
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://127.0.0.1:3000/api/health"]
       interval: 10s

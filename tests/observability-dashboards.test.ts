@@ -190,7 +190,7 @@ describe("OBS-AC-2.2 Linked logs and traces, files (OBS-F-7, OBS-T-9)", () => {
       assert.equal(panel?.datasource?.uid, "prometheus", title);
       const expression = panel?.targets?.[0]?.expr ?? "";
       assert.match(expression, /http_server_request_duration_seconds/, title);
-      assert.match(expression, /by \(service_name/, title);
+      assert.match(expression, /by \([^)]*service_name/, title);
     }
   });
 
