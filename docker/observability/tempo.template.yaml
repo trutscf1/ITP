@@ -1,0 +1,30 @@
+# Trace store (OBS-C-5). The configuration step (check-config.ts) writes this file to
+# /generated/tempo.yaml with the retention of OBS_TRACES_RETENTION_DAYS in hours, because the
+# trace store accepts a duration in hours at most (OBS-NF-4). Reached only on the internal network.
+server:
+  http_listen_port: 3200
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+
+compactor:
+  compaction:
+    block_retention: __OBS_TRACES_RETENTION_HOURS__h
+
+storage:
+  trace:
+    backend: local
+    wal:
+      path: /var/tempo/wal
+    local:
+      path: /var/tempo/blocks
+
+# No usage reporting to the internet (OBS-NF-1).
+usage_report:
+  reporting_enabled: false

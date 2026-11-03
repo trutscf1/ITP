@@ -1554,3 +1554,32 @@ Answer: none yet; assumption A1 stands until the review.
 Answer: none yet; assumption A2 stands until the review.
 
 The question numbers are provisional until merged into `dev` (P-TEAM-5).
+## Round 56 — 2026-11-03 — Start of Sprint 2, own issues (`trutscf1` (agent))
+
+Instruction of `trutscf1`, verbatim: "starte nun sprint 2 mit dem /engineering-human und /grill-me skill. schaue, wegen meinen docs und issues bezüglich opentelemetry, observability, ... beginne meine issues"
+
+**Q261 - Einstieg:** Womit soll Sprint 2 für OBS beginnen?
+
+Answer: "starte mit meinen tickets von sprint 2"
+
+**Q262 - Reihenfolge:** Welches Issue zuerst, wenn wir umsetzen?
+
+Answer: "#82 Slice 1, dann Slice 2 (Recommended)"
+
+**Q263 - Vorgehen:** Wie soll ich bei der Umsetzung arbeiten?
+
+Answer: "Ein Issue pro Session (Recommended)"
+
+The question numbers continue after Q258 of this branch; round 55 (Q259, Q260, mirror of the repository) is on `chore/github-mirror` and not yet in `dev`, so Q261 to Q263 are provisional until both are merged (P-TEAM-5).
+
+## Round 60 — 2026-11-03 — Container scan of !44 (`trutscf1` (agent))
+
+**Q280 - Container-Scan !44:** Der Job `container-scan` fand 4 HIGH-Funde in `node:24.14-alpine` (OpenSSL) und 16 Funde in `grafana/grafana:13.2.5` (gebündelte npm-Pakete); Grafana 13.2.5 ist der neueste Tag von 13.2. Wie soll ich vorgehen?
+
+Answer: "Node bumpen, Grafana ignorieren (Recommended)".
+
+**A1 - Node-Bump nicht möglich:** The bump did not help, so the agent fell back to the entries of the other option for node as well. `node:24.22-alpine` has 6 other HIGH findings (npm), `node:24.14-alpine3.22` has 17, and `node:24.14-alpine3.23` has the same 4 OpenSSL findings as `node:24.14-alpine`; checked locally with Trivy 0.69.3 on 2026-11-03. The two OpenSSL CVEs and the CVEs of Grafana are in `.trivyignore` with reason and expiry 2026-11-23, like the entries of the other images. `trutscf1` is asked to confirm A1 in the review of !44.
+
+The number Q280 is provisional until merged (P-TEAM-5).
+
+**A2 - Review of !44 by `tschudea07` (revise):** Points 1 to 6 were accepted. Fixed: the red pipeline (`docs`, `container-scan`, see A1); the IPv6 pattern now needs a boundary (`std::vector` is kept) and runs twice; an IPv4 address before a full stop is redacted; §8, M6, `STACK.md` (OBS-C-6, SCF-C-7), and `scaffolding.md` (SCF-F-4, §8) are updated in the same MR (P-GIT-5); the proxy test is filed under `OBS-AC-1.3`. Also done from the non-blocking notes: CI tests for the patterns, a test that no service outside the profile depends on it (OBS-E-4), the span status message is emptied, the collector version stands in the README. Not done, with reasons in the replies: one Dockerfile with `ARG` instead of three, the defaults in three places (`.env.example` documents them, SCF-F-11), structured log bodies (slice 2, OBS-AC-1.4).

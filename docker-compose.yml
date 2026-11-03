@@ -218,6 +218,179 @@ services:
     networks:
       - backend
 
+  # Observability stack (profile "observability", OBS-F-5; concept observability.md §16, slice 1
+  # of OBS-US-1). The six containers share the memory budget of OBS-NF-8 (1472 MB of 1536 MB);
+  # none publishes a port except the dashboard tool on 127.0.0.1 (OBS-NF-7). The configuration
+  # step runs first, the collector and the stores start after it ended with 0, the dashboard tool
+  # after the stores are healthy. Remove the profile from COMPOSE_PROFILES in .env to start
+  # without the stack.
+
+  # Checks the variables of the stack and writes the configuration of the trace store (OBS-F-28,
+  # OBS-E-4); a one-shot container like db-migrate.
+  obs-config:
+    image: node:24.14-alpine
+    profiles: [observability]
+    restart: "no"
+    mem_limit: 64m
+    command: ["node", "/obs/check-config.ts"]
+    environment:
+      OBS_METRICS_RETENTION_DAYS: ${OBS_METRICS_RETENTION_DAYS:-15}
+      OBS_LOGS_RETENTION_DAYS: ${OBS_LOGS_RETENTION_DAYS:-7}
+      OBS_TRACES_RETENTION_DAYS: ${OBS_TRACES_RETENTION_DAYS:-7}
+      OBS_ALERT_ERROR_RATE_PERCENT: ${OBS_ALERT_ERROR_RATE_PERCENT:-5}
+      OBS_ALERT_MIN_REQUESTS: ${OBS_ALERT_MIN_REQUESTS:-20}
+      OBS_ALERT_STORAGE_PERCENT: ${OBS_ALERT_STORAGE_PERCENT:-90}
+      OBS_ALERT_QUEUE_MIN_WAITING: ${OBS_ALERT_QUEUE_MIN_WAITING:-10}
+      OBS_ALERT_SILENT_MINUTES: ${OBS_ALERT_SILENT_MINUTES:-2}
+      OBS_DASHBOARD_PORT: ${OBS_DASHBOARD_PORT:-3300}
+    volumes:
+      - ./docker/observability:/obs:ro
+      - obs-generated:/generated
+    networks:
+      - backend
+
+  # Receives metrics, log entries, and spans, removes person identifiers, and routes each kind to
+  # its store (OBS-C-2, OBS-F-2, OBS-F-29).
+  collector:
+    build:
+      context: .
+      dockerfile: docker/observability/collector.Dockerfile
+    profiles: [observability]
+    restart: unless-stopped
+    mem_limit: 192m
+    command: ["--config", "/etc/collector.yaml"]
+    depends_on:
+      obs-config:
+        condition: service_completed_successfully
+    networks:
+      - backend
+    volumes:
+      - ./docker/observability/collector.yaml:/etc/collector.yaml:ro
+    healthcheck:
+      test: ["CMD", "/busybox", "wget", "-qO", "/dev/null", "http://127.0.0.1:13133/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Metric store (OBS-C-3): OTLP receiver, retention from OBS_METRICS_RETENTION_DAYS.
+  prometheus:
+    image: prom/prometheus:v3.15.1
+    profiles: [observability]
+    restart: unless-stopped
+    mem_limit: 384m
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=${OBS_METRICS_RETENTION_DAYS:-15}d
+      - --web.enable-otlp-receiver
+    depends_on:
+      obs-config:
+        condition: service_completed_successfully
+    networks:
+      - backend
+    volumes:
+      - ./docker/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://127.0.0.1:9090/-/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Log store (OBS-C-4): OTLP ingestion, retention from OBS_LOGS_RETENTION_DAYS.
+  loki:
+    build:
+      context: .
+      dockerfile: docker/observability/loki.Dockerfile
+    profiles: [observability]
+    restart: unless-stopped
+    mem_limit: 320m
+    command: ["-config.file=/etc/loki/loki.yaml", "-config.expand-env=true"]
+    environment:
+      OBS_LOGS_RETENTION_DAYS: ${OBS_LOGS_RETENTION_DAYS:-7}
+    depends_on:
+      obs-config:
+        condition: service_completed_successfully
+    networks:
+      - backend
+    volumes:
+      - ./docker/observability/loki.yaml:/etc/loki/loki.yaml:ro
+      - loki-data:/loki
+    healthcheck:
+      test: ["CMD", "/busybox", "wget", "-qO", "/dev/null", "http://127.0.0.1:3100/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  # Trace store (OBS-C-5): OTLP ingestion; obs-config writes its configuration with the retention
+  # of OBS_TRACES_RETENTION_DAYS.
+  tempo:
+    build:
+      context: .
+      dockerfile: docker/observability/tempo.Dockerfile
+    profiles: [observability]
+    restart: unless-stopped
+    mem_limit: 256m
+    command: ["-config.file=/generated/tempo.yaml"]
+    depends_on:
+      obs-config:
+        condition: service_completed_successfully
+    networks:
+      - backend
+    volumes:
+      - obs-generated:/generated:ro
+      - tempo-data:/var/tempo
+    healthcheck:
+      test: ["CMD", "/busybox", "wget", "-qO", "/dev/null", "http://127.0.0.1:3200/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  # Dashboard tool (OBS-C-6). Slice 1 starts it empty; data sources, dashboards, and alert rules
+  # come with OBS-US-2. Until TLS exists it is reachable on the server itself only, with
+  # read-only anonymous access (OBS-F-10, OBS-F-24). No login form, no self-registration, no
+  # update check, no usage reporting, no plugin download (OBS-NF-1, OBS-NF-6).
+  grafana:
+    image: grafana/grafana:13.2.5
+    profiles: [observability]
+    restart: unless-stopped
+    mem_limit: 256m
+    environment:
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: "false"
+      GF_PLUGINS_PREINSTALL_DISABLED: "true"
+      GF_NEWS_NEWS_FEED_ENABLED: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    depends_on:
+      obs-config:
+        condition: service_completed_successfully
+      prometheus:
+        condition: service_healthy
+      loki:
+        condition: service_healthy
+      tempo:
+        condition: service_healthy
+    networks:
+      - backend
+    ports:
+      - "127.0.0.1:${OBS_DASHBOARD_PORT:-3300}:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://127.0.0.1:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
 networks:
   frontend:
   backend:
@@ -231,3 +404,8 @@ volumes:
   seaweedfs-data:
   clamav-data:
   proxy-data:
+  obs-generated:
+  prometheus-data:
+  loki-data:
+  tempo-data:
+  grafana-data:

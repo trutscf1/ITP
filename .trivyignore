@@ -82,3 +82,34 @@ CVE-2026-102554 exp:2026-11-23
 # in go-jose 4.1.6. Both services listen only on 127.0.0.1 in the local stack and parse no JWKs
 # from outside. Upstream must rebuild the images.
 CVE-2026-116587 exp:2026-11-23
+
+# Added 2026-11-03 (observability profile, #82): OpenSSL (libcrypto3, libssl3) 3.5.6 in node:24.14-alpine
+# (Alpine 3.23.4), which only runs the configuration step of the observability stack. The fix is
+# OpenSSL 3.5.8-r0; no node image has it yet (checked: 24.14-alpine, 24.14-alpine3.23, 24.22-alpine on
+# 2026-11-03, the newer one has other findings in npm). The step opens no network connection and no
+# TLS connection. Upstream must rebuild the image.
+CVE-2026-14456 exp:2026-11-23
+CVE-2026-45447 exp:2026-11-23
+
+# Added 2026-11-03 (observability profile, #82): npm packages bundled in grafana/grafana:13.2.5
+# (brace-expansion, minimatch, pacote, ip-address and others), the newest 13.2 tag. The dashboard tool
+# listens only on 127.0.0.1 until TLS exists (R14). Upstream must update the bundled packages.
+CVE-2026-102276 exp:2026-11-23
+CVE-2026-102278 exp:2026-11-23
+CVE-2026-13149 exp:2026-11-23
+CVE-2026-14257 exp:2026-11-23
+CVE-2026-21728 exp:2026-11-23
+CVE-2026-27903 exp:2026-11-23
+CVE-2026-27904 exp:2026-11-23
+CVE-2026-28377 exp:2026-11-23
+CVE-2026-29786 exp:2026-11-23
+CVE-2026-31802 exp:2026-11-23
+CVE-2026-33671 exp:2026-11-23
+CVE-2026-48815 exp:2026-11-23
+CVE-2026-59873 exp:2026-11-23
+CVE-2026-59874 exp:2026-11-23
+CVE-2026-69152 exp:2026-11-23
+CVE-2026-69192 exp:2026-11-23
+CVE-2026-73566 exp:2026-11-23
+CVE-2026-9496 exp:2026-11-23
+

@@ -294,8 +294,8 @@ The secret key fragments and the secret keys are part of the contract of the pac
 | Pattern | Matches |
 | --- | --- |
 | E-mail address | one or more characters other than white space and `@`, then `@`, then one or more such characters, a `.`, and one or more such characters |
-| IPv4 address | four groups of 1 to 3 digits separated by `.`, not part of a longer run of digits and dots |
-| IPv6 address | 3 to 8 groups of 1 to 4 hexadecimal digits separated by `:` that contain `::`, or exactly 8 such groups; a time such as `10:00:00` has no `::` and fewer than 8 groups and is kept |
+| IPv4 address | four groups of 1 to 3 digits separated by `.`, not part of a longer run of digits and dots; one full stop directly after the address is not part of the run, so the address in `from 203.0.113.7.` is redacted |
+| IPv6 address | 1 to 7 groups of 1 to 4 hexadecimal digits separated by `:` that contain `::` (`fe80::1`, `::1`), or exactly 8 such groups; not directly preceded or followed by a letter, digit, underscore, or `:`, so that `std::vector` is kept; a time such as `10:00:00` has no `::` and fewer than 8 groups and is kept |
 
 **Operations overview** (the operations dashboard of [OBS-F-6]; every value over the 5 minutes before each point in time, all units or the unit chosen in the unit selector):
 
@@ -691,8 +691,10 @@ function check(environment: map<string, string>) -> exit code
   1. For each variable of §8 "Configuration of the observability stack": missing and no default,
      or outside its valid values → one line "  <NAME>: <reason>"; never the value.
   2. If any line: print "Invalid configuration for the observability stack:" and the lines; exit 1.
-  3. Write the alert rule files from their templates in the repository, replacing the placeholders
-     of the four alert thresholds and of OBS_ALERT_SILENT_MINUTES with the values; exit 0.
+  3. Write the trace store configuration from its template, with the retention in hours; once the alert
+     rules exist (OBS-US-2, slices 2 and 4), also write the alert rule files from their templates in the
+     repository, replacing the placeholders of the four alert thresholds and of OBS_ALERT_SILENT_MINUTES
+     with the values; exit 0.
 ```
 
 **M7 CollectorPipeline** — Traces to: OBS-F-2, OBS-F-29, OBS-NF-2, OBS-NF-3, OBS-NF-7, OBS-E-2. Requires: OBS-C-2.

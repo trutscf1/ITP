@@ -1,0 +1,12 @@
+# Metric store (OBS-C-3). It receives metrics from the collector over its OTLP receiver
+# (--web.enable-otlp-receiver); nothing is scraped. Alert rules are evaluated every 60 seconds
+# (OBS-F-8) and join with the alert rules of OBS-US-2.
+global:
+  scrape_interval: 60s
+  evaluation_interval: 60s
+
+otlp:
+  # The unit and its version stay labels of every metric (OBS-F-11).
+  promote_resource_attributes:
+    - service.name
+    - service.version
