@@ -69,4 +69,8 @@ describe("#153 Scan into the shared SonarQube", () => {
     const example = readFileSync(join(root, ".env.sonar.example"), "utf8");
     assert.match(example, /^SONAR_TOKEN=$/m);
   });
+
+  it("keeps the scanner work folder .scannerwork out of git", () => {
+    assert.equal(isIgnored(".scannerwork"), true);
+  });
 });
