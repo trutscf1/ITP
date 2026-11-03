@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { describe, it } from "node:test";
@@ -19,13 +18,27 @@ function readProperties(path: string): Map<string, string> {
   return new Map(entries);
 }
 
+// Applies the root .gitignore to a file in the repository root: the last matching pattern
+// wins, and a pattern starting with ! re-includes. It reads the file instead of asking git,
+// because the CI image of the test job (node:alpine) has no git.
 function isIgnored(path: string): boolean {
-  try {
-    execFileSync("git", ["check-ignore", "-q", path], { cwd: root });
-    return true;
-  } catch {
-    return false;
+  let ignored = false;
+  for (const raw of readFileSync(join(root, ".gitignore"), "utf8").split(
+    /\r?\n/,
+  )) {
+    const line = raw.trim();
+    if (line === "" || line.startsWith("#")) continue;
+    const negated = line.startsWith("!");
+    const pattern = (negated ? line.slice(1) : line)
+      .replace(/^\//, "")
+      .replace(/\/$/, "");
+    const source = pattern
+      .split("*")
+      .map((part) => part.replace(/[.+?^${}()|[\]\\]/g, "\\$&"))
+      .join("[^/]*");
+    if (new RegExp(`^${source}$`).test(path)) ignored = !negated;
   }
+  return ignored;
 }
 
 describe("#153 Scan into the shared SonarQube", () => {
