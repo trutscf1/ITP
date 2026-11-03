@@ -170,6 +170,29 @@ describe("M11 UnitWiring for cms (OBS-AC-1.1)", () => {
     assert.equal(accepted, false);
   });
 
+  it("OBS-AC-1.1 OBS-F-1 delivers the start entry once even when the code that accepts requests fails to start, and passes the error on", async () => {
+    const stub = await collector();
+    const timer = manualScheduler();
+    try {
+      await assert.rejects(
+        boot(
+          { TELEMETRY_ENDPOINT: stub.endpoint },
+          async () => {
+            throw new Error("cms did not start");
+          },
+          { stdout: () => undefined, scheduler: timer.scheduler },
+        ),
+        /cms did not start/,
+      );
+      assert.match(
+        JSON.stringify(stub.requests.find((r) => r.path === "/v1/logs")),
+        /unit started/,
+      );
+    } finally {
+      await stub.close();
+    }
+  });
+
   it("OBS-AC-1.1 OBS-F-31 still writes the start log entry to standard output while telemetry is switched off", async () => {
     const lines: string[] = [];
     await boot({ TELEMETRY_ENABLED: "false" }, async () => undefined, {
