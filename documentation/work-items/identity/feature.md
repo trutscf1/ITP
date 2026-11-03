@@ -24,3 +24,7 @@ In dependency order; each file holds the story, its acceptance criteria, and its
 4. [IDN-US-4 Two-factor authentication with TOTP](IDN-US-4-two-factor-authentication-with-totp.md)
 5. [IDN-US-5 Log in with passkeys (WebAuthn)](IDN-US-5-log-in-with-passkeys-webauthn.md)
 6. [IDN-US-6 Reset the password](IDN-US-6-reset-the-password.md)
+7. [IDN-US-7 Operator role and session check](IDN-US-7-operator-role-and-session-check.md) — draft
+8. [IDN-US-8 Delete my account](IDN-US-8-delete-my-account.md) — draft
+
+Ready for generation (2026-11-03): IDN-US-1, IDN-US-2, IDN-US-6. IDN-US-3 to -5, -7, -8 are grilled before Sprint 3 (concept, Q3).

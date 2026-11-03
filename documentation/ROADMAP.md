@@ -92,6 +92,8 @@ About 53 h per person, about 213 h for the team in total; this replaces the earl
 
 **R14 — Deployment** (`tschudea07`, CI/CD). Automatic deployment of the whole stack on push to `main` to the team's own server, TLS through the reverse proxy (school requirement, `docs/anforderungen_software_projekte.md`). Blocked until server and domain exist.
 
+**O1 — End-to-end encryption** (optional extension, no owner yet). If it is built, the school rule applies: true end-to-end encryption uses libsodium, and the project writes no cryptographic algorithm of its own (`G-1.N5`, Definition of Done item 19 in `WORKFLOW.md`).
+
 ## Milestones
 
 What must be finished when each milestone ends. A milestone is one sprint and one GitLab milestone; the text below is copied into the milestone description on GitLab. Due dates and review dates are in `WORKFLOW.md`. The cycle is the same every sprint (`WORKFLOW.md`, "Sprint cycle"): concept `ready`, tests first, code generated from the documents, review, release MR, regeneration probe.

@@ -120,6 +120,14 @@ What exists today and what is planned (`documentation/ROADMAP.md`, R14 *Deployme
 
 Releases are tagged `v<version>` on `main` and published as GitLab Releases; the rules are in [documentation/WORKFLOW.md](documentation/WORKFLOW.md), section *Releases*.
 
+## Code quality scan
+
+The repository is scanned locally into a SonarQube server that every project on the developer's computer shares; the server itself is not part of this repository (`documentation/STACK.md`, section 3).
+
+1. Start the shared server (`docker compose up -d` in its folder) and open <http://localhost:9000>.
+2. Create a token (*My Account → Security*) and write it into `.env.sonar`, a copy of `.env.sonar.example`. The file is never committed.
+3. Run `pnpm sonar`. It scans under the project key `stash` (`sonar-project.properties`) and fails when the quality gate fails.
+
 ## Documentation
 
 | Where | What |

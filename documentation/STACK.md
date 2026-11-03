@@ -20,14 +20,14 @@ Every row traces to the capability IDs (`SCF-C-x`, later other prefixes) that de
 
 ## Capability index
 
-Every capability of `concepts/scaffolding.md` §7, `concepts/public-content.md` §7, and `concepts/observability.md` §7 and where its technology stands. The index only points to the track sections; it holds no technology of its own, except the capabilities added on 2026-10-13 that no section maps yet. Their owner moves the row into the own section when the technology is chosen.
+Every capability of `concepts/scaffolding.md` §7, `concepts/public-content.md` §7, `concepts/observability.md` §7, and `concepts/identity.md` §7 and where its technology stands. The index only points to the track sections; it holds no technology of its own, except the capabilities added on 2026-10-13 that no section maps yet. Their owner moves the row into the own section when the technology is chosen.
 
 | ID | Capability | Technology | Owner |
 | --- | --- | --- | --- |
 | SCF-C-1 | Workspace and task runner | section 1 | `trutscf1` |
 | SCF-C-2 | Schemas | section 2 | `schauby1` |
 | SCF-C-3 | Web application framework | section 4 | `schwaigc` |
-| SCF-C-4 | HTTP server framework | sections 2 and 3 | `schauby1`, `tschudea07` |
+| SCF-C-4 | HTTP server framework | sections 2 and 3 (`identity`: Hono) | `schauby1`, `tschudea07` |
 | SCF-C-5 | Content management system | section 1 | `trutscf1` |
 | SCF-C-6 | Reverse proxy | section 1 | `trutscf1` |
 | SCF-C-7 | Container runtime | section 1 | `trutscf1` |
@@ -56,6 +56,14 @@ Every capability of `concepts/scaffolding.md` §7, `concepts/public-content.md` 
 | OBS-C-5 | Trace store | section 1 | `trutscf1` |
 | OBS-C-6 | Dashboard tool | section 1 | `trutscf1` |
 | OBS-C-7 | Session check in the reverse proxy | section 1 | `trutscf1` |
+| IDN-C-1 | Authentication library | section 3 | `tschudea07` |
+| IDN-C-2 | Password hash | section 3 | `tschudea07` |
+| IDN-C-3 | Shared schema library | section 3 | `tschudea07` |
+| IDN-C-4 | Form library | section 3 | `tschudea07` |
+| IDN-C-5 | Bot check | section 3 | `tschudea07` |
+| IDN-C-6 | Session store | section 3 | `tschudea07` |
+| IDN-C-7 | HTTP server framework (`identity`) | section 3 | `tschudea07` |
+| IDN-C-8 | E-mail delivery | section 3 | `tschudea07` |
 
 ## 1. Platform — `trutscf1`
 
@@ -66,7 +74,7 @@ Every capability of `concepts/scaffolding.md` §7, `concepts/public-content.md` 
 | Shared lint / format / type configuration | Biome (lint, format); shared TypeScript base config | Biome 2.4; `@stash/config` | `biome.json` at the root, generated Prisma files excluded, `noExplicitAny` set to `error`; `packages/config/tsconfig.base.json` with `strict`, extended by every unit including `web`. Set by #38 and #102. |
 | SCF-C-13 unit test runner (shared) | Node.js test runner (`node --test`), TypeScript by type stripping | Node.js 24 | Provisional, for the acceptance tests (`tests/`, the workspace package `@stash/tests`) and the unit tests of every package; the owner may replace it. Browser end-to-end runner: section 4. |
 | SCF-C-7 container runtime & stack | Docker, Docker Compose | Compose v2; images pinned to a tag (`postgres:18-alpine`, `redis:8.8-alpine`, `mongo:8.0`, `couchdb:3.5`, `chrislusf/seaweedfs:4.51`, `clamav/clamav:1.5`, `axllent/mailpit:v1.32`, `caddy:2.11-alpine`); each image except PostgreSQL pinned to a minor version (PostgreSQL to the major version the school requirements name) | SCF-US-2. `docker-compose.yml`: every setting from `.env` (documented in `.env.example`, secrets as `${NAME:?…}` without a default), a health check per service, `depends_on` with `service_healthy`, except a one-shot container (`restart: "no"`, such as `db-migrate`), which has no health check and whose dependents wait with `service_completed_successfully` (SCF-AC-2.4, SCF-F-20); data services published on `127.0.0.1` only. `web` is built from `docker/web.Dockerfile` (Node.js as in `.tool-versions`), a temporary stop-gap that M9 of the track plan Web replaces with `apps/web/Dockerfile`; its health check requests `/` until `/health` exists. Mailpit replaces outgoing e-mail; OAuth and captcha are off by default (SCF-NF-2); ClamAV starts with the definitions of its image (`CLAMAV_NO_FRESHCLAMD`) and runs as `linux/amd64`, emulated on ARM machines, because its image exists for amd64 only (#148). The tests are `tests/docker-compose.test.ts`. |
-| SCF-C-6 reverse proxy | Caddy | `caddy:2.11-alpine` | One origin on `PROXY_PORT`, plain HTTP (TLS with R14); routes in `docker/Caddyfile`, only `/` to `web` until the other units run; `/proxy-health` is answered by the proxy for its health check. |
+| SCF-C-6 reverse proxy | Caddy | `caddy:2.11-alpine` | One origin on `PROXY_PORT`, plain HTTP (TLS with R14: the automatic HTTPS of Caddy with a certificate from Let's Encrypt, HTTP-01 challenge, and the redirect from HTTP to HTTPS of DEP-F-2; the school's optional Traefik is not used, deviation in `WORKFLOW.md`, Q265); routes in `docker/Caddyfile`, only `/` to `web` until the other units run; `/proxy-health` is answered by the proxy for its health check. |
 | SCF-C-8 relational database | PostgreSQL | 18 (`postgres:18-alpine`) | Data in the volume `postgres-data` mounted at `/var/lib/postgresql` (PostgreSQL 18 layout). Prisma is set up by SCF-US-4. |
 | SCF-C-5 content management system | _open_ | | |
 | SCF-C-12 changelog draft generator | _open_ | | |
@@ -103,11 +111,19 @@ Type mapping (neutral type → concrete type) and error mapping (`E-x` → concr
 
 | Capability | Technology | Version constraint | Notes |
 | --- | --- | --- | --- |
-| SCF-C-4 HTTP server framework (`identity`) | _open_ | | |
+| SCF-C-4 HTTP server framework (`identity`), IDN-C-7 | Hono on Node.js | `hono` 4, newest version older than 7 days | Q11 of `concepts/identity.qa-log.md`. Set by #115. |
+| IDN-C-1 authentication library | Better Auth with its email-and-password flow, e-mail verification, password reset, and secondary storage for sessions; tables mapped onto `auth_users`, `auth_accounts`, `auth_verifications` (SCF-C-19) | `better-auth` ≥ 1.76 (school requirement) | Sessions only in the session store (IDN-C-6), `auth_sessions` stays empty ([ADR-0007](adr/0007-session-check-through-identity.md)). Set by #115. |
+| IDN-C-2 password hash | Argon2id through the package `@node-rs/argon2`, plugged into Better Auth's password hashing | OWASP parameters: memory 19 MiB, 2 iterations, parallelism 1 | School requirement: Argon2id or bcrypt. Set by #115. |
+| IDN-C-3 shared schema library | Zod in `packages/contracts` (module `identity`), with the common-password list as a data file there | Zod of SCF-C-2 | The same rules in the browser and in `identity` (school requirement). Set by #115. |
+| IDN-C-4 form library | TanStack Form or React Hook Form, chosen by the owner of `web` in slice 2 of IDN-US-1 | – | School requirement names both. |
+| IDN-C-5 bot check | Cloudflare Turnstile, visible managed widget, verified server-side through its siteverify address | – | Q10. Off with `CAPTCHA_ENABLED=false`; no notice text needed for a visible widget (A16, PUB-F-23). Set by #115. |
+| IDN-C-6 session store, throttle counters | Redis of the local stack (`redis:8.8-alpine`) | Redis 8 | Keys of `concepts/identity.md` §8. Set by #115. |
+| IDN-C-8 e-mail delivery | SMTP with `nodemailer`; locally `mailpit` | – | Set by #115. |
 | SCF-C-19 database access layer (package `db`, used by every unit with the relational database) | Prisma ORM 8 with its PostgreSQL target; contract in Prisma Schema Language `packages/db/src/prisma/contract.prisma`, migrations in `packages/db/migrations/app`; `pg` for the seed and the database tests | `prisma` 8.0.0-rc.27, `@prisma/orm-postgres` 8.0.0-rc.20, `@prisma/cli-engine` 0.9.0, exact — the newest release candidates that share one toolchain version and are seven days old ([ADR-0006](adr/0006-prisma-8-release-candidate.md)); `pg` 8.22.0 | School minimum Prisma ≥ 8; no stable 8.0.0 exists yet (ADR-0006). Create a migration with the package scripts of `packages/db`, the one way to run the schema commands: `contract:emit`, then `migration:plan <snake_slug>` (offline, no database needed); a hand-made step (the trigger of SCF-F-24) is added to the planned `migration.ts` and written with `node migrations/app/<dir>/migration.ts`. Apply: `pnpm db:migrate` (the script `migrate`: `prisma db migrate --show && prisma db migrate`, one transaction); container `db-migrate` from `packages/db/Dockerfile`. Seed: `pnpm db:seed`. Time columns are `TimestamptzString` (text on read), because the `Temporal` codec needs Node.js ≥ 26.8. Auth library tables: model and field names mapped to `auth_users`, `auth_sessions`, `auth_accounts`, `auth_verifications` in snake_case by its configuration (identity concept). Database tests: `TEST_DATABASE_URL`, passed through by Turborepo; CI job `test` has a `postgres:18-alpine` service. Set by #41 (`trutscf1`, A21). |
 | SCF-C-21 data model diagram tool | Vertabelo (Redgate) | – | Prescribed by `docs/anforderungen_software_projekte.md`. The text form in `concepts/scaffolding.md` §8 is binding until the export `documentation/images/er-diagram.png` is embedded (human step). Set by #41. |
 | SCF-C-9 CI service | GitLab CI | – | Q4. `.gitlab-ci.yml`: one pipeline per change (merge request pipeline while an MR is open, otherwise branch pipeline); lint, typecheck, test, build in parallel on the `node` image of the version in `.tool-versions`; 10-minute job timeout; pnpm store cached by lockfile, Turborepo cache per job, shared by all branches (SCF-US-5) |
-| SCF-C-10 secret scanner, code scanner, dependency auditor, container image scanner | Gitleaks, Semgrep, `pnpm audit`, Trivy | Gitleaks 8.30.0, Semgrep 1.148.0, Trivy 0.69.3 | From `docs/security_next_js.md`: `.gitleaks.toml`, `.semgrep.yml` (registry rule sets passed with `--config`, `.claude/` ignored), `.pre-commit-config.yaml` locally and the same files in CI. `pnpm audit --prod --audit-level=high`. Trivy scans every image of `docker-compose.yml` with `--ignore-unfixed`; accepted upstream findings in `.trivyignore`, each with reason and expiry (SCF-US-5) |
+| SCF-C-10 secret scanner, code scanner, dependency auditor, container image scanner | Gitleaks, Semgrep, `pnpm audit`, Trivy | Gitleaks 8.30.0, Semgrep 1.148.0, Trivy 0.69.3 | From `docs/security_next_js.md`: `.gitleaks.toml`, `.semgrep.yml` (registry rule sets passed with `--config`, `.claude/` ignored), `.pre-commit-config.yaml` locally and the same files in CI. Single secret-scan findings that are no secrets go into `.gitleaksignore` by fingerprint, each with its reason. `pnpm audit --prod --audit-level=high`. Trivy scans every image of `docker-compose.yml` with `--ignore-unfixed`; accepted upstream findings in `.trivyignore`, each with reason and expiry (SCF-US-5) |
+| Code quality scan (local, beside SCF-C-10) | SonarQube Community Build, the server shared by every project on the developer's computer (Docker network `sonarqube-shared`, `127.0.0.1:9000`), kept outside this repository; scanner container `sonarsource/sonar-scanner-cli` | Scanner image `12.3.0.4285_8.1.0`, exact — the newest tag that is seven days old | `sonar-project.properties` (project key `stash`, test files and generated files excluded from the sources); `pnpm sonar` (`scripts/sonar.ts`) runs the scanner and waits for the quality gate; token `SONAR_TOKEN` in the ignored `.env.sonar` (copy of `.env.sonar.example`). No CI job, because the server answers only on localhost; no coverage report yet (`../qa-log.md`, Q259–Q262). Set by #153. |
 | Accessibility check in CI | axe with Playwright | Playwright 1.63.0 (pinned; equals the CI image tag), `@axe-core/playwright` | `tests/accessibility/axe-check.ts` against the built web client; fails on a critical violation. Pages are added there with R4 (`../qa-log.md`, Q27) |
 | SCF-C-11 commit message linter | commitlint | `@commitlint/cli` 21 | `commitlint.config.ts`: Conventional Commits, scope list and requirement ID of `WORKFLOW.md`; commit-msg hook through `.pre-commit-config.yaml`, CI job `commit-messages`. Changelog draft and release notes: `scripts/changelog.ts` (`pnpm run changelog:draft`); CI jobs `release-notes` and `release` (GitLab CLI image 1.74.0) publish the GitLab Release on a SemVer tag (SCF-US-6) |
 

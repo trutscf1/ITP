@@ -76,6 +76,7 @@ Presented at the final presentation (`docs/anforderungen_software_projekte.md`, 
 | Proposal says | Rule here | Reason |
 | --- | --- | --- |
 | CI/CD with GitHub Actions | GitLab CI | Repository, MRs, reviews, and merge checks live on GitLab; GitHub is only a mirror and cannot block a GitLab merge. |
+| Reverse proxy Traefik ≥ 3.6.10 with Let's Encrypt (HTTP-01), an optional extra requirement of the school (`docs/anforderungen_software_projekte.md`, "Eventuelle Zusatzanforderungen") | Caddy (`caddy:2.11-alpine`) in the local stack and on the server, with its automatic HTTPS from Let's Encrypt (HTTP-01) | One proxy for both: the local stack, the routes of `docker/Caddyfile`, and the session check of the observability dashboards (`forward_auth`, `STACK.md` OBS-C-7) already use Caddy; a second proxy would double the configuration. The school's TLS and routing requirements (§9) are met either way (Q265). |
 
 ## Tracker (P-TRK-1…4)
 
@@ -91,6 +92,7 @@ Every change starts with an issue (§3). Each issue has: description, acceptance
 | `type::concept` | Tracking issue for concept authoring on a `concept/…` branch, one per roadmap feature |
 | `type::request` | Raw incoming feature request; enters the concept process via the inbox (`/engineering-human triage`) |
 | `type::documentation` | Documentation work that belongs to no single story (project-specific) |
+| `type::technical-improvement` | Technical improvement, refactoring, or tooling that belongs to no story (project-specific); its acceptance criteria stand in the issue without `AC` IDs, and its tests name the issue number |
 | `status::backlog` | Not planned for a sprint yet (project-specific; first board column) |
 | `status::ready` / `status::in-progress` / `status::review` | Board columns |
 | `status::done` | Finished; set at the merge (project-specific; last board column) |
@@ -182,7 +184,12 @@ An issue is done, and its MR may be merged, only when every item holds:
 15. Test first (ADR-0005): on the story's branch, a `test(<scope>): … [AC-ID]` commit with the failing tests of the story's acceptance criteria comes before the first `feat` or `fix` commit that touches production code; the MR checklist confirms it.
 16. Every acceptance criterion of the story is covered by a test whose name carries its `AC` ID (check: `tools/doc-check.mjs` rule `AC-TEST`, once built; until then the reviewer checks it by hand).
 
-Items 15 and 16 apply from the day the sprint plan is merged into `dev`, to work that begins after that day. Merge requests that are already open on that day (`!5`, `!7`, `!9`, `!14`) were written before the rule and are not blocked on these two items; their reviewers check items 1 to 14.
+17. Layers stay separate (school requirement §1): pages and UI components hold no business rule and no database statement, business logic sits in the unit that owns it (ADR-0001), and every database access goes through the access layer of the package `db` (`STACK.md` SCF-C-19).
+18. Dependencies and content (school requirements §3, §10): no SaaS service replaces a core function (authentication, database logic, business logic); no experimental or unmaintained dependency, except an exception recorded as an ADR (ADR-0006, Prisma 8 release candidate); every committed image, font, text, and dependency is licence-free, because the repository is public (`concepts/scaffolding.md` SCF-F-28, licence notes).
+19. Keys and encryption (school requirements, "Projektanforderungen"): symmetric encryption uses at least AES-256-GCM; its key comes from `.env` on the server or from a key vault (Azure Key Vault, AWS KMS, or HashiCorp Vault), never from the code or the repository; no own cryptographic algorithm (`G-1.N5`); an end-to-end encryption, if it is built (O1), uses libsodium.
+20. User interface (school requirements §10): a changed page is built mobile first, readable at 320 pixels without horizontal scrolling, and usable with keyboard and screen reader; the automated accessibility check reports no violation (`G-1.S2`).
+
+Items 15 and 16 apply from the day the sprint plan is merged into `dev`, to work that begins after that day. Items 17 to 20 apply from the day of the merge request `chore/school-requirements-gaps`, to work that begins after that day; they restate school requirements that were already binding through `docs/`, and the reviewer checks them in the MR like items 1 to 14. Merge requests that are already open on that day (`!5`, `!7`, `!9`, `!14`) were written before the rule and are not blocked on these two items; their reviewers check items 1 to 14.
 
 ## Releases (P-VER-1…3)
 

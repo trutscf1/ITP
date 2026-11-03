@@ -1,0 +1,6 @@
+# Findings of the secret scan that are not secrets (docs/security_next_js.md). One line per
+# finding: <commit>:<file>:<rule>:<line>, with the reason above it. Prefer the allowlist in
+# .gitleaks.toml for whole classes; list single findings here.
+
+# Example password of a worked example in the identity concept, not a credential.
+9fe9ddd47550af59b8be547183be79efcf1febbd:documentation/concepts/identity.md:generic-api-key:319

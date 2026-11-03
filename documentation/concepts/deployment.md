@@ -33,7 +33,7 @@ Draft, derived one to one from the acceptance criteria.
 | ID | Title | Requirement | Derives from |
 | --- | --- | --- | --- |
 | DEP-F-1 | Deploy on merge | Given a release merge to `main`, when the pipeline runs, the system MUST ensure that it builds the Docker images, pushes them to a registry, and deploys them to the Hetzner server. | DEP-AC-1.1 (Deploy on merge) |
-| DEP-F-2 | TLS and redirect | Given the deployed system behind Traefik (≥ 3.6.10) with Let's Encrypt (HTTP-01), when a browser requests a page over HTTP, the system MUST ensure that the request is redirected to HTTPS. | DEP-AC-1.2 (TLS and redirect) |
+| DEP-F-2 | TLS and redirect | Given the deployed system behind its reverse proxy with a certificate from Let's Encrypt (HTTP-01 challenge), when a browser requests a page over HTTP, the system MUST ensure that the request is redirected to HTTPS. | DEP-AC-1.2 (TLS and redirect) |
 | DEP-F-3 | Secrets outside the code | Given the deployment, when it needs a secret, the system MUST ensure that the secret comes only from pipeline secrets or from `.env` on the server, never from the code. | DEP-AC-1.3 (Secrets outside the code) |
 | DEP-F-4 | Failed deployment | Given a running version on the server, when a deployment fails, the system MUST ensure that the previous version keeps running. | DEP-AC-1.4 (Failed deployment) |
 | DEP-F-5 | Documented procedure | Given the project documentation, when a team member looks up the deployment, the system MUST ensure that the deployment procedure is described there. | DEP-AC-1.5 (Documented procedure) |

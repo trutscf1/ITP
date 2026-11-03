@@ -1466,6 +1466,72 @@ Answer: "-s ours + Inbox-Eintrag (Recommended)".
 
 Answer: "Remote löschen (Recommended)". Before deleting, the agent checked that the head of each branch is the head of its merge request (`refs/merge-requests/<n>/head`), so every commit stays reachable through the closed merge request. The four remote branches were deleted; `feature/40-contracts-zod-openapi` and `concept/migrate-scaffolding` are recorded in `dev` with the strategy "ours" (content of `dev` unchanged).
 
+## Round 55 — 2026-11-02 — GitHub mirror (`trutscf1` (agent))
+
+Instruction of `trutscf1`, verbatim: "nun mirror mir dieses repo noch auf meine github account"
+
+**Q259 - Sichtbarkeit GitHub-Repo:** CLAUDE.md sagt "the repository is public, so all content must be licence-free", das GitLab-Projekt selbst ist aber private. Wie soll das GitHub-Repo sichtbar sein?
+
+Answer: "Private". `trutscf1` created the repository `trutscf1/ITP` as public; the visibility stays the owner's decision.
+
+**Q260 - Zugang gamgamstyle:** docs §18 verlangt, dem GitHub-User gamgamstyle die Rolle Reporter zu geben. Bei einem Repo in einem persönlichen GitHub-Account gibt es keine Nur-Lese-Rolle. Was soll passieren?
+
+Answer: "Als Collaborator einladen (Recommended)". Invitation sent; on a personal account a collaborator can push.
+
+The first mirror entered on GitLab failed with "Invalid username or token. Password authentication is not supported for Git operations". The agent checked the token of `trutscf1` (scope `repo`, push access to `trutscf1/ITP`), replaced the mirror with one that carries the token in its URL, all branches (not only protected ones), and ran the first sync: 34 branches and the tag `v0.1.0`, the same as on GitLab.
+
+## Round 57 — 2026-11-03 — Anchoring the school requirements (`trutscf1` (agent))
+
+Instruction of `trutscf1`, verbatim: "schau dass diese anforderungen alle fix verankert sind:" followed by the text of `docs/anforderungen_software_projekte.md`.
+
+**Q264 - Verankerung:** Wie sollen die Schulanforderungen aus `docs/anforderungen_software_projekte.md` dauerhaft verankert werden? Ich habe sie mit dem Text im Repo verglichen: Die eingefügten Anforderungen stehen dort wörtlich schon drin, aber nicht jede Zeile ist einem Dokument, einer Story oder einem DoD-Punkt zugeordnet.
+
+Answer: "Nur Lücken schließen"
+
+**Q265 - Reverse Proxy:** `deployment.md` (DEP-F-2) verlangt Traefik ≥ 3.6.10 mit Let's Encrypt, der lokale Stack und `STACK.md` (SCF-C-6, OBS-C-7) verwenden aber Caddy. Traefik ist in den Schulanforderungen nur eine „eventuelle Zusatzanforderung“. Wie soll das aufgelöst werden?
+
+Answer: "Caddy überall, Abweichung dokumentieren (Recommended)"
+
+The question numbers are provisional until merged into `dev` (P-TEAM-5): round 56 (Q261 to Q263) is on `feature/82-observability-stack` and round 55 (Q259, Q260) on `chore/github-mirror`.
+
+## Round 58 — 2026-11-03 — Shared SonarQube server (`tschudea07` (agent))
+
+Instruction of `tschudea07`, verbatim: "/Users/andreas/Downloads/sonarqube-shared.zip bau das ein". The archive holds `compose.yaml`, `start.ps1`, and `README.md` of a SonarQube server shared by every project on one computer (port `127.0.0.1:9000`, Docker network `sonarqube-shared`). A1: developer handle `tschudea07` (git user; no `CLAUDE.local.md`). A2: no CI job, because the server listens on localhost only and GitLab CI cannot reach it.
+
+**Q266 - Umfang:** Was soll aus dem SonarQube-ZIP ins Repo?
+
+Answer: "Nur Projekt-Anbindung (Recommended)".
+
+**Q267 - Tracking:** Wie läuft die Änderung über GitLab?
+
+Answer: "Issue + Branch + MR (Recommended)".
+
+**Q268 - Coverage:** Soll der Scan schon Testabdeckung (lcov) mitliefern?
+
+Answer: "Erst ohne Coverage (Recommended)".
+
+**Q269 - Projekt-Key:** Unter welchem Key scannt das Projekt in den geteilten Server?
+
+Answer: "stash (Recommended)".
+
+**Q270 - Issue anlegen:** "Anbindung an den geteilten SonarQube-Server" (type::technical-improvement, status::in-progress, area::infrastructure, tschudea07, Sprint 2, weight 1, 1h) so veröffentlichen?
+
+Answer: "Veröffentlichen (Recommended)". Created as #153.
+
+**Q271 - Push + MR:** Branch feature/153-sonarqube pushen und das MR "feat(repo): scan into the shared SonarQube with pnpm sonar" nach dev öffnen (Closes #153; kein echter Scan gelaufen, weil der Server hier nicht läuft)?
+
+Answer: "Push + MR öffnen (Recommended)".
+
+Revision after the review of `trutscf1` (two passes on !41). Instruction of `tschudea07`, verbatim: "schau dir mr !41 an und ändere was von trutscf1 gefordert wird". Open points of the second pass: real scan not run, `.scannerwork/` not ignored, label `type::technical-improvement` missing in `WORKFLOW.md`, no `AC` IDs in #153. The shared server was running, so the agent ran `pnpm sonar` from a clean clone of this branch: `EXECUTION SUCCESS`, `QUALITY GATE STATUS: PASSED`, 93 files indexed. `.scannerwork/` added to `.gitignore` test-first.
+
+**Q275 - Label:** trutscf1 bemängelt, dass `type::technical-improvement` (auf #153) nicht in der Label-Tabelle von WORKFLOW.md steht. Das Label existiert auf GitLab bereits und wird auch von schwaigc auf #150 verwendet. Wie lösen?
+
+Answer: "In WORKFLOW.md aufnehmen (Recommended)".
+
+**Q276 - Veröffentlichen auf !41:** Commits pushen, MR-Beschreibung aktualisieren (echter Scan, Abschnitt „No story, no AC IDs“, Fragenummern Q266–Q271) und Antwort-Kommentar an trutscf1 zu allen vier Punkten posten?
+
+Answer: "Alles veröffentlichen (Recommended)".
+
 ## Round 59 — 2026-11-03 — review of the open merge requests (`tschudea07` (agent))
 
 Instruction of `tschudea07`, verbatim: "review alle merrequest die man revien kann"
@@ -1493,3 +1559,21 @@ Open merge requests of `tschudea07` with conflicts: !43 (`concept/identity`) and
 Answer: "Beide pushen (Recommended)". Asked in the pop-up as Q272; renumbered here because round 59 holds Q272 and Q273. Pushed as `0d6d8d04b` (!43) and `2d7f143f6` (!41).
 
 Follow-up of `tschudea07`, verbatim: "ich kann den MR !41 noch nicht mergen". Cause: !43 was merged into `dev` (`f76a77bb4`) after the first merge, and both branches had appended to `ROADMAP-DETAILS.md` and changed the same spot in `STACK.md` (SCF-C-10 on `dev`, the new SonarQube row below it on !41). `dev` merged into `feature/153-sonarqube` again (`944082f5e`): the SCF-C-10 row of `dev` kept with the SonarQube row below it, both log entries kept. `doc-check` 0 errors, markdownlint 0 issues; GitLab reports !41 free of conflicts.
+
+## Round 61 — 2026-11-03 — session start and the open log branch (`tschudea07` (agent))
+
+Session started with `/engineering-human` without an argument. Stated assumption A1: entry point `tickets identity`, since the R3 position on `dev` is Phase 6 for IDN-US-1, -2, -6 and !43 (Phase 4 gate) is approved by `trutscf1`. Found: the log branch `chore/review-round-2026-11-03` holds three commits not on `dev` and has no merge request.
+
+**Q277 - Entry point:** Should this session continue with `/engineering-human tickets identity` (cut IDN-US-1, -2, -6 into issues; nothing gets published before you confirm the draft)?
+
+Answer: "tickets identity (Recommended)".
+
+**Q278 - Log branch:** The 3 log commits on `chore/review-round-2026-11-03` have no MR. What should happen to them?
+
+Answer: "Merge dev, push, MR (Recommended)". `dev` merged in; conflicts only in the append-only logs `ROADMAP-DETAILS.md` and `qa-log.md`, both sides kept, entries of `dev` first.
+
+**Q279 - CLAUDE.local.md:** It doesn't exist yet (open inbox item from 2026-10-06). Should I create it with `Developer handle: tschudea07`? It's gitignored and never committed.
+
+Answer: "Create it (Recommended)". Created; the inbox item is removed.
+
+Follow-up of `tschudea07`, verbatim: "review mrs", then "yes".
