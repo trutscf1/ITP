@@ -20,7 +20,7 @@ One user story of [Deployment: automatic deploy on push to `main`, TLS](feature.
 | ID | Title | Given | When | Then |
 | --- | --- | --- | --- | --- |
 | DEP-AC-1.1 | Deploy on merge | A release merge to `main` | The pipeline runs | It builds the Docker images, pushes them to a registry, and deploys them to the Hetzner server |
-| DEP-AC-1.2 | TLS and redirect | The deployed system behind Traefik (≥ 3.6.10) with Let's Encrypt (HTTP-01) | A browser requests a page over HTTP | The request is redirected to HTTPS |
+| DEP-AC-1.2 | TLS and redirect | The deployed system behind its reverse proxy with a certificate from Let's Encrypt (HTTP-01 challenge) | A browser requests a page over HTTP | The request is redirected to HTTPS |
 | DEP-AC-1.3 | Secrets outside the code | The deployment | It needs a secret | The secret comes only from pipeline secrets or from `.env` on the server, never from the code |
 | DEP-AC-1.4 | Failed deployment | A running version on the server | A deployment fails | The previous version keeps running |
 | DEP-AC-1.5 | Documented procedure | The project documentation | A team member looks up the deployment | The deployment procedure is described there |
