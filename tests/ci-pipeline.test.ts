@@ -291,10 +291,13 @@ describe("SCF-AC-2.5 Exceptions of one built image", () => {
   });
 
   it("SCF-AC-2.5 adds the exceptions of .trivyignore.d/<service> only to the image of that service", () => {
+    const script = scriptOf("container-scan");
+    // The list starts from .trivyignore again for every image, so no image inherits another's.
     assert.match(
-      scriptOf("container-scan"),
-      /\.trivyignore\.d\/\$\{image#stash-\}/,
+      script,
+      /for image in \$images; do\n\s+cp \.trivyignore \/tmp\/trivyignore\n/,
     );
+    assert.match(script, /\.trivyignore\.d\/\$\{image#stash-\}/);
   });
 
   it("SCF-AC-2.5 keeps an exception file only for a service that builds its image", () => {

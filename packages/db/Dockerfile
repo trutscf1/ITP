@@ -9,7 +9,9 @@ FROM node:24.14.0-alpine
 
 # The image carries no known high or critical vulnerability that has a fix (SCF-AC-2.5,
 # SCF-NF-6): the Alpine packages are upgraded to their fixed versions, and the npm bundled with
-# Node.js is removed, since the container runs pnpm through corepack and never npm.
+# Node.js is removed, since the container runs pnpm through corepack and never npm. The upgrade
+# makes the contents depend on the build date; the container scan rebuilds and checks the image
+# on every pipeline run.
 RUN apk upgrade --no-cache \
   && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx \
   && corepack enable

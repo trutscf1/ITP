@@ -1,6 +1,8 @@
 # Exceptions for the image of the service web only (docker/web.Dockerfile, SCF-AC-2.5). The
 # container scan adds this file to .trivyignore when it scans that image (#149). Found with
 # Trivy 0.69.3 on 2026-11-03, unfixed vulnerabilities are not reported (--ignore-unfixed).
+# docker/web.Dockerfile is a stop-gap that ships the whole repository with its development
+# dependencies until slice 1 of SCF-US-8 replaces it with apps/web/Dockerfile (track Web).
 # Every entry expires at the end of Sprint 2; #157 fixes the image, then this file is removed.
 
 # Alpine packages of the base image node:24.14.0-alpine (OpenSSL, musl, zlib); fixed versions
