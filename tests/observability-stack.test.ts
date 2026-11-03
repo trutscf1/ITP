@@ -294,6 +294,8 @@ describe("OBS-AC-1.2 Redaction patterns of the collector (OBS-F-29, OBS-T-32)", 
       const match = start.exec(line);
       if (!match) continue;
       let source = (match[1] as string).replace(/\\\\/g, "\\");
+      // Not a text pattern: it turns the mask of the secret keys into [redacted].
+      if (source === "^\\*\\*\\*\\*$") continue;
       let flags = "";
       if (source.startsWith("(?i)")) {
         source = source.slice(4);

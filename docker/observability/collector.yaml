@@ -33,6 +33,7 @@ processors:
       - context: span
         statements:
           - keep_matching_keys(span.attributes, "^(unit|version|route|method|status code|peer unit|queue|job name|job id|outcome|error type|http\\.route|http\\.request\\.method|http\\.response\\.status_code|server\\.address|messaging\\.destination\\.name|messaging\\.operation\\.name|messaging\\.message\\.id|error\\.type)$")
+          - set(span.status.message, "")
       - context: spanevent
         statements:
           - delete_matching_keys(spanevent.attributes, ".*")
@@ -47,16 +48,20 @@ processors:
         statements:
           - delete_matching_keys(log.attributes, "(?i)^(.*[._-])?(ip|client\\.address|remote\\.address|user_agent|user-agent|url|url\\.full|path|query|header|headers|email|name\\.first|name\\.last|member\\.id|user\\.id|file\\.name|folder\\.name)$")
           - set(log.attributes["level"], log.severity_text) where log.severity_text != ""
-          # E-mail address, then IPv4 address (twice in the text and in the attribute values, so
-          # that two addresses separated by one character are both found), then IPv6 address.
+          # E-mail address; then IPv4 address and IPv6 address, each twice, so that two addresses separated
+          # by one character are both found (the first match uses up the character after it). An IPv4 address
+          # may be followed by one full stop; an IPv6 address must not touch a letter, digit, underscore, or
+          # colon (std::vector is kept). Tests: tests/observability-stack.test.ts, concept §8.
           - replace_pattern(log.body, "[^\\s@]+@[^\\s@]+\\.[^\\s@]+", "[redacted]")
           - replace_all_patterns(log.attributes, "value", "[^\\s@]+@[^\\s@]+\\.[^\\s@]+", "[redacted]")
-          - replace_pattern(log.body, "(^|[^0-9.])(\\d{1,3}\\.){3}\\d{1,3}($|[^0-9.])", "$${1}[redacted]$${3}")
-          - replace_pattern(log.body, "(^|[^0-9.])(\\d{1,3}\\.){3}\\d{1,3}($|[^0-9.])", "$${1}[redacted]$${3}")
-          - replace_all_patterns(log.attributes, "value", "(^|[^0-9.])(\\d{1,3}\\.){3}\\d{1,3}($|[^0-9.])", "$${1}[redacted]$${3}")
-          - replace_all_patterns(log.attributes, "value", "(^|[^0-9.])(\\d{1,3}\\.){3}\\d{1,3}($|[^0-9.])", "$${1}[redacted]$${3}")
-          - replace_pattern(log.body, "(?i)([0-9a-f]{1,4}:){7}[0-9a-f]{1,4}|([0-9a-f]{1,4}:){1,7}:([0-9a-f]{1,4}(:[0-9a-f]{1,4}){0,6})?|::([0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4}", "[redacted]")
-          - replace_all_patterns(log.attributes, "value", "(?i)([0-9a-f]{1,4}:){7}[0-9a-f]{1,4}|([0-9a-f]{1,4}:){1,7}:([0-9a-f]{1,4}(:[0-9a-f]{1,4}){0,6})?|::([0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4}", "[redacted]")
+          - replace_pattern(log.body, "(^|[^0-9.])(\\d{1,3}\\.){3}\\d{1,3}(\\.?($|[^0-9.]))", "$${1}[redacted]$${3}")
+          - replace_pattern(log.body, "(^|[^0-9.])(\\d{1,3}\\.){3}\\d{1,3}(\\.?($|[^0-9.]))", "$${1}[redacted]$${3}")
+          - replace_all_patterns(log.attributes, "value", "(^|[^0-9.])(\\d{1,3}\\.){3}\\d{1,3}(\\.?($|[^0-9.]))", "$${1}[redacted]$${3}")
+          - replace_all_patterns(log.attributes, "value", "(^|[^0-9.])(\\d{1,3}\\.){3}\\d{1,3}(\\.?($|[^0-9.]))", "$${1}[redacted]$${3}")
+          - replace_pattern(log.body, "(?i)(^|[^0-9a-z_:])((?:[0-9a-f]{1,4}:){7}[0-9a-f]{1,4}|(?:[0-9a-f]{1,4}:){1,7}:(?:[0-9a-f]{1,4}(?::[0-9a-f]{1,4}){0,6})?|::(?:[0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})($|[^0-9a-z_:])", "$${1}[redacted]$${3}")
+          - replace_pattern(log.body, "(?i)(^|[^0-9a-z_:])((?:[0-9a-f]{1,4}:){7}[0-9a-f]{1,4}|(?:[0-9a-f]{1,4}:){1,7}:(?:[0-9a-f]{1,4}(?::[0-9a-f]{1,4}){0,6})?|::(?:[0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})($|[^0-9a-z_:])", "$${1}[redacted]$${3}")
+          - replace_all_patterns(log.attributes, "value", "(?i)(^|[^0-9a-z_:])((?:[0-9a-f]{1,4}:){7}[0-9a-f]{1,4}|(?:[0-9a-f]{1,4}:){1,7}:(?:[0-9a-f]{1,4}(?::[0-9a-f]{1,4}){0,6})?|::(?:[0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})($|[^0-9a-z_:])", "$${1}[redacted]$${3}")
+          - replace_all_patterns(log.attributes, "value", "(?i)(^|[^0-9a-z_:])((?:[0-9a-f]{1,4}:){7}[0-9a-f]{1,4}|(?:[0-9a-f]{1,4}:){1,7}:(?:[0-9a-f]{1,4}(?::[0-9a-f]{1,4}){0,6})?|::(?:[0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})($|[^0-9a-z_:])", "$${1}[redacted]$${3}")
 
   # Secret key fragments and secret keys of §8: the processor masks the value with ****, the next
   # statement turns the mask into the agreed text.
