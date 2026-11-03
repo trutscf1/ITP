@@ -1531,3 +1531,24 @@ Answer: "In WORKFLOW.md aufnehmen (Recommended)".
 **Q276 - Veröffentlichen auf !41:** Commits pushen, MR-Beschreibung aktualisieren (echter Scan, Abschnitt „No story, no AC IDs“, Fragenummern Q266–Q271) und Antwort-Kommentar an trutscf1 zu allen vier Punkten posten?
 
 Answer: "Alles veröffentlichen (Recommended)".
+
+## Round 63 — 2026-11-03 — fix #149, scan the built images (`tschudea07` (agent))
+
+Instruction of `tschudea07`, verbatim: "arbeite ein issue von mir ab das machbar ist". Chosen: #149 (bug, weight 1, Sprint 2, `status::ready`); the stories of R3 still need `tickets`, and slice 1 of #45 is blocked. Rounds 59 to 62 are on `chore/review-round-2026-11-03` (!45), not yet on `dev`.
+
+**Q281 - #149 build approach:** `container-scan` currently runs on the Trivy image, which can't build images, so `web` and `db-migrate` are never scanned. How should the job get the built images?
+
+Answer: "Docker-in-Docker (Recommended)".
+
+A2: the tests stay at the existing seam, the static checks of `.gitlab-ci.yml` in `tests/ci-pipeline.test.ts`; the job run on the merge request is the proof that it works.
+
+The local run of the new scan found high and critical vulnerabilities that have a fix in both built images: the Alpine packages of `node:24.14.0-alpine` and the npm bundled with Node.js in both, Storybook in `web`, hono and lodash of the Prisma CLI in `db-migrate`.
+
+**Q282 - #149 findings:** The fixed scan finds HIGH/CRITICAL in the two built images (Alpine OpenSSL/musl/zlib, the npm bundled with Node, hono/lodash in db-migrate, Storybook in web). `packages/db/Dockerfile` is in your track; `docker/web.Dockerfile` is in trutscf1's (Storybook is schwaigc's). How should this MR handle that?
+
+Answer: "Fix mine, issue for web (Recommended)".
+
+- A3: hono, @hono/node-server, and lodash come with the pinned Prisma CLI that `db-migrate` needs; pruning them would break the migration, and a pnpm override belongs to the root configuration (track of `trutscf1`). They become exceptions with reason and expiry, and the override goes into the issue for `trutscf1`.
+- A4: exceptions of a built image must not hide the same finding in other images (for example OpenSSL in `node:24.14-alpine` on !44), so each built image gets its own file `.trivyignore.d/<service>`, added to `.trivyignore` only when that image is scanned; the fixed project name `stash` names the built images `stash-<service>`.
+
+Issue #157 created for `trutscf1` (Sprint 2, weight 2): fix the `web` image and the Prisma CLI findings; the exceptions expire on 2026-11-23.
