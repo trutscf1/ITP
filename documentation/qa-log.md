@@ -1465,3 +1465,25 @@ Answer: "-s ours + Inbox-Eintrag (Recommended)".
 **Q258 - Vier Branches mit alten, nicht konformen Commits** (chore/grill-trutscf1-2026-10-29 !31, feature/40-shared-contracts !23, concept/milestone-plan !15, feature/40-shared-contracts-zod-openapi !16, alle MRs geschlossen und nie gemergt): Ein Anbinden an dev würde commit-messages in diesem MR und im nächsten Release-MR rot machen (10 Commits). Wie weiter?
 
 Answer: "Remote löschen (Recommended)". Before deleting, the agent checked that the head of each branch is the head of its merge request (`refs/merge-requests/<n>/head`), so every commit stays reachable through the closed merge request. The four remote branches were deleted; `feature/40-contracts-zod-openapi` and `concept/migrate-scaffolding` are recorded in `dev` with the strategy "ours" (content of `dev` unchanged).
+
+Instruction of `tschudea07`, verbatim: "/Users/andreas/Downloads/sonarqube-shared.zip bau das ein". The archive holds `compose.yaml`, `start.ps1`, and `README.md` of a SonarQube server shared by every project on one computer (port `127.0.0.1:9000`, Docker network `sonarqube-shared`). A1: developer handle `tschudea07` (git user; no `CLAUDE.local.md`). A2: no CI job, because the server listens on localhost only and GitLab CI cannot reach it.
+
+**Q259 - Umfang:** Was soll aus dem SonarQube-ZIP ins Repo?
+
+Answer: "Nur Projekt-Anbindung (Recommended)".
+
+**Q260 - Tracking:** Wie läuft die Änderung über GitLab?
+
+Answer: "Issue + Branch + MR (Recommended)".
+
+**Q261 - Coverage:** Soll der Scan schon Testabdeckung (lcov) mitliefern?
+
+Answer: "Erst ohne Coverage (Recommended)".
+
+**Q262 - Projekt-Key:** Unter welchem Key scannt das Projekt in den geteilten Server?
+
+Answer: "stash (Recommended)".
+
+**Q263 - Issue anlegen:** "Anbindung an den geteilten SonarQube-Server" (type::technical-improvement, status::in-progress, area::infrastructure, tschudea07, Sprint 2, weight 1, 1h) so veröffentlichen?
+
+Answer: "Veröffentlichen (Recommended)". Created as #153.
