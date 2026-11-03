@@ -1466,18 +1466,28 @@ Answer: "-s ours + Inbox-Eintrag (Recommended)".
 
 Answer: "Remote löschen (Recommended)". Before deleting, the agent checked that the head of each branch is the head of its merge request (`refs/merge-requests/<n>/head`), so every commit stays reachable through the closed merge request. The four remote branches were deleted; `feature/40-contracts-zod-openapi` and `concept/migrate-scaffolding` are recorded in `dev` with the strategy "ours" (content of `dev` unchanged).
 
-## Round 58 — 2026-11-03 — review of the open merge requests (`tschudea07` (agent))
+## Round 59 — 2026-11-03 — review of the open merge requests (`tschudea07` (agent))
 
 Instruction of `tschudea07`, verbatim: "review alle merrequest die man revien kann"
 
 Reviewable for `tschudea07`: !40 and !42 (author `trutscf1`, reviewer `tschudea07`). Not reviewed: !43 and !41 (own MRs), !35 (draft of `schauby1`). Both MRs: `doc-check` 0 errors (the same 29 warnings as `dev`), markdownlint 0 issues, pipeline green; no issue (`chore/`), so no acceptance criteria.
 
-**Q266 - Review !40 (GitHub-Mirror, trutscf1):** Das GitHub-Repo trutscf1/ITP ist öffentlich, obwohl Q259 mit „Private“ beantwortet wurde. Das GitLab-Projekt ist privat, also sind jetzt alle 34 Branches öffentlich. Dazu kommen: ein Token wurde im Chat geteilt und seine Rotation steht nirgends als offene Aufgabe, und die Collaborator-Rolle weicht von docs §18 (Reporter) ab, ohne Eintrag in WORKFLOW.md. Was soll ich auf !40 posten?
+**Q272 - Review !40 (GitHub-Mirror, trutscf1):** Das GitHub-Repo trutscf1/ITP ist öffentlich, obwohl Q259 mit „Private“ beantwortet wurde. Das GitLab-Projekt ist privat, also sind jetzt alle 34 Branches öffentlich. Dazu kommen: ein Token wurde im Chat geteilt und seine Rotation steht nirgends als offene Aufgabe, und die Collaborator-Rolle weicht von docs §18 (Reporter) ab, ohne Eintrag in WORKFLOW.md. Was soll ich auf !40 posten?
 
 Answer: "Änderungen anfordern (Recommended)". Posted as a resolvable thread on !40, no approval.
 
-**Q267 - Review !42 (Schulanforderungen, Caddy statt Traefik, trutscf1):** Inhaltlich in Ordnung, und Caddy passt zu deinem Konzept deployment.md. Kleine Punkte: Die Traefik-Zeile steht in der Tabelle „Deviations from the project proposal“, obwohl Traefik aus den Schulanforderungen kommt. Der Schlussabsatz der DoD ist missverständlich formuliert. DoD-Punkt 20 macht „Mobile-First (empfohlen)“ samt 320 px verpflichtend. Was soll ich auf !42 posten?
+**Q273 - Review !42 (Schulanforderungen, Caddy statt Traefik, trutscf1):** Inhaltlich in Ordnung, und Caddy passt zu deinem Konzept deployment.md. Kleine Punkte: Die Traefik-Zeile steht in der Tabelle „Deviations from the project proposal“, obwohl Traefik aus den Schulanforderungen kommt. Der Schlussabsatz der DoD ist missverständlich formuliert. DoD-Punkt 20 macht „Mobile-First (empfohlen)“ samt 320 px verpflichtend. Was soll ich auf !42 posten?
 
 Answer: "Kommentar + Approve (Recommended)". Posted as a plain comment (not blocking) and approved by `tschudea07`.
 
 The question numbers are provisional until merged into `dev` (P-TEAM-5): Q259 to Q265 sit on open branches. Q264 is used twice, on `feature/153-sonarqube` and on `chore/school-requirements-gaps`; the branch merged second renumbers.
+
+## Round 60 — 2026-11-03 — merge conflicts of the own merge requests (`tschudea07` (agent))
+
+Instruction of `tschudea07`, verbatim: "Resolve meine merge conflicts mei meinen MRS"
+
+Open merge requests of `tschudea07` with conflicts: !43 (`concept/identity`) and !41 (`feature/153-sonarqube`). `dev` merged into each branch (`docs/git_workflow_commands.md` §7.1, no force push). Conflicts only in the append-only logs: `ROADMAP-DETAILS.md` (both branches) and `qa-log.md` (!41); both sides kept, entries of `dev` first. The questions of !41 (Q259 to Q264, without a round heading) collided with Q259 to Q265 on `dev` and became round 58, Q266 to Q271 (P-TEAM-5); the review round on this branch therefore moved from round 58, Q266 to Q267 to round 59, Q272 to Q273. `doc-check` 0 errors and markdownlint 0 issues on both merge results; GitLab reports both merge requests free of conflicts.
+
+**Q274 - Push:** Die Merge-Commits (dev → Branch, ohne Force-Push) für !43 concept/identity (nur ROADMAP-DETAILS-Log, beide Einträge behalten) und !41 feature/153-sonarqube (Logs behalten; deine Sonar-Fragen Q259–Q264 kollidierten mit dev und wurden zu Runde 58, Q266–Q271) pushen?
+
+Answer: "Beide pushen (Recommended)". Asked in the pop-up as Q272; renumbered here because round 59 holds Q272 and Q273. Pushed as `0d6d8d04b` (!43) and `2d7f143f6` (!41).
