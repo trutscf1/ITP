@@ -1,0 +1,109 @@
+# Offline rule test of the alert "High error rate" (OBS-AC-2.3, OBS-F-17, OBS-F-8, OBS-U-4,
+# OBS-T-33): the five rows of concept observability.md §10, example 5, as series. One series per
+# unit and status code holds the counter of http.server.request.duration (metric store name
+# http_server_request_duration_seconds_count); one value per minute from minute 0 to minute 10.
+# The rules are the rendered file alert-rules.yml with the default thresholds (5 % and 20 requests).
+rule_files:
+  - alert-rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  - name: "19 requests, 10 of them with status 500: normal, fewer than 20 requests"
+    interval: 1m
+    input_series:
+      - series: 'http_server_request_duration_seconds_count{service_name="storage", http_response_status_code="200"}'
+        values: "0 0 0 0 0 0 1 3 5 7 9"
+      - series: 'http_server_request_duration_seconds_count{service_name="storage", http_response_status_code="500"}'
+        values: "0 0 0 0 0 0 2 4 6 8 10"
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: High error rate
+        exp_alerts: []
+
+  - name: "100 requests, 5 of them with status 500: normal, 5.0 % is not more than 5 %"
+    interval: 1m
+    input_series:
+      - series: 'http_server_request_duration_seconds_count{service_name="storage", http_response_status_code="200"}'
+        values: "0 0 0 0 0 0 19 38 57 76 95"
+      - series: 'http_server_request_duration_seconds_count{service_name="storage", http_response_status_code="500"}'
+        values: "0 0 0 0 0 0 1 2 3 4 5"
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: High error rate
+        exp_alerts: []
+
+  - name: "100 requests, 6 of them with status 500: firing with the summary text"
+    interval: 1m
+    input_series:
+      - series: 'http_server_request_duration_seconds_count{service_name="storage", http_response_status_code="200"}'
+        values: "0 0 0 0 0 0 19 38 57 76 94"
+      - series: 'http_server_request_duration_seconds_count{service_name="storage", http_response_status_code="500"}'
+        values: "0 0 0 0 0 0 1 2 3 4 6"
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: High error rate
+        exp_alerts:
+          - exp_labels:
+              service_name: storage
+            exp_annotations:
+              summary: "Unit storage: 6.0 % of 100 requests failed in the last 5 minutes."
+
+  - name: "200 requests, 30 of them with status 404: normal, client errors do not count"
+    interval: 1m
+    input_series:
+      - series: 'http_server_request_duration_seconds_count{service_name="storage", http_response_status_code="200"}'
+        values: "0 0 0 0 0 0 34 68 102 136 170"
+      - series: 'http_server_request_duration_seconds_count{service_name="storage", http_response_status_code="404"}'
+        values: "0 0 0 0 0 0 6 12 18 24 30"
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: High error rate
+        exp_alerts: []
+
+  - name: "no request at all and no series: normal, no data"
+    interval: 1m
+    input_series:
+      - series: 'unit_running{service_name="storage"}'
+        values: "1 1 1 1 1 1 1 1 1 1 1"
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: High error rate
+        exp_alerts: []
+
+  - name: "the alert concerns the unit that fails, not its neighbour"
+    interval: 1m
+    input_series:
+      - series: 'http_server_request_duration_seconds_count{service_name="storage", http_response_status_code="200"}'
+        values: "0 0 0 0 0 0 19 38 57 76 94"
+      - series: 'http_server_request_duration_seconds_count{service_name="storage", http_response_status_code="500"}'
+        values: "0 0 0 0 0 0 1 2 3 4 6"
+      - series: 'http_server_request_duration_seconds_count{service_name="web", http_response_status_code="200"}'
+        values: "0 0 0 0 0 0 40 80 120 160 200"
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: High error rate
+        exp_alerts:
+          - exp_labels:
+              service_name: storage
+            exp_annotations:
+              summary: "Unit storage: 6.0 % of 100 requests failed in the last 5 minutes."
+
+  - name: "the alert is normal again at the first evaluation at which the condition does not hold"
+    interval: 1m
+    input_series:
+      - series: 'http_server_request_duration_seconds_count{service_name="storage", http_response_status_code="200"}'
+        values: "0 0 0 0 0 0 19 38 57 76 94 200 300 400 500 600 700"
+      - series: 'http_server_request_duration_seconds_count{service_name="storage", http_response_status_code="500"}'
+        values: "0 0 0 0 0 0 1 2 3 4 6 6 6 6 6 6 6"
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: High error rate
+        exp_alerts:
+          - exp_labels:
+              service_name: storage
+            exp_annotations:
+              summary: "Unit storage: 6.0 % of 100 requests failed in the last 5 minutes."
+      - eval_time: 16m
+        alertname: High error rate
+        exp_alerts: []
