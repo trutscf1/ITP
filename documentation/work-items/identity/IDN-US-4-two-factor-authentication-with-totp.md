@@ -23,7 +23,7 @@ One user story of [Identity: accounts, external login, MFA](feature.md) and the 
 | IDN-AC-4.2 | Code at login | A member with TOTP activated | They log in with their password | The TOTP code is requested |
 | IDN-AC-4.3 | Backup codes | A member activating TOTP | The activation succeeds | 10 single-use backup codes are generated and shown exactly once |
 | IDN-AC-4.4 | Deactivation | A member with TOTP activated | They deactivate it | Their password and a current code are required |
-| IDN-AC-4.5 | Encrypted secrets | An activated TOTP | Its secret is stored | The secret is encrypted with AES-256-GCM, with the key from `.env` or a vault |
+| IDN-AC-4.5 | Encrypted secrets | An activated TOTP | Its secret is stored | The secret is stored encrypted, with a key from the configuration |
 
 ## Slices
 
