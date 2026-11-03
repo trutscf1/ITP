@@ -6,10 +6,10 @@ import {
   type LogEntry,
   type MetricItem,
   type SpanRecord,
+  startTelemetry,
   type Telemetry,
   type TelemetryConfig,
   type TelemetryOptions,
-  startTelemetry,
 } from "../index.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));

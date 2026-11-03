@@ -46,7 +46,7 @@ describe("OBS-T-29 collector unreachable (example 9)", () => {
       ["L1", "L2", "L3", "L4", "L5"],
     );
     await h.tick();
-    assert.deepEqual(h.received.logs, []);
+    assert.equal(h.received.logs.length, 0);
     h.mode.value = "ok";
     await h.tick();
     assert.deepEqual(

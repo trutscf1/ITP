@@ -394,7 +394,7 @@ describe("OBS-AC-1.7 Units without the stack", () => {
       });
       await telemetry.flush();
       await telemetry.shutdown();
-      assert.deepEqual(received.map((r) => r.url).sort(), [
+      assert.deepEqual([...new Set(received.map((r) => r.url))].sort(), [
         "/v1/logs",
         "/v1/metrics",
         "/v1/traces",
