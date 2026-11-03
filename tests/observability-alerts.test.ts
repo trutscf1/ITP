@@ -205,7 +205,7 @@ describe("OBS-AC-2.3 Configuration step writes the thresholds into the alert rul
 });
 
 describe("OBS-AC-2.3 Rules reach the metric store and the alert list (OBS-F-8, OBS-F-9, OBS-C-3)", () => {
-  const compose = parse(readText("docker-compose.yml")) as Compose;
+  const composeFile = parse(readText("docker-compose.yml")) as Compose;
 
   it("OBS-AC-2.3 lets the metric store load the rendered rule file after the configuration step has written it (OBS-F-28)", () => {
     const prometheus = parse(
@@ -213,7 +213,7 @@ describe("OBS-AC-2.3 Rules reach the metric store and the alert list (OBS-F-8, O
     ) as { rule_files?: string[] };
     assert.ok(prometheus.rule_files?.length);
     const file = prometheus.rule_files[0];
-    const service = compose.services.prometheus;
+    const service = composeFile.services.prometheus;
     const mount = (service.volumes ?? []).find((volume) =>
       volume.startsWith("obs-generated:"),
     );

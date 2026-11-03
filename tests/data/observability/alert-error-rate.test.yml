@@ -46,6 +46,7 @@ tests:
         exp_alerts:
           - exp_labels:
               service_name: storage
+              unit: storage
             exp_annotations:
               summary: "Unit storage: 6.0 % of 100 requests failed in the last 5 minutes."
 
@@ -86,6 +87,7 @@ tests:
         exp_alerts:
           - exp_labels:
               service_name: storage
+              unit: storage
             exp_annotations:
               summary: "Unit storage: 6.0 % of 100 requests failed in the last 5 minutes."
 
@@ -102,6 +104,7 @@ tests:
         exp_alerts:
           - exp_labels:
               service_name: storage
+              unit: storage
             exp_annotations:
               summary: "Unit storage: 6.0 % of 100 requests failed in the last 5 minutes."
       - eval_time: 16m

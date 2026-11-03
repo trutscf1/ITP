@@ -9,8 +9,10 @@
 # the counter 5 minutes ago, per unit. A series that is new inside the window starts at 0, so the
 # requests that created it count. `increase()` would extrapolate to the window edges and report
 # 23.75 for 19 requests; the threshold "at least 20 requests" needs the exact count (OBS-F-17).
-# After a restart of a unit its counter starts again at 0; the count of that window is then too low,
-# never too high (clamp_min), so a restart cannot raise a false alert.
+# Known limits: after a restart of a unit its counter starts again at 0 and the count of that window
+# is too low (clamp_min at 0). After a gap of more than 5 minutes in the data of a unit (silent unit,
+# data loss of the metric store) the whole counter counts as new for one window, so the count can be
+# too high once; the alert "Unit silent" (slice 4) covers the silent unit.
 groups:
   - name: operations
     interval: 60s
@@ -47,6 +49,8 @@ groups:
           (100 * unit:http_server_errors:delta5m / unit:http_server_requests:delta5m > __OBS_ALERT_ERROR_RATE_PERCENT__)
           and
           (unit:http_server_requests:delta5m >= __OBS_ALERT_MIN_REQUESTS__)
+        labels:
+          unit: "{{ $labels.service_name }}"
         annotations:
           summary: >-
             Unit {{ $labels.service_name }}: {{ printf "%.1f" $value }} % of {{ with printf "unit:http_server_requests:delta5m{service_name=%q}" $labels.service_name | query }}{{ . | first | value | printf "%.0f" }}{{ end }} requests failed in the last 5 minutes.
