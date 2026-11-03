@@ -1583,3 +1583,27 @@ Instruction of `trutscf1`, verbatim (coordinator): implement #83, slice 1 of OBS
 **A5 - Issue text of #83 is outdated:** The description of #83 still has the five old criteria and the old story file name; the story file `OBS-US-2-operations-dashboards-and-alerts.md` is the source (P-DOC-6). The MR says so; the issue text is not changed here.
 
 The numbers Q300 to Q302 are provisional until merged (P-TEAM-5).
+
+## Round 64 — 2026-11-03 — Slice 2 error rate alert (#156) (trutscf1 (agent))
+
+Instruction of `trutscf1`, verbatim (coordinator): implement #156, slice 2 of OBS-US-2 ("error rate alert", OBS-AC-2.3; modules M6 thresholds and M9 alert rule) on top of the open !47 and, through it, !44. The agent could not ask questions; each gap is closed with a default (P-GRILL-4).
+
+**Q320 - Where the rule is evaluated:** The concept names "alert rules" and "alert list of the dashboard tool" but not the evaluating component. Does the dashboard tool evaluate its own rules or the metric store?
+
+**A1 - The metric store evaluates, the dashboard tool lists:** `STACK.md` §OBS-C-3 already fixes it: alert rules are Prometheus rule files rendered by the configuration step, tested offline with `promtool test rules`. The data source "Metrics" sets `manageAlerts: true`, so the dashboard tool shows the rules and their alerts read-only in its alert list (OBS-F-9: no change is savable). The rule file is written by the configuration step into the volume `obs-generated` and mounted read-only into the metric store.
+
+**Q321 - Exact request count:** OBS-F-17 needs the number of requests in the last 5 minutes and compares it with "at least 20". Prometheus `increase()` extrapolates to the window edges (19 requests become about 23.75 with samples every minute), so the row "19 requests, 10 errors → normal" of example 5 would fire.
+
+**A2 - Counter now minus counter 5 minutes ago:** Two recording rules compute per unit the exact difference of the counter `http_server_request_duration_seconds_count` (all status codes, and status codes 500 to 599) between now and 5 minutes ago; a series that is new inside the window starts at 0. The alert reads these two series. Known limit: after a restart of a unit its counter starts again at 0, the count of that window is too low (`clamp_min` at 0), so a restart cannot cause a false alert but can hide one for up to 5 minutes.
+
+**A3 - No pending period:** OBS-F-17 and the state diagram let the error rate alert go from normal directly to firing; the rule has no `for` and fires at the first evaluation at which the condition holds.
+
+**A4 - Summary text through a query:** The text needs `N` and the value `E / N × 100`. The value of the alert is the share; `N` is read with the template function `query` from the recording rule of the same unit.
+
+**Q322 - Offline rule test in CI:** The `test` job runs on `node:24.14.0-alpine` without `promtool` or Docker, so the offline rule test cannot run there.
+
+**A5 - Skip with reason, local run stated in the MR:** The test uses a local `promtool`, else the pinned image of the metric store through Docker, else it is skipped with a reason (as the stack tests are until SCF-US-5 offers a container runtime, §17). A CI job `rule-test` on the image of the metric store is a follow-up for the track Identity & CI; the result of the local run is stated in the MR.
+
+**A6 - Test data in the rule test file:** The series of example 5 are the `input_series` of one `promtool` test file, `tests/data/observability/alert-error-rate.test.yml`, kept as data next to the tests (§17); the file that also feeds the dashboard test is part of slice 3.
+
+The numbers Q320 to Q322 are provisional until merged (P-TEAM-5).

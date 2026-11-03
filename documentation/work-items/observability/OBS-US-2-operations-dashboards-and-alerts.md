@@ -35,7 +35,7 @@ The vertical slices that deliver this story (concept §16, Q30). Slice 1 is deli
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
 | 1 — dashboard tool on the server itself, stored files, and links (`trutscf1`) | OBS-AC-2.2, OBS-AC-2.4 | OBS-US-1 slice 1 | #83 |
-| 2 — error rate alert (`trutscf1`) | OBS-AC-2.3 | slice 1 | — |
+| 2 — error rate alert (`trutscf1`) | OBS-AC-2.3 | slice 1 | #156 |
 | 3 — operations dashboard "Operations overview" (`trutscf1`) | OBS-AC-2.1 | slice 1; the metrics of R5 and R9 | — |
 | 4 — storage, queue, and silent-unit alerts (`trutscf1`) | OBS-AC-2.6, OBS-AC-2.7, OBS-AC-2.8 | slice 2; the metrics of R5 and R9 | — |
 | 5 — login through `identity` behind the reverse proxy over HTTPS (`trutscf1`) | OBS-AC-2.5 | slice 1; the operator login of R3; TLS of R14 | — |

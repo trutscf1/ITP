@@ -686,10 +686,11 @@ function check(environment: map<string, string>) -> exit code
   1. For each variable of §8 "Configuration of the observability stack": missing and no default,
      or outside its valid values → one line "  <NAME>: <reason>"; never the value.
   2. If any line: print "Invalid configuration for the observability stack:" and the lines; exit 1.
-  3. Write the trace store configuration from its template, with the retention in hours; once the alert
-     rules exist (OBS-US-2, slices 2 and 4), also write the alert rule files from their templates in the
-     repository, replacing the placeholders of the four alert thresholds and of OBS_ALERT_SILENT_MINUTES
-     with the values; exit 0.
+  3. Write the trace store configuration from its template, with the retention in hours, and the alert
+     rule file `alert-rules.yml` from its template `alert-rules.template.yml` in the repository,
+     replacing every placeholder (a variable name between two double underscores) with its checked value;
+     slice 2 of OBS-US-2 has the placeholders of OBS_ALERT_ERROR_RATE_PERCENT and OBS_ALERT_MIN_REQUESTS,
+     slice 4 adds those of the storage and queue thresholds and of OBS_ALERT_SILENT_MINUTES; exit 0.
 ```
 
 **M7 CollectorPipeline** — Traces to: OBS-F-2, OBS-F-29, OBS-NF-2, OBS-NF-3, OBS-NF-7, OBS-E-2. Requires: OBS-C-2.
@@ -699,6 +700,8 @@ Order for every received batch: (1) drop span attributes not in the allowed list
 **M8 Stores** — Traces to: OBS-NF-4, OBS-NF-7. Requires: OBS-C-3, OBS-C-4, OBS-C-5. Each store keeps its data in a named volume of the stack, so it survives a restart, and deletes by the retention variable of §8.
 
 **M9 DashboardProvisioning** — Traces to: OBS-F-6, OBS-F-7, OBS-F-8, OBS-F-9, OBS-F-10, OBS-F-17 to OBS-F-20, OBS-F-27, OBS-U-1 to OBS-U-4, OBS-NF-1, OBS-NF-5, OBS-NF-6, OBS-E-5, OBS-E-8. Requires: OBS-C-3, OBS-C-6. Files in the repository: three data sources (metric store, log store with a link from `traceId` to the trace store, trace store with a link to log entries by trace ID); the dashboard "Operations overview" with the panels of §8 and the links of [OBS-F-7]; the alert rule templates of §8; the settings of the dashboard tool (until TLS: anonymous read-only access on the local port; with TLS: the person taken from the header of the reverse proxy and anonymous access off; never self-registration, a login form, or a password; update checks and usage reporting off; served under `/observability`; loaded files not savable).
+
+**Form of the alert rules (M9, from slice 2 of OBS-US-2).** The rules are Prometheus rules in the template `docker/observability/alert-rules.template.yml`, in one group evaluated every 60 seconds; the metric store loads the rendered file from the volume of the configuration step, and the data source "Metrics" lets the dashboard tool list them read-only. "High error rate" has two recording rules, one per unit: the exact number of requests and the exact number of requests with a status code from 500 to 599 in the 5 minutes before the evaluation, each as the counter now minus the counter 5 minutes ago (a series that is new inside the window starts at 0; `increase()` would extrapolate and break the threshold of 20 requests; after a restart of a unit the count is too low, never too high). The alert rule has no pending period.
 
 **M10 ProfileAndRoute** — Traces to: OBS-F-5, OBS-F-16, OBS-F-24, OBS-F-27, OBS-NF-7, OBS-NF-8, OBS-E-3, OBS-E-5. Requires: OBS-C-7, [SCF-C-6], [SCF-C-7]. The example configuration names the profile in `COMPOSE_PROFILES`. Start order inside the profile: M6 → the three stores and the collector (after M6 exited with 0) → the dashboard tool (after the stores report healthy). No container of the profile publishes a host port except the dashboard tool, whose port `OBS_DASHBOARD_PORT` is bound to `127.0.0.1` until TLS exists; with TLS the port is removed, and the reverse proxy reaches the dashboard tool on the internal network after the session check of `identity` ([OBS-F-27]).
 
