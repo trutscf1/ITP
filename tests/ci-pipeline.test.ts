@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -60,6 +60,14 @@ function imageOf(name: string): string {
 
 function scriptOf(name: string): string {
   return (readJob(name).script ?? []).join("\n");
+}
+
+function exceptionFiles(): string[] {
+  const folder = join(root, ".trivyignore.d");
+  const own = existsSync(folder)
+    ? readdirSync(folder).map((name) => `.trivyignore.d/${name}`)
+    : [];
+  return [".trivyignore", ...own];
 }
 
 function jobNames(): string[] {
@@ -275,6 +283,38 @@ describe("SCF-AC-2.5 Clean images (SCF-NF-6, SCF-T-10)", () => {
   });
 });
 
+describe("SCF-AC-2.5 Exceptions of one built image", () => {
+  it("SCF-AC-2.5 names the built images after the fixed project name stash", () => {
+    const script = scriptOf("container-scan");
+    assert.match(script, /docker compose -p stash [^\n]*build/);
+    assert.match(script, /docker compose -p stash [^\n]*config --images/);
+  });
+
+  it("SCF-AC-2.5 adds the exceptions of .trivyignore.d/<service> only to the image of that service", () => {
+    assert.match(
+      scriptOf("container-scan"),
+      /\.trivyignore\.d\/\$\{image#stash-\}/,
+    );
+  });
+
+  it("SCF-AC-2.5 keeps an exception file only for a service that builds its image", () => {
+    const compose = parse(
+      readFileSync(join(root, "docker-compose.yml"), "utf8"),
+    ) as {
+      services: Record<string, { build?: unknown }>;
+    };
+    for (const file of exceptionFiles().filter((name) =>
+      name.startsWith(".trivyignore.d/"),
+    )) {
+      const service = file.slice(".trivyignore.d/".length);
+      assert.ok(
+        compose.services[service]?.build,
+        `${file}: no service ${service} with build`,
+      );
+    }
+  });
+});
+
 describe("SCF-AC-5.3 Failing conditions", () => {
   it("SCF-AC-5.3 lets no job fail without failing the pipeline", () => {
     for (const name of jobNames()) {
@@ -297,18 +337,24 @@ describe("SCF-AC-5.3 Failing conditions", () => {
   });
 
   it("SCF-AC-5.3 ignores a known image vulnerability only with a reason and an expiry date", () => {
-    const lines = readFileSync(join(root, ".trivyignore"), "utf8").split("\n");
-    let reason = false;
-    lines.forEach((line, index) => {
-      if (line.trim() === "") {
-        reason = false;
-      } else if (line.startsWith("# ")) {
-        reason = true;
-      } else {
-        assert.match(line, /^\S+ exp:\d{4}-\d{2}-\d{2}$/, `line ${index + 1}`);
-        assert.ok(reason, `line ${index + 1} has no reason above it`);
-      }
-    });
+    for (const file of exceptionFiles()) {
+      const lines = readFileSync(join(root, file), "utf8").split("\n");
+      let reason = false;
+      lines.forEach((line, index) => {
+        if (line.trim() === "") {
+          reason = false;
+        } else if (line.startsWith("# ")) {
+          reason = true;
+        } else {
+          assert.match(
+            line,
+            /^\S+ exp:\d{4}-\d{2}-\d{2}$/,
+            `${file} line ${index + 1}`,
+          );
+          assert.ok(reason, `${file} line ${index + 1} has no reason above it`);
+        }
+      });
+    }
   });
 });
 
