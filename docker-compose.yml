@@ -273,7 +273,8 @@ services:
       retries: 5
       start_period: 10s
 
-  # Metric store (OBS-C-3): OTLP receiver, retention from OBS_METRICS_RETENTION_DAYS.
+  # Metric store (OBS-C-3): OTLP receiver, retention from OBS_METRICS_RETENTION_DAYS, alert rules
+  # evaluated every 60 seconds from the file of the configuration step (OBS-F-8, OBS-F-17).
   prometheus:
     image: prom/prometheus:v3.15.1
     profiles: [observability]
@@ -291,6 +292,8 @@ services:
       - backend
     volumes:
       - ./docker/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      # The alert rule file written by the configuration step (OBS-F-28, OBS-F-8).
+      - obs-generated:/etc/prometheus/generated:ro
       - prometheus-data:/prometheus
     healthcheck:
       test: ["CMD", "wget", "-qO", "/dev/null", "http://127.0.0.1:9090/-/ready"]
@@ -351,7 +354,8 @@ services:
       start_period: 20s
 
   # Dashboard tool (OBS-C-6). Its data sources and the dashboard come from files (OBS-US-2, slice
-  # 1; docker/observability/grafana); the alert rules follow in slices 2 and 4. Until TLS exists it is reachable on the server itself only, with
+  # 1; docker/observability/grafana); the alert rule "High error rate" is evaluated by the metric store and listed here (slice 2; the other
+  # alerts follow in slice 4). Until TLS exists it is reachable on the server itself only, with
   # read-only anonymous access (OBS-F-10, OBS-F-24). No login form, no self-registration, no
   # update check, no usage reporting, no plugin download (OBS-NF-1, OBS-NF-6).
   grafana:

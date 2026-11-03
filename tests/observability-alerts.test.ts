@@ -355,21 +355,24 @@ describe("OBS-AC-2.3 Started stack (OBS-T-10)", { skip: stackSkip }, () => {
         },
       ],
     };
-    const status = inGrafana([
-      "curl",
-      "-s",
-      "-o",
-      "/dev/null",
-      "-w",
-      "%{http_code}",
-      "-X",
-      "POST",
-      "-H",
-      "Content-Type: application/json",
-      "--data-binary",
-      "@-",
-      "http://collector:4318/v1/metrics",
-    ], JSON.stringify(body));
+    const status = inGrafana(
+      [
+        "curl",
+        "-s",
+        "-o",
+        "/dev/null",
+        "-w",
+        "%{http_code}",
+        "-X",
+        "POST",
+        "-H",
+        "Content-Type: application/json",
+        "--data-binary",
+        "@-",
+        "http://collector:4318/v1/metrics",
+      ],
+      JSON.stringify(body),
+    );
     assert.equal(status, "200");
 
     type Alert = {

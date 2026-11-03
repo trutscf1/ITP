@@ -10,6 +10,9 @@ datasources:
     url: http://prometheus:9090
     isDefault: true
     editable: false
+    jsonData:
+      # The alert rules of the metric store show in the alert list, read-only (OBS-F-8).
+      manageAlerts: true
 
   # A log entry with a trace ID links to its trace (OBS-F-7): the trace ID is stored as structured
   # metadata of the entry, under the key of the OTLP field (trace_id) or of the attribute (traceId).

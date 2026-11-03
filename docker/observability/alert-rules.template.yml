@@ -1,0 +1,52 @@
+# Alert rules of the metric store (OBS-C-3, OBS-F-8; concept observability.md §8 "Alert rules",
+# §16 M9). This file is a template: the configuration step (check-config.ts, M6) replaces the
+# placeholders (a variable name of §8 between two double underscores) with the validated values and
+# writes alert-rules.yml into the volume
+# that the metric store loads. Rules are evaluated every 60 seconds; the dashboard tool shows them
+# in its alert list, read-only. Nothing is sent outside the installation (no alertmanager).
+#
+# The two recording rules count the requests of the last 5 minutes exactly: the counter now minus
+# the counter 5 minutes ago, per unit. A series that is new inside the window starts at 0, so the
+# requests that created it count. `increase()` would extrapolate to the window edges and report
+# 23.75 for 19 requests; the threshold "at least 20 requests" needs the exact count (OBS-F-17).
+# After a restart of a unit its counter starts again at 0; the count of that window is then too low,
+# never too high (clamp_min), so a restart cannot raise a false alert.
+groups:
+  - name: operations
+    interval: 60s
+    rules:
+      - record: unit:http_server_requests:delta5m
+        expr: >-
+          clamp_min(
+            sum by (service_name) (http_server_request_duration_seconds_count)
+            - (
+              sum by (service_name) (http_server_request_duration_seconds_count offset 5m)
+              or
+              sum by (service_name) (http_server_request_duration_seconds_count) * 0
+            ),
+            0
+          )
+
+      - record: unit:http_server_errors:delta5m
+        expr: >-
+          clamp_min(
+            sum by (service_name) (http_server_request_duration_seconds_count{http_response_status_code=~"5.."})
+            - (
+              sum by (service_name) (http_server_request_duration_seconds_count{http_response_status_code=~"5.."} offset 5m)
+              or
+              sum by (service_name) (http_server_request_duration_seconds_count{http_response_status_code=~"5.."}) * 0
+            ),
+            0
+          )
+
+      # OBS-F-17: firing when N >= minimum requests and E / N * 100 > threshold, normal otherwise
+      # (a unit without data or without server errors yields no result, which is normal, OBS-F-8).
+      # No pending period: the alert fires at the first evaluation at which the condition holds.
+      - alert: High error rate
+        expr: >-
+          (100 * unit:http_server_errors:delta5m / unit:http_server_requests:delta5m > __OBS_ALERT_ERROR_RATE_PERCENT__)
+          and
+          (unit:http_server_requests:delta5m >= __OBS_ALERT_MIN_REQUESTS__)
+        annotations:
+          summary: >-
+            Unit {{ $labels.service_name }}: {{ printf "%.1f" $value }} % of {{ with printf "unit:http_server_requests:delta5m{service_name=%q}" $labels.service_name | query }}{{ . | first | value | printf "%.0f" }}{{ end }} requests failed in the last 5 minutes.
