@@ -1479,3 +1479,17 @@ Answer: "Private". `trutscf1` created the repository `trutscf1/ITP` as public; t
 Answer: "Als Collaborator einladen (Recommended)". Invitation sent; on a personal account a collaborator can push.
 
 The first mirror entered on GitLab failed with "Invalid username or token. Password authentication is not supported for Git operations". The agent checked the token of `trutscf1` (scope `repo`, push access to `trutscf1/ITP`), replaced the mirror with one that carries the token in its URL, all branches (not only protected ones), and ran the first sync: 34 branches and the tag `v0.1.0`, the same as on GitLab.
+
+## Round 57 — 2026-11-03 — Anchoring the school requirements (`trutscf1` (agent))
+
+Instruction of `trutscf1`, verbatim: "schau dass diese anforderungen alle fix verankert sind:" followed by the text of `docs/anforderungen_software_projekte.md`.
+
+**Q264 - Verankerung:** Wie sollen die Schulanforderungen aus `docs/anforderungen_software_projekte.md` dauerhaft verankert werden? Ich habe sie mit dem Text im Repo verglichen: Die eingefügten Anforderungen stehen dort wörtlich schon drin, aber nicht jede Zeile ist einem Dokument, einer Story oder einem DoD-Punkt zugeordnet.
+
+Answer: "Nur Lücken schließen"
+
+**Q265 - Reverse Proxy:** `deployment.md` (DEP-F-2) verlangt Traefik ≥ 3.6.10 mit Let's Encrypt, der lokale Stack und `STACK.md` (SCF-C-6, OBS-C-7) verwenden aber Caddy. Traefik ist in den Schulanforderungen nur eine „eventuelle Zusatzanforderung“. Wie soll das aufgelöst werden?
+
+Answer: "Caddy überall, Abweichung dokumentieren (Recommended)"
+
+The question numbers are provisional until merged into `dev` (P-TEAM-5): round 56 (Q261 to Q263) is on `feature/82-observability-stack` and round 55 (Q259, Q260) on `chore/github-mirror`.
