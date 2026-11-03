@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
+import { scannerArgs } from "../scripts/sonar.ts";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -36,13 +37,17 @@ describe("#153 Scan into the shared SonarQube", () => {
   });
 
   it("runs the scanner container on the network sonarqube-shared with the token file", () => {
-    const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8")) as {
+    const pkg = JSON.parse(
+      readFileSync(join(root, "package.json"), "utf8"),
+    ) as {
       scripts: Record<string, string>;
     };
-    const sonar = pkg.scripts.sonar ?? "";
-    assert.match(sonar, /--network sonarqube-shared/);
-    assert.match(sonar, /--env-file \.env\.sonar/);
-    assert.match(sonar, /SONAR_HOST_URL=http:\/\/sonarqube-shared:9000/);
+    assert.equal(pkg.scripts.sonar, "node scripts/sonar.ts");
+    const args = scannerArgs("/repo").join(" ");
+    assert.match(args, /--network sonarqube-shared/);
+    assert.match(args, /--env-file \.env\.sonar/);
+    assert.match(args, /SONAR_HOST_URL=http:\/\/sonarqube-shared:9000/);
+    assert.match(args, /-v \/repo:\/usr\/src/);
   });
 
   it("keeps .env.sonar out of git and ships .env.sonar.example", () => {

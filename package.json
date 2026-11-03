@@ -14,6 +14,7 @@
     "build": "turbo run build",
     "test:accessibility": "node tests/accessibility/axe-check.ts",
     "changelog:draft": "node scripts/changelog.ts draft",
+    "sonar": "node scripts/sonar.ts",
     "db:migrate": "pnpm --filter @stash/db run migrate",
     "db:seed": "pnpm --filter @stash/db run seed"
   },
