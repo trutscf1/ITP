@@ -1487,3 +1487,7 @@ Answer: "stash (Recommended)".
 **Q263 - Issue anlegen:** "Anbindung an den geteilten SonarQube-Server" (type::technical-improvement, status::in-progress, area::infrastructure, tschudea07, Sprint 2, weight 1, 1h) so veröffentlichen?
 
 Answer: "Veröffentlichen (Recommended)". Created as #153.
+
+**Q264 - Push + MR:** Branch feature/153-sonarqube pushen und das MR "feat(repo): scan into the shared SonarQube with pnpm sonar" nach dev öffnen (Closes #153; kein echter Scan gelaufen, weil der Server hier nicht läuft)?
+
+Answer: "Push + MR öffnen (Recommended)".
