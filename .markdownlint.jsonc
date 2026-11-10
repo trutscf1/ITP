@@ -1,4 +1,4 @@
-// markdownlint configuration for documentation/ (engineering-human).
+// markdownlint configuration for gam-ai-knowledge/ (engineering-human).
 // Every rule is on with its defaults, except where a document form of the
 // manifest needs otherwise. Used by markdownlint-cli2 locally and in CI.
 {

@@ -1,4 +1,4 @@
-# CI pipeline (SCF-US-5, documentation/concepts/scaffolding.md SCF-F-15).
+# CI pipeline (SCF-US-5, gam-ai-knowledge/concepts/scaffolding.md SCF-F-15).
 # One pipeline per change: a merge request pipeline while an MR is open, otherwise a branch
 # pipeline for every push (feature branches, dev, main) — SCF-AC-5.1.
 workflow:
@@ -67,7 +67,7 @@ test:
   cache:
     - *pnpm-store
   # The tests of the relational schema create their own databases on this server
-  # (SCF-US-4, documentation/concepts/scaffolding.md §17). Throwaway credentials of the job.
+  # (SCF-US-4, gam-ai-knowledge/concepts/scaffolding.md §17). Throwaway credentials of the job.
   services:
     - name: postgres:18-alpine
       alias: postgres

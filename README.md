@@ -2,7 +2,7 @@
 
 A cloud storage platform that schools, clubs, and small companies run on their own server: upload, organize, search, and share files, and use them offline. School project of HTL Villach, class 5BHITM, subject ITP (project 1), built by a team of four.
 
-The project goal, its target users, and its non-goals are in [documentation/GOAL.md](documentation/GOAL.md).
+The project goal, its target users, and its non-goals are in [gam-ai-knowledge/GOAL.md](gam-ai-knowledge/GOAL.md).
 
 ## Status
 
@@ -10,9 +10,9 @@ Early scaffold. What exists today:
 
 - a pnpm and Turborepo workspace with the five units in `apps/` and the shared packages in `packages/`; the Next.js application is the `web` unit in `apps/web/` (App Router, React, Tailwind CSS, Biome), the other units are empty; the shared package `packages/db` holds the relational schema (Prisma 8), its migrations, and the seed data
 - a `docker-compose.yml` that starts PostgreSQL 18, Redis, MongoDB, CouchDB, SeaweedFS, ClamAV, Mailpit, a Caddy reverse proxy, and the `web` unit; the other four units join when their code runs
-- the project documentation in `documentation/`
+- the project documentation in `gam-ai-knowledge/`
 
-Everything else in the architecture below is planned. The current state of every feature is in [documentation/ROADMAP.md](documentation/ROADMAP.md) and [documentation/ROADMAP-DETAILS.md](documentation/ROADMAP-DETAILS.md).
+Everything else in the architecture below is planned. The current state of every feature is in [gam-ai-knowledge/ROADMAP.md](gam-ai-knowledge/ROADMAP.md) and [gam-ai-knowledge/ROADMAP-DETAILS.md](gam-ai-knowledge/ROADMAP-DETAILS.md).
 
 ## Quick start
 
@@ -40,8 +40,8 @@ pnpm run typecheck                             # TypeScript check of every packa
 pnpm run build                                 # build of every package
 pnpm test                                      # tests of every package, including the acceptance tests of the repository
 pnpm dev                                       # the dev task of every package (watch mode), through Turborepo
-node tools/doc-check.mjs documentation          # consistency check of the documentation
-npx markdownlint-cli2 "documentation/**/*.md"   # markdown lint
+node gam-ai-knowledge/tools/doc-check.mjs      # consistency check of the documentation
+npx markdownlint-cli2 "gam-ai-knowledge/**/*.md" # markdown lint
 ```
 
 ## Start without internet access
@@ -51,13 +51,13 @@ The school requires that the application starts locally without internet access.
 1. Prepare once while online: `docker compose pull`, `docker compose build web`, and `pnpm install` (fills the local pnpm store).
 2. Afterwards, offline: `docker compose up -d`, `pnpm install --offline`, then start the web application as in the quick start.
 3. To check it, start the stack with `docker/compose.offline-check.yml` on top: both networks become internal, so no container reaches the internet, and every service must become healthy (SCF-T-8; the commands are in the file).
-4. Settings that decide whether a feature may use the internet live in `.env` and are never hard-coded. Features that need the internet (login with GitHub, Google, or Microsoft, bot protection) must be switchable off there; they arrive with the identity feature (R3, [ROADMAP.md](documentation/ROADMAP.md)).
+4. Settings that decide whether a feature may use the internet live in `.env` and are never hard-coded. Features that need the internet (login with GitHub, Google, or Microsoft, bot protection) must be switchable off there; they arrive with the identity feature (R3, [ROADMAP.md](gam-ai-knowledge/ROADMAP.md)).
 
 Known gap: the starter layout loads its fonts through `next/font/google`, which fetches them at build time. A build without internet fails until the fonts are bundled locally.
 
 ## Architecture overview
 
-The target architecture is five separately running units behind one reverse proxy, one per area of the team ([ADR-0001](documentation/adr/0001-five-units-behind-one-origin.md)). The browser reaches `web`, `identity`, `storage`, and `cms` under one origin; `worker` is internal.
+The target architecture is five separately running units behind one reverse proxy, one per area of the team ([ADR-0001](gam-ai-knowledge/adr/0001-five-units-behind-one-origin.md)). The browser reaches `web`, `identity`, `storage`, and `cms` under one origin; `worker` is internal.
 
 ```mermaid
 flowchart LR
@@ -85,11 +85,11 @@ flowchart LR
 | Web client & design system | `web` | file browser, preview, themes, accessibility modes |
 | Offline, content & observability | `cms` | installable offline web app, landing page, help center, changelog, metrics, logs, traces |
 
-The planned technology is listed in the project proposal ([docs/projektantrag.md](docs/projektantrag.md)); binding choices and versions are recorded in [documentation/STACK.md](documentation/STACK.md) as they are made. The units share their data shapes through one contracts package.
+The planned technology is listed in the project proposal ([docs/projektantrag.md](docs/projektantrag.md)); binding choices and versions are recorded in [gam-ai-knowledge/STACK.md](gam-ai-knowledge/STACK.md) as they are made. The units share their data shapes through one contracts package.
 
 ## Data model
 
-The relational schema as it stands, defined in `packages/db` (Prisma 8) and drawn with every column in [documentation/concepts/scaffolding.md](documentation/concepts/scaffolding.md) §8, "Relational data model" (story `SCF-US-4`). Table names are plural, as the SQL style guide of the school demands. The application's own `users` table is in a 1:1 relation to the user table of the authentication library: the database creates the `users` row with every auth user. Files, share links, quotas, and the audit log join with their features. The diagram drawn in Vertabelo follows as an export (open human step).
+The relational schema as it stands, defined in `packages/db` (Prisma 8) and drawn with every column in [gam-ai-knowledge/concepts/scaffolding.md](gam-ai-knowledge/concepts/scaffolding.md) §8, "Relational data model" (story `SCF-US-4`). Table names are plural, as the SQL style guide of the school demands. The application's own `users` table is in a 1:1 relation to the user table of the authentication library: the database creates the `users` row with every auth user. Files, share links, quotas, and the audit log join with their features. The diagram drawn in Vertabelo follows as an export (open human step).
 
 ```mermaid
 erDiagram
@@ -108,7 +108,7 @@ erDiagram
 
 ## Operation and deployment
 
-What exists today and what is planned (`documentation/ROADMAP.md`, R14 *Deployment*):
+What exists today and what is planned (`gam-ai-knowledge/ROADMAP.md`, R14 *Deployment*):
 
 | Topic | Today | Planned |
 | --- | --- | --- |
@@ -118,11 +118,11 @@ What exists today and what is planned (`documentation/ROADMAP.md`, R14 *Deployme
 | Deployment | None | The GitLab CI pipeline deploys the whole stack to the team's own server when `main` is updated, TLS terminated by the reverse proxy |
 | Monitoring | None | Metrics, logs, and traces in Prometheus, Loki, Tempo, and Grafana (R2) |
 
-Releases are tagged `v<version>` on `main` and published as GitLab Releases; the rules are in [documentation/WORKFLOW.md](documentation/WORKFLOW.md), section *Releases*.
+Releases are tagged `v<version>` on `main` and published as GitLab Releases; the rules are in [gam-ai-knowledge/WORKFLOW.md](gam-ai-knowledge/WORKFLOW.md), section *Releases*.
 
 ## Code quality scan
 
-The repository is scanned locally into a SonarQube server that every project on the developer's computer shares; the server itself is not part of this repository (`documentation/STACK.md`, section 3).
+The repository is scanned locally into a SonarQube server that every project on the developer's computer shares; the server itself is not part of this repository (`gam-ai-knowledge/STACK.md`, section 3).
 
 1. Start the shared server (`docker compose up -d` in its folder) and open <http://localhost:9000>.
 2. Create a token (*My Account → Security*) and write it into `.env.sonar`, a copy of `.env.sonar.example`. The file is never committed.
@@ -132,22 +132,22 @@ The repository is scanned locally into a SonarQube server that every project on 
 
 | Where | What |
 | --- | --- |
-| [documentation/GOAL.md](documentation/GOAL.md) | Project goal, target users, success signals, non-goals |
-| [documentation/ROADMAP.md](documentation/ROADMAP.md) | Features in dependency order, with owner and stage |
-| [documentation/concepts/](documentation/concepts/) | One concept document per feature |
-| [documentation/work-items/](documentation/work-items/) | User stories with their acceptance criteria |
-| [documentation/adr/](documentation/adr/) | Decision records |
-| [documentation/WORKFLOW.md](documentation/WORKFLOW.md) | Branches, commits, merge requests, Definition of Done, releases |
-| [documentation/team/TEAM.md](documentation/team/TEAM.md) | Team members, roles, ownership |
+| [gam-ai-knowledge/GOAL.md](gam-ai-knowledge/GOAL.md) | Project goal, target users, success signals, non-goals |
+| [gam-ai-knowledge/ROADMAP.md](gam-ai-knowledge/ROADMAP.md) | Features in dependency order, with owner and stage |
+| [gam-ai-knowledge/concepts/](gam-ai-knowledge/concepts/) | One concept document per feature |
+| [gam-ai-knowledge/work-items/](gam-ai-knowledge/work-items/) | User stories with their acceptance criteria |
+| [gam-ai-knowledge/adr/](gam-ai-knowledge/adr/) | Decision records |
+| [gam-ai-knowledge/WORKFLOW.md](gam-ai-knowledge/WORKFLOW.md) | Branches, commits, merge requests, Definition of Done, releases |
+| [gam-ai-knowledge/team/TEAM.md](gam-ai-knowledge/team/TEAM.md) | Team members, roles, ownership |
 | [docs/](docs/) | The school's binding requirements and the project proposal |
 
 ## Definition of Done
 
-The Definition of Done is binding for every issue and merge request: [documentation/WORKFLOW.md](documentation/WORKFLOW.md), section *Definition of Done*. It is kept only there so that it cannot drift; a merge request is merged only when every item holds.
+The Definition of Done is binding for every issue and merge request: [gam-ai-knowledge/WORKFLOW.md](gam-ai-knowledge/WORKFLOW.md), section *Definition of Done*. It is kept only there so that it cannot drift; a merge request is merged only when every item holds.
 
 ## Working on the project
 
-Every change starts with an issue, happens on its own branch, and reaches `dev` through a merge request reviewed by another person; `main` only receives releases. The rules are in [documentation/WORKFLOW.md](documentation/WORKFLOW.md), the commands in [docs/git_workflow_commands.md](docs/git_workflow_commands.md). Sessions with Claude Code start with `/engineering-human` ([CLAUDE.md](CLAUDE.md)).
+Every change starts with an issue, happens on its own branch, and reaches `dev` through a merge request reviewed by another person; `main` only receives releases. The rules are in [gam-ai-knowledge/WORKFLOW.md](gam-ai-knowledge/WORKFLOW.md), the commands in [docs/git_workflow_commands.md](docs/git_workflow_commands.md). Sessions with Claude Code start with `/engineering-human` ([CLAUDE.md](CLAUDE.md)).
 
 ## Licence notes
 

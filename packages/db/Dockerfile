@@ -1,5 +1,5 @@
 # One-shot container of the local stack that applies the pending migrations of the relational
-# schema and exits (documentation/concepts/scaffolding.md, SCF-F-26, SCF-E-7). It lists the
+# schema and exits (gam-ai-knowledge/concepts/scaffolding.md, SCF-F-26, SCF-E-7). It lists the
 # migrations it will run, applies them in one transaction, and exits non-zero if one fails;
 # docker-compose.yml starts every unit that uses the database only after it succeeded.
 #

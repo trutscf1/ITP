@@ -1,6 +1,6 @@
 # Issue tracker: GitLab (REST API)
 
-Issues and merge requests for this repo live on GitLab in project `87030014` (`htl-villach/it/classes/5bhitm-2026/itp/waent/project1/SJ26_27_5BHITM_ITP_trutscf1_project1`). Agents use the GitLab REST API v4 with `curl` or a short script; `glab` is not used by agents. Labels, templates, and sprints are bound in `documentation/WORKFLOW.md`.
+Issues and merge requests for this repo live on GitLab in project `87030014` (`htl-villach/it/classes/5bhitm-2026/itp/waent/project1/SJ26_27_5BHITM_ITP_trutscf1_project1`). Agents use the GitLab REST API v4 with `curl` or a short script; `glab` is not used by agents. Labels, templates, and sprints are bound in `gam-ai-knowledge/WORKFLOW.md`.
 
 ## Access
 
@@ -20,8 +20,8 @@ Issues and merge requests for this repo live on GitLab in project `87030014` (`h
 - **Labels:** `PUT $API/issues/<iid>` with `{add_labels}` / `{remove_labels}` (comma-separated). When setting a new `status::` label, remove the old one in the same call.
 - **Close:** first post the explanation as a note, then `PUT $API/issues/<iid>` with `{state_event: "close"}`.
 - **Blocking:** `POST $API/issues/<iid>/links` with `{target_project_id, target_issue_iid, link_type: "is_blocked_by"}`.
-- **Weight:** the native `weight` field (scale in `documentation/WORKFLOW.md`).
-- **Hierarchy (P-TRK-2, P-TRK-4):** feature → story issues → slice issues. The tier is recorded as *Host tier* in `documentation/WORKFLOW.md`; re-check it before every `tickets` publish (see *Tier check*).
+- **Weight:** the native `weight` field (scale in `gam-ai-knowledge/WORKFLOW.md`).
+- **Hierarchy (P-TRK-2, P-TRK-4):** feature → story issues → slice issues. The tier is recorded as *Host tier* in `gam-ai-knowledge/WORKFLOW.md`; re-check it before every `tickets` publish (see *Tier check*).
   - **Premium or Ultimate, project in a group (the current tier):** the feature is a group epic, `POST $GROUP/epics` with `{title, labels: "type::feature", description}` (the description from `.gitlab/issue_templates/feature.md`); each story issue becomes its native child, `POST $GROUP/epics/<epic-iid>/issues/<issue-id>` (`<issue-id>` is the global `id`, not the `iid`). Where the instance has retired the REST epics API, use GraphQL work items instead: `workItemCreate` with type *Epic*, then `workItemUpdate` with `hierarchyWidget: { parentId }` on each story. Epics are referenced as `&<iid>`.
   - **Free:** the feature is an issue labelled `type::feature`; each child carries `Part of #<parent>` at the top of its description and a related-issue link; the parent lists its children as a task list (`- [ ] #<n> <title>`).
   - **Slices, every tier:** GitLab allows no issue under an issue, so a slice issue carries `Part of #<story>` and a related-issue link (`POST $API/issues/<iid>/links`), and the story lists it in its task list.

@@ -33,7 +33,7 @@ Consistency-check result: ["no findings" or the list: child ID — parent ID —
 To be completed by a person other than the author. The merge itself follows the merge policy in `.claude/settings.json` (P-MR-4); under `auto` (solo mode) the recorded `/engineering-human review` completes this list.
 
 - [ ] All acceptance criteria of the issue are met
-- [ ] Definition of Done (`documentation/WORKFLOW.md`) is fully met
+- [ ] Definition of Done (`gam-ai-knowledge/WORKFLOW.md`) is fully met
 - [ ] Test first: a `test(...)` commit with the `AC` ID comes before the first code commit (DoD item 15)
 - [ ] Title, description, and commit subjects are understandable without looking up IDs
 - [ ] Content comment left on this MR

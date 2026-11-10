@@ -6,14 +6,14 @@ import { dirname, join } from "node:path";
 import { after, describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 
-// Rule AC-TEST of tools/doc-check.mjs (#138, WORKFLOW.md "Definition of Done" item 1,
+// Rule AC-TEST of gam-ai-knowledge/tools/doc-check.mjs (#138, WORKFLOW.md "Definition of Done" item 1,
 // MANIFEST.md "What the script checks"): every acceptance criterion needs a test whose name
 // carries its AC ID. Each case builds a small repository in a temporary folder: one feature
 // "Alpha" (prefix ALP) with one story, two criteria, and two slices (#11 delivers ALP-AC-1.1,
 // #12 delivers ALP-AC-1.2), plus the test files the case needs.
 
 const repo = join(dirname(fileURLToPath(import.meta.url)), "..");
-const docCheck = join(repo, "tools", "doc-check.mjs");
+const docCheck = join(repo, "gam-ai-knowledge", "tools", "doc-check.mjs");
 const scratch = mkdtempSync(join(tmpdir(), "doc-check-ac-test-"));
 
 after(() => rmSync(scratch, { recursive: true, force: true }));
@@ -40,7 +40,7 @@ interface Run {
 }
 
 const frontmatter = (fields: string): string =>
-  `---\n${fields}\nformat: engineering-human/2\naudience: [developer]\n---\n`;
+  `---\n${fields}\nformat: gam-ai-knowledge/1\naudience: [developer]\n---\n`;
 
 function writeFiles(dir: string, files: Record<string, string>): void {
   for (const [path, content] of Object.entries(files)) {
@@ -57,14 +57,14 @@ function documentation({
     ? `\n| ID | Reason |\n| --- | --- |\n${untested.map((id) => `| ${id} | checked by hand |`).join("\n")}\n`
     : "";
   return {
-    "documentation/GOAL.md": `${frontmatter("doc: goal\ntitle: Project goal")}# Goal\n`,
-    "documentation/ROADMAP.md": `${frontmatter("doc: roadmap\ntitle: Roadmap")}# Roadmap
+    "gam-ai-knowledge/GOAL.md": `${frontmatter("doc: goal\ntitle: Project goal")}# Goal\n`,
+    "gam-ai-knowledge/ROADMAP.md": `${frontmatter("doc: roadmap\ntitle: Roadmap")}# Roadmap
 
 | Version | Feature | Serves | Status | Depends on | Feasibility |
 | --- | --- | --- | --- | --- | --- |
 | – | Alpha | G-1 | ${stage} | – | high |
 `,
-    "documentation/concepts/alpha.md": `${frontmatter('doc: concept\ntitle: Alpha\nid-prefix: "ALP"\nserves: G-1')}# Alpha
+    "gam-ai-knowledge/concepts/alpha.md": `${frontmatter('doc: concept\ntitle: Alpha\nid-prefix: "ALP"\nserves: G-1')}# Alpha
 
 | ID | Title | Requirement | Derives from |
 | --- | --- | --- | --- |
@@ -75,11 +75,11 @@ function documentation({
 | --- | --- | --- | --- | --- | --- |
 | ALP-T-1 | Both | ALP-AC-1.1, ALP-AC-1.2, ALP-F-1, ALP-F-2 | a | b | c |
 ${untestedTable}`,
-    "documentation/work-items/alpha/feature.md": `${frontmatter('doc: feature\ntitle: Alpha\nid-prefix: "ALP"\nconcept: "alpha.md"')}# Alpha
+    "gam-ai-knowledge/work-items/alpha/feature.md": `${frontmatter('doc: feature\ntitle: Alpha\nid-prefix: "ALP"\nconcept: "alpha.md"')}# Alpha
 
 - [ALP-US-1](ALP-US-1-one.md)
 `,
-    "documentation/work-items/alpha/ALP-US-1-one.md": `${frontmatter('doc: story\ntitle: "ALP-US-1 One"\nid-prefix: "ALP"')}# ALP-US-1 One
+    "gam-ai-knowledge/work-items/alpha/ALP-US-1-one.md": `${frontmatter('doc: story\ntitle: "ALP-US-1 One"\nid-prefix: "ALP"')}# ALP-US-1 One
 
 | ID | Title | As a | I want | so that | Priority |
 | --- | --- | --- | --- | --- | --- |
@@ -114,7 +114,7 @@ function check(fixture: Fixture, ...options: string[]): Run {
   });
   const result = spawnSync(
     process.execPath,
-    [docCheck, "documentation", ...options],
+    [docCheck, "gam-ai-knowledge", ...options],
     {
       cwd: dir,
       encoding: "utf8",

@@ -9,5 +9,5 @@
 .env
 .env.*
 !.env.example
-documentation
+/gam-ai-knowledge/
 docs

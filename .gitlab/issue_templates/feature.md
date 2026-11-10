@@ -5,8 +5,8 @@
 
 The parent work item of this feature (P-DOC-6, P-TRK-2). What it delivers is specified in the concept document; this issue only groups the story issues.
 
-- **Feature goal:** concept document `documentation/concepts/[feature].md` §1
-- **Work items:** `documentation/work-items/[feature]/feature.md`
+- **Feature goal:** concept document `gam-ai-knowledge/concepts/[feature].md` §1
+- **Work items:** `gam-ai-knowledge/work-items/[feature]/feature.md`
 
 ## User stories
 
