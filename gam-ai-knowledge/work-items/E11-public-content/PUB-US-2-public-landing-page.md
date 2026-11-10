@@ -38,4 +38,4 @@ The vertical slices that deliver this story. One slice is delivered by the story
 
 - **Story issue:** #79
 - **Weight:** 3
-- **Depends on:** DSA-US-1 (Design system with design tokens and four themes, #68), PUB-US-1 (Set up the headless CMS with Strapi, #78), slice 3 (delivery by web)
+- **Depends on:** DSA-US-1 (Design system with design tokens and four themes, #68), PUB-US-1 (Set up the headless CMS, #78), slice 3 (delivery by web)

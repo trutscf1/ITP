@@ -23,6 +23,8 @@ Session positions of one developer (P-TEAM-3). Precise enough that a fresh sessi
 | Offline mode: installable web app with sync and conflict handling (R12) | [concepts/offline-mode.md](../../concepts/offline-mode.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/gam-engineering offline-mode` |
 | Load tests & operations dashboards (R13) | [concepts/load-tests.md](../../concepts/load-tests.md) | 1, grill (draft) | — | — | Review the draft and its work items, then grill it with `/gam-engineering load-tests` |
 
+Replanning of 2026-11-10: #41 (SCF-US-4) is assigned to `trutscf1`, with the slices #151 and #152; the Sprint 2 load of `trutscf1` is 21 of 11 points, 16 of them in review (#82, #83, #114); the decision ticket is closed, the rest is for the review of Sprint 2 (`ROADMAP.md`, chapter "Milestones").
+
 Sprint 1 (until 2026-11-02): #108, #147 done; #126 done — release `v0.1.0` tagged on `main` on 2026-11-02 (release MR !36, changelog section through !38); still open in Sprint 1: #127 (regeneration probe); #78, #81, #107 carried over to Sprint 3, #79, #80 planned in Sprint 4 (GitLab milestones; shared: #38, #39, #40, #85). Next: Sprint 2 OBS-US-1/-2 (#82, #83) and the `AC-TEST` rule; plan in `ROADMAP.md`, chapter "Milestones".
 
 Tooling (state after the merge of `feature/138-doc-check-ac-test`): #138 done — `gam-ai-knowledge/tools/doc-check.mjs` rule `AC-TEST` checks that every acceptance criterion has a test name carrying its ID (`MANIFEST.md`, "What the script checks"). Open: drop "once built; until then the reviewer checks it by hand" from Definition of Done item 16 once both this MR and !15 are on `dev` (`qa-log.md` Q144).
