@@ -1,6 +1,6 @@
 import { z } from "./zod.ts";
 
-/** The units of the system (`documentation/concepts/scaffolding.md` §7). */
+/** The units of the system (`gam-ai-knowledge/concepts/scaffolding.md` §7). */
 export const unitNames = [
   "web",
   "identity",

@@ -1,0 +1,58 @@
+{
+  "model": "haiku",
+  "plansDirectory": "./gam-ai-memory/plans",
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "env": {
+    "GAM_ENGINEERING_BRANCHES": "dev",
+    "GAM_ENGINEERING_FLOW": "full",
+    "GAM_ENGINEERING_MERGE": "ask",
+    "GAM_ENGINEERING_APPROVALS": "1",
+    "GAM_ENGINEERING_RELEASE_MERGE": "ask",
+    "GAM_ENGINEERING_MODEL_JUDGE": "opus",
+    "GAM_ENGINEERING_MODEL_DRAFT": "sonnet",
+    "GAM_ENGINEERING_MODEL_CHECK": "haiku",
+    "GAM_ENGINEERING_SESSION_THRESHOLD": "50",
+    "GAM_ENGINEERING_DELEGATE_MIN_FILES": "5",
+    "GAM_ENGINEERING_DELEGATE_MIN_OUTPUT_LINES": "200"
+  },
+  "permissions": {
+    "ask": [
+      "Bash(git merge *)",
+      "Bash(glab mr merge *)",
+      "Bash(gh pr merge *)",
+      "PowerShell(git merge *)",
+      "PowerShell(glab mr merge *)",
+      "PowerShell(gh pr merge *)"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/gam-engineering/tools/status-reminder.mjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/gam-engineering/tools/open-work-reminder.mjs\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/gam-engineering/tools/inbox-names.mjs\""
+          }
+        ]
+      }
+    ]
+  }
+}

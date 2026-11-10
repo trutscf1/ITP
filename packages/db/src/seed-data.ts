@@ -1,5 +1,5 @@
 // Test data for local development (SCF-F-25). The values are the worked example of
-// documentation/concepts/scaffolding.md §10, example 8; they are fictitious and hold no
+// gam-ai-knowledge/concepts/scaffolding.md §10, example 8; they are fictitious and hold no
 // personal data. Fixed IDs make the seed idempotent.
 export const seedData = {
   authUser: {
