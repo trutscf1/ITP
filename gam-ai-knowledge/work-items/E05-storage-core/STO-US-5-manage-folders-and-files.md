@@ -5,7 +5,7 @@ title: "STO-US-5 Manage folders and files"
 audience: [product, developer, reviewer, agent]
 id-prefix: "STO"
 status: ready
-sprint: 2
+sprint: 3
 ---
 # STO-US-5 Manage folders and files
 
@@ -37,4 +37,4 @@ The vertical slices that deliver this story. One slice is delivered by the story
 
 - **Story issue:** #60
 - **Weight:** 5
-- **Depends on:** STO-US-1 (Connect the storage backend to SeaweedFS, #56)
+- **Depends on:** STO-US-1 (Connect the storage backend to the object storage, #56)

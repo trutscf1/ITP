@@ -21,7 +21,7 @@ The parent work item of this epic: its user stories in the order they are built,
 
 In dependency order; each file holds the story, its acceptance criteria, and its slices.
 
-1. [PUB-US-1 Set up the headless CMS with Strapi](PUB-US-1-set-up-the-headless-cms-with-strapi.md)
+1. [PUB-US-1 Set up the headless CMS](PUB-US-1-set-up-the-headless-cms.md)
 2. [PUB-US-2 Public landing page](PUB-US-2-public-landing-page.md)
 3. [PUB-US-3 Help center and changelog](PUB-US-3-help-center-and-changelog.md)
 4. [PUB-US-4 Legal pages (imprint, terms, privacy)](PUB-US-4-legal-pages-imprint-terms-privacy.md)

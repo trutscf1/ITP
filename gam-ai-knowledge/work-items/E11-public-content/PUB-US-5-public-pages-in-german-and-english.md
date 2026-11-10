@@ -36,4 +36,4 @@ The vertical slices that deliver this story. One slice is delivered by the story
 
 - **Story issue:** — (created with `/gam-engineering tickets public-content`)
 - **Weight:** 3, estimated with the architecture chapter on 2026-10-20
-- **Depends on:** PUB-US-1 (Set up the headless CMS with Strapi, #78), slice 3 (delivery by web)
+- **Depends on:** PUB-US-1 (Set up the headless CMS, #78), slice 3 (delivery by web)

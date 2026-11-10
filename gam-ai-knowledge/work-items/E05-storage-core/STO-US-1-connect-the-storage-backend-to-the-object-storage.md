@@ -1,13 +1,13 @@
 ---
 doc: story
 format: gam-ai-knowledge/1
-title: "STO-US-1 Connect the storage backend to SeaweedFS"
+title: "STO-US-1 Connect the storage backend to the object storage"
 audience: [product, developer, reviewer, agent]
 id-prefix: "STO"
 status: ready
 sprint: 2
 ---
-# STO-US-1 Connect the storage backend to SeaweedFS
+# STO-US-1 Connect the storage backend to the object storage
 
 One user story of [Storage core: folders, resumable upload, deduplication](epic.md) and the acceptance criteria that decide when it is done. This file is the single source for both; the story issue copies them verbatim (P-DOC-6, P-TRK-2). The story was written by the team as tracker issue US-19 and brought into this form on 2026-10-06; its owner reviews the wording.
 
@@ -15,7 +15,7 @@ One user story of [Storage core: folders, resumable upload, deduplication](epic.
 
 | ID | Title | As a | I want | so that | Priority |
 | --- | --- | --- | --- | --- | --- |
-| STO-US-1 | Connect the storage backend to SeaweedFS | operator | a storage API that puts file content into SeaweedFS | file content is stored scalably and apart from metadata | Must |
+| STO-US-1 | Connect the storage backend to the object storage | operator | a storage API that puts file content into SeaweedFS | file content is stored scalably and apart from metadata | Must |
 
 ## Acceptance criteria
 

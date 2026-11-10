@@ -293,7 +293,7 @@ The secret key fragments and the secret keys are part of the contract of the pac
 | --- | --- |
 | E-mail address | one or more characters other than white space and `@`, then `@`, then one or more such characters, a `.`, and one or more such characters |
 | IPv4 address | four groups of 1 to 3 digits separated by `.`, not part of a longer run of digits and dots; one full stop directly after the address is not part of the run, so the address in `from 203.0.113.7.` is redacted |
-| IPv6 address | 1 to 7 groups of 1 to 4 hexadecimal digits separated by `:` that contain `::` (`fe80::1`, `::1`), or exactly 8 such groups; not directly preceded or followed by a letter, digit, underscore, or `:`, so that `std::vector` is kept; a time such as `10:00:00` has no `::` and fewer than 8 groups and is kept |
+| IPv6 address | 1 to 7 groups of 1 to 4 hexadecimal digits separated by `:` that contain `::` (`fe80::1`, `::1`), or exactly 8 such groups; not directly preceded or followed by a letter, digit, underscore, or `:`, so that `std::vector` is kept; a time such as `10:00:00` has no `::` and fewer than 8 groups and is kept; an address written directly after a colon without a space (`ip:2001:db8::1`) is not redacted, because the colon before it is part of the boundary, while `client=2001:db8::1` and `[2001:db8::1]:443` are |
 
 **Operations overview** (the operations dashboard of [OBS-F-6]; every value over the 5 minutes before each point in time, all units or the unit chosen in the unit selector):
 
