@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -11,6 +11,7 @@ type Rule = { if?: string; when?: string };
 type Cache = { key?: string | { files?: string[] }; paths?: string[] };
 type Job = {
   image?: string | { name: string };
+  services?: (string | { name: string; alias?: string })[];
   stage?: string;
   needs?: string[];
   release?: { tag_name?: string; description?: string };
@@ -59,6 +60,14 @@ function imageOf(name: string): string {
 
 function scriptOf(name: string): string {
   return (readJob(name).script ?? []).join("\n");
+}
+
+function exceptionFiles(): string[] {
+  const folder = join(root, ".trivyignore.d");
+  const own = existsSync(folder)
+    ? readdirSync(folder).map((name) => `.trivyignore.d/${name}`)
+    : [];
+  return [".trivyignore", ...own];
 }
 
 function jobNames(): string[] {
@@ -231,9 +240,8 @@ describe("SCF-AC-5.2 Pipeline steps", () => {
     assert.match(scriptOf("dependency-audit"), /pnpm audit --prod/);
   });
 
-  it("SCF-AC-5.2 scans every image of docker-compose.yml with Trivy", () => {
-    assert.match(imageOf("container-scan"), /^aquasec\/trivy:\d/);
-    assert.match(scriptOf("container-scan"), /docker-compose\.yml/);
+  it("SCF-AC-5.2 scans the images of the stack with the pinned Trivy version", () => {
+    assert.match(scriptOf("container-scan"), /aquasec\/trivy:\d+\.\d+\.\d+/);
     assert.match(scriptOf("container-scan"), /trivy image/);
   });
 
@@ -245,6 +253,68 @@ describe("SCF-AC-5.2 Pipeline steps", () => {
   it("SCF-F-15 runs the code scan with Semgrep", () => {
     assert.match(imageOf("code-scan"), /semgrep:\d/);
     assert.match(scriptOf("code-scan"), /--config \.semgrep\.yml/);
+  });
+});
+
+describe("SCF-AC-2.5 Clean images (SCF-NF-6, SCF-T-10)", () => {
+  it("SCF-AC-2.5 runs the container scan on a pinned Docker with a Docker daemon of the same version", () => {
+    const image = imageOf("container-scan");
+    assert.match(image, /^docker:\d+\.\d+\.\d+$/);
+    const services = (readJob("container-scan").services ?? []).map(
+      (service) => (typeof service === "string" ? service : service.name),
+    );
+    assert.ok(services.includes(`${image}-dind`), `no service ${image}-dind`);
+  });
+
+  it("SCF-AC-2.5 builds every image the stack builds, in every profile, before the scan", () => {
+    assert.match(
+      scriptOf("container-scan"),
+      /docker compose [^\n]*--profile "\*" [^\n]*build/,
+    );
+  });
+
+  it("SCF-AC-2.5 scans the image list of the stack definition, built and pulled images alike", () => {
+    const script = scriptOf("container-scan");
+    assert.match(
+      script,
+      /docker compose [^\n]*--profile "\*" [^\n]*config --images/,
+    );
+    assert.doesNotMatch(script, /awk/);
+  });
+});
+
+describe("SCF-AC-2.5 Exceptions of one built image", () => {
+  it("SCF-AC-2.5 names the built images after the fixed project name stash", () => {
+    const script = scriptOf("container-scan");
+    assert.match(script, /docker compose -p stash [^\n]*build/);
+    assert.match(script, /docker compose -p stash [^\n]*config --images/);
+  });
+
+  it("SCF-AC-2.5 adds the exceptions of .trivyignore.d/<service> only to the image of that service", () => {
+    const script = scriptOf("container-scan");
+    // The list starts from .trivyignore again for every image, so no image inherits another's.
+    assert.match(
+      script,
+      /for image in \$images; do\n\s+cp \.trivyignore \/tmp\/trivyignore\n/,
+    );
+    assert.match(script, /\.trivyignore\.d\/\$\{image#stash-\}/);
+  });
+
+  it("SCF-AC-2.5 keeps an exception file only for a service that builds its image", () => {
+    const compose = parse(
+      readFileSync(join(root, "docker-compose.yml"), "utf8"),
+    ) as {
+      services: Record<string, { build?: unknown }>;
+    };
+    for (const file of exceptionFiles().filter((name) =>
+      name.startsWith(".trivyignore.d/"),
+    )) {
+      const service = file.slice(".trivyignore.d/".length);
+      assert.ok(
+        compose.services[service]?.build,
+        `${file}: no service ${service} with build`,
+      );
+    }
   });
 });
 
@@ -270,18 +340,24 @@ describe("SCF-AC-5.3 Failing conditions", () => {
   });
 
   it("SCF-AC-5.3 ignores a known image vulnerability only with a reason and an expiry date", () => {
-    const lines = readFileSync(join(root, ".trivyignore"), "utf8").split("\n");
-    let reason = false;
-    lines.forEach((line, index) => {
-      if (line.trim() === "") {
-        reason = false;
-      } else if (line.startsWith("# ")) {
-        reason = true;
-      } else {
-        assert.match(line, /^\S+ exp:\d{4}-\d{2}-\d{2}$/, `line ${index + 1}`);
-        assert.ok(reason, `line ${index + 1} has no reason above it`);
-      }
-    });
+    for (const file of exceptionFiles()) {
+      const lines = readFileSync(join(root, file), "utf8").split("\n");
+      let reason = false;
+      lines.forEach((line, index) => {
+        if (line.trim() === "") {
+          reason = false;
+        } else if (line.startsWith("# ")) {
+          reason = true;
+        } else {
+          assert.match(
+            line,
+            /^\S+ exp:\d{4}-\d{2}-\d{2}$/,
+            `${file} line ${index + 1}`,
+          );
+          assert.ok(reason, `${file} line ${index + 1} has no reason above it`);
+        }
+      });
+    }
   });
 });
 

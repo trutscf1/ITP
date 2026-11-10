@@ -1,0 +1,12 @@
+# Exceptions for the image of the service db-migrate only (packages/db/Dockerfile, SCF-AC-2.5).
+# The container scan adds this file to .trivyignore when it scans that image (#149). Found with
+# Trivy 0.69.3 on 2026-11-03, unfixed vulnerabilities are not reported (--ignore-unfixed).
+
+# hono 4.11.4 and @hono/node-server 1.19.9 (via @prisma/dev) and lodash 4.17.21 (via chevrotain)
+# are dependencies of the pinned Prisma CLI, which the container needs to apply the migrations;
+# the migration command starts no web server and parses no outside input. Fix requested in #157:
+# a pnpm override in the root configuration, or a Prisma release without them.
+CVE-2026-29045 exp:2026-11-23
+CVE-2026-29087 exp:2026-11-23
+CVE-2026-4800 exp:2026-11-23
+CVE-2026-54290 exp:2026-11-23
