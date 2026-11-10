@@ -56,7 +56,7 @@ Draft for DSA-US-2, written on 2026-11-10 when its owner chose to cut the story 
 
 ### Slices of DSA-US-2
 
-| Slice | Delivers | Issue | Blocked by |
+| Slice | Requirements | Issue | Blocked by |
 | --- | --- | --- | --- |
 | 1 — modes in the browser | DSA-F-6, DSA-F-7, DSA-F-8, DSA-F-10, DSA-F-17 (DSA-AC-2.1, 2.2, 2.3, 2.5; DSA-AC-2.4 up to the browser) | #71 | — |
 | 2 — settings in the profile | DSA-F-9 (DSA-AC-2.4) | child issue of #71, cut with slice 3 of DSA-US-1 (#112) | the profile of IDN-US-2 (#46), #112 |
