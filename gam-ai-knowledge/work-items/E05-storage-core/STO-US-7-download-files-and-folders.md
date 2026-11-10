@@ -36,4 +36,4 @@ The vertical slices that deliver this story. One slice is delivered by the story
 
 - **Story issue:** #62
 - **Weight:** 3
-- **Depends on:** STO-US-1 (Connect the storage backend to SeaweedFS, #56)
+- **Depends on:** STO-US-1 (Connect the storage backend to the object storage, #56)
