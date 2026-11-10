@@ -27,7 +27,7 @@ One user story of [Design system & accessibility modes](feature.md) and the acce
 
 ## Slices
 
-The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it. The cut and its decisions are in the concept document, §16 (`qa-log.md`, Q277).
+The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it. The cut and its decisions are in the concept document, §16 (`qa-log.md`, Q340).
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |

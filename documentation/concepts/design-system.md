@@ -52,7 +52,7 @@ Draft, derived one to one from the acceptance criteria.
 
 ## 16. Design for Testability
 
-Draft for DSA-US-2, written on 2026-11-10 when its owner chose to cut the story before the grilling (`qa-log.md`, Q277). Every decision below is an assumption the grilling of this concept may change.
+Draft for DSA-US-2, written on 2026-11-10 when its owner chose to cut the story before the grilling (`qa-log.md`, Q340). Every decision below is an assumption the grilling of this concept may change.
 
 ### Slices of DSA-US-2
 

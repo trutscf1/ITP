@@ -1532,22 +1532,44 @@ Answer: "In WORKFLOW.md aufnehmen (Recommended)".
 
 Answer: "Alles veröffentlichen (Recommended)".
 
-## Round 59 — 2026-11-10 — Accessibility modes, slice 1 (`schwaigc` (agent))
+## Round 63 — 2026-11-03 — fix #149, scan the built images (`tschudea07` (agent))
 
-Instruction, verbatim: "ja starte #71 mit dem skill gam enginieering implement". Gate before the first change: the concept `design-system.md` is an ungrilled draft without §16, the story of weight 5 was not cut into slices, and DSA-AC-2.4 needs a profile store that does not exist yet (#112 waits for #46).
+Instruction of `tschudea07`, verbatim: "arbeite ein issue von mir ab das machbar ist". Chosen: #149 (bug, weight 1, Sprint 2, `status::ready`); the stories of R3 still need `tickets`, and slice 1 of #45 is blocked. Rounds 59 to 62 are on `chore/review-round-2026-11-03` (!45), not yet on `dev`.
 
-**Q277 - Umfang #71:** Wie soll DSA-US-2 (Accessibility modes) umgesetzt werden, obwohl das Konzept ein Entwurf ist, die Story noch nicht in Slices geschnitten ist und die Profilspeicherung (DSA-AC-2.4) noch fehlt?
+**Q281 - #149 build approach:** `container-scan` currently runs on the Trivy image, which can't build images, so `web` and `db-migrate` are never scanned. How should the job get the built images?
+
+Answer: "Docker-in-Docker (Recommended)".
+
+A2: the tests stay at the existing seam, the static checks of `.gitlab-ci.yml` in `tests/ci-pipeline.test.ts`; the job run on the merge request is the proof that it works.
+
+The local run of the new scan found high and critical vulnerabilities that have a fix in both built images: the Alpine packages of `node:24.14.0-alpine` and the npm bundled with Node.js in both, Storybook in `web`, hono and lodash of the Prisma CLI in `db-migrate`.
+
+**Q282 - #149 findings:** The fixed scan finds HIGH/CRITICAL in the two built images (Alpine OpenSSL/musl/zlib, the npm bundled with Node, hono/lodash in db-migrate, Storybook in web). `packages/db/Dockerfile` is in your track; `docker/web.Dockerfile` is in trutscf1's (Storybook is schwaigc's). How should this MR handle that?
+
+Answer: "Fix mine, issue for web (Recommended)".
+
+- A3: hono, @hono/node-server, and lodash come with the pinned Prisma CLI that `db-migrate` needs; pruning them would break the migration, and a pnpm override belongs to the root configuration (track of `trutscf1`). They become exceptions with reason and expiry, and the override goes into the issue for `trutscf1`.
+- A4: exceptions of a built image must not hide the same finding in other images (for example OpenSSL in `node:24.14-alpine` on !44), so each built image gets its own file `.trivyignore.d/<service>`, added to `.trivyignore` only when that image is scanned; the fixed project name `stash` names the built images `stash-<service>`.
+
+Issue #157 created for `trutscf1` (Sprint 2, weight 2): fix the `web` image and the Prisma CLI findings; the exceptions expire on 2026-11-23.
+
+## Round 66 — 2026-11-10 — Accessibility modes, slice 1 (`schwaigc` (agent))
+
+Instruction, verbatim: "ja starte #71 mit dem skill gam enginieering implement". Gate before the first change: the concept `design-system.md` is an ungrilled draft without §16, the story of weight 5 was not cut into slices, and DSA-AC-2.4 needs a profile store that does not exist yet (#112 waits for #46). The pop-ups were asked as Q277 to Q280; they are logged as Q340 to Q343 because open branches already use Q277 to Q331 and rounds 59 to 65.
+
+**Q340 - Umfang #71:** Wie soll DSA-US-2 (Accessibility modes) umgesetzt werden, obwohl das Konzept ein Entwurf ist, die Story noch nicht in Slices geschnitten ist und die Profilspeicherung (DSA-AC-2.4) noch fehlt?
 
 Answer: "Slices schneiden + Slice 1 (Recommended)".
 
-**Q278 - Flow:** In .claude/settings.json ist kein GAM_ENGINEERING_FLOW gesetzt. Welcher Ablauf gilt für dieses Projekt?
+**Q341 - Flow:** In .claude/settings.json ist kein GAM_ENGINEERING_FLOW gesetzt. Welcher Ablauf gilt für dieses Projekt?
 
 Answer: "full (Recommended)".
 
-**Q279 - Veröffentlichen #71:** Branch feature/71-accessibility-modes pushen, MR nach dev öffnen (Titel „DSA-US-2 Accessibility modes, slice 1: modes in the browser“, Beschreibung nach Template inkl. Testtabelle und Merge danger), #71 auf status::review setzen und das Child-Issue „DSA-US-2 slice 2: Accessibility settings in the profile“ anlegen (Part of #71, DSA-AC-2.4, blockiert durch #46 und #112, Sprint 5, Weight 2, dir zugewiesen, status::backlog)?
+**Q342 - Veröffentlichen #71:** Branch feature/71-accessibility-modes pushen, MR nach dev öffnen (Titel „DSA-US-2 Accessibility modes, slice 1: modes in the browser“, Beschreibung nach Template inkl. Testtabelle und Merge danger), #71 auf status::review setzen und das Child-Issue „DSA-US-2 slice 2: Accessibility settings in the profile“ anlegen (Part of #71, DSA-AC-2.4, blockiert durch #46 und #112, Sprint 5, Weight 2, dir zugewiesen, status::backlog)?
 
 Answer: "Alles veröffentlichen (Recommended)". The child issue is #161.
 
-**Q280 - Issue #71 beim Merge:** Laut Slice-Tabelle liefert #71 Slice 1, die Story DSA-US-2 ist aber erst mit Slice 2 fertig. Soll der MR #71 schließen?
+**Q343 - Issue #71 beim Merge:** Laut Slice-Tabelle liefert #71 Slice 1, die Story DSA-US-2 ist aber erst mit Slice 2 fertig. Soll der MR #71 schließen?
 
 Answer: "Closes #71 (Recommended)".
+||||||| 4e36e0823

@@ -114,26 +114,44 @@ dependency-audit:
   script:
     - pnpm audit --prod --audit-level=high
 
-# Every image of docker-compose.yml, scanned for known high and critical vulnerabilities that
-# have a fix; accepted exceptions with reason and expiry live in .trivyignore (SCF-AC-5.2,
-# SCF-AC-5.3). Every image is scanned before the job fails, so one run lists all findings.
+# Every image the stack uses, scanned for known high and critical vulnerabilities that have a
+# fix (SCF-AC-2.5, SCF-AC-5.2, SCF-AC-5.3, SCF-NF-6). The job builds every image the stack
+# builds, in every profile, on its own Docker daemon, and takes the image list from the stack
+# definition, so built and pulled images are scanned alike (#149). Accepted exceptions with
+# reason and expiry: .trivyignore for every image, .trivyignore.d/<service> in addition for the
+# image that service builds only; the fixed project name stash names the built images
+# stash-<service>. Trivy is copied out of its pinned image. Every image is scanned before the
+# job fails, so one run lists all findings.
 container-scan:
   stage: test
-  image:
-    name: aquasec/trivy:0.69.3
-    entrypoint: [""]
+  image: docker:29.9.2
+  services:
+    - name: docker:29.9.2-dind
+      alias: docker
   variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: /certs
+    DOCKER_TLS_VERIFY: "1"
+    DOCKER_CERT_PATH: /certs/client
     TRIVY_CACHE_DIR: .trivy-cache
   cache:
     - key: trivy
       paths:
         - .trivy-cache
   script:
-    - images=$(awk '/^[[:space:]]*image:/ {print $2}' docker-compose.yml)
+    - docker create --name trivy aquasec/trivy:0.69.3
+    - docker cp trivy:/usr/local/bin/trivy /usr/local/bin/trivy
+    - docker rm trivy
+    # .env.example only fills the required variables of the stack definition; nothing is started.
+    - docker compose -p stash --env-file .env.example --profile "*" build
+    - images=$(docker compose -p stash --env-file .env.example --profile "*" config --images)
     - |
       failed=""
       for image in $images; do
-        trivy image --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --ignorefile .trivyignore --exit-code 1 "$image" || failed="$failed $image"
+        cp .trivyignore /tmp/trivyignore
+        own=".trivyignore.d/${image#stash-}"
+        if [ -f "$own" ]; then printf '\n' >> /tmp/trivyignore; cat "$own" >> /tmp/trivyignore; fi
+        trivy image --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --ignorefile /tmp/trivyignore --exit-code 1 "$image" || failed="$failed $image"
       done
       if [ -n "$failed" ]; then
         echo "Images with findings:$failed"
