@@ -30,5 +30,5 @@ Every story whose `sprint` field is 3, in the order of the product backlog. A st
 | [WEB-US-1 File browser](../E06-web-client/WEB-US-1-file-browser.md) | E06 Web client: dashboard, file browser, preview | backlog | 8 | #69 |
 | [WEB-US-3 Account settings](../E06-web-client/WEB-US-3-account-settings.md) | E06 Web client: dashboard, file browser, preview | backlog | 5 | #73 |
 | [TPM-US-1 Teams with roles](../E07-teams-permissions/TPM-US-1-teams-with-roles.md) | E07 Teams, roles, inherited permissions, quotas, audit log | backlog | 5 | #51 |
-| [PUB-US-1 Set up the headless CMS with Strapi](../E11-public-content/PUB-US-1-set-up-the-headless-cms-with-strapi.md) | E11 Public content: landing page, help center, changelog, legal pages | ready | 8 | #78 |
+| [PUB-US-1 Set up the headless CMS](../E11-public-content/PUB-US-1-set-up-the-headless-cms.md) | E11 Public content: landing page, help center, changelog, legal pages | ready | 8 | #78 |
 | [PUB-US-4 Legal pages (imprint, terms, privacy)](../E11-public-content/PUB-US-4-legal-pages-imprint-terms-privacy.md) | E11 Public content: landing page, help center, changelog, legal pages | ready | 3 | #81 |

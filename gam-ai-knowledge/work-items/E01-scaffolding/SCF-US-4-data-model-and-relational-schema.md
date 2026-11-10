@@ -1,13 +1,13 @@
 ---
 doc: story
 format: gam-ai-knowledge/1
-title: "SCF-US-4 Data model and Prisma schema"
+title: "SCF-US-4 Data model and relational schema"
 audience: [product, developer, reviewer, agent]
 id-prefix: "SCF"
 status: in-progress
 sprint: 2
 ---
-# SCF-US-4 Data model and Prisma schema
+# SCF-US-4 Data model and relational schema
 
 One user story of [Scaffolding & shared contracts](epic.md) and the acceptance criteria that decide when it is done. This file is the single source for both; the story issue copies them verbatim (P-DOC-6, P-TRK-2). The story was written by the team as tracker issue US-04 and brought into this form on 2026-10-06; its owner reviews the wording. On 2026-10-27 the command of `SCF-AC-4.5` was changed to its Prisma 8 name (`scaffolding.qa-log.md`, Q26). On 2026-11-02 the story was cut into two slices: the Vertabelo diagram (SCF-AC-4.1) is a human step and its own slice (`qa-log.md`, Q213).
 
@@ -15,7 +15,7 @@ One user story of [Scaffolding & shared contracts](epic.md) and the acceptance c
 
 | ID | Title | As a | I want | so that | Priority |
 | --- | --- | --- | --- | --- | --- |
-| SCF-US-4 | Data model and Prisma schema | operator | a documented relational data model with versioned migrations | users, teams, permissions, and folders are stored consistently | Must |
+| SCF-US-4 | Data model and relational schema | operator | a documented relational data model with versioned migrations | users, teams, permissions, and folders are stored consistently | Must |
 
 ## Acceptance criteria
 
@@ -34,7 +34,7 @@ The vertical slices that deliver this story. One slice is delivered by the story
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
 | 1 — Schema, migrations, seed, migrating at start | SCF-AC-4.2, SCF-AC-4.3, SCF-AC-4.4, SCF-AC-4.5 | — | #41 |
-| 2 — ER diagram in Vertabelo | SCF-AC-4.1 (human step: draw the diagram of `scaffolding.md` §8 in Vertabelo, export it, embed it) | slice 1 | #151 |
+| 2 — ER diagram of the schema | SCF-AC-4.1 (human step: draw the diagram of `scaffolding.md` §8 in Vertabelo, export it, embed it) | slice 1 | #151 |
 
 - **Story issue:** #41
 - **Weight:** 5 (slice 1: 4, slice 2: 1)

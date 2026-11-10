@@ -12,7 +12,7 @@ The story files are the source: their `status` and `sprint` fields decide what s
 
 | # | Story | Epic | Status | Sprint | Weight | Issue |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | [SCF-US-4 Data model and Prisma schema](E01-scaffolding/SCF-US-4-data-model-and-prisma-schema.md) | E01 Scaffolding & shared contracts | in-progress | 2 | 5 | #41 |
+| 1 | [SCF-US-4 Data model and relational schema](E01-scaffolding/SCF-US-4-data-model-and-relational-schema.md) | E01 Scaffolding & shared contracts | in-progress | 2 | 5 | #41 |
 | 2 | [SCF-US-8 Units reachable and visible](E01-scaffolding/SCF-US-8-units-reachable-and-visible.md) | E01 Scaffolding & shared contracts | backlog | — | — | — |
 | 3 | [OBS-US-1 Telemetry of every unit](E02-observability/OBS-US-1-telemetry-of-every-unit.md) | E02 Observability baseline | review | 2 | 8 | #82 |
 | 4 | [OBS-US-2 Operations dashboards and alerts](E02-observability/OBS-US-2-operations-dashboards-and-alerts.md) | E02 Observability baseline | review | 2 | 5 | #83 |
@@ -26,7 +26,7 @@ The story files are the source: their `status` and `sprint` fields decide what s
 | 12 | [IDN-US-8 Delete my account](E03-identity/IDN-US-8-delete-my-account.md) | E03 Identity: accounts, external login, MFA | backlog | — | 3 | — |
 | 13 | [DSA-US-2 Accessibility modes](E04-design-system/DSA-US-2-accessibility-modes.md) | E04 Design system & accessibility modes | in-progress | 2 | 5 | #71 |
 | 14 | [DSA-US-3 Keyboard operation and screen reader support](E04-design-system/DSA-US-3-keyboard-operation-and-screen-reader-support.md) | E04 Design system & accessibility modes | ready | 3 | 5 | #72 |
-| 15 | [STO-US-1 Connect the storage backend to SeaweedFS](E05-storage-core/STO-US-1-connect-the-storage-backend-to-seaweedfs.md) | E05 Storage core: folders, resumable upload, deduplication | ready | 2 | 5 | #56 |
+| 15 | [STO-US-1 Connect the storage backend to the object storage](E05-storage-core/STO-US-1-connect-the-storage-backend-to-the-object-storage.md) | E05 Storage core: folders, resumable upload, deduplication | ready | 2 | 5 | #56 |
 | 16 | [STO-US-2 Upload files](E05-storage-core/STO-US-2-upload-files.md) | E05 Storage core: folders, resumable upload, deduplication | ready | 2 | 5 | #57 |
 | 17 | [STO-US-3 Chunked upload with resume](E05-storage-core/STO-US-3-chunked-upload-with-resume.md) | E05 Storage core: folders, resumable upload, deduplication | backlog | 3 | 8 | #58 |
 | 18 | [STO-US-4 Deduplication by file hash](E05-storage-core/STO-US-4-deduplication-by-file-hash.md) | E05 Storage core: folders, resumable upload, deduplication | backlog | 4 | 5 | #59 |
@@ -42,12 +42,12 @@ The story files are the source: their `status` and `sprint` fields decide what s
 | 28 | [TPM-US-3 Storage quotas](E07-teams-permissions/TPM-US-3-storage-quotas.md) | E07 Teams, roles, inherited permissions, quotas, audit log | backlog | 4 | 3 | #54 |
 | 29 | [TPM-US-4 Audit log](E07-teams-permissions/TPM-US-4-audit-log.md) | E07 Teams, roles, inherited permissions, quotas, audit log | backlog | 6 | 3 | #55 |
 | 30 | [SHR-US-1 Share links with password and expiry](E08-share-links/SHR-US-1-share-links-with-password-and-expiry.md) | E08 Share links with password and expiry | backlog | 6 | 5 | #53 |
-| 31 | [BGP-US-1 Background processing with BullMQ](E09-background-processing/BGP-US-1-background-processing-with-bullmq.md) | E09 Background processing: thumbnails, virus scan, OCR, scheduled jobs | backlog | 5 | 5 | #63 |
+| 31 | [BGP-US-1 Background processing with a job queue](E09-background-processing/BGP-US-1-background-processing-with-a-job-queue.md) | E09 Background processing: thumbnails, virus scan, OCR, scheduled jobs | backlog | 5 | 5 | #63 |
 | 32 | [BGP-US-2 Virus scan of uploaded files](E09-background-processing/BGP-US-2-virus-scan-of-uploaded-files.md) | E09 Background processing: thumbnails, virus scan, OCR, scheduled jobs | backlog | 6 | 3 | #64 |
 | 33 | [BGP-US-3 Generate thumbnails](E09-background-processing/BGP-US-3-generate-thumbnails.md) | E09 Background processing: thumbnails, virus scan, OCR, scheduled jobs | backlog | 6 | 3 | #65 |
 | 34 | [BGP-US-4 Text recognition (OCR)](E09-background-processing/BGP-US-4-text-recognition-ocr.md) | E09 Background processing: thumbnails, virus scan, OCR, scheduled jobs | backlog | 5 | 5 | #66 |
 | 35 | [SRC-US-1 Full-text search](E10-search/SRC-US-1-full-text-search.md) | E10 Full-text search | backlog | 6 | 5 | #67 |
-| 36 | [PUB-US-1 Set up the headless CMS with Strapi](E11-public-content/PUB-US-1-set-up-the-headless-cms-with-strapi.md) | E11 Public content: landing page, help center, changelog, legal pages | ready | 3 | 8 | #78 |
+| 36 | [PUB-US-1 Set up the headless CMS](E11-public-content/PUB-US-1-set-up-the-headless-cms.md) | E11 Public content: landing page, help center, changelog, legal pages | ready | 3 | 8 | #78 |
 | 37 | [PUB-US-2 Public landing page](E11-public-content/PUB-US-2-public-landing-page.md) | E11 Public content: landing page, help center, changelog, legal pages | backlog | 4 | 3 | #79 |
 | 38 | [PUB-US-3 Help center and changelog](E11-public-content/PUB-US-3-help-center-and-changelog.md) | E11 Public content: landing page, help center, changelog, legal pages | backlog | 4 | 3 | #80 |
 | 39 | [PUB-US-4 Legal pages (imprint, terms, privacy)](E11-public-content/PUB-US-4-legal-pages-imprint-terms-privacy.md) | E11 Public content: landing page, help center, changelog, legal pages | ready | 3 | 3 | #81 |
