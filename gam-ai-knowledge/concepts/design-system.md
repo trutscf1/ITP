@@ -90,7 +90,7 @@ Cut on 2026-11-10, when its owner chose to build what does not wait for the file
 | Slice | Requirements | Issue | Blocked by |
 | --- | --- | --- | --- |
 | 1 — keyboard, skip link, checks | DSA-F-11, DSA-F-12, DSA-F-14, DSA-F-15 (DSA-AC-3.1, 3.2, 3.4, 3.5 for the pages and controls that exist) | #72 | — |
-| 2 — screen reader for files | DSA-F-13 (DSA-AC-3.3); DSA-AC-3.1 and 3.5 for the new screens | child issue of #72, still to be cut | the file browser of WEB-US-1 (#69) and the upload |
+| 2 — screen reader for files | DSA-F-13 (DSA-AC-3.3); DSA-AC-3.1 and 3.5 for the new screens | #163 | the file browser of WEB-US-1 (#69) and the upload |
 
 ### Decisions of slice 1 of DSA-US-3 (assumptions)
 

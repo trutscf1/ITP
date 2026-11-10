@@ -34,7 +34,7 @@ The vertical slices that deliver this story. One slice is delivered by the story
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
 | 1 — keyboard, skip link, checks | DSA-AC-3.1, DSA-AC-3.2, DSA-AC-3.4, DSA-AC-3.5 for the pages and controls that exist | — | #72 |
-| 2 — screen reader for files | DSA-AC-3.3; DSA-AC-3.1 and DSA-AC-3.5 for the new screens | WEB-US-1 (#69) | child issue of #72, still to be cut |
+| 2 — screen reader for files | DSA-AC-3.3; DSA-AC-3.1 and DSA-AC-3.5 for the new screens | WEB-US-1 (#69) | #163 |
 
 - **Story issue:** #72
 - **Weight:** 5
