@@ -74,7 +74,7 @@ async function within(promise: Promise<unknown>, ms: number): Promise<void> {
 }
 
 /**
- * M1 startTelemetry: the start call of a unit (`documentation/concepts/observability.md` §16).
+ * M1 startTelemetry: the start call of a unit (`gam-ai-knowledge/concepts/observability.md` §16).
  * Nothing here waits for the collector (OBS-NF-9); an invalid configuration throws
  * `InvalidConfigurationError`, which the unit treats as SCF-E-1 (OBS-E-7).
  */
