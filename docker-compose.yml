@@ -276,7 +276,9 @@ services:
       start_period: 10s
 
   # Metric store (OBS-C-3): OTLP receiver, retention from OBS_METRICS_RETENTION_DAYS, alert rules
-  # evaluated every 60 seconds from the file of the configuration step (OBS-F-8, OBS-F-17).
+  # evaluated every 60 seconds (the evaluation interval) from the file of the configuration step,
+  # which the metric store reads at its start only: after a change of a threshold run
+  # `docker compose up -d` and restart the metric store (OBS-F-8, OBS-F-17).
   prometheus:
     image: prom/prometheus:v3.15.1
     profiles: [observability]
