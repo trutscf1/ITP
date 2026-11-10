@@ -5,7 +5,7 @@ title: "STO-US-5 Manage folders and files"
 audience: [product, developer, reviewer, agent]
 id-prefix: "STO"
 status: ready
-sprint: 2
+sprint: 3
 ---
 # STO-US-5 Manage folders and files
 

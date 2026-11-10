@@ -26,7 +26,5 @@ Every story whose `sprint` field is 2, in the order of the product backlog. A st
 | [IDN-US-2 Log in and log out with rate limiting](../E03-identity/IDN-US-2-log-in-and-log-out-with-rate-limiting.md) | E03 Identity: accounts, external login, MFA | ready | 3 | #46 |
 | [IDN-US-6 Reset the password](../E03-identity/IDN-US-6-reset-the-password.md) | E03 Identity: accounts, external login, MFA | ready | 2 | #50 |
 | [DSA-US-2 Accessibility modes](../E04-design-system/DSA-US-2-accessibility-modes.md) | E04 Design system & accessibility modes | in-progress | 5 | #71 |
-| [DSA-US-3 Keyboard operation and screen reader support](../E04-design-system/DSA-US-3-keyboard-operation-and-screen-reader-support.md) | E04 Design system & accessibility modes | ready | 5 | #72 |
 | [STO-US-1 Connect the storage backend to SeaweedFS](../E05-storage-core/STO-US-1-connect-the-storage-backend-to-seaweedfs.md) | E05 Storage core: folders, resumable upload, deduplication | ready | 5 | #56 |
 | [STO-US-2 Upload files](../E05-storage-core/STO-US-2-upload-files.md) | E05 Storage core: folders, resumable upload, deduplication | ready | 5 | #57 |
-| [STO-US-5 Manage folders and files](../E05-storage-core/STO-US-5-manage-folders-and-files.md) | E05 Storage core: folders, resumable upload, deduplication | ready | 5 | #60 |
