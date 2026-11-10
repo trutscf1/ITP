@@ -1531,3 +1531,15 @@ Answer: "In WORKFLOW.md aufnehmen (Recommended)".
 **Q276 - Veröffentlichen auf !41:** Commits pushen, MR-Beschreibung aktualisieren (echter Scan, Abschnitt „No story, no AC IDs“, Fragenummern Q266–Q271) und Antwort-Kommentar an trutscf1 zu allen vier Punkten posten?
 
 Answer: "Alles veröffentlichen (Recommended)".
+
+## Round 59 — 2026-11-10 — Accessibility modes, slice 1 (`schwaigc` (agent))
+
+Instruction, verbatim: "ja starte #71 mit dem skill gam enginieering implement". Gate before the first change: the concept `design-system.md` is an ungrilled draft without §16, the story of weight 5 was not cut into slices, and DSA-AC-2.4 needs a profile store that does not exist yet (#112 waits for #46).
+
+**Q277 - Umfang #71:** Wie soll DSA-US-2 (Accessibility modes) umgesetzt werden, obwohl das Konzept ein Entwurf ist, die Story noch nicht in Slices geschnitten ist und die Profilspeicherung (DSA-AC-2.4) noch fehlt?
+
+Answer: "Slices schneiden + Slice 1 (Recommended)".
+
+**Q278 - Flow:** In .claude/settings.json ist kein GAM_ENGINEERING_FLOW gesetzt. Welcher Ablauf gilt für dieses Projekt?
+
+Answer: "full (Recommended)".

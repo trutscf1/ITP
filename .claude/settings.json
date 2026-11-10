@@ -2,7 +2,8 @@
   "env": {
     "ENGINEERING_HUMAN_MERGE": "ask",
     "ENGINEERING_HUMAN_APPROVALS": "1",
-    "ENGINEERING_HUMAN_RELEASE_MERGE": "ask"
+    "ENGINEERING_HUMAN_RELEASE_MERGE": "ask",
+    "GAM_ENGINEERING_FLOW": "full"
   },
   "permissions": {
     "ask": [

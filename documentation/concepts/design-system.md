@@ -48,6 +48,36 @@ Draft, derived one to one from the acceptance criteria.
 | DSA-F-14 | Manual tests | Given the project documentation, when a reader looks up the accessibility tests, the system MUST ensure that manual tests with NVDA and VoiceOver are documented. | DSA-AC-3.4 (Manual tests) |
 | DSA-F-15 | Automated check | Given the web client, when the automated axe check runs, the system MUST ensure that it reports no critical violation. | DSA-AC-3.5 (Automated check) |
 | DSA-F-16 | Theme in the profile | Given a signed-in member, when they choose a theme, the system MUST save the choice in their profile so that it applies on every device they sign in on. | DSA-AC-1.6 (Theme in the profile) |
+| DSA-F-17 | Settings remembered in the browser | Given a member, when they change an accessibility setting, the system MUST apply it at once without a reload and the browser MUST remember it for the next visit, until the profile takes over with DSA-F-9. | DSA-AC-2.4 (Saved settings) |
+
+## 16. Design for Testability
+
+Draft for DSA-US-2, written on 2026-11-10 when its owner chose to cut the story before the grilling (`qa-log.md`, Q277). Every decision below is an assumption the grilling of this concept may change.
+
+### Slices of DSA-US-2
+
+| Slice | Delivers | Issue | Blocked by |
+| --- | --- | --- | --- |
+| 1 — modes in the browser | DSA-F-6, DSA-F-7, DSA-F-8, DSA-F-10, DSA-F-17 (DSA-AC-2.1, 2.2, 2.3, 2.5; DSA-AC-2.4 up to the browser) | #71 | — |
+| 2 — settings in the profile | DSA-F-9 (DSA-AC-2.4) | child issue of #71, cut with slice 3 of DSA-US-1 (#112) | the profile of IDN-US-2 (#46), #112 |
+
+### Decisions of slice 1 (assumptions)
+
+- **A1 — Modes sit beside the theme.** The accessibility settings are three independent values next to the theme: *contrast* (`system` or `high`), *colour vision* (`none`, `protanopia`, `deuteranopia`, `tritanopia`), and *motion* (`system` or `reduced`). `system` follows `prefers-contrast: more` and `prefers-reduced-motion: reduce` of the operating system automatically; the member can only add a mode by hand, never switch the system preference off.
+- **A2 — High contrast has two palettes.** Light and sepia switch to a light high-contrast palette, dark and night to a dark one, so the member keeps a light or dark interface.
+- **A3 — Colour vision changes the status colours.** Information-bearing colour lives only in status tokens (`success`, `warning`, `danger`, `info`); each colour-vision mode replaces them with a palette that stays distinguishable for that vision. A status is never shown by colour alone: the status badge always carries an icon and a text, the colour only marks it.
+- **A4 — Reduced motion stops animations and transitions** on the whole page, both under the system preference and under the hand-set mode.
+- **A5 — Font size follows the browser.** No own font-size setting: every type and spacing token is in `rem`, so the browser's font size and zoom scale the layout; at 200 % no content is cut off and no horizontal scroll appears at 1280 px.
+- **A6 — Memory like the theme.** The settings are kept in one cookie read by the root layout, which renders them as attributes on `<html>`, so the first paint is right; slice 2 moves them into the profile.
+
+### Modules and seams
+
+| Module | Responsibility | Seam the tests use |
+| --- | --- | --- |
+| `@stash/ui` accessibility helpers | The settings type and defaults, reading and writing the cookie (unknown values fall back to the default), applying the settings as attributes on the root element | Pure functions, tested with plain objects, like the theme helpers |
+| `@stash/ui` token stylesheet | The high-contrast palettes, the status tokens per colour-vision mode, the reduced-motion rule | The stylesheet text, measured by the contrast test |
+| `@stash/ui` accessibility settings and status badge | The controls for the three settings (Radix primitives) and the badge with icon and text | Rendered with `react-dom/server`; one story each in Storybook |
+| `web` root layout | Reads the cookie and renders the attributes on `<html>`, shows the controls next to the theme switcher | The running web client, checked in the accessibility job of CI |
 
 ## 17. Test Concept & TDD Contract
 
@@ -68,6 +98,7 @@ Draft. DSA-T-1 to DSA-T-5 exist and run with `pnpm test` (`tests/design-system.t
 | DSA-T-9 | Reduced motion | DSA-AC-2.3, DSA-F-8 | A system that sets `prefers-reduced-motion` | The web client opens, and later the member switches the mode on by hand | No animation runs in either case |
 | DSA-T-10 | Saved accessibility settings | DSA-AC-2.4, DSA-F-9 | A signed-in member | They change an accessibility setting and reload | The setting applies at once and is still set after the reload |
 | DSA-T-11 | Font size 200 % | DSA-AC-2.5, DSA-F-10 | Every page of the web client | The root font size is doubled | No content overlaps or is cut off and no horizontal scroll appears at 1280 px |
+| DSA-T-17 | Settings remembered in the browser | DSA-AC-2.4, DSA-F-17 | The accessibility helpers | A setting is applied, and the cookie is written and read | The root element carries the setting at once, the cookie returns it, and an unknown or missing cookie falls back to the defaults |
 | DSA-T-12 | Keyboard only | DSA-AC-3.1, DSA-F-11 | Every page of the web client | It is walked through with Tab | Every control is reached in reading order with a visible focus indicator |
 | DSA-T-13 | Skip link | DSA-AC-3.2, DSA-F-12 | Any page | The first Tab is pressed and Enter follows | Focus moves to the main content |
 | DSA-T-14 | ARIA roles and live regions | DSA-AC-3.3, DSA-F-13 | The file browser, a dialog, and an upload in progress | The accessibility tree is read | Each has its role and label, and the progress is announced through a live region |
