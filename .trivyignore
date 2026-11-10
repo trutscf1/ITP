@@ -85,18 +85,16 @@ CVE-2026-116587 exp:2026-11-23
 
 # golang.org/x/net/html (denial of service when parsing crafted HTML, fixed in x/net 0.62.0) in
 # the caddy binary of caddy:2.11-alpine, the weed binary of chrislusf/seaweedfs:4.51, and the
-# MongoDB database tools of mongo:8.0 (bsondump, mongodump, …), found on 2026-11-10 (#160). The
-# newest builds still ship x/net 0.60/0.61: caddy:2.11-alpine of 2026-11-06 and seaweedfs 4.53 of
-# 2026-11-08 (checked with Trivy 0.69.3). The local proxy forwards requests without parsing HTML,
-# weed listens on 127.0.0.1 only, and the stack never runs the database tools. Upstream must
+# MongoDB database tools of mongo:8.0 (bsondump, mongodump, …), found on 2026-11-10 (#160). No
+# published build fixes it yet: caddy:2.11-alpine of 2026-11-06 ships x/net 0.60, and moving
+# seaweedfs to 4.53 (2026-11-08) would not help, it still ships 0.61 (checked with Trivy 0.69.3).
+# The local proxy forwards requests without parsing HTML, weed listens on 127.0.0.1 only, and the stack never runs the database tools. Upstream must
 # rebuild the images.
 CVE-2026-78661 exp:2026-11-23
 
-# zlib (heap buffer overflow in gz_vacate() when writing gzip files) in couchdb:3.5 (zlib1g) and
-# in the web image (base image node:24.14.0-alpine), found on 2026-11-10 (#160); the fixed Debian
-# and Alpine packages came out after couchdb:3.5 of 2026-11-05 was built. CouchDB writes no gzip
-# files from outside input in the local stack; the web image is fixed by #157 (Alpine packages
-# upgraded in the image). Upstream must rebuild couchdb:3.5.
+# zlib (heap buffer overflow in gz_vacate() when writing gzip files) in couchdb:3.5 (zlib1g), found
+# on 2026-11-10 (#160); the fixed Debian package came out after couchdb:3.5 of 2026-11-05 was built.
+# CouchDB writes no gzip files from outside input in the local stack. Upstream must rebuild the image.
 CVE-2026-85091 exp:2026-11-23
 CVE-2026-76844 exp:2026-11-23
 
