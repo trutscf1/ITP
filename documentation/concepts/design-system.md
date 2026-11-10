@@ -69,6 +69,10 @@ Draft for DSA-US-2, written on 2026-11-10 when its owner chose to cut the story 
 - **A4 — Reduced motion stops animations and transitions** on the whole page, both under the system preference and under the hand-set mode.
 - **A5 — Font size follows the browser.** No own font-size setting: every type and spacing token is in `rem`, so the browser's font size and zoom scale the layout; at 200 % no content is cut off and no horizontal scroll appears at 1280 px.
 - **A6 — Memory like the theme.** The settings are kept in one cookie read by the root layout, which renders them as attributes on `<html>`, so the first paint is right; slice 2 moves them into the profile.
+- **A7 — One cookie, keyed value.** The cookie `stash-a11y` holds `contrast:<value>.vision:<value>.motion:<value>`, built only from characters RFC 6265 allows. The reader takes every part on its own, so an unknown or missing part falls back to its default and the others stay. The settings type is named `AccessibilityModes`, because `AccessibilitySettings` is the component that shows it.
+- **A8 — Status colours are marks, measured as marks.** Each status colour reaches 3:1 against background and surface (WCAG 1.4.11) in every theme, contrast, and vision combination, because it is never the text. "Distinguishable for that vision" means a CIE Lab distance of at least 30 between every two of the four colours in the simulation of that vision (Machado et al. 2009, severity 1.0, computed inside the test). The high-contrast palettes change only the seven text and surface colour tokens, never the status colours.
+- **A9 — The settings sit behind one button.** The controls open from a labelled button "Accessibility" in the header, next to the theme switcher, as a popover. A switch that is off means `system`, so the member never has to switch an operating-system preference off to follow it.
+- **A10 — Components are tested from a build.** Node.js does not run `.tsx`, so the component tests compile `packages/ui` with `tsc` into a temporary folder and render the result with `react-dom/server`; the pure helpers and the stylesheet are tested directly.
 
 ### Modules and seams
 
@@ -81,7 +85,7 @@ Draft for DSA-US-2, written on 2026-11-10 when its owner chose to cut the story 
 
 ## 17. Test Concept & TDD Contract
 
-Draft. DSA-T-1 to DSA-T-5 exist and run with `pnpm test` (`tests/design-system.test.ts`, `tests/theme.test.ts`, `tests/contrast.test.ts`, `tests/storybook.test.ts`; seams agreed in `qa-log.md`, Q75; Storybook itself is built with `pnpm --filter @stash/ui run build-storybook`); every other row is a planned test that its slice writes first and that the grilling of this concept may sharpen. Each test name carries the `AC` ID it covers (`STACK.md` §6).
+Draft. DSA-T-1 to DSA-T-5, DSA-T-7, DSA-T-8, DSA-T-17, and the stylesheet parts of DSA-T-9 and DSA-T-11 exist and run with `pnpm test` (`tests/design-system.test.ts`, `tests/theme.test.ts`, `tests/contrast.test.ts`, `tests/storybook.test.ts`, `tests/accessibility-settings.test.ts`, `tests/accessibility-tokens.test.ts`, `tests/accessibility-components.test.ts`; seams agreed in `qa-log.md`, Q75; Storybook itself is built with `pnpm --filter @stash/ui run build-storybook`); the browser parts of DSA-T-9 (no running animation under `prefers-reduced-motion` and under `data-motion="reduced"`) and DSA-T-11 (200 % root font size, no horizontal scroll and no content wider than its box at 1280 px) are in the accessibility check `tests/accessibility/axe-check.ts`, which the CI job `accessibility` runs against the built web client (`pnpm run test:accessibility`); every other row is a planned test that its slice writes first and that the grilling of this concept may sharpen. Each test name carries the `AC` ID it covers (`STACK.md` §6).
 
 ### Acceptance Tests
 
