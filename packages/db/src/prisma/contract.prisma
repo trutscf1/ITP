@@ -1,6 +1,6 @@
 // use prisma-8
 // Relational schema of stash: the mapping of the entity-relationship diagram in
-// documentation/concepts/scaffolding.md §8 (SCF-F-22, SCF-F-23). Table and column names are
+// gam-ai-knowledge/concepts/scaffolding.md §8 (SCF-F-22, SCF-F-23). Table and column names are
 // plural snake_case as the SQL style guide demands.
 //
 // After a change (never edit an applied migration, SCF-F-23):

@@ -1,0 +1,2 @@
+#!/bin/sh
+node --no-warnings gam-engineering/tools/prompt-export.mjs export --stage || true  # gam-engineering prompt-export

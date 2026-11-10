@@ -2,7 +2,7 @@
 # one `docker compose up`. Every setting comes from `.env` (SCF-AC-2.2); `.env.example` lists
 # every variable. Every service has a health check, and a service starts only after the
 # services it depends on are healthy (SCF-AC-2.4). The units `identity`, `storage`, `worker`,
-# and `cms` join when their code runs (documentation/concepts/scaffolding.md, SCF-F-1).
+# and `cms` join when their code runs (gam-ai-knowledge/concepts/scaffolding.md, SCF-F-1).
 services:
   # Relational database (SCF-C-8).
   postgres:
@@ -132,7 +132,7 @@ services:
   # Local replacement for outgoing e-mail (SCF-AC-2.3): catches every message; the inbox is
   # at http://localhost:${MAILPIT_UI_PORT}.
   mailpit:
-    image: axllent/mailpit:v1.32
+    image: axllent/mailpit:v1.33
     restart: unless-stopped
     networks:
       - backend
@@ -146,7 +146,7 @@ services:
       start_period: 5s
 
   # The `web` unit (Next.js). docker/web.Dockerfile is a temporary stop-gap; M9 of the track plan
-  # Web (documentation/concepts/scaffolding.track-web.md) replaces it with apps/web/Dockerfile.
+  # Web (gam-ai-knowledge/concepts/scaffolding.track-web.md) replaces it with apps/web/Dockerfile.
   web:
     build:
       context: .

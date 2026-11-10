@@ -205,10 +205,10 @@ describe("OBS-AC-1.5 Limits, retention, and ports of the stack (OBS-NF-4, OBS-NF
         assert.match(from[1] as string, /:\d+\.\d+/, `${name}: ${from[1]}`);
       }
     }
-    assert.match(
-      readText(".gitlab-ci.yml"),
-      /docker\/observability\/\*\.Dockerfile/,
-    );
+    // The job builds every image of every profile and scans the images the stack definition lists.
+    const ci = readText(".gitlab-ci.yml");
+    assert.match(ci, /--profile "\*" build/);
+    assert.match(ci, /--profile "\*" config --images/);
   });
 
   it("OBS-AC-1.5 switches update checks, usage reporting, plugin downloads, login form, and self-registration of the dashboard tool off (OBS-NF-1, OBS-F-10)", () => {
