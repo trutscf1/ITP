@@ -140,7 +140,7 @@ describe("OBS-AC-2.4 Dashboards as code, files (OBS-F-9, OBS-E-8, OBS-T-11)", ()
     );
   });
 
-  it("OBS-AC-2.4 stores the dashboard 'Operations overview' with the time range last hour, refresh 30 seconds, and a unit selector (OBS-F-6, OBS-U-1)", () => {
+  it("OBS-F-6 OBS-U-1 stores the dashboard 'Operations overview' with the time range last hour, refresh 30 seconds, and a unit selector", () => {
     const board = dashboard();
     assert.equal(board.title, "Operations overview");
     assert.equal(board.uid, "operations-overview");
@@ -152,7 +152,7 @@ describe("OBS-AC-2.4 Dashboards as code, files (OBS-F-9, OBS-E-8, OBS-T-11)", ()
     );
   });
 
-  it("OBS-AC-2.4 keeps the update checks, the usage reporting, and the plugin downloads of the dashboard tool off while it loads the files (OBS-NF-1)", () => {
+  it("OBS-NF-1 keeps the update checks, the usage reporting, and the plugin downloads of the dashboard tool off while it loads the files", () => {
     const env =
       (parse(readText("docker-compose.yml")) as Compose).services.grafana
         ?.environment ?? {};
@@ -176,14 +176,14 @@ describe("OBS-AC-2.2 Linked logs and traces, files (OBS-F-7, OBS-T-9)", () => {
       assert.ok(links.length > 0, `${title} has no link`);
       const url = decodeURIComponent(links[0]?.url ?? "");
       assert.match(url, /explore/, title);
-      assert.match(url, /"datasource":"loki"|loki/, title);
+      assert.match(url, /"datasource":"loki"/, title);
       assert.match(url, /service_name/, title);
       assert.match(url, /__from/, title);
       assert.match(url, /__to/, title);
     }
   });
 
-  it("OBS-AC-2.2 computes the three panels from the request metric of the metric store, one line per unit (OBS-F-6, OBS-F-12)", () => {
+  it("OBS-F-6 OBS-F-12 computes the three panels from the request metric of the metric store, one line per unit", () => {
     const panels = dashboard().panels;
     for (const title of logPanels) {
       const panel = panels.find((candidate) => candidate.title === title);
@@ -390,7 +390,7 @@ describe(
       );
     });
 
-    it("OBS-AC-2.2 opens, from the panel link, the log entries of the same unit in the log store (OBS-F-7, OBS-T-9)", async () => {
+    it("OBS-F-7 OBS-T-9 finds the log entries of one unit in the log store by its service name, the query behind the panel link", async () => {
       const marker = `dashlink${Date.now()}`;
       const resource = (unit: string) => ({
         attributes: [{ key: "service.name", value: { stringValue: unit } }],
