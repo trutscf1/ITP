@@ -8,7 +8,7 @@ import { root } from "./tokens-css.ts";
 const ui: string = join(root, "packages/ui");
 const requireFromUi: NodeJS.Require = createRequire(join(ui, "package.json"));
 
-interface React {
+interface ReactModule {
   createElement(
     type: unknown,
     props?: unknown,
@@ -32,7 +32,7 @@ export interface BuiltUi {
 /**
  * Compiles `packages/ui` with the TypeScript compiler into a temporary folder inside it
  * (so that `react` and `radix-ui` resolve) and loads its index, because Node.js does not run
- * `.tsx` files. Type errors do not stop the emit; `pnpm typecheck` owns them.
+ * `.tsx` files. A failed compile fails the test run with the output of `tsc`.
  */
 export async function buildUi(): Promise<BuiltUi> {
   const cache = join(ui, "node_modules/.cache");
@@ -41,7 +41,7 @@ export async function buildUi(): Promise<BuiltUi> {
   const tsc = createRequire(join(root, "package.json")).resolve(
     "typescript/bin/tsc",
   );
-  spawnSync(
+  const compile = spawnSync(
     process.execPath,
     [
       tsc,
@@ -54,10 +54,16 @@ export async function buildUi(): Promise<BuiltUi> {
     ],
     { cwd: ui, encoding: "utf8" },
   );
+  if (compile.error || compile.status !== 0) {
+    rmSync(out, { recursive: true, force: true });
+    throw new Error(
+      `tsc could not build packages/ui (status ${compile.status}): ${compile.error?.message ?? ""}\n${compile.stdout}${compile.stderr}`,
+    );
+  }
   const index = (await import(
     pathToFileURL(join(out, "index.js")).href
   )) as Record<string, unknown>;
-  const { createElement } = requireFromUi("react") as React;
+  const { createElement } = requireFromUi("react") as ReactModule;
   const { renderToStaticMarkup } = requireFromUi(
     "react-dom/server",
   ) as ReactServer;
