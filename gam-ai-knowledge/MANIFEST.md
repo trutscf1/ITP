@@ -50,6 +50,7 @@ If a concept document is incomplete, ambiguous, or wrong, the synthesized code w
 | `concepts/<feature>.qa-log.md` | Archive only: the verbatim transcript of the concept's grilling rounds before the AI chat export took over (P-GRILL-2); new rounds are in `docs/prompts/`, distilled into the concept's §13 | No |
 | `STACK.md` | The single technology-mapping document: languages, frameworks, versions, commands | **Only here** |
 | `test-data/` | The invented sample data that proves a rebuild: `README.md` (`doc: test-data`) and, per feature in `test-data/<feature>/`, golden dumps of the stored data and contract examples as JSON files, with invented values as its `README.md` requires | No |
+| `tests/<name>.md` | Test documents with steps that a person runs and the table that records the runs, for tests no script can do, such as `tests/screen-reader-protocol.md` (NVDA and VoiceOver); `doc: test-strategy`; a concept lists them in the intro of its test concept (§17) | No |
 
 **Process documents** — how work flows around the specifications. Their conventions are the engineering profile's standing decisions (IDs in parentheses); the files bind them to this repo:
 
@@ -213,7 +214,7 @@ Every file in `gam-ai-knowledge/` starts with a YAML frontmatter block. GitLab a
 
 | Field | Required in | Values |
 | --- | --- | --- |
-| `doc` | every file | `goal`, `manifest`, `context`, `adr`, `concept`, `epic`, `story`, `backlog`, `sprint`, `qa-log`, `stack`, `workflow`, `roadmap`, `roadmap-details`, `inbox`, `versioning`, `team`, `status`, `test-data` |
+| `doc` | every file | `goal`, `manifest`, `context`, `adr`, `concept`, `epic`, `story`, `backlog`, `sprint`, `qa-log`, `stack`, `workflow`, `roadmap`, `roadmap-details`, `inbox`, `versioning`, `team`, `status`, `test-strategy`, `test-data` |
 | `format` | every file | `gam-ai-knowledge/1`, or `legacy` for a not-yet-migrated concept document; the former IDs of the format (`gam-engineering/2` and the names before it) are accepted during the transition period (P-DOC-10) |
 | `title` | every file | Plain-language title; for a concept document, the feature name exactly as in the ROADMAP *Feature* column |
 | `audience` | every file | List of `product`, `developer`, `reviewer`, `agent` — who reads this file |

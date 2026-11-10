@@ -6,7 +6,7 @@ audience: [developer, reviewer, agent]
 ---
 # Screen reader test protocol
 
-The written steps for the manual tests of the web client with the screen readers NVDA and VoiceOver, and the table in which each run is recorded. Testers follow it, and reviewers read the result table to see whether DSA-AC-3.4 (Manual tests, DSA-F-14, DSA-T-15) is met; the decision to write it as a protocol is A14 in [the concept of the design system](../concepts/design-system.md), section 16.
+The written steps for the manual tests of the web client with the screen readers NVDA and VoiceOver, and the table in which each run is recorded. Testers follow it, and reviewers read the result table to see whether DSA-AC-3.4 (Manual tests), its requirement DSA-F-14 (Manual tests), and its test DSA-T-15 (Manual screen-reader tests) is met; the decision to write it as a protocol is A14 in [the concept of the design system](../concepts/design-system.md), section 16.
 
 ## How to use this protocol
 
@@ -14,7 +14,7 @@ The written steps for the manual tests of the web client with the screen readers
 2. Serve the web client of the branch under test on your machine (`pnpm --filter @stash/web dev`, port 3000) or open the deployed environment. Open it in a new private window, so that no cookie of an earlier visit sets a theme or an accessibility mode.
 3. Work through the section of your screen reader step by step. Each step has an *Expect* line: the role, the name, and the state the reader has to announce. The exact words differ between readers, versions, and verbosity settings; what must be announced is the name, the role, the state, and the position in a group.
 4. Mark a step as failed when the reader announces nothing, a wrong or empty name, a wrong role or state, or when focus lands somewhere other than described. Write the step (for example "NVDA, theme switcher, step 2") and what you heard into the *Findings* column.
-5. Add one row to the table per run (one screen reader, one browser, one page), with the result `pass`, `pass with findings`, or `fail`. Never add a row for a run that did not happen.
+5. Add one row to the table per run (one screen reader, one browser, one page), with the result `pass`, `pass with findings`, or `fail`. Never add a row for a run that did not happen. Write the date as YYYY-MM-DD, the reader as `NVDA 2025.3` or `VoiceOver 15.1` (name and version), and the result as `pass`, `pass with findings`, or `fail`.
 6. Afterwards switch every accessibility mode you changed back off, because the browser remembers them.
 
 ## Pages and controls under test
@@ -61,8 +61,8 @@ The file browser, its dialogs, and the upload progress are not part of this prot
 4. Press Tab. Expect: the group name "Colour vision" (radio group), then "None, radio button, checked, 1 of 4".
 5. Press the down arrow key. Expect: "Protanopia, radio button, checked, 2 of 4"; moving in a radio group selects the option.
 6. Press Tab. Expect: "Reduce motion, switch, off". Press Space. Expect: "on".
-7. Press Tab. Expect: focus stays inside the dialog and moves back to "High contrast".
-8. Press Escape. Expect: the dialog closes and focus returns to "Accessibility, button, collapsed".
+7. Press Tab. Expect: focus loops inside the popover and moves back to "High contrast". The popover is non-modal: focus is not trapped, so a click outside it or Escape closes it, and the page behind it is not hidden from the reader.
+8. Press Escape. Expect: the popover closes and focus returns to "Accessibility, button, collapsed" (it may take a moment).
 9. Reset: open the dialog again and switch High contrast and Reduce motion off and choose None for the colour vision.
 
 ### NVDA main content
@@ -107,8 +107,8 @@ The file browser, its dialogs, and the upload progress are not part of this prot
 4. Press Tab. Expect: the group name "Colour vision" (radio group), then "None, selected, radio button, 1 of 4".
 5. Press the down arrow key. Expect: "Protanopia, selected, radio button, 2 of 4"; moving in a radio group selects the option.
 6. Press Tab. Expect: "Reduce motion, switch, off". Press VO+Space. Expect: "on".
-7. Press Tab. Expect: focus stays inside the dialog and moves back to "High contrast".
-8. Press Escape. Expect: the dialog closes and focus returns to "Accessibility, button, collapsed".
+7. Press Tab. Expect: focus loops inside the popover and moves back to "High contrast". The popover is non-modal: focus is not trapped, so a click outside it or Escape closes it, and the page behind it is not hidden from the reader.
+8. Press Escape. Expect: the popover closes and focus returns to "Accessibility, button, collapsed" (it may take a moment).
 9. Reset: open the dialog again and switch High contrast and Reduce motion off and choose None for the colour vision.
 
 ### VoiceOver main content
