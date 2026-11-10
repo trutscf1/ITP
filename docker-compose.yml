@@ -357,11 +357,12 @@ services:
       retries: 10
       start_period: 20s
 
-  # Dashboard tool (OBS-C-6). Its data sources and the dashboard come from files (OBS-US-2, slice
-  # 1; docker/observability/grafana); the alert rule "High error rate" is evaluated by the metric store and listed here (slice 2; the other
-  # alerts follow in slice 4). Until TLS exists it is reachable on the server itself only, with
-  # read-only anonymous access (OBS-F-10, OBS-F-24). No login form, no self-registration, no
-  # update check, no usage reporting, no plugin download (OBS-NF-1, OBS-NF-6).
+  # Dashboard tool (OBS-C-6). Its data sources and the dashboard come from files (OBS-US-2,
+  # slice 1; docker/observability/grafana); the alert rule "High error rate" is evaluated by the
+  # metric store and listed here (slice 2; the other alerts follow in slice 4). Until TLS exists
+  # it is reachable on the server itself only, with read-only anonymous access (OBS-F-10,
+  # OBS-F-24). No login form, no self-registration, no update check, no usage reporting, no
+  # plugin download (OBS-NF-1, OBS-NF-6).
   grafana:
     image: grafana/grafana:13.2.5
     profiles: [observability]

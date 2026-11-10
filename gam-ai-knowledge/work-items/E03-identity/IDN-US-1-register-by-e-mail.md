@@ -42,4 +42,4 @@ The vertical slices that deliver this story (concept §16, Q13). Slice 1 is deli
 
 - **Story issue:** #45
 - **Weight:** 5
-- **Depends on:** SCF-US-3 (Shared contracts with Zod and OpenAPI, #40), SCF-US-4 (Data model and Prisma schema, #41)
+- **Depends on:** SCF-US-3 (Shared contracts with Zod and OpenAPI, #40), SCF-US-4 (Data model and relational schema, #41)
