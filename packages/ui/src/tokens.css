@@ -201,3 +201,33 @@
   --color-status-danger: #f2203a;
   --color-status-info: #8a63f5;
 }
+
+/*
+ * Reduced motion (DSA-F-8): no animation, no transition, no smooth scrolling, on the whole page,
+ * when the system asks for it and when the member switches the mode on. The member can only
+ * add the mode; nothing here switches the system preference off.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: must also beat inline and unlayered styles of the page */
+    animation: none !important;
+    /* biome-ignore lint/complexity/noImportantStyles: must also beat inline and unlayered styles of the page */
+    transition: none !important;
+    /* biome-ignore lint/complexity/noImportantStyles: must also beat inline and unlayered styles of the page */
+    scroll-behavior: auto !important;
+  }
+}
+
+[data-motion="reduced"],
+[data-motion="reduced"] *,
+[data-motion="reduced"] *::before,
+[data-motion="reduced"] *::after {
+  /* biome-ignore lint/complexity/noImportantStyles: must also beat inline and unlayered styles of the page */
+  animation: none !important;
+  /* biome-ignore lint/complexity/noImportantStyles: must also beat inline and unlayered styles of the page */
+  transition: none !important;
+  /* biome-ignore lint/complexity/noImportantStyles: must also beat inline and unlayered styles of the page */
+  scroll-behavior: auto !important;
+}
