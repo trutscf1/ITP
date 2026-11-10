@@ -1,4 +1,4 @@
-// Acceptance tests of SCF-US-4 that read the repository (documentation/concepts/scaffolding.md
+// Acceptance tests of SCF-US-4 that read the repository (gam-ai-knowledge/concepts/scaffolding.md
 // §17, SCF-T-18, SCF-T-19, SCF-T-22): the entity-relationship diagram, the schema definition and
 // its migrations, and the migrating service of the local stack.
 import assert from "node:assert/strict";
@@ -17,7 +17,7 @@ type Table = Map<string, Column>;
 /** The tables and columns of the erDiagram block in §8 of the scaffolding concept. */
 function diagramTables(): Map<string, Table> {
   const concept = readFileSync(
-    join(root, "documentation", "concepts", "scaffolding.md"),
+    join(root, "gam-ai-knowledge", "concepts", "scaffolding.md"),
     "utf8",
   );
   const block = concept.match(/```mermaid\n(erDiagram\n[\s\S]*?)```/);
@@ -105,7 +105,7 @@ describe("SCF-AC-4.1 ER diagram", () => {
     },
     () => {
       assert.ok(
-        existsSync(join(root, "documentation", "images", "er-diagram.png")),
+        existsSync(join(root, "gam-ai-knowledge", "images", "er-diagram.png")),
       );
     },
   );

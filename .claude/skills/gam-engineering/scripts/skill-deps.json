@@ -1,0 +1,208 @@
+{
+  "skills": [
+    {
+      "name": "gam-v-grilling",
+      "tier": "required",
+      "used": "gam-concept",
+      "upstream": {
+        "repo": "https://github.com/mattpocock/skills",
+        "path": "skills/productivity/grilling",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "copied": "2026-11-03",
+        "identical": true
+      }
+    },
+    {
+      "name": "gam-v-domain-modeling",
+      "tier": "required",
+      "used": "gam-concept, gam-ai-knowledge",
+      "upstream": {
+        "repo": "https://github.com/mattpocock/skills",
+        "path": "skills/engineering/domain-modeling",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "copied": "2026-11-03",
+        "identical": true
+      }
+    },
+    {
+      "name": "gam-v-privacy-by-design",
+      "tier": "required",
+      "used": "gam-concept",
+      "upstream": {
+        "repo": "https://github.com/sickn33/antigravity-awesome-skills",
+        "path": "skills/privacy-by-design",
+        "commit": "8ceacbb9d499e71cc1a8d364ab22685ef2463d5a",
+        "copied": "2026-11-03",
+        "identical": true
+      }
+    },
+    {
+      "name": "gam-v-doubt-driven-development",
+      "tier": "required",
+      "used": "gam-concept",
+      "upstream": {
+        "repo": "https://github.com/addyosmani/agent-skills",
+        "path": "skills/doubt-driven-development",
+        "commit": "301b02b12bff98e4688e6984af6556802322bbde",
+        "copied": "2026-11-03",
+        "identical": true
+      }
+    },
+    {
+      "name": "gam-v-tdd",
+      "tier": "required",
+      "used": "gam-delivery",
+      "upstream": {
+        "repo": "https://github.com/mattpocock/skills",
+        "path": "skills/engineering/tdd",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "copied": "2026-11-03",
+        "identical": false
+      }
+    },
+    {
+      "name": "gam-v-code-review",
+      "tier": "required",
+      "used": "gam-delivery",
+      "upstream": {
+        "repo": "https://github.com/mattpocock/skills",
+        "path": "skills/engineering/code-review",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "copied": "2026-11-03",
+        "identical": true
+      }
+    },
+    {
+      "name": "gam-v-verification-before-completion",
+      "tier": "required",
+      "used": "gam-delivery",
+      "upstream": {
+        "repo": "https://github.com/obra/superpowers",
+        "path": "skills/verification-before-completion",
+        "commit": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+        "copied": "2026-11-03",
+        "identical": true
+      }
+    },
+    {
+      "name": "gam-v-receiving-code-review",
+      "tier": "required",
+      "used": "gam-delivery revise",
+      "upstream": {
+        "repo": "https://github.com/obra/superpowers",
+        "path": "skills/receiving-code-review",
+        "commit": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+        "copied": "2026-11-03",
+        "identical": true
+      }
+    },
+    {
+      "name": "gam-v-pre-release-review",
+      "tier": "required",
+      "used": "gam-delivery release",
+      "upstream": {
+        "repo": "https://github.com/sickn33/antigravity-awesome-skills",
+        "path": "skills/pre-release-review",
+        "commit": "8ceacbb9d499e71cc1a8d364ab22685ef2463d5a",
+        "copied": "2026-11-03",
+        "identical": true
+      }
+    },
+    {
+      "name": "gam-v-pr",
+      "tier": "required",
+      "used": "gam-delivery",
+      "upstream": {
+        "repo": "https://github.com/mattpocock/skills",
+        "path": "skills/engineering/pr",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "copied": "2026-11-03",
+        "identical": true
+      }
+    },
+    {
+      "name": "gam-v-prototype",
+      "tier": "optional",
+      "used": "side skill",
+      "upstream": {
+        "repo": "https://github.com/mattpocock/skills",
+        "path": "skills/engineering/prototype",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "copied": "2026-11-03",
+        "identical": true
+      }
+    },
+    {
+      "name": "gam-v-research",
+      "tier": "optional",
+      "used": "side skill",
+      "upstream": {
+        "repo": "https://github.com/mattpocock/skills",
+        "path": "skills/engineering/research",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "copied": "2026-11-03",
+        "identical": true
+      }
+    },
+    {
+      "name": "gam-v-wizard",
+      "tier": "optional",
+      "used": "side skill",
+      "upstream": {
+        "repo": "https://github.com/mattpocock/skills",
+        "path": "skills/engineering/wizard",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "copied": "2026-11-03",
+        "identical": true
+      }
+    },
+    {
+      "name": "gam-v-diagnosing-bugs",
+      "tier": "optional",
+      "used": "side skill",
+      "upstream": {
+        "repo": "https://github.com/mattpocock/skills",
+        "path": "skills/engineering/diagnosing-bugs",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "copied": "2026-11-03",
+        "identical": true
+      }
+    },
+    {
+      "name": "gam-v-codebase-design",
+      "tier": "optional",
+      "used": "side skill",
+      "upstream": {
+        "repo": "https://github.com/mattpocock/skills",
+        "path": "skills/engineering/codebase-design",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "copied": "2026-11-03",
+        "identical": true
+      }
+    },
+    {
+      "name": "gam-v-skill-check",
+      "tier": "maintenance",
+      "used": "changing the skills",
+      "upstream": {
+        "repo": "https://github.com/sickn33/antigravity-awesome-skills",
+        "path": "skills/skill-check",
+        "commit": "8ceacbb9d499e71cc1a8d364ab22685ef2463d5a",
+        "copied": "2026-11-03",
+        "identical": true
+      }
+    },
+    {
+      "name": "gam-v-writing-for-agents",
+      "tier": "maintenance",
+      "used": "changing the skills",
+      "upstream": {
+        "repo": "https://github.com/mattpocock/skills",
+        "path": "skills/productivity/writing-for-agents",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "copied": "2026-11-03",
+        "identical": true
+      }
+    }
+  ]
+}

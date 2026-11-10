@@ -131,10 +131,10 @@ describe("SCF-AC-7.2 Setup guide", () => {
 describe("SCF-AC-7.3 Definition of Done", () => {
   it("SCF-AC-7.3 the README links the binding Definition of Done", () => {
     const body = section("Definition of Done");
-    assert.match(body, /documentation\/WORKFLOW\.md/);
+    assert.match(body, /gam-ai-knowledge\/WORKFLOW\.md/);
     assert.match(body, /binding/);
     const workflow = readFileSync(
-      join(root, "documentation/WORKFLOW.md"),
+      join(root, "gam-ai-knowledge/WORKFLOW.md"),
       "utf8",
     );
     assert.match(workflow, /^#+ Definition of Done/m);

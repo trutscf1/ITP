@@ -1,0 +1,1620 @@
+{
+  "version": 1,
+  "thresholds": [
+    "low",
+    "medium",
+    "high",
+    "critical"
+  ],
+  "codeExtensions": [".ps1", ".psm1", ".py", ".js", ".mjs", ".cjs", ".ts", ".tsx", ".jsx", ".sh", ".bash", ".cmd", ".bat", ".php", ".java", ".kt", ".cs", ".go", ".rs", ".rb", ".sql", ".vue", ".svelte", ".mts", ".cts", ".kts", ".dart", ".swift"],
+  "docsOnly": {
+    "kinds": ["docs", "secrets", "audit"],
+    "documentPaths": ["*.md", "gam-ai-knowledge/", "gam-ai-memory/"],
+    "stackFiles": ["pipeline.json", "package.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "composer.json", "composer.lock", "pyproject.toml", "requirements*.txt", "Cargo.toml", "go.mod", "pom.xml", "*.csproj", "*.sln", "compose*.y*ml", "docker-compose*.y*ml", "Dockerfile*", ".gitlab-ci.yml", ".gitlab/ci/", ".github/workflows/", ".gitleaks.toml", ".markdownlint*", "biome.json*", "tsconfig*.json", "sonar-project.properties"],
+    "dataFolders": ["test-data/", "testdata/", "fixtures/", "__fixtures__/", "golden/", "snapshots/", "tests/", "test/"]
+  },
+  "hostTiers": {
+    "gitlab": [
+      "Free",
+      "Premium",
+      "Ultimate"
+    ],
+    "github": [
+      "Free",
+      "Team",
+      "Enterprise"
+    ]
+  },
+  "detection": {
+    "depth": 3,
+    "skipFolders": [
+      ".git",
+      "node_modules",
+      "vendor",
+      ".venv",
+      "venv",
+      "__pycache__",
+      "dist",
+      "build",
+      "target",
+      "bin",
+      "obj",
+      ".next",
+      ".nuxt",
+      "coverage",
+      "gam-engineering",
+      "gam-ai-knowledge",
+      "gam-ai-memory"
+    ],
+    "integration": [
+      "*.bats",
+      "tests/integration",
+      "test/integration",
+      "integration-tests",
+      "tests/ops",
+      "ops/tests"
+    ],
+    "stackLint": [
+      "compose.yaml",
+      "compose.yml",
+      "compose.*.yaml",
+      "compose.*.yml",
+      "docker-compose*.yaml",
+      "docker-compose*.yml",
+      "*.tf",
+      "Caddyfile",
+      "nginx.conf",
+      "*.nginx.conf",
+      "traefik*.yaml",
+      "traefik*.yml",
+      "Chart.yaml",
+      "kustomization.yaml"
+    ],
+    "dockerfiles": [
+      "Dockerfile",
+      "Dockerfile.*",
+      "*.Dockerfile"
+    ],
+    "overlapTools": [
+      "biome",
+      "eslint",
+      "prettier",
+      "oxlint",
+      "pint",
+      "php-cs-fixer",
+      "phpcs",
+      "phpstan",
+      "psalm",
+      "phpunit",
+      "pest",
+      "vitest",
+      "jest",
+      "mocha",
+      "pytest",
+      "ruff",
+      "flake8",
+      "mypy",
+      "black",
+      "tsc",
+      "vue-tsc",
+      "playwright",
+      "cypress",
+      "bats",
+      "hadolint",
+      "shellcheck",
+      "kubeconform",
+      "tflint",
+      "trivy",
+      "semgrep",
+      "gitleaks",
+      "sonar-scanner",
+      "sonarqube",
+      "dependency-cruiser",
+      "doc-check",
+      "golangci-lint",
+      "clippy",
+      "rubocop",
+      "rspec"
+    ]
+  },
+  "languages": [
+    {
+      "name": "Node",
+      "markers": [
+        "package.json"
+      ],
+      "lintCommand": "npm run lint",
+      "testCommand": "npm test",
+      "ruleSet": "p/javascript",
+      "ciJob": {
+        "gitlab": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [
+            "npm ci"
+          ],
+          "script": [],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [
+            "npm ci"
+          ],
+          "script": [],
+          "sastReport": ""
+        }
+      }
+    },
+    {
+      "name": "TypeScript",
+      "markers": [
+        "tsconfig.json"
+      ],
+      "lintCommand": "",
+      "testCommand": "node gam-engineering/tools/ts-check.mjs vitest {cwdFlag}",
+      "skipExit": 3,
+      "ruleSet": "p/typescript",
+      "ciJob": {
+        "gitlab": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [
+            "npm ci"
+          ],
+          "script": [],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [
+            "npm ci"
+          ],
+          "script": [],
+          "sastReport": ""
+        }
+      }
+    },
+    {
+      "name": "PHP",
+      "markers": [
+        "composer.json"
+      ],
+      "lintCommand": "composer run lint",
+      "testCommand": "composer test",
+      "ruleSet": "p/php",
+      "ciJob": {
+        "gitlab": {
+          "image": "composer:2.8",
+          "variables": {},
+          "setup": [
+            "composer install --no-interaction --no-progress"
+          ],
+          "script": [],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "composer:2.8",
+          "variables": {},
+          "setup": [
+            "composer install --no-interaction --no-progress"
+          ],
+          "script": [],
+          "sastReport": ""
+        }
+      }
+    },
+    {
+      "name": "Python",
+      "markers": [
+        "pyproject.toml",
+        "requirements.txt"
+      ],
+      "lintCommand": "ruff check .",
+      "testCommand": "pytest",
+      "ruleSet": "p/python",
+      "ciJob": {
+        "gitlab": {
+          "image": "python:3.13-slim",
+          "variables": {},
+          "setup": [
+            "pip install --quiet ruff pytest",
+            "if [ -f requirements.txt ]; then pip install --quiet -r requirements.txt; fi"
+          ],
+          "script": [],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "python:3.13-slim",
+          "variables": {},
+          "setup": [
+            "pip install --quiet ruff pytest",
+            "if [ -f requirements.txt ]; then pip install --quiet -r requirements.txt; fi"
+          ],
+          "script": [],
+          "sastReport": ""
+        }
+      }
+    },
+    {
+      "name": "Go",
+      "markers": [
+        "go.mod"
+      ],
+      "lintCommand": "go vet ./...",
+      "testCommand": "go test ./...",
+      "ruleSet": "p/golang",
+      "ciJob": {
+        "gitlab": {
+          "image": "golang:1.23",
+          "variables": {},
+          "setup": [],
+          "script": [],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "golang:1.23",
+          "variables": {},
+          "setup": [],
+          "script": [],
+          "sastReport": ""
+        }
+      }
+    },
+    {
+      "name": "Java",
+      "markers": [
+        "pom.xml",
+        "build.gradle"
+      ],
+      "lintCommand": "",
+      "testCommand": "mvn -q test",
+      "ruleSet": "p/java",
+      "ciJob": {
+        "gitlab": {
+          "image": "maven:3.9-eclipse-temurin-21",
+          "variables": {},
+          "setup": [],
+          "script": [],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "maven:3.9-eclipse-temurin-21",
+          "variables": {},
+          "setup": [],
+          "script": [],
+          "sastReport": ""
+        }
+      }
+    },
+    {
+      "name": "C#",
+      "markers": [
+        "*.csproj"
+      ],
+      "lintCommand": "dotnet format --verify-no-changes",
+      "testCommand": "dotnet test",
+      "ruleSet": "p/csharp",
+      "ciJob": {
+        "gitlab": {
+          "image": "mcr.microsoft.com/dotnet/sdk:8.0",
+          "variables": {},
+          "setup": [],
+          "script": [],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "mcr.microsoft.com/dotnet/sdk:8.0",
+          "variables": {},
+          "setup": [],
+          "script": [],
+          "sastReport": ""
+        }
+      }
+    },
+    {
+      "name": "Rust",
+      "markers": [
+        "Cargo.toml"
+      ],
+      "lintCommand": "cargo clippy -- -D warnings",
+      "testCommand": "cargo test",
+      "ruleSet": "p/rust",
+      "ciJob": {
+        "gitlab": {
+          "image": "rust:1.83",
+          "variables": {},
+          "setup": [
+            "rustup component add clippy"
+          ],
+          "script": [],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "rust:1.83",
+          "variables": {},
+          "setup": [
+            "rustup component add clippy"
+          ],
+          "script": [],
+          "sastReport": ""
+        }
+      }
+    }
+  ],
+  "checks": [
+    {
+      "kind": "audit",
+      "language": "",
+      "tier": "merge",
+      "tool": "trivy",
+      "version": "0.58.1",
+      "localCalls": [
+        [
+          "trivy",
+          "fs",
+          "--scanners",
+          "vuln",
+          "--severity",
+          "{threshold}",
+          "--exit-code",
+          "1",
+          "."
+        ]
+      ],
+      "needsContainer": false,
+      "installHint": "Install trivy 0.58.1: https://github.com/aquasecurity/trivy/releases/tag/v0.58.1",
+      "recommended": true,
+      "defaultThreshold": "high",
+      "ciJob": {
+        "gitlab": {
+          "image": "aquasec/trivy:0.58.1",
+          "variables": {},
+          "setup": [],
+          "script": [
+            "trivy fs --scanners vuln --severity {threshold} --exit-code 1 ."
+          ],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "aquasec/trivy:0.58.1",
+          "variables": {},
+          "setup": [],
+          "script": [
+            "trivy fs --scanners vuln --severity {threshold} --exit-code 1 ."
+          ],
+          "sastReport": ""
+        }
+      },
+      "native": [],
+      "yieldsTo": [
+        {
+          "kind": "audit",
+          "language": "*"
+        }
+      ]
+    },
+    {
+      "kind": "secrets",
+      "language": "",
+      "tier": "merge",
+      "tool": "gitleaks",
+      "version": "8.21.2",
+      "localCalls": [
+        [
+          "gitleaks",
+          "git",
+          ".",
+          "--redact"
+        ],
+        [
+          "gitleaks",
+          "dir",
+          ".",
+          "--redact"
+        ]
+      ],
+      "needsContainer": false,
+      "installHint": "Install gitleaks 8.21.2: https://github.com/gitleaks/gitleaks/releases/tag/v8.21.2",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "ghcr.io/gitleaks/gitleaks:v8.21.2",
+          "variables": {
+            "GIT_DEPTH": "0"
+          },
+          "setup": [
+            "git config --global --add safe.directory \"$CI_PROJECT_DIR\""
+          ],
+          "script": [
+            "gitleaks git . --redact",
+            "gitleaks dir . --redact"
+          ],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "ghcr.io/gitleaks/gitleaks:v8.21.2",
+          "variables": {},
+          "setup": [
+            "git config --global --add safe.directory \"$GITHUB_WORKSPACE\""
+          ],
+          "script": [
+            "gitleaks git . --redact",
+            "gitleaks dir . --redact"
+          ],
+          "sastReport": ""
+        }
+      },
+      "native": []
+    },
+    {
+      "kind": "docs",
+      "language": "",
+      "tier": "merge",
+      "tool": "doc-check",
+      "version": "",
+      "localCalls": [
+        [
+          "node",
+          "{docCheck}",
+          "--status"
+        ]
+      ],
+      "needsContainer": false,
+      "installHint": "Install Node 18 or later: https://nodejs.org/",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "node:24-alpine",
+          "variables": {
+            "GIT_DEPTH": "0"
+          },
+          "setup": [
+            "apk add --no-cache git",
+            "git config --global --add safe.directory \"$CI_PROJECT_DIR\"",
+            "git fetch --quiet --tags origin"
+          ],
+          "script": [
+            "node {docCheck} --status --pending-title \"$CI_MERGE_REQUEST_TITLE\" --pending-branch \"$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME\""
+          ],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "node:24",
+          "variables": {
+            "PR_TITLE": "${{ github.event.pull_request.title }}",
+            "PR_BRANCH": "${{ github.head_ref }}"
+          },
+          "setup": [
+            "git config --global --add safe.directory \"$GITHUB_WORKSPACE\""
+          ],
+          "script": [
+            "node {docCheck} --status --pending-title \"$PR_TITLE\" --pending-branch \"$PR_BRANCH\""
+          ],
+          "sastReport": ""
+        }
+      },
+      "native": []
+    },
+    {
+      "kind": "limits",
+      "language": "",
+      "tier": "merge",
+      "tool": "architecture-check",
+      "version": "",
+      "localCalls": [
+        [
+          "node",
+          "gam-engineering/tools/architecture-check.mjs",
+          "limits"
+        ]
+      ],
+      "needsContainer": false,
+      "installHint": "Install Node 18 or later: https://nodejs.org/",
+      "recommended": true,
+      "defaultThreshold": "",
+      "defaults": {
+        "maxFileLines": 400,
+        "maxFunctionLines": 60
+      },
+      "ciJob": {
+        "gitlab": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [],
+          "script": [
+            "node gam-engineering/tools/architecture-check.mjs limits"
+          ],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [],
+          "script": [
+            "node gam-engineering/tools/architecture-check.mjs limits"
+          ],
+          "sastReport": ""
+        }
+      },
+      "native": []
+    },
+    {
+      "kind": "guard",
+      "language": "",
+      "tier": "merge",
+      "tool": "floor-guard",
+      "version": "",
+      "localCalls": [
+        [
+          "node",
+          "gam-engineering/tools/floor-guard.mjs",
+          "check"
+        ]
+      ],
+      "needsContainer": false,
+      "skipExit": 2,
+      "installHint": "Install Node 18 or later: https://nodejs.org/",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "node:24-alpine",
+          "variables": {
+            "GIT_DEPTH": "0"
+          },
+          "setup": [
+            "apk add --no-cache git",
+            "git config --global --add safe.directory \"$CI_PROJECT_DIR\"",
+            "git fetch --quiet origin \"${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-$CI_DEFAULT_BRANCH}\""
+          ],
+          "script": [
+            "GAM_GUARD_BASE=\"origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-$CI_DEFAULT_BRANCH}\" node gam-engineering/tools/floor-guard.mjs check"
+          ],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "node:24",
+          "variables": {
+            "BASE_REF": "${{ github.base_ref }}",
+            "DEFAULT_BRANCH": "${{ github.event.repository.default_branch }}"
+          },
+          "setup": [
+            "git config --global --add safe.directory \"$GITHUB_WORKSPACE\""
+          ],
+          "script": [
+            "GAM_GUARD_BASE=\"origin/${BASE_REF:-$DEFAULT_BRANCH}\" node gam-engineering/tools/floor-guard.mjs check"
+          ],
+          "sastReport": ""
+        }
+      },
+      "native": []
+    },
+    {
+      "kind": "quality",
+      "language": "",
+      "tier": "release",
+      "tool": "sonarqube",
+      "version": "",
+      "localCalls": [
+        [
+          "node",
+          "gam-engineering/tools/sonar-check.mjs",
+          "scan",
+          "{versionFlag}"
+        ]
+      ],
+      "needsContainer": false,
+      "skipExit": 3,
+      "localOnly": true,
+      "installHint": "Install Node 18 or later: https://nodejs.org/; the scan also needs Docker and the shared SonarQube stack, a sonar-project.properties, and a git-ignored .env.sonar",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [],
+          "script": [],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [],
+          "script": [],
+          "sastReport": ""
+        }
+      },
+      "native": [],
+      "yieldsTo": [
+        {
+          "kind": "sast",
+          "language": "*"
+        }
+      ],
+      "after": [
+        "tests"
+      ]
+    },
+    {
+      "kind": "sonar-summary",
+      "language": "",
+      "tier": "release",
+      "tool": "sonar-summary",
+      "version": "",
+      "offeredBy": "quality",
+      "localCalls": [
+        [
+          "node",
+          "gam-engineering/tools/sonar-summary.mjs"
+        ]
+      ],
+      "needsContainer": false,
+      "skipExit": 3,
+      "localOnly": true,
+      "installHint": "Runs after the quality check and reads its report; it needs no install",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [],
+          "script": [],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [],
+          "script": [],
+          "sastReport": ""
+        }
+      },
+      "native": [],
+      "after": [
+        "quality"
+      ]
+    },
+    {
+      "kind": "integration",
+      "language": "",
+      "tier": "merge",
+      "tool": "integration-check",
+      "version": "",
+      "offeredBy": "marker",
+      "marker": "integration",
+      "projectCommand": true,
+      "localCalls": [
+        [
+          "node",
+          "gam-engineering/tools/integration-check.mjs",
+          "{checkIndex}"
+        ]
+      ],
+      "needsContainer": false,
+      "skipExit": 3,
+      "localOnly": true,
+      "installHint": "Install Node 18 or later: https://nodejs.org/; the services of the check need Docker or another container runtime",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [],
+          "script": [],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [],
+          "script": [],
+          "sastReport": ""
+        }
+      },
+      "native": []
+    },
+    {
+      "kind": "stack-lint",
+      "language": "",
+      "tier": "merge",
+      "tool": "",
+      "version": "",
+      "offeredBy": "marker",
+      "marker": "stackLint",
+      "projectCommand": true,
+      "localCalls": [],
+      "needsContainer": false,
+      "installHint": "The project names the command line and installs its tool",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [],
+          "script": [],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [],
+          "script": [],
+          "sastReport": ""
+        }
+      },
+      "native": []
+    },
+    {
+      "kind": "custom",
+      "language": "",
+      "tier": "merge",
+      "tool": "",
+      "version": "",
+      "offeredBy": "merge",
+      "projectCommand": true,
+      "localCalls": [],
+      "needsContainer": false,
+      "installHint": "The project names the command line and installs its tool",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [],
+          "script": [],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [],
+          "script": [],
+          "sastReport": ""
+        }
+      },
+      "native": []
+    },
+    {
+      "kind": "sast",
+      "language": "Node",
+      "tier": "merge",
+      "tool": "semgrep",
+      "version": "1.99.0",
+      "localCalls": [
+        [
+          "docker",
+          "run",
+          "--rm",
+          "-v",
+          "{repoRoot}:/src",
+          "semgrep/semgrep:1.99.0",
+          "semgrep",
+          "scan",
+          "--metrics=off",
+          "--config",
+          "p/javascript",
+          "--error",
+          "/src"
+        ]
+      ],
+      "needsContainer": true,
+      "installHint": "Install Docker Desktop (https://docs.docker.com/desktop/) and start it; semgrep runs in its container",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "semgrep/semgrep:1.99.0",
+          "variables": {},
+          "setup": [],
+          "script": [
+            "semgrep scan --metrics=off --config p/javascript --error ."
+          ],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "semgrep/semgrep:1.99.0",
+          "variables": {},
+          "setup": [],
+          "script": [
+            "semgrep scan --metrics=off --config p/javascript --error ."
+          ],
+          "sastReport": ""
+        }
+      },
+      "native": [
+        {
+          "host": "gitlab",
+          "tool": "gitlab-sast",
+          "minimumTier": "Premium",
+          "ciJob": {
+            "image": "registry.gitlab.com/security-products/semgrep:5",
+            "variables": {},
+            "setup": [],
+            "script": [
+              "/analyzer run"
+            ],
+            "sastReport": "gl-sast-report.json"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "sast",
+      "language": "TypeScript",
+      "tier": "merge",
+      "tool": "semgrep",
+      "version": "1.99.0",
+      "localCalls": [
+        [
+          "docker",
+          "run",
+          "--rm",
+          "-v",
+          "{repoRoot}:/src",
+          "semgrep/semgrep:1.99.0",
+          "semgrep",
+          "scan",
+          "--metrics=off",
+          "--config",
+          "p/typescript",
+          "--error",
+          "/src"
+        ]
+      ],
+      "needsContainer": true,
+      "installHint": "Install Docker Desktop (https://docs.docker.com/desktop/) and start it; semgrep runs in its container",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "semgrep/semgrep:1.99.0",
+          "variables": {},
+          "setup": [],
+          "script": [
+            "semgrep scan --metrics=off --config p/typescript --error ."
+          ],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "semgrep/semgrep:1.99.0",
+          "variables": {},
+          "setup": [],
+          "script": [
+            "semgrep scan --metrics=off --config p/typescript --error ."
+          ],
+          "sastReport": ""
+        }
+      },
+      "native": [
+        {
+          "host": "gitlab",
+          "tool": "gitlab-sast",
+          "minimumTier": "Premium",
+          "ciJob": {
+            "image": "registry.gitlab.com/security-products/semgrep:5",
+            "variables": {},
+            "setup": [],
+            "script": [
+              "/analyzer run"
+            ],
+            "sastReport": "gl-sast-report.json"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "sast",
+      "language": "PHP",
+      "tier": "merge",
+      "tool": "semgrep",
+      "version": "1.99.0",
+      "localCalls": [
+        [
+          "docker",
+          "run",
+          "--rm",
+          "-v",
+          "{repoRoot}:/src",
+          "semgrep/semgrep:1.99.0",
+          "semgrep",
+          "scan",
+          "--metrics=off",
+          "--config",
+          "p/php",
+          "--error",
+          "/src"
+        ]
+      ],
+      "needsContainer": true,
+      "installHint": "Install Docker Desktop (https://docs.docker.com/desktop/) and start it; semgrep runs in its container",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "semgrep/semgrep:1.99.0",
+          "variables": {},
+          "setup": [],
+          "script": [
+            "semgrep scan --metrics=off --config p/php --error ."
+          ],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "semgrep/semgrep:1.99.0",
+          "variables": {},
+          "setup": [],
+          "script": [
+            "semgrep scan --metrics=off --config p/php --error ."
+          ],
+          "sastReport": ""
+        }
+      },
+      "native": [
+        {
+          "host": "gitlab",
+          "tool": "gitlab-sast",
+          "minimumTier": "Premium",
+          "ciJob": {
+            "image": "registry.gitlab.com/security-products/semgrep:5",
+            "variables": {},
+            "setup": [],
+            "script": [
+              "/analyzer run"
+            ],
+            "sastReport": "gl-sast-report.json"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "sast",
+      "language": "Python",
+      "tier": "merge",
+      "tool": "semgrep",
+      "version": "1.99.0",
+      "localCalls": [
+        [
+          "docker",
+          "run",
+          "--rm",
+          "-v",
+          "{repoRoot}:/src",
+          "semgrep/semgrep:1.99.0",
+          "semgrep",
+          "scan",
+          "--metrics=off",
+          "--config",
+          "p/python",
+          "--error",
+          "/src"
+        ]
+      ],
+      "needsContainer": true,
+      "installHint": "Install Docker Desktop (https://docs.docker.com/desktop/) and start it; semgrep runs in its container",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "semgrep/semgrep:1.99.0",
+          "variables": {},
+          "setup": [],
+          "script": [
+            "semgrep scan --metrics=off --config p/python --error ."
+          ],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "semgrep/semgrep:1.99.0",
+          "variables": {},
+          "setup": [],
+          "script": [
+            "semgrep scan --metrics=off --config p/python --error ."
+          ],
+          "sastReport": ""
+        }
+      },
+      "native": [
+        {
+          "host": "gitlab",
+          "tool": "gitlab-sast",
+          "minimumTier": "Premium",
+          "ciJob": {
+            "image": "registry.gitlab.com/security-products/semgrep:5",
+            "variables": {},
+            "setup": [],
+            "script": [
+              "/analyzer run"
+            ],
+            "sastReport": "gl-sast-report.json"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "sast",
+      "language": "Go",
+      "tier": "merge",
+      "tool": "semgrep",
+      "version": "1.99.0",
+      "localCalls": [
+        [
+          "docker",
+          "run",
+          "--rm",
+          "-v",
+          "{repoRoot}:/src",
+          "semgrep/semgrep:1.99.0",
+          "semgrep",
+          "scan",
+          "--metrics=off",
+          "--config",
+          "p/golang",
+          "--error",
+          "/src"
+        ]
+      ],
+      "needsContainer": true,
+      "installHint": "Install Docker Desktop (https://docs.docker.com/desktop/) and start it; semgrep runs in its container",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "semgrep/semgrep:1.99.0",
+          "variables": {},
+          "setup": [],
+          "script": [
+            "semgrep scan --metrics=off --config p/golang --error ."
+          ],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "semgrep/semgrep:1.99.0",
+          "variables": {},
+          "setup": [],
+          "script": [
+            "semgrep scan --metrics=off --config p/golang --error ."
+          ],
+          "sastReport": ""
+        }
+      },
+      "native": [
+        {
+          "host": "gitlab",
+          "tool": "gitlab-sast",
+          "minimumTier": "Premium",
+          "ciJob": {
+            "image": "registry.gitlab.com/security-products/semgrep:5",
+            "variables": {},
+            "setup": [],
+            "script": [
+              "/analyzer run"
+            ],
+            "sastReport": "gl-sast-report.json"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "sast",
+      "language": "Java",
+      "tier": "merge",
+      "tool": "semgrep",
+      "version": "1.99.0",
+      "localCalls": [
+        [
+          "docker",
+          "run",
+          "--rm",
+          "-v",
+          "{repoRoot}:/src",
+          "semgrep/semgrep:1.99.0",
+          "semgrep",
+          "scan",
+          "--metrics=off",
+          "--config",
+          "p/java",
+          "--error",
+          "/src"
+        ]
+      ],
+      "needsContainer": true,
+      "installHint": "Install Docker Desktop (https://docs.docker.com/desktop/) and start it; semgrep runs in its container",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "semgrep/semgrep:1.99.0",
+          "variables": {},
+          "setup": [],
+          "script": [
+            "semgrep scan --metrics=off --config p/java --error ."
+          ],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "semgrep/semgrep:1.99.0",
+          "variables": {},
+          "setup": [],
+          "script": [
+            "semgrep scan --metrics=off --config p/java --error ."
+          ],
+          "sastReport": ""
+        }
+      },
+      "native": [
+        {
+          "host": "gitlab",
+          "tool": "gitlab-sast",
+          "minimumTier": "Premium",
+          "ciJob": {
+            "image": "registry.gitlab.com/security-products/semgrep:5",
+            "variables": {},
+            "setup": [],
+            "script": [
+              "/analyzer run"
+            ],
+            "sastReport": "gl-sast-report.json"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "sast",
+      "language": "C#",
+      "tier": "merge",
+      "tool": "semgrep",
+      "version": "1.99.0",
+      "localCalls": [
+        [
+          "docker",
+          "run",
+          "--rm",
+          "-v",
+          "{repoRoot}:/src",
+          "semgrep/semgrep:1.99.0",
+          "semgrep",
+          "scan",
+          "--metrics=off",
+          "--config",
+          "p/csharp",
+          "--error",
+          "/src"
+        ]
+      ],
+      "needsContainer": true,
+      "installHint": "Install Docker Desktop (https://docs.docker.com/desktop/) and start it; semgrep runs in its container",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "semgrep/semgrep:1.99.0",
+          "variables": {},
+          "setup": [],
+          "script": [
+            "semgrep scan --metrics=off --config p/csharp --error ."
+          ],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "semgrep/semgrep:1.99.0",
+          "variables": {},
+          "setup": [],
+          "script": [
+            "semgrep scan --metrics=off --config p/csharp --error ."
+          ],
+          "sastReport": ""
+        }
+      },
+      "native": [
+        {
+          "host": "gitlab",
+          "tool": "gitlab-sast",
+          "minimumTier": "Premium",
+          "ciJob": {
+            "image": "registry.gitlab.com/security-products/semgrep:5",
+            "variables": {},
+            "setup": [],
+            "script": [
+              "/analyzer run"
+            ],
+            "sastReport": "gl-sast-report.json"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "sast",
+      "language": "Rust",
+      "tier": "merge",
+      "tool": "semgrep",
+      "version": "1.99.0",
+      "localCalls": [
+        [
+          "docker",
+          "run",
+          "--rm",
+          "-v",
+          "{repoRoot}:/src",
+          "semgrep/semgrep:1.99.0",
+          "semgrep",
+          "scan",
+          "--metrics=off",
+          "--config",
+          "p/rust",
+          "--error",
+          "/src"
+        ]
+      ],
+      "needsContainer": true,
+      "installHint": "Install Docker Desktop (https://docs.docker.com/desktop/) and start it; semgrep runs in its container",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "semgrep/semgrep:1.99.0",
+          "variables": {},
+          "setup": [],
+          "script": [
+            "semgrep scan --metrics=off --config p/rust --error ."
+          ],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "semgrep/semgrep:1.99.0",
+          "variables": {},
+          "setup": [],
+          "script": [
+            "semgrep scan --metrics=off --config p/rust --error ."
+          ],
+          "sastReport": ""
+        }
+      },
+      "native": [
+        {
+          "host": "gitlab",
+          "tool": "gitlab-sast",
+          "minimumTier": "Premium",
+          "ciJob": {
+            "image": "registry.gitlab.com/security-products/semgrep:5",
+            "variables": {},
+            "setup": [],
+            "script": [
+              "/analyzer run"
+            ],
+            "sastReport": "gl-sast-report.json"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "format",
+      "language": "TypeScript",
+      "tier": "merge",
+      "tool": "biome",
+      "version": "",
+      "localCalls": [
+        [
+          "node",
+          "gam-engineering/tools/ts-check.mjs",
+          "biome",
+          "{cwdFlag}"
+        ]
+      ],
+      "needsContainer": false,
+      "skipExit": 3,
+      "installHint": "Install Node 18 or later: https://nodejs.org/; Biome is a dev dependency of the project (npm i -D @biomejs/biome)",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [
+            "npm ci"
+          ],
+          "script": [
+            "node gam-engineering/tools/ts-check.mjs biome {cwdFlag}"
+          ],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [
+            "npm ci"
+          ],
+          "script": [
+            "node gam-engineering/tools/ts-check.mjs biome {cwdFlag}"
+          ],
+          "sastReport": ""
+        }
+      },
+      "native": [],
+      "perFolder": true
+    },
+    {
+      "kind": "types",
+      "language": "TypeScript",
+      "tier": "merge",
+      "tool": "tsc",
+      "version": "",
+      "localCalls": [
+        [
+          "node",
+          "gam-engineering/tools/ts-check.mjs",
+          "tsc",
+          "{cwdFlag}"
+        ]
+      ],
+      "needsContainer": false,
+      "skipExit": 3,
+      "installHint": "Install Node 18 or later: https://nodejs.org/; TypeScript is a dev dependency of the project (npm i -D typescript)",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [
+            "npm ci"
+          ],
+          "script": [
+            "node gam-engineering/tools/ts-check.mjs tsc {cwdFlag}"
+          ],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [
+            "npm ci"
+          ],
+          "script": [
+            "node gam-engineering/tools/ts-check.mjs tsc {cwdFlag}"
+          ],
+          "sastReport": ""
+        }
+      },
+      "native": [],
+      "perFolder": true
+    },
+    {
+      "kind": "audit",
+      "language": "TypeScript",
+      "tier": "merge",
+      "tool": "npm-audit",
+      "version": "",
+      "localCalls": [
+        [
+          "node",
+          "gam-engineering/tools/ts-check.mjs",
+          "audit",
+          "{cwdFlag}"
+        ]
+      ],
+      "needsContainer": false,
+      "skipExit": 3,
+      "installHint": "Install Node 18 or later: https://nodejs.org/; the audit follows the lock file: pnpm-lock.yaml runs pnpm audit, package-lock.json runs npm audit",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [
+            "npm ci"
+          ],
+          "script": [
+            "node gam-engineering/tools/ts-check.mjs audit {cwdFlag}"
+          ],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [
+            "npm ci"
+          ],
+          "script": [
+            "node gam-engineering/tools/ts-check.mjs audit {cwdFlag}"
+          ],
+          "sastReport": ""
+        }
+      },
+      "native": [],
+      "perFolder": true
+    },
+    {
+      "kind": "e2e",
+      "language": "TypeScript",
+      "tier": "release",
+      "tool": "playwright",
+      "version": "",
+      "localCalls": [
+        [
+          "node",
+          "gam-engineering/tools/ts-check.mjs",
+          "playwright",
+          "{cwdFlag}"
+        ]
+      ],
+      "needsContainer": false,
+      "skipExit": 3,
+      "localOnly": true,
+      "installHint": "Install Node 18 or later: https://nodejs.org/; Playwright is a dev dependency of the project (npm i -D @playwright/test, then npx playwright install)",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [
+            "npm ci"
+          ],
+          "script": [],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [
+            "npm ci"
+          ],
+          "script": [],
+          "sastReport": ""
+        }
+      },
+      "native": [],
+      "perFolder": true
+    },
+    {
+      "kind": "image",
+      "language": "TypeScript",
+      "tier": "release",
+      "tool": "trivy",
+      "version": "0.58.1",
+      "localCalls": [
+        [
+          "node",
+          "gam-engineering/tools/ts-check.mjs",
+          "trivy-image",
+          "{threshold}",
+          "{cwdFlag}"
+        ]
+      ],
+      "needsContainer": true,
+      "skipExit": 3,
+      "localOnly": true,
+      "installHint": "Install trivy 0.58.1: https://github.com/aquasecurity/trivy/releases/tag/v0.58.1; the scan builds an image from the Dockerfile and needs Docker",
+      "recommended": true,
+      "defaultThreshold": "high",
+      "ciJob": {
+        "gitlab": {
+          "image": "aquasec/trivy:0.58.1",
+          "variables": {},
+          "setup": [
+            "npm ci"
+          ],
+          "script": [],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "aquasec/trivy:0.58.1",
+          "variables": {},
+          "setup": [
+            "npm ci"
+          ],
+          "script": [],
+          "sastReport": ""
+        }
+      },
+      "native": [],
+      "perFolder": true
+    },
+    {
+      "kind": "config",
+      "language": "TypeScript",
+      "tier": "release",
+      "tool": "trivy",
+      "version": "0.58.1",
+      "localCalls": [
+        [
+          "trivy",
+          "config",
+          "--severity",
+          "{threshold}",
+          "--exit-code",
+          "1",
+          "."
+        ]
+      ],
+      "needsContainer": false,
+      "skipExit": 3,
+      "localOnly": true,
+      "installHint": "Install trivy 0.58.1: https://github.com/aquasecurity/trivy/releases/tag/v0.58.1",
+      "recommended": true,
+      "defaultThreshold": "high",
+      "ciJob": {
+        "gitlab": {
+          "image": "aquasec/trivy:0.58.1",
+          "variables": {},
+          "setup": [
+            "npm ci"
+          ],
+          "script": [],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "aquasec/trivy:0.58.1",
+          "variables": {},
+          "setup": [
+            "npm ci"
+          ],
+          "script": [],
+          "sastReport": ""
+        }
+      },
+      "native": [],
+      "perFolder": true,
+      "yieldsTo": [
+        {
+          "kind": "stack-lint",
+          "language": ""
+        }
+      ]
+    },
+    {
+      "kind": "architecture",
+      "language": "Node",
+      "tier": "merge",
+      "tool": "dependency-cruiser",
+      "version": "16.10.4",
+      "localCalls": [
+        [
+          "node",
+          "gam-engineering/tools/architecture-check.mjs",
+          "layers"
+        ]
+      ],
+      "needsContainer": false,
+      "installHint": "Install Node 18 or later: https://nodejs.org/ (dependency-cruiser 16.10.4 runs through npx)",
+      "recommended": true,
+      "defaultThreshold": "",
+      "ciJob": {
+        "gitlab": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [
+            "npm ci"
+          ],
+          "script": [
+            "node gam-engineering/tools/architecture-check.mjs layers"
+          ],
+          "sastReport": ""
+        },
+        "github": {
+          "image": "node:24-alpine",
+          "variables": {},
+          "setup": [
+            "npm ci"
+          ],
+          "script": [
+            "node gam-engineering/tools/architecture-check.mjs layers"
+          ],
+          "sastReport": ""
+        }
+      },
+      "native": []
+    }
+  ]
+}
