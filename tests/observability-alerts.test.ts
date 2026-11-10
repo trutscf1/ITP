@@ -88,7 +88,7 @@ const dockerImage =
 const ruleToolSkip =
   localPromtool || dockerImage
     ? false
-    : "offline rule test: neither promtool nor the pinned metric store image is available locally (OBS-T-33 runs where one of them is, §17)";
+    : "offline rule test: neither promtool nor the pinned metric store image is available locally (OBS-T-33 runs where one of them is, §17; the pipeline job `rule-test` of #164 runs it on the pinned image)";
 
 /**
  * The offline rule test of OBS-C-3: a local `promtool`, or the pinned image of the metric store
