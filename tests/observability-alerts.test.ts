@@ -192,6 +192,18 @@ describe("OBS-AC-2.3 Configuration step writes the thresholds into the alert rul
     assert.match(expr, />= 20\b/);
   });
 
+  it("OBS-AC-2.3 writes a threshold with a leading zero as the number it means, never as an octal literal of PromQL (OBS-F-28, OBS-E-4)", () => {
+    const result = render(
+      { OBS_ALERT_ERROR_RATE_PERCENT: "010", OBS_ALERT_MIN_REQUESTS: "020" },
+      out,
+    );
+    assert.equal(result.status, 0, result.stdout);
+    const { expr } = errorRateAlert(join(out, "alert-rules.yml"));
+    assert.match(expr, /> 10\b/);
+    assert.match(expr, />= 20\b/);
+    assert.doesNotMatch(expr, /\b0\d/);
+  });
+
   it("OBS-AC-2.3 writes no rule file when a variable is invalid (OBS-E-4)", () => {
     const empty = mkdtempSync(join(tmpdir(), "obs-alerts-bad-"));
     try {
