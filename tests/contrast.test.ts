@@ -1,11 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import {
-  contrast,
-  textOnBackground,
-  themes,
-  tokensOf,
-} from "./helpers/tokens-css.ts";
+import { contrast } from "./helpers/colour.ts";
+import { textOnBackground, themes, tokensOf } from "./helpers/tokens-css.ts";
 
 /** The colour tokens of a theme as the browser resolves them without any accessibility mode. */
 function themeColours(theme: (typeof themes)[number]): Map<string, string> {
