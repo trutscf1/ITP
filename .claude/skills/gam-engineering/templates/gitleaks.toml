@@ -1,0 +1,12 @@
+# Configuration of the gam-engineering secrets check (gitleaks, PP-F-45), copied to .gitleaks.toml in the project root.
+# gitleaks reads it there in both scans (git history and working tree). Keep the default rules; add the project's own
+# paths below, for example invented test fixtures, never a real secret.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Git-ignored files the gam checks write on purpose"
+paths = [
+  '''(^|/)\.env\.sonar$''',
+  '''(^|/)\.scannerwork/''',
+]

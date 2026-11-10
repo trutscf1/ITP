@@ -18,7 +18,7 @@ async function check(message: string): Promise<boolean> {
   return result.valid;
 }
 
-// Example 4 of documentation/concepts/scaffolding.md §9 and WORKFLOW.md "Commit messages".
+// Example 4 of gam-ai-knowledge/concepts/scaffolding.md §9 and WORKFLOW.md "Commit messages".
 describe("SCF-AC-6.1 Commit check", () => {
   it("SCF-AC-6.1 accepts a feature with unit scope, requirement ID, and issue footer", async () => {
     assert.equal(
