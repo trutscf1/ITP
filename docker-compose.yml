@@ -132,7 +132,7 @@ services:
   # Local replacement for outgoing e-mail (SCF-AC-2.3): catches every message; the inbox is
   # at http://localhost:${MAILPIT_UI_PORT}.
   mailpit:
-    image: axllent/mailpit:v1.32
+    image: axllent/mailpit:v1.33
     restart: unless-stopped
     networks:
       - backend
