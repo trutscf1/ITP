@@ -30,7 +30,7 @@ Consistency-check result: ["no findings" or the list: child ID — parent ID —
 
 ## Reviewer checklist
 
-To be completed by a person other than the author. The merge itself follows the merge policy in `.claude/settings.json` (P-MR-4); under `auto` (solo mode) the recorded `/engineering-human review` completes this list.
+To be completed by a person other than the author. The merge itself follows the merge policy in `.claude/settings.json` (P-MR-4); under `auto` (solo mode) the recorded `/gam-engineering review` completes this list.
 
 - [ ] All acceptance criteria of the issue are met
 - [ ] Definition of Done (`gam-ai-knowledge/WORKFLOW.md`) is fully met

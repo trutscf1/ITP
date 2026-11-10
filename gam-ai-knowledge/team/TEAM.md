@@ -19,14 +19,14 @@ Who works on this repo and who owns what (P-TEAM-1…5), for every team member a
 
 Each member copies `CLAUDE.local.md.example` from the repo root to `CLAUDE.local.md` and enters their own handle (`Developer handle: <handle>`), so the agent knows whose status file and inbox to use. `CLAUDE.local.md` is ignored by git: it differs per person and is never committed.
 
-The vendored skill in `.claude/skills/engineering-human/` is the binding profile (P-TEAM-1). Its `templates/` folder holds the starting points for new documents; they are templates, not working copies, so the project's documents live only in `gam-ai-knowledge/` and are never edited in `templates/`.
+The vendored skills in `.claude/skills/gam-*/` are the binding profile (P-TEAM-1). Its `templates/` folder holds the starting points for new documents; they are templates, not working copies, so the project's documents live only in `gam-ai-knowledge/` and are never edited in `templates/`.
 
 ## Roles
 
 | Role | Handle(s) | Responsibility |
 | --- | --- | --- |
 | PM approver | trutscf1 | Signs off the Phase 4 review gate by approving the MR |
-| Profile maintainer | trutscf1 | Reviews MRs against the vendored `.claude/skills/engineering-human/` |
+| Profile maintainer | trutscf1 | Reviews MRs against the vendored `.claude/skills/gam-*/` |
 
 ## Ownership rules
 

@@ -1,6 +1,6 @@
 ---
 doc: concept
-format: legacy   # pre-engineering-human section numbers; migrated on the next change (P-DOC-5, ADR-0002)
+format: legacy   # pre-gam-engineering section numbers; migrated on the next change (P-DOC-5, ADR-0002)
 title: "Scaffolding & shared contracts"
 audience: [product, developer, reviewer, agent]
 id-prefix: "SCF"
@@ -47,7 +47,7 @@ Requested from other tracks (one issue each, listed under "Issues"):
 The issues #15 and #16 of the first cut were deleted on 2026-09-29. The work of this track is tracked by the story issues it delivers ([work items](../work-items/scaffolding/feature.md)):
 
 - #113 — this plan (`type::concept`)
-- SCF-US-8 (units reachable and visible), slice 1: the `web` part of the health reports (M1, M2, M7, M8, M9); slice 2: the status page (M3, M4, M5). Their issues follow with `/engineering-human tickets scaffolding`.
+- SCF-US-8 (units reachable and visible), slice 1: the `web` part of the health reports (M1, M2, M7, M8, M9); slice 2: the status page (M3, M4, M5). Their issues follow with `/gam-engineering tickets scaffolding`.
 - SCF-US-3 (shared contracts, #40): serving the generated API description at `/api/docs` (M6)
 - The requests of the table above, one issue per row, created with the first slice issue.
 

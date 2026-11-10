@@ -21,7 +21,7 @@ The project was migrated to `engineering-human` in solo layout ([ADR-0002](0002-
 
 ## Decision
 
-1. The skill is vendored in `.claude/skills/engineering-human/`; the repo copy is binding and changes only through a merge request (P-TEAM-1).
+1. The skill is vendored in `.claude/skills/engineering-human/`; the repo copy is binding and changes only through a merge request (P-TEAM-1). *Path superseded by [ADR-0008](0008-adopt-the-gam-engineering-skills.md): the vendored skills are now `.claude/skills/gam-*/`.*
 2. Handles are the GitLab usernames; roster, roles, and ownership rules are in [team/TEAM.md](../team/TEAM.md). `trutscf1` is PM approver and profile maintainer.
 3. Session positions and inboxes live in `team/<handle>/`; `ROADMAP-DETAILS.md` is the index and the log (P-TEAM-3).
 4. Every roadmap feature has one owner in the Owner column of `ROADMAP.md` (P-TEAM-4).

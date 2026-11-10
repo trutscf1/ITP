@@ -1,6 +1,6 @@
 ---
 doc: concept
-format: legacy   # pre-engineering-human section numbers; migrated on the next change (P-DOC-5, ADR-0002)
+format: legacy   # pre-gam-engineering section numbers; migrated on the next change (P-DOC-5, ADR-0002)
 title: "Scaffolding & shared contracts"
 audience: [product, developer, reviewer, agent]
 id-prefix: "SCF"

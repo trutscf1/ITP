@@ -1,4 +1,4 @@
-# Documentation checks (engineering-human), included from .gitlab-ci.yml.
+# Documentation checks (gam-engineering), included from .gitlab-ci.yml.
 # Runs the markdown lint and the machine-readable contract check (gam-ai-knowledge/tools/doc-check.mjs) on every
 # merge request and on dev and main. A failing job blocks the merge (P-MR-3: green pipeline).
 # --status compares the ROADMAP stages and the position rows with the merges and release tags in

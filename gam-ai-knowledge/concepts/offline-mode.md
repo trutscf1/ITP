@@ -8,7 +8,7 @@ serves: "G-1"
 ---
 # Offline mode: installable web app with sync and conflict handling Concept
 
-The specification of roadmap feature R12, for its owner, its reviewers, and the agents that will implement it. **This is a first draft made on 2026-10-06 from the team's tracker issues, before any grilling:** it holds the feature goal, the link to the user stories, and one requirement per acceptance criterion. Its owner (trutscf1) sharpens it with `/engineering-human offline-mode`.
+The specification of roadmap feature R12, for its owner, its reviewers, and the agents that will implement it. **This is a first draft made on 2026-10-06 from the team's tracker issues, before any grilling:** it holds the feature goal, the link to the user stories, and one requirement per acceptance criterion. Its owner (trutscf1) sharpens it with `/gam-engineering offline-mode`.
 
 ## 0. Synthesis Context
 

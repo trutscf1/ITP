@@ -1,10 +1,10 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code when working in this repository. It is a pointer file: school requirements live in `docs/`, process rules in `gam-ai-knowledge/MANIFEST.md`, standing conventions in the `engineering-human` skill, workflows in the installed skills. Do not restate their content here — link it.
+This file provides guidance to Claude Code when working in this repository. It is a pointer file: school requirements live in `docs/`, process rules in `gam-ai-knowledge/MANIFEST.md`, standing conventions in the `gam-engineering` skill, workflows in the installed skills. Do not restate their content here — link it.
 
 ## Mandatory skill
 
-**Every grilling, planning, concept, or delivery session starts with `/engineering-human`** (P-GRILL-5, P-WS-6), and every content change in this project is made under that skill. The skill is part of this repository (`.claude/skills/engineering-human/`); if it is not available in the session, stop and tell the user before changing anything.
+**Every grilling, planning, concept, or delivery session starts with `/gam-engineering`** (P-GRILL-5, P-WS-6), and every content change in this project is made under that skill. The skills are part of this repository (`.claude/skills/gam-*/`, the router is `.claude/skills/gam-engineering/`); if the skill is not available in the session, stop and tell the user before changing anything.
 
 ## School requirements (`docs/`) — binding
 
@@ -25,17 +25,17 @@ When you build or materially change a feature, update the owning document in the
 
 Process documents: `gam-ai-knowledge/WORKFLOW.md` (git/tracker binding, mode, Definition of Done), `ROADMAP.md` (ordered backlog), `ROADMAP-DETAILS.md` (single status entry point — start every session here), `VERSIONING.md`.
 
-**Team mode:** the engineering profile is vendored in `.claude/skills/engineering-human/` and binding for everyone. Each developer keeps `Developer handle: <handle>` and personal-scope preferences in the gitignored `CLAUDE.local.md`; session positions and inbox live in `gam-ai-knowledge/team/<handle>/`. Roles and ownership: `gam-ai-knowledge/team/TEAM.md`.
+**Team mode:** the engineering profile is vendored in `.claude/skills/gam-*/` and binding for everyone. Each developer keeps `Developer handle: <handle>` and personal-scope preferences in the gitignored `CLAUDE.local.md`; session positions and inbox live in `gam-ai-knowledge/team/<handle>/`. Roles and ownership: `gam-ai-knowledge/team/TEAM.md`.
 
 ## Standing conventions (engineering profile)
 
-The user's general engineering decisions — git flow, versioning, roadmap conventions, documentation quality bar, merge policy, working style — live in the **`engineering-human`** skill (`PROFILE.md`, IDs `P-…`) and are binding here, subject to the precedence rule above. Never re-ask a question it answers.
+The user's general engineering decisions — git flow, versioning, roadmap conventions, documentation quality bar, merge policy, working style — live in the **`gam-engineering`** skill (`PROFILE.md`, IDs `P-…`) and are binding here, subject to the precedence rule above. Never re-ask a question it answers.
 
-The command table of `/engineering-human` — setup, grill, check, triage, wayfind, sweep, tickets, implement, review, revise, merge, release, settings — is the single routing table for the engineering flow; it is not copied here. Every question to the developer is an `AskUserQuestion` pop-up, never a chat question (P-GRILL-1). Agents merge only through it, under the merge policy in `.claude/settings.json` (P-MR-4).
+The command table of `/gam-engineering` — setup, grill, check, triage, wayfind, sweep, tickets, implement, review, revise, merge, release, settings — is the single routing table for the engineering flow; it is not copied here. Every question to the developer is an `AskUserQuestion` pop-up, never a chat question (P-GRILL-1). Agents merge only through it, under the merge policy in `.claude/settings.json` (P-MR-4).
 
 ## Other skills
 
-Before each task, load the matching skill (P-WS-5). For situations outside the `/engineering-human` commands:
+Before each task, load the matching skill (P-WS-5). For situations outside the `/gam-engineering` commands:
 
 | Situation | Skill |
 | --- | --- |
@@ -50,7 +50,7 @@ Before each task, load the matching skill (P-WS-5). For situations outside the `
 
 Vocabulary layers, model-invoked as needed: `/domain-modeling` (glossary + ADRs), `/codebase-design` (module/interface/seam/depth terms). Additionally, load matching technology skills for the task at hand.
 
-**Not started directly here**: `/to-spec` (the concept document is the spec); `/grill-me`, `/grill-with-docs`, `/to-tickets`, `/implement`, `/triage`, `/wayfinder`, `/improve-codebase-architecture` — `/engineering-human` carries their work with this project's rules. `/receiving-code-review`, `/pre-release-review`, and `/privacy-by-design` are called by `revise`, `release`, and the grill flow, not started on their own.
+**Not started directly here**: `/to-spec` (the concept document is the spec); `/grill-me`, `/grill-with-docs`, `/to-tickets`, `/implement`, `/triage`, `/wayfinder`, `/improve-codebase-architecture` — `/gam-engineering` carries their work with this project's rules. `/receiving-code-review`, `/pre-release-review`, and `/privacy-by-design` are called by `revise`, `release`, and the grill flow, not started on their own.
 
 ## Agent skills
 

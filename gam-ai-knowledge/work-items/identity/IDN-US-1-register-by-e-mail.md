@@ -31,7 +31,7 @@ One user story of [Identity: accounts, external login, MFA](feature.md) and the 
 
 ## Slices
 
-The vertical slices that deliver this story (concept §16, Q13). Slice 1 is delivered by the story issue itself; slice 2 becomes a child issue of it with `/engineering-human tickets identity`.
+The vertical slices that deliver this story (concept §16, Q13). Slice 1 is delivered by the story issue itself; slice 2 becomes a child issue of it with `/gam-engineering tickets identity`.
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |

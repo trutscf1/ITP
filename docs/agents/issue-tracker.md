@@ -33,11 +33,11 @@ Issues and merge requests for this repo live on GitLab in project `87030014` (`h
 - **Read:** `GET $API/merge_requests/<iid>`, comments with `GET $API/merge_requests/<iid>/notes?sort=asc`, threads with `GET $API/merge_requests/<iid>/discussions`, the diff with `GET $API/merge_requests/<iid>/changes`.
 - **Approvals:** `GET $API/merge_requests/<iid>/approvals` — count approvers other than the author for merge policy `approved`.
 - **Comment:** `POST $API/merge_requests/<iid>/notes` with `{body}`.
-- **Merge:** only through `/engineering-human merge` (P-MR-4); `PUT $API/merge_requests/<iid>/merge` with `{squash: false, should_remove_source_branch: false}`.
+- **Merge:** only through `/gam-engineering merge` (P-MR-4); `PUT $API/merge_requests/<iid>/merge` with `{squash: false, should_remove_source_branch: false}`.
 
 ## External merge requests as a triage surface
 
-**MRs as a request surface: no.** *(Set to `yes` if external merge requests count as requests; `/engineering-human triage` reads this flag.)* External means the author is not a project member.
+**MRs as a request surface: no.** *(Set to `yes` if external merge requests count as requests; `/gam-engineering triage` reads this flag.)* External means the author is not a project member.
 
 GitLab numbers issues and MRs separately: `#42` is an issue, `!42` an MR.
 

@@ -8,7 +8,7 @@ serves: "G-1"
 ---
 # Share links with password and expiry Concept
 
-The specification of roadmap feature R8, for its owner, its reviewers, and the agents that will implement it. **This is a first draft made on 2026-10-06 from the team's tracker issues, before any grilling:** it holds the feature goal, the link to the user stories, and one requirement per acceptance criterion. Its owner (tschudea07) sharpens it with `/engineering-human share-links`.
+The specification of roadmap feature R8, for its owner, its reviewers, and the agents that will implement it. **This is a first draft made on 2026-10-06 from the team's tracker issues, before any grilling:** it holds the feature goal, the link to the user stories, and one requirement per acceptance criterion. Its owner (tschudea07) sharpens it with `/gam-engineering share-links`.
 
 ## 0. Synthesis Context
 

@@ -8,7 +8,7 @@ audience: [developer, reviewer, agent]
 
 **How this project builds software from concept documents — and why.**
 
-This is the skill-bound edition of the manifest: every phase names the installed skill that executes it. Process mechanics live in those skills; standing personal conventions live in the `engineering-human` skill's `PROFILE.md`; this document owns only what neither covers — the documentation model, the derivation chain from the project goal, the dual human/AI readability rules, the quality bar, the phase gates, and the stack-neutrality rules. Nothing is stated in two places.
+This is the skill-bound edition of the manifest: every phase names the installed skill that executes it. Process mechanics live in those skills; standing personal conventions live in the `gam-engineering` skill's `PROFILE.md`; this document owns only what neither covers — the documentation model, the derivation chain from the project goal, the dual human/AI readability rules, the quality bar, the phase gates, and the stack-neutrality rules. Nothing is stated in two places.
 
 ---
 
@@ -83,20 +83,20 @@ The installed engineering skills execute the phases. To keep every rule in exact
 
 | Concern | Single source | Consequence |
 | --- | --- | --- |
-| Interview mechanics (rounds with the full frontier, each question a numbered `Q<n>` pop-up with options, explore-instead-of-ask) | `/grilling`, always started via `/engineering-human` (P-GRILL-5) | Not restated here — except depth, order, and logging, which the `/engineering-human` overrides fix |
-| Glossary format, ADR criteria and format | `/domain-modeling` | Not restated here — except locations, mandatory ADRs, and team numbering, which the `/engineering-human` overrides fix |
+| Interview mechanics (rounds with the full frontier, each question a numbered `Q<n>` pop-up with options, explore-instead-of-ask) | `/grilling`, always started via `/gam-engineering` (P-GRILL-5) | Not restated here — except depth, order, and logging, which the `/gam-engineering` overrides fix |
+| Glossary format, ADR criteria and format | `/domain-modeling` | Not restated here — except locations, mandatory ADRs, and team numbering, which the `/gam-engineering` overrides fix |
 | Design vocabulary (module, interface, seam, depth, adapter, leverage, locality) | `/codebase-design` | Architecture chapters use these terms exactly |
 | TDD loop rules, what a good test is, seam discipline | `/tdd` | Not restated here |
 | Review axes (Standards + Spec) and smell baseline | `/code-review` | Not restated here |
 | User stories and acceptance criteria | `work-items/<feature>/` (P-DOC-6) | The concept's §3 links the tree; issues copy the rows verbatim; nothing restates them |
-| Ticket cutting (feature issue, one child issue per user story, slices as child issues of the story, wide refactors as expand–contract) | `/engineering-human tickets` (P-WS-6, P-TRK-2, P-TRK-4) | Not restated here |
-| Implementation loop, review, answering review threads, merge, release | `/engineering-human implement / review / revise / merge / release` (P-WS-6), which call `/tdd`, `/code-review`, `/receiving-code-review`, and `/pre-release-review` | Not restated here |
+| Ticket cutting (feature issue, one child issue per user story, slices as child issues of the story, wide refactors as expand–contract) | `/gam-engineering tickets` (P-WS-6, P-TRK-2, P-TRK-4) | Not restated here |
+| Implementation loop, review, answering review threads, merge, release | `/gam-engineering implement / review / revise / merge / release` (P-WS-6), which call `/tdd`, `/code-review`, `/receiving-code-review`, and `/pre-release-review` | Not restated here |
 | Proof before "done" (every acceptance criterion and Definition of Done item, with fresh evidence) | `/verification-before-completion`, called by `implement` and `merge` | Not restated here |
-| Privacy requirements for personal data (minimisation, retention, deletion, rights) | `/privacy-by-design`, called by the `/engineering-human` grill flow | Its results are `NF` requirements in the concept document; legal questions go to the data-protection contact, never decided by the agent |
-| Triage of raw incoming issues, wayfinding for foggy efforts, architecture sweeps | `/engineering-human triage / wayfind / sweep` (P-WS-6) | Not restated here |
+| Privacy requirements for personal data (minimisation, retention, deletion, rights) | `/privacy-by-design`, called by the `/gam-engineering` grill flow | Its results are `NF` requirements in the concept document; legal questions go to the data-protection contact, never decided by the agent |
+| Triage of raw incoming issues, wayfinding for foggy efforts, architecture sweeps | `/gam-engineering triage / wayfind / sweep` (P-WS-6) | Not restated here |
 | Merge policy (`ask` / `approved` / `auto`), release merge, merge guard | `.claude/settings.json` (P-MR-4…6) | `WORKFLOW.md` points to it, never copies the value |
-| Tracker commands and domain-doc layout for this repo | `docs/agents/*.md`, written by `/engineering-human setup` | Skills read these, humans edit them |
-| Standing conventions (goal, git flow, versioning, roadmap files, tracker, MR and review, time tracking, readability, team mode, working style) | `engineering-human` skill, `PROFILE.md` | This repo's process documents bind them by ID |
+| Tracker commands and domain-doc layout for this repo | `docs/agents/*.md`, written by `/gam-engineering setup` | Skills read these, humans edit them |
+| Standing conventions (goal, git flow, versioning, roadmap files, tracker, MR and review, time tracking, readability, team mode, working style) | `gam-engineering` skill, `PROFILE.md` | This repo's process documents bind them by ID |
 | Definition of Done, labels, sprint length, project-specific workflow values | `WORKFLOW.md` | Issues and MRs link it, never copy it |
 | What the system does | `concepts/<feature>.md` | Never answered in chat, code comments, or tickets |
 | What it is built with | `STACK.md` | Never named in a concept document |
@@ -104,11 +104,11 @@ The installed engineering skills execute the phases. To keep every rule in exact
 
 **Deliberately unused skills, and why:**
 
-* **`/to-spec`** — not used. The concept document *is* the spec; generating a second spec from conversation would create a competing source of truth. `/engineering-human tickets` reads the work-item tree (P-DOC-6) and the slice breakdown (§16) directly.
-* **`/to-tickets`, `/implement`, `/triage`, `/wayfinder`, `/improve-codebase-architecture`** — not started directly. `/engineering-human` carries their procedures, adapted to this process (P-WS-6).
-* **`/grill-me`** and plain **`/grill-with-docs`** — not used inside a repo. `/engineering-human` runs the same interview, goal-first and profile-aware, and leaves the paper trail (`CONTEXT.md`, ADRs, `.qa-log.md`) this process depends on.
+* **`/to-spec`** — not used. The concept document *is* the spec; generating a second spec from conversation would create a competing source of truth. `/gam-engineering tickets` reads the work-item tree (P-DOC-6) and the slice breakdown (§16) directly.
+* **`/to-tickets`, `/implement`, `/triage`, `/wayfinder`, `/improve-codebase-architecture`** — not started directly. `/gam-engineering` carries their procedures, adapted to this process (P-WS-6).
+* **`/grill-me`** and plain **`/grill-with-docs`** — not used inside a repo. `/gam-engineering` runs the same interview, goal-first and profile-aware, and leaves the paper trail (`CONTEXT.md`, ADRs, `.qa-log.md`) this process depends on.
 
-**Situational skills** (outside the phase sequence): `/engineering-human triage` for raw incoming issues and external MRs (never for the story issues `tickets` produced), `/diagnosing-bugs` for hard bugs, `/resolving-merge-conflicts` mid-conflict, `/research` for reading legwork, `/prototype` for runnable design questions, `/wizard` for steps only a human can perform, `/engineering-human wayfind` for efforts too big and foggy for one session (see Phase 1).
+**Situational skills** (outside the phase sequence): `/gam-engineering triage` for raw incoming issues and external MRs (never for the story issues `tickets` produced), `/diagnosing-bugs` for hard bugs, `/resolving-merge-conflicts` mid-conflict, `/research` for reading legwork, `/prototype` for runnable design questions, `/wizard` for steps only a human can perform, `/gam-engineering wayfind` for efforts too big and foggy for one session (see Phase 1).
 
 ---
 
@@ -137,7 +137,7 @@ Every document and every ID-bearing row descends from the project goal `G-1` in 
 
 ### Consistency check
 
-A short pass run at the Phase 1 start (feature vs. goal), the Phase 4 gate, the end of Phase 5, every merge, and every Phase 8 sweep, or on demand via `/engineering-human check`:
+A short pass run at the Phase 1 start (feature vs. goal), the Phase 4 gate, the end of Phase 5, every merge, and every Phase 8 sweep, or on demand via `/gam-engineering check`:
 
 1. Run `node gam-ai-knowledge/tools/doc-check.mjs` (see [Machine-Readable Contract](#machine-readable-contract)). It lists every orphan, dangling reference, coverage gap (rule 4, including acceptance criteria without a test in the code, rule `AC-TEST`), malformed or duplicate ID, and contract violation. The CI runs the same script on every MR.
 2. Read each row next to its parent and the non-goals; list every contradiction as *child ID — parent ID — conflict in one sentence*. This is the semantic part no script can do.
@@ -154,14 +154,14 @@ A concept document written under the older `engineering-profile` format (no §3 
 ```yaml
 ---
 doc: concept
-format: legacy   # pre-engineering-human section numbers; migrated on the next change (P-DOC-5, ADR-[number])
+format: legacy   # pre-gam-engineering section numbers; migrated on the next change (P-DOC-5, ADR-[number])
 title: "[feature name as in ROADMAP.md]"
 audience: [product, developer, reviewer, agent]
 id-prefix: "[DOC]"
 ---
 ```
 
-The next MR that changes the document migrates it completely (`/engineering-human migrate <feature>`) and sets `format: engineering-human/2`. A legacy document's old section numbers stay valid inside that document until then.
+The next MR that changes the document migrates it completely (`/gam-engineering migrate <feature>`) and sets `format: gam-ai-knowledge/1`. A legacy document's old section numbers stay valid inside that document until then.
 
 ---
 
@@ -209,7 +209,7 @@ Every file in `gam-ai-knowledge/` starts with a YAML frontmatter block. GitLab a
 | Field | Required in | Values |
 | --- | --- | --- |
 | `doc` | every file | `goal`, `manifest`, `context`, `adr`, `concept`, `feature`, `story`, `qa-log`, `stack`, `workflow`, `roadmap`, `roadmap-details`, `inbox`, `versioning`, `team`, `status` |
-| `format` | every file | `engineering-human/2`, or `legacy` for a not-yet-migrated concept document |
+| `format` | every file | `gam-ai-knowledge/1`, or `legacy` for a not-yet-migrated concept document |
 | `title` | every file | Plain-language title; for a concept document, the feature name exactly as in the ROADMAP *Feature* column |
 | `audience` | every file | List of `product`, `developer`, `reviewer`, `agent` — who reads this file |
 | `id-prefix` | `concept`, `feature`, `story` | The document prefix of P-DOC-4, 2–4 capital letters (`QE`); a feature's work items carry the prefix of its concept |
@@ -352,7 +352,7 @@ The mode is decided once in Phase 0 (*"Will more than one developer work on this
 
 | Document | Solo | Team |
 | --- | --- | --- |
-| Engineering profile | Personal skill | Vendored in `.claude/skills/engineering-human/`, changed via MR |
+| Engineering profile | Personal skill | Vendored in `.claude/skills/gam-*/`, changed via MR |
 | Personal preferences + developer handle | `~/.claude/CLAUDE.md` | `CLAUDE.local.md` (gitignored) |
 | Session positions | `ROADMAP-DETAILS.md` | `team/<handle>/STATUS.md`, one file per developer |
 | `ROADMAP-DETAILS.md` | Positions + processed-task log | Index (feature → owner → link to the owner's STATUS.md) + append-only log, entries prefixed with date and handle |
@@ -439,22 +439,22 @@ A concept document is **synthesis-ready** when it satisfies all of the following
 
 ### Phase 0 — Repo setup (once)
 
-First write `GOAL.md` (P-GOAL-1) — nothing else is created before the project goal exists. Then decide solo or team (see Team Mode). Then set up the tracker and the workflow per P-TRK-1 and `WORKFLOW.md` (labels, issue and MR templates, sprint milestones, protected `main` and `dev`, Definition of Done) and the merge policy, merge guard, and status hook in `.claude/settings.json` (P-MR-4…6, P-ROAD-4). Then write the agent files every other skill reads from `docs/agents/*.md` — tracker commands and the domain-doc layout pointing to `gam-ai-knowledge/CONTEXT.md` and `gam-ai-knowledge/adr/` — and create the root `CONTEXT-MAP.md` (P-DOC-2); `/engineering-human setup` does all of this. Create the process documents (`WORKFLOW.md`, `ROADMAP.md`, `ROADMAP-DETAILS.md`, `next.md` or the per-developer folders, `VERSIONING.md`) per the profile's P-GIT / P-ROAD / P-VER / P-TEAM decisions, and `STACK.md` with at least §0, §1, and §8 filled in.
+First write `GOAL.md` (P-GOAL-1) — nothing else is created before the project goal exists. Then decide solo or team (see Team Mode). Then set up the tracker and the workflow per P-TRK-1 and `WORKFLOW.md` (labels, issue and MR templates, sprint milestones, protected `main` and `dev`, Definition of Done) and the merge policy, merge guard, and status hook in `.claude/settings.json` (P-MR-4…6, P-ROAD-4). Then write the agent files every other skill reads from `docs/agents/*.md` — tracker commands and the domain-doc layout pointing to `gam-ai-knowledge/CONTEXT.md` and `gam-ai-knowledge/adr/` — and create the root `CONTEXT-MAP.md` (P-DOC-2); `/gam-engineering setup` does all of this. Create the process documents (`WORKFLOW.md`, `ROADMAP.md`, `ROADMAP-DETAILS.md`, `next.md` or the per-developer folders, `VERSIONING.md`) per the profile's P-GIT / P-ROAD / P-VER / P-TEAM decisions, and `STACK.md` with at least §0, §1, and §8 filled in.
 
 ### Phase 1 — Grill the draft
 
-Run **`/engineering-human <feature>`** (the profile-aware wrapper around `/grill-with-docs`) on whatever exists (loose notes, a roadmap entry, a half-finished doc). It drives the `/grilling` interview and maintains `CONTEXT.md` and ADRs via `/domain-modeling` as decisions land.
+Run **`/gam-engineering <feature>`** (the profile-aware wrapper around `/grill-with-docs`) on whatever exists (loose notes, a roadmap entry, a half-finished doc). It drives the `/grilling` interview and maintains `CONTEXT.md` and ADRs via `/domain-modeling` as decisions land.
 
 Manifest-specific rules on top of the skill:
 
-* **Consult the engineering profile first.** Before the first question, read the `engineering-human` skill's `PROFILE.md`, state the applied standing decisions by ID, and ask only what is new about this feature. Re-asking a profile-answered question is a defect.
+* **Consult the engineering profile first.** Before the first question, read the `gam-engineering` skill's `PROFILE.md`, state the applied standing decisions by ID, and ask only what is new about this feature. Re-asking a profile-answered question is a defect.
 * **Goal before details.** Write the feature goal (≤ 200 characters) in §1 and run the consistency check against `G-1` and the non-goals before the first detail question. A feature that serves no part of `G-1` stops here.
 * **Stories before requirements.** Capture user stories and their acceptance criteria first, in the dual-readable form, as the feature's work items (`work-items/<feature>/`, P-DOC-6); derive `F` / `U` / `NF` from them, each naming the `AC` or `US` it derives from.
 * **Personal data gets privacy requirements.** When a story stores, shows, or sends data about a person, the grill flow derives `NF` requirements with `/privacy-by-design`.
 * **Requirements first, solutions later.** Push back if the interview drifts to code — and equally hard if it drifts to technology ("we could use X library"). Stack talk is deferred to `STACK.md`, always.
 * Separate functional, non-functional, and user-interaction requirements; **number everything** (`US-1`, `AC-1.1`, `F-1`, `NF-1`, `U-1`) with the document prefix per P-DOC-4.
 * Capture open questions as numbered items (`Q1`, `Q2`, …).
-* **Too big for one session?** If the effort is a fog-wrapped, multi-session endeavor, chart it with **`/engineering-human wayfind`** first. Its decision tickets resolve into exactly the material Phases 1–2 need; when the map is clear, return here and continue — wayfinder plans, it does not build.
+* **Too big for one session?** If the effort is a fog-wrapped, multi-session endeavor, chart it with **`/gam-engineering wayfind`** first. Its decision tickets resolve into exactly the material Phases 1–2 need; when the map is clear, return here and continue — wayfinder plans, it does not build.
 
 ### Phase 2 — Resolve open questions & sharpen terminology
 
@@ -497,16 +497,16 @@ Add the test concept as the final documentation chapter, structured so an agent 
 
 ### Phase 7 — Synthesize via tickets and TDD
 
-The concept document is the spec — `/to-spec` is not run (see Skill Bindings). The steps are the `engineering-human` delivery commands, which own their procedure; in order:
+The concept document is the spec — `/to-spec` is not run (see Skill Bindings). The steps are the `gam-engineering` delivery commands, which own their procedure; in order:
 
 | Step | Command | What it produces |
 | --- | --- | --- |
-| 1 | `/engineering-human tickets <feature>` | The feature issue, one child issue per user story with its `AC-n.m` rows, weight, and milestone, slice issues below their story; issue numbers written back into the work items (P-TRK-2) |
-| 2 | `/engineering-human implement <issue>`, one fresh session per issue | Branch, TDD loop, commits with requirement IDs, MR with the status for the state after the merge |
-| 3 | `/engineering-human review <MR>` | Review against the acceptance criteria and the Definition of Done; a person reviews as well, except under merge policy `auto` in solo mode (P-MR-2) |
-| 3a | `/engineering-human revise <MR>`, when review threads are open | Each thread verified, answered, or fixed; fixes carry requirement IDs |
-| 4 | `/engineering-human merge <MR>` | Merge under the merge policy and status update in the same step (P-MR-4, P-ROAD-4) |
-| — | `/engineering-human release [<version>]` | Read-only pre-release review, release MR, tag, release notes (P-VER-1, P-MR-5) |
+| 1 | `/gam-engineering tickets <feature>` | The feature issue, one child issue per user story with its `AC-n.m` rows, weight, and milestone, slice issues below their story; issue numbers written back into the work items (P-TRK-2) |
+| 2 | `/gam-engineering implement <issue>`, one fresh session per issue | Branch, TDD loop, commits with requirement IDs, MR with the status for the state after the merge |
+| 3 | `/gam-engineering review <MR>` | Review against the acceptance criteria and the Definition of Done; a person reviews as well, except under merge policy `auto` in solo mode (P-MR-2) |
+| 3a | `/gam-engineering revise <MR>`, when review threads are open | Each thread verified, answered, or fixed; fixes carry requirement IDs |
+| 4 | `/gam-engineering merge <MR>` | Merge under the merge policy and status update in the same step (P-MR-4, P-ROAD-4) |
+| — | `/gam-engineering release [<version>]` | Read-only pre-release review, release MR, tag, release notes (P-VER-1, P-MR-5) |
 
 The one rule the manifest adds: **if the agent gets stuck or asks a question during synthesis, that is a documentation defect** — answer it in the concept document or `STACK.md` first, then resume. Never answer only in chat.
 
@@ -514,15 +514,15 @@ The one rule the manifest adds: **if the agent gets stuck or asks a question dur
 
 AI-driven development accelerates software entropy; periodically run a maintenance pass:
 
-* **`/engineering-human sweep`** surfaces deepening opportunities; a picked candidate becomes an idea that re-enters at Phase 1.
+* **`/gam-engineering sweep`** surfaces deepening opportunities; a picked candidate becomes an idea that re-enters at Phase 1.
 * The same sweep checks **goal drift** (the consistency check across all concept documents against the current `GOAL.md`), **Part H drift** (human summaries that no longer match their chapter), **concept drift** (code and concept document disagree — repaired in the document first, then the code, never the other way around silently) and **stack leaks** (technology names in concept documents — moved to `STACK.md`).
-* Bugs found along the way follow `/diagnosing-bugs`; its post-mortem hands back to `/engineering-human sweep` when the real finding is a missing seam.
+* Bugs found along the way follow `/diagnosing-bugs`; its post-mortem hands back to `/gam-engineering sweep` when the real finding is a missing seam.
 
 ---
 
 ## The Stack Document (`STACK.md`)
 
-The single place where technology lives. Rebuilding on a different stack means rewriting this one file. Setup creates it from the `engineering-human` skill's `templates/STACK.md`, which follows this outline.
+The single place where technology lives. Rebuilding on a different stack means rewriting this one file. Setup creates it from the `gam-engineering` skill's `templates/STACK.md`, which follows this outline.
 
 ```markdown
 # Stack Document
@@ -559,7 +559,7 @@ Rules:
 | Two developers edit one concept document or STATUS file | One owner per concept; one STATUS file per developer |
 | Jump to architecture before requirements are stable | Complete Phases 1–4 first |
 | Re-ask a question the engineering profile answers | Read `PROFILE.md`, state applied decisions by ID |
-| Run `/to-spec` on a concept-document feature | The concept document is the spec; `/engineering-human tickets` reads its work items and §16 |
+| Run `/to-spec` on a concept-document feature | The concept document is the spec; `/gam-engineering tickets` reads its work items and §16 |
 | MR or commit only an agent understands ("fix [QE-F-6]") | Plain-language title and summary, IDs with titles (P-GIT-4, P-MR-1) |
 | Improvise a workflow an installed skill owns | Load the skill (P-WS-5); the routing lives in Skill Bindings |
 | Write requirements as prose paragraphs | Numbered tables (`F-1`, `NF-1`, `U-1`), one sentence per row |
@@ -581,7 +581,7 @@ Rules:
 | Ignore entropy after synthesis | Periodic Phase 8 rescue, incl. drift + stack-leak sweep |
 | Copy positions into README/CONTEXT/ROADMAP | Link to `ROADMAP-DETAILS.md`; ROADMAP holds only the lifecycle stage (P-ROAD-2) |
 | Leave the status update for the next session | Update position and stage in the same step as the merge (P-ROAD-4) |
-| Merge with a bare `git merge` or the host button | `/engineering-human merge` under the merge policy (P-MR-4) |
+| Merge with a bare `git merge` or the host button | `/gam-engineering merge` under the merge policy (P-MR-4) |
 
 ---
 

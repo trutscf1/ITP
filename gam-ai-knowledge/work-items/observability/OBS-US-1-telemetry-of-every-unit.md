@@ -29,7 +29,7 @@ One user story of [Observability baseline](feature.md) and the acceptance criter
 
 ## Slices
 
-The vertical slices that deliver this story (concept §16, Q30). Slice 1 is delivered by the story issue itself; every further slice becomes a child issue of it with `/engineering-human tickets observability`. Slices 3–6 change units of other tracks and are built by those tracks' owners. The trace through a job needs the upload of R5 and the queue of R9, so it has its own slice (A19).
+The vertical slices that deliver this story (concept §16, Q30). Slice 1 is delivered by the story issue itself; every further slice becomes a child issue of it with `/gam-engineering tickets observability`. Slices 3–6 change units of other tracks and are built by those tracks' owners. The trace through a job needs the upload of R5 and the queue of R9, so it has its own slice (A19).
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |

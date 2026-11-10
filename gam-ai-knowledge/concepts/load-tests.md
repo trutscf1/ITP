@@ -8,7 +8,7 @@ serves: "G-1"
 ---
 # Load tests & operations dashboards Concept
 
-The specification of roadmap feature R13, for its owner, its reviewers, and the agents that will implement it. **This is a first draft made on 2026-10-06 from the team's tracker issues, before any grilling:** it holds the feature goal, the link to the user stories, and one requirement per acceptance criterion. Its owner (trutscf1) sharpens it with `/engineering-human load-tests`.
+The specification of roadmap feature R13, for its owner, its reviewers, and the agents that will implement it. **This is a first draft made on 2026-10-06 from the team's tracker issues, before any grilling:** it holds the feature goal, the link to the user stories, and one requirement per acceptance criterion. Its owner (trutscf1) sharpens it with `/gam-engineering load-tests`.
 
 ## 0. Synthesis Context
 

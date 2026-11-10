@@ -147,7 +147,7 @@ The Definition of Done is binding for every issue and merge request: [gam-ai-kno
 
 ## Working on the project
 
-Every change starts with an issue, happens on its own branch, and reaches `dev` through a merge request reviewed by another person; `main` only receives releases. The rules are in [gam-ai-knowledge/WORKFLOW.md](gam-ai-knowledge/WORKFLOW.md), the commands in [docs/git_workflow_commands.md](docs/git_workflow_commands.md). Sessions with Claude Code start with `/engineering-human` ([CLAUDE.md](CLAUDE.md)).
+Every change starts with an issue, happens on its own branch, and reaches `dev` through a merge request reviewed by another person; `main` only receives releases. The rules are in [gam-ai-knowledge/WORKFLOW.md](gam-ai-knowledge/WORKFLOW.md), the commands in [docs/git_workflow_commands.md](docs/git_workflow_commands.md). Sessions with Claude Code start with `/gam-engineering` ([CLAUDE.md](CLAUDE.md)).
 
 ## Licence notes
 

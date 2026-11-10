@@ -29,7 +29,7 @@ One user story of [Scaffolding & shared contracts](feature.md) and the acceptanc
 
 ## Slices
 
-The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it. Recut on 2026-10-13 with the migration of the concept: four units are not runnable yet, so `SCF-AC-2.1` (one start command) is met only when the last unit has joined the stack (`qa-log.md`, Q35; concept §13, A11). Slices 3 and 4 get their issues and weights with `/engineering-human tickets`.
+The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it. Recut on 2026-10-13 with the migration of the concept: four units are not runnable yet, so `SCF-AC-2.1` (one start command) is met only when the last unit has joined the stack (`qa-log.md`, Q35; concept §13, A11). Slices 3 and 4 get their issues and weights with `/gam-engineering tickets`.
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |

@@ -30,7 +30,7 @@ One user story of [Observability baseline](feature.md) and the acceptance criter
 
 ## Slices
 
-The vertical slices that deliver this story (concept §16, Q30). Slice 1 is delivered by the story issue itself; every further slice becomes a child issue of it with `/engineering-human tickets observability`. The panels and alerts that read the metrics of storage and processing wait for R5 and R9, the silent-unit alert follows them (A19), and the login through `identity` waits for R3 and TLS of R14 (Q36, Q37); until then the dashboard tool is reachable only on the server itself (A22).
+The vertical slices that deliver this story (concept §16, Q30). Slice 1 is delivered by the story issue itself; every further slice becomes a child issue of it with `/gam-engineering tickets observability`. The panels and alerts that read the metrics of storage and processing wait for R5 and R9, the silent-unit alert follows them (A19), and the login through `identity` waits for R3 and TLS of R14 (Q36, Q37); until then the dashboard tool is reachable only on the server itself (A22).
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |

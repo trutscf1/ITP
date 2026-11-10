@@ -1,6 +1,6 @@
 # Domain docs
 
-How agents and skills read this repo's domain documentation before they explore the code. Written by `/engineering-human setup`; edit it directly if the layout changes.
+How agents and skills read this repo's domain documentation before they explore the code. Written by `/gam-engineering setup`; edit it directly if the layout changes.
 
 ## Read these first
 

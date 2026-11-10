@@ -8,7 +8,7 @@ serves: "G-1"
 ---
 # Storage core: folders, resumable upload, deduplication Concept
 
-The specification of roadmap feature R5, for its owner, its reviewers, and the agents that will implement it. **This is a first draft made on 2026-10-06 from the team's tracker issues, before any grilling:** it holds the feature goal, the link to the user stories, and one requirement per acceptance criterion. Its owner (schauby1) sharpens it with `/engineering-human storage-core`.
+The specification of roadmap feature R5, for its owner, its reviewers, and the agents that will implement it. **This is a first draft made on 2026-10-06 from the team's tracker issues, before any grilling:** it holds the feature goal, the link to the user stories, and one requirement per acceptance criterion. Its owner (schauby1) sharpens it with `/gam-engineering storage-core`.
 
 ## 0. Synthesis Context
 

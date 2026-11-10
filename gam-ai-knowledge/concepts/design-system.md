@@ -8,7 +8,7 @@ serves: "G-1.S2"
 ---
 # Design system & accessibility modes Concept
 
-The specification of roadmap feature R4, for its owner, its reviewers, and the agents that will implement it. **This is a first draft made on 2026-10-06 from the team's tracker issues, before any grilling:** it holds the feature goal, the link to the user stories, and one requirement per acceptance criterion. Its owner (schwaigc) sharpens it with `/engineering-human design-system`.
+The specification of roadmap feature R4, for its owner, its reviewers, and the agents that will implement it. **This is a first draft made on 2026-10-06 from the team's tracker issues, before any grilling:** it holds the feature goal, the link to the user stories, and one requirement per acceptance criterion. Its owner (schwaigc) sharpens it with `/gam-engineering design-system`.
 
 ## 0. Synthesis Context
 

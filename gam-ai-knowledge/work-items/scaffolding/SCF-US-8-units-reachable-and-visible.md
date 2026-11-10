@@ -27,7 +27,7 @@ One user story of [Scaffolding & shared contracts](feature.md) and the acceptanc
 
 ## Slices
 
-The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it. Proposed cut of 2026-10-13; the issues and weights follow with `/engineering-human tickets`.
+The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it. Proposed cut of 2026-10-13; the issues and weights follow with `/gam-engineering tickets`.
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |

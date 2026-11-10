@@ -8,7 +8,7 @@ serves: "G-1"
 ---
 # Background processing: thumbnails, virus scan, OCR, scheduled jobs Concept
 
-The specification of roadmap feature R9, for its owner, its reviewers, and the agents that will implement it. **This is a first draft made on 2026-10-06 from the team's tracker issues, before any grilling:** it holds the feature goal, the link to the user stories, and one requirement per acceptance criterion. Its owner (schauby1) sharpens it with `/engineering-human background-processing`.
+The specification of roadmap feature R9, for its owner, its reviewers, and the agents that will implement it. **This is a first draft made on 2026-10-06 from the team's tracker issues, before any grilling:** it holds the feature goal, the link to the user stories, and one requirement per acceptance criterion. Its owner (schauby1) sharpens it with `/gam-engineering background-processing`.
 
 ## 0. Synthesis Context
 

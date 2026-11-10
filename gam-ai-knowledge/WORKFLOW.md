@@ -14,7 +14,7 @@ How work moves through this repo — branches, labels, merge requests, the Defin
 - **Git host / tracker:** GitLab — `htl-villach/it/classes/5bhitm-2026/itp/waent/project1/SJ26_27_5BHITM_ITP_trutscf1_project1`. People use `glab` as in `docs/git_workflow_commands.md`; agents use the REST API (`docs/agents/issue-tracker.md`). Mirror to GitHub with **all branches**; the GitHub user `gamgamstyle` gets the Reporter role (§18).
 - **Time tracking:** on for humans (P-TIME-1; school requirement, see "Time tracking")
 - **Host tier:** GitLab Premium/Ultimate, project in a group — determined by the agent's tier check on 2026-10-06 (the group epics API answers), not assumed, and re-checked before every `tickets` publish (P-TRK-4). Features are meant to be group epics with the story issues as native child items. The agent's project token may not create group epics, so the feature issues #87–#100 were created as project issues labelled `type::feature`, with a related-issue link from every story; a member with rights on the group promotes them with the `/promote` quick action.
-- **Merge policy:** the keys `env.ENGINEERING_HUMAN_MERGE`, `env.ENGINEERING_HUMAN_APPROVALS`, and `env.ENGINEERING_HUMAN_RELEASE_MERGE` in `.claude/settings.json` (P-MR-4…6). The values live only there; they are not copied into this file. Show or change them with `/engineering-human settings`.
+- **Merge policy:** the keys `env.GAM_ENGINEERING_MERGE`, `env.GAM_ENGINEERING_APPROVALS`, and `env.GAM_ENGINEERING_RELEASE_MERGE` in `.claude/settings.json` (P-MR-4…6). The values live only there; they are not copied into this file. Show or change them with `/gam-engineering settings`.
 
 ## Team
 
@@ -90,7 +90,7 @@ Every change starts with an issue (§3). Each issue has: description, acceptance
 | `type::story` | User story issue (`US-n`), child of its feature issue; slice issues are children of their story |
 | `type::bug` | Defect against an existing requirement |
 | `type::concept` | Tracking issue for concept authoring on a `concept/…` branch, one per roadmap feature |
-| `type::request` | Raw incoming feature request; enters the concept process via the inbox (`/engineering-human triage`) |
+| `type::request` | Raw incoming feature request; enters the concept process via the inbox (`/gam-engineering triage`) |
 | `type::documentation` | Documentation work that belongs to no single story (project-specific) |
 | `type::technical-improvement` | Technical improvement, refactoring, or tooling that belongs to no story (project-specific); its acceptance criteria stand in the issue without `AC` IDs, and its tests name the issue number |
 | `status::backlog` | Not planned for a sprint yet (project-specific; first board column) |
@@ -102,7 +102,7 @@ Every change starts with an issue (§3). Each issue has: description, acceptance
 | `priority::high` / `priority::medium` / `priority::low` | Urgency, optional (project-specific) |
 | `area::ui` / `area::api` / `area::infrastructure` | Affected part of the system, optional (project-specific) |
 | `env::development` / `env::staging` / `env::production` | Deployment context, optional (project-specific) |
-| `wayfinder:map`, `wayfinder:research` / `prototype` / `grilling` / `task` | Map and decision tickets of `/engineering-human wayfind` |
+| `wayfinder:map`, `wayfinder:research` / `prototype` / `grilling` / `task` | Map and decision tickets of `/gam-engineering wayfind` |
 
 ### Board
 
@@ -114,7 +114,7 @@ GitLab — issues: `.gitlab/issue_templates/feature.md`, `.gitlab/issue_template
 
 ### Issues and weight
 
-Every roadmap feature has one **concept issue** (`type::concept`, assignee = feature owner); its owner starts the concept with `/engineering-human <feature>`. Story and slice issues are cut from the approved concept with `/engineering-human tickets <feature>`, one track per person.
+Every roadmap feature has one **concept issue** (`type::concept`, assignee = feature owner); its owner starts the concept with `/gam-engineering <feature>`. Story and slice issues are cut from the approved concept with `/gam-engineering tickets <feature>`, one track per person.
 
 Weight is the relative effort on the scale 1, 2, 3, 5, 8 (P-TRK-3). The expected hours are the issue's time estimate. A slice issue is cut so that it fits into one project lesson of 200 minutes; a story that needs more gets several slices.
 
@@ -145,7 +145,7 @@ Every sprint runs the same five steps; the exit criteria of each milestone are i
 
 1. **Concept.** The concept documents of the sprint's features reach `ready`: phases 1–6 including §17 (tests carrying the `AC` IDs), work items, issues cut.
 2. **Generate, tests first.** From the ready documents the code is generated per story: first a `test(<scope>): … [AC-ID]` commit with failing tests, then `feat`/`fix` commits until they pass. One MR per story.
-3. **Review** by another person in the last working lesson; fixes with `/engineering-human revise`.
+3. **Review** by another person in the last working lesson; fixes with `/gam-engineering revise`.
 4. **Release.** Release MR by the milestone due date, tag `v0.<sprint>.0`, `CHANGELOG.md`, status current (P-ROAD-4).
 5. **Regeneration probe.** One feature of the sprint is regenerated in an empty worktree from its concept document and tests alone; its acceptance tests must pass. The result (feature, passed or not, what was missing from the documents) is logged in `ROADMAP-DETAILS.md`; every gap found is fixed in the documents first.
 
@@ -155,7 +155,7 @@ Every sprint runs the same five steps; the exit criteria of each milestone are i
 - Title: plain-language summary with the story ID, e.g. `SCF-US-3 Status page: one row per unit`.
 - Description (MR template): `Closes #<issue>`, what changes for the user, summary of the implementation, tested functions, consistency-check result, and the Definition of Done check — IDs always with their titles.
 - Reviewer: a person other than the author checks the acceptance criteria and the DoD explicitly and leaves a short, content-related comment (§10, P-MR-2).
-- Merging: the author never merges their own MR (§11); an agent merges only via `/engineering-human merge` under the merge policy (P-MR-4).
+- Merging: the author never merges their own MR (§11); an agent merges only via `/gam-engineering merge` under the merge policy (P-MR-4).
 - Every review thread is resolved and the pipeline is green before merging.
 - Merge method: merge commit (no squash, P-GIT-3).
 
@@ -193,7 +193,7 @@ Items 15 and 16 apply from the day the sprint plan is merged into `dev`, to work
 
 ## Releases (P-VER-1…3)
 
-Run `/engineering-human release [<version>]`:
+Run `/gam-engineering release [<version>]`:
 
 1. Merge `dev` → `main` via a release MR (§15.1) that includes the curated `CHANGELOG.md` section, as the release merge key allows (P-MR-5).
 2. Create the annotated tag `v<version>` on `main` (§15.2).

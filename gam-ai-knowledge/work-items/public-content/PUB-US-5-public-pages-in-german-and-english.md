@@ -32,6 +32,6 @@ The vertical slices that deliver this story. One slice is delivered by the story
 | --- | --- | --- | --- |
 | 1 — whole story | PUB-AC-5.1, PUB-AC-5.2, PUB-AC-5.3, PUB-AC-5.4 | — | — |
 
-- **Story issue:** — (created with `/engineering-human tickets public-content`)
+- **Story issue:** — (created with `/gam-engineering tickets public-content`)
 - **Weight:** 3, estimated with the architecture chapter on 2026-10-20
 - **Depends on:** PUB-US-1 (Set up the headless CMS with Strapi, #78), slice 3 (delivery by web)

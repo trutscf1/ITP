@@ -1,0 +1,11 @@
+# Project settings and built-in procedures
+
+Linked from the sections *Project settings* and *Built-in procedures* of [the core](../SKILL.md); moved here so the core stays within the size the compaction keeps (M-2).
+
+## Project settings
+
+The merge rules are P-MR-4 (merge policy and approvals), P-MR-5 (release merge), and P-MR-6 (merge guard); this section only says how to read them, and `gam-delivery` how to apply them. Read the committed `.claude/settings.json` itself ([template](../templates/claude/settings.json)) — never the process environment, which may hold personal values — and apply the fallbacks and team-mode rules of those IDs to get the effective values. **Transition (P-DOC-10, P-DOC-11).** A project not yet renamed or moved still has former key prefixes and former paths: read them as [Former names and paths](former-names.md) says, and offer `/gam-engineering migrate` once per session. Changing a value is a normal MR on that file, made with [`/gam-engineering settings`](../../gam-setup/references/settings.md); `WORKFLOW.md` names the keys but never copies their values.
+
+## Built-in procedures
+
+The generic skills `/to-tickets`, `/implement`, `/implement-spec`, `/setup-matt-pocock-skills`, `/triage`, `/wayfinder`, `/improve-codebase-architecture`, and `/retro` cannot be invoked by the model (`disable-model-invocation`). Their procedures are therefore built into the gam- skills, already adapted to the profile, as `references/` files of the skill that owns the command; a command loads only its own file. Only model-invocable skills are called with the Skill tool: `gam-v-grilling`, `gam-v-domain-modeling`, `gam-v-codebase-design`, `gam-v-tdd`, `gam-v-code-review`, `gam-v-verification-before-completion`, `gam-v-receiving-code-review`, `gam-v-pre-release-review`, `gam-v-privacy-by-design`, `gam-v-doubt-driven-development`, `gam-v-pr`, `gam-v-research`, `gam-v-prototype`, `gam-v-diagnosing-bugs`, `gam-v-wizard`, `gam-ai-memory`, and, for maintaining the skills themselves, `gam-v-writing-for-agents` and `gam-v-skill-check`. `implement` and `review` also call the technology skills the project's `STACK.md` §10 binds (P-DES-7). Where they differ from this profile, the overrides in [gam-delivery](../../gam-delivery/SKILL.md#overrides-for-the-delivery-skills) and the other gam- skills take precedence.
