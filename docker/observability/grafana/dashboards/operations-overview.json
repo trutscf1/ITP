@@ -60,7 +60,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "100 * sum by (service_name) (rate(http_server_request_duration_seconds_count{service_name=~\"$unit\",http_response_status_code=~\"5..\"}[5m])) / sum by (service_name) (rate(http_server_request_duration_seconds_count{service_name=~\"$unit\"}[5m]))",
+          "expr": "100 * (sum by (service_name) (rate(http_server_request_duration_seconds_count{service_name=~\"$unit\",http_response_status_code=~\"5..\"}[5m])) or 0 * sum by (service_name) (rate(http_server_request_duration_seconds_count{service_name=~\"$unit\"}[5m]))) / sum by (service_name) (rate(http_server_request_duration_seconds_count{service_name=~\"$unit\"}[5m]))",
           "legendFormat": "{{service_name}}"
         }
       ],
@@ -86,13 +86,13 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "histogram_quantile(0.95, sum by (le, service_name) (rate(http_server_request_duration_seconds_bucket{service_name=~\"$unit\"}[5m])))",
+          "expr": "1000 * histogram_quantile(0.95, sum by (le, service_name) (rate(http_server_request_duration_seconds_bucket{service_name=~\"$unit\"}[5m])))",
           "legendFormat": "{{service_name}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "s",
+          "unit": "ms",
           "links": [
             {
               "title": "Log entries of this unit",
