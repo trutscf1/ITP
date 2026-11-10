@@ -197,7 +197,7 @@ describe("OBS-AC-1.5 Limits, retention, and ports of the stack (OBS-NF-4, OBS-NF
   });
 
   it("OBS-AC-1.5 gives the images without a shell a pinned Dockerfile and lets the container scan cover its base images (SCF-AC-5.2)", () => {
-    for (const name of ["collector", "loki", "tempo"]) {
+    for (const name of ["obs-config", "collector", "loki", "tempo"]) {
       const dockerfile = services[name]?.build?.dockerfile;
       assert.equal(dockerfile, `docker/observability/${name}.Dockerfile`);
       const text = readText(dockerfile as string);

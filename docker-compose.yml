@@ -228,7 +228,9 @@ services:
   # Checks the variables of the stack and writes the configuration of the trace store (OBS-F-28,
   # OBS-E-4); a one-shot container like db-migrate.
   obs-config:
-    image: node:24.14-alpine
+    build:
+      context: .
+      dockerfile: docker/observability/obs-config.Dockerfile
     profiles: [observability]
     restart: "no"
     mem_limit: 64m
