@@ -3,6 +3,15 @@
  * type values (DSA-F-1). The @theme block holds the base values, which are
  * the light theme; Tailwind CSS 4 turns them into utilities. Every other
  * theme overrides the colour tokens on [data-theme] (DSA-F-2).
+ *
+ * The accessibility modes come after the themes and switch on data attributes
+ * of the root element (applyAccessibility in accessibility.ts):
+ *   - data-contrast="high" and prefers-contrast: more: a light high-contrast
+ *     palette for light and sepia, a dark one for dark and night (DSA-F-6, DSA-F-8);
+ *   - data-colour-vision: replaces the status colours (DSA-F-7);
+ *   - data-motion="reduced" and prefers-reduced-motion: stops all motion (DSA-F-8).
+ * Type and spacing tokens stay in rem so that the browser's font size scales
+ * the layout (DSA-F-10).
  */
 @theme {
   --color-background: #ffffff;
@@ -12,6 +21,11 @@
   --color-accent: #1d4ed8;
   --color-accent-foreground: #ffffff;
   --color-border: #d4d4d4;
+  /* Status colours only mark a status; text and an icon always say it (DSA-F-7). */
+  --color-status-success: #15803d;
+  --color-status-warning: #b45309;
+  --color-status-danger: #b91c1c;
+  --color-status-info: #1d4ed8;
 
   /* Not named xs to xl: Tailwind CSS 4 looks up max-w-xs in --spacing-* before the container sizes,
      so these names would shrink max-w-* to a few pixels. */
@@ -51,6 +65,10 @@
   --color-accent: #60a5fa;
   --color-accent-foreground: #0a0a0a;
   --color-border: #3a3a3a;
+  --color-status-success: #4ade80;
+  --color-status-warning: #fbbf24;
+  --color-status-danger: #f87171;
+  --color-status-info: #60a5fa;
 }
 
 [data-theme="sepia"] {
@@ -62,6 +80,10 @@
   --color-accent: #8a4b08;
   --color-accent-foreground: #ffffff;
   --color-border: #d6c7a1;
+  --color-status-success: #15803d;
+  --color-status-warning: #b45309;
+  --color-status-danger: #b91c1c;
+  --color-status-info: #1d4ed8;
 }
 
 [data-theme="night"] {
@@ -73,4 +95,8 @@
   --color-accent: #7aa2c8;
   --color-accent-foreground: #000000;
   --color-border: #262626;
+  --color-status-success: #4ade80;
+  --color-status-warning: #fbbf24;
+  --color-status-danger: #f87171;
+  --color-status-info: #60a5fa;
 }
