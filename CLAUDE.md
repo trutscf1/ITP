@@ -68,8 +68,8 @@ Vocabulary layers, model-invoked as needed: `/domain-modeling` (glossary + ADRs)
 
 ## Agent skills
 
-- **Issue tracker:** GitLab, through the REST API with a personal token in `GITLAB_TOKEN` (no `glab` for agents). See `docs/agents/issue-tracker.md`.
-- **Domain docs:** single-context, glossary `gam-ai-knowledge/CONTEXT.md`, ADRs `gam-ai-knowledge/adr/`. See `docs/agents/domain.md`.
+- **Issue tracker:** GitLab, through the REST API with a personal token in `GITLAB_TOKEN` (no `glab` for agents). See `gam-engineering/agents/issue-tracker.md`.
+- **Domain docs:** single-context, glossary `gam-ai-knowledge/CONTEXT.md`, ADRs `gam-ai-knowledge/adr/`. See `gam-engineering/agents/domain.md`.
 
 ## Project overview
 
