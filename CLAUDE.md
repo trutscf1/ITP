@@ -1,5 +1,9 @@
 # CLAUDE.md
 
+@AGENTS.md
+
+The agent-neutral project memory lives in `gam-ai-memory/` (skill `gam-ai-memory`). Start a session with `/gam-ai-memory start`, end it with `/gam-ai-memory handover`.
+
 This file provides guidance to Claude Code when working in this repository. It is a pointer file: school requirements live in `docs/`, process rules in `gam-ai-knowledge/MANIFEST.md`, standing conventions in the `gam-engineering` skill, workflows in the installed skills. Do not restate their content here — link it.
 
 ## Mandatory skill
