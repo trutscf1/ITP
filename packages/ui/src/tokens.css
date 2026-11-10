@@ -127,7 +127,7 @@
   --color-border: #ffffff;
 }
 
-/* The same palettes when the system asks for more contrast, without any attribute (DSA-F-8). */
+/* The same palettes when the system asks for more contrast, without any attribute (DSA-F-6, DSA-F-8). */
 @media (prefers-contrast: more) {
   :root {
     --color-background: #ffffff;

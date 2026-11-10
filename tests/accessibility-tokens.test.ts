@@ -108,8 +108,8 @@ describe("DSA-AC-2.1 High contrast (DSA-T-7)", () => {
   });
 });
 
-describe("DSA-AC-2.3 Contrast follows the system preference (DSA-T-9)", () => {
-  it("DSA-AC-2.3 DSA-T-9 reads prefers-contrast: more without any attribute set", () => {
+describe("DSA-AC-2.1 DSA-AC-2.3 Contrast follows the system preference (DSA-T-7, DSA-T-9)", () => {
+  it("DSA-AC-2.1 DSA-AC-2.3 DSA-T-7 DSA-T-9 reads prefers-contrast: more without any attribute set", () => {
     assert.ok(
       rules.some((rule) =>
         rule.atRules.includes("@media (prefers-contrast: more)"),
