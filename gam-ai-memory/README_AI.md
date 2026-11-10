@@ -31,4 +31,3 @@ Which file answers which question. Rules for agents: [CLAUDE.md](CLAUDE.md).
 | What does a term mean? | [CONTEXT.md](../gam-ai-knowledge/CONTEXT.md) |
 | How is the system built, and how do I run it? | [STACK.md](../gam-ai-knowledge/STACK.md) |
 | How do we work together (branches, labels, Definition of Done)? | [WORKFLOW.md](../gam-ai-knowledge/WORKFLOW.md) |
-
