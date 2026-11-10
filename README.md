@@ -42,6 +42,7 @@ pnpm test                                      # tests of every package, includi
 pnpm dev                                       # the dev task of every package (watch mode), through Turborepo
 node gam-ai-knowledge/tools/doc-check.mjs      # consistency check of the documentation
 npx markdownlint-cli2 "gam-ai-knowledge/**/*.md" # markdown lint
+node gam-engineering/tools/prompt-export.mjs install-hook # once per clone: activates the AI chat export hook
 ```
 
 ## Start without internet access
