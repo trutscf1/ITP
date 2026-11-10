@@ -111,7 +111,8 @@ export function checkConfig(
       given === undefined || given === "" ? variable.fallback : given;
     const problem = problemOf(variable, value);
     if (problem === undefined) {
-      values[variable.name] = value;
+      // Written without leading zeros: PromQL reads 020 as an octal literal.
+      values[variable.name] = String(Number(value));
     } else {
       lines.push(`  ${variable.name}: ${problem}`);
     }
