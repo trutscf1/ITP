@@ -42,11 +42,20 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        {/* First focusable element: hidden until it has focus, then shown in the top corner (DSA-F-12). */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-base focus:top-base focus:z-50 focus:rounded-md focus:bg-accent focus:px-base focus:py-snug focus:text-accent-foreground"
+        >
+          Skip to main content
+        </a>
         <header className="flex flex-wrap items-center justify-end gap-snug p-base">
           <ThemeSwitcher initialTheme={theme} />
           <AccessibilitySettings initialSettings={accessibility} />
         </header>
-        {children}
+        <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col">
+          {children}
+        </main>
       </body>
     </html>
   );
