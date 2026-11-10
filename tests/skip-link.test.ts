@@ -41,7 +41,7 @@ describe("DSA-AC-3.2 Skip link to the main content (DSA-T-13)", () => {
       const at = layout.indexOf(later);
       assert.ok(at > skip, `${later} comes before the skip link`);
     }
-    const between = layout.slice(body, skip);
+    const between = layout.slice(body, layout.lastIndexOf("<a", skip));
     assert.doesNotMatch(
       between,
       /<(a|button|input|select|textarea)\b/,
