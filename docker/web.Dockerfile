@@ -3,7 +3,7 @@
 # `docker compose up` starts `web` before its owner's build exists; accepted as a stop-gap in the
 # review of !17 (Q70 of `schwaigc`). It ships the whole repository with its development
 # dependencies, runs `next start`, and is not meant for the image scan or a deployment. It is replaced by M9 (container build) of the track plan Web,
-# documentation/concepts/scaffolding.track-web.md: `apps/web/Dockerfile` with two stages, the
+# gam-ai-knowledge/concepts/scaffolding.track-web.md: `apps/web/Dockerfile` with two stages, the
 # standalone output, user `node`, the start command with the configuration check, and a health
 # check on `/health`, delivered with slice 1 of SCF-US-8. That change deletes this file and points
 # the `web` service of docker-compose.yml at the new one.

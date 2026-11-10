@@ -6,7 +6,7 @@ import {
   releaseNotes,
 } from "../scripts/changelog.ts";
 
-// Example 5 of documentation/concepts/scaffolding.md §9 and WORKFLOW.md "Changelog".
+// Example 5 of gam-ai-knowledge/concepts/scaffolding.md §9 and WORKFLOW.md "Changelog".
 describe("SCF-AC-6.2 Changelog from commits", () => {
   it("SCF-AC-6.2 drafts Added, Changed, and Fixed from the commits since the last release", () => {
     const draft = draftChangelog([
