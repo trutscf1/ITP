@@ -5,7 +5,7 @@
 
 **As a** [role from GOAL.md] **I want** [capability] **so that** [benefit].
 
-Part of: #[feature issue] · Story file: `documentation/work-items/[feature]/[DOC]-US-[n]-[slug].md` · Concept document: `documentation/concepts/[feature].md`
+Part of: #[feature issue] · Story file: `gam-ai-knowledge/work-items/[feature]/[DOC]-US-[n]-[slug].md` · Concept document: `gam-ai-knowledge/concepts/[feature].md`
 
 ## Acceptance criteria
 

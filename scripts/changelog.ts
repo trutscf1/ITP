@@ -1,7 +1,7 @@
 // Changelog draft and release notes (SCF-F-16, SCF-AC-6.2, SCF-AC-6.3).
 //   node scripts/changelog.ts draft         → draft section for the commits since the last v* tag
 //   node scripts/changelog.ts notes <tag>   → the CHANGELOG.md section of a SemVer tag
-// Mapping (documentation/WORKFLOW.md "Changelog"): feat → Added, fix → Fixed, breaking → Changed;
+// Mapping (gam-ai-knowledge/WORKFLOW.md "Changelog"): feat → Added, fix → Fixed, breaking → Changed;
 // other types are left out. The release MR author rewrites the draft for readers.
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
