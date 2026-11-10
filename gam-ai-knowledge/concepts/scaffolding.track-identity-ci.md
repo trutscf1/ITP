@@ -54,7 +54,7 @@ _Written by Andreas before the first MR._
 The CI part has no runtime modules: it is configuration. Its parts and what they trace to:
 
 - `.gitlab-ci.yml` — workflow rules (one pipeline per change) and the check jobs. Traces to: SCF-F-15, SCF-AC-5.1…5.5. Requires: root tasks (SCF-F-12), `pnpm-lock.yaml`, `.tool-versions`.
-- `.gitlab/ci/docs.yml` — documentation checks, included unchanged.
+- `gam-engineering/ci/gitlab-docs.yml` — documentation checks, included unchanged.
 - Local hooks and scanner configuration — SCF-F-13, SCF-F-14, with #44 and #104.
 
 ### Order of work

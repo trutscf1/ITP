@@ -20,7 +20,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/status-reminder.mjs\""
+            "command": "node \"$CLAUDE_PROJECT_DIR/gam-engineering/tools/status-reminder.mjs\""
           }
         ]
       }

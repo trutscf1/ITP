@@ -58,7 +58,7 @@ Refs: #<issue>
 
 ## CI/CD
 
-GitLab CI (`.gitlab-ci.yml`) runs one pipeline per change: a merge request pipeline while an MR is open, otherwise a branch pipeline on every push to a feature branch, `dev`, or `main`; the jobs are defined by `gam-ai-knowledge/concepts/scaffolding.md` SCF-F-15, plus the documentation checks in `.gitlab/ci/docs.yml` (markdown lint and `gam-ai-knowledge/tools/doc-check.mjs`, including the rule `AC-TEST` for tests carrying the `AC` IDs). "Pipeline must succeed" is enabled as a merge check. Deployment on push to `main` follows with roadmap item R14.
+GitLab CI (`.gitlab-ci.yml`) runs one pipeline per change: a merge request pipeline while an MR is open, otherwise a branch pipeline on every push to a feature branch, `dev`, or `main`; the jobs are defined by `gam-ai-knowledge/concepts/scaffolding.md` SCF-F-15, plus the documentation checks in `gam-engineering/ci/gitlab-docs.yml` (markdown lint and `gam-ai-knowledge/tools/doc-check.mjs`, including the rule `AC-TEST` for tests carrying the `AC` IDs). "Pipeline must succeed" is enabled as a merge check. Deployment on push to `main` follows with roadmap item R14.
 
 ## Deviations from the profile
 

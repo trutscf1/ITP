@@ -14,7 +14,9 @@
       "!dist",
       "!build",
       "!.claude",
-      "!tools",
+      "!gam-ai-knowledge/tools",
+      "!gam-engineering",
+      "!gam-ai-memory",
       "!**/src/prisma/contract.d.ts",
       "!**/src/prisma/contract.json",
       "!**/migrations"

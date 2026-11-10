@@ -5,8 +5,8 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
-const STATUS_FILE = "documentation/ROADMAP-DETAILS.md";
-const PATHSPECS = [STATUS_FILE, ":(glob)documentation/team/*/STATUS.md"];
+const STATUS_FILE = "gam-ai-knowledge/ROADMAP-DETAILS.md";
+const PATHSPECS = [STATUS_FILE, ":(glob)gam-ai-knowledge/team/*/STATUS.md"];
 
 function readInput() {
   try {
@@ -35,7 +35,7 @@ function newestMerge(root) {
 
 function statusIsCurrent(root, merge) {
   if (!git(root, ["ls-files", STATUS_FILE])) {
-    // documentation/ is outside git: the status is applied right after the merge, so file times decide.
+    // gam-ai-knowledge/ is outside git: the status is applied right after the merge, so file times decide.
     return statSync(join(root, STATUS_FILE)).mtimeMs / 1000 >= merge.time;
   }
   if (git(root, ["diff", "--name-only", `${merge.sha}^1`, merge.sha, "--", ...PATHSPECS])) return true;
@@ -57,7 +57,7 @@ if (!merge || statusIsCurrent(root, merge)) process.exit(0);
 
 process.stderr.write(
   `engineering-human (P-ROAD-4): the newest merge on ${merge.ref} (${merge.sha.slice(0, 8)}) did not update the status. ` +
-    "Update the position in documentation/ROADMAP-DETAILS.md (or your team/<handle>/STATUS.md), the stage in " +
-    "documentation/ROADMAP.md, and close the issue — through an MR, since dev takes no direct commits (P-GIT-1).\n",
+    "Update the position in gam-ai-knowledge/ROADMAP-DETAILS.md (or your team/<handle>/STATUS.md), the stage in " +
+    "gam-ai-knowledge/ROADMAP.md, and close the issue — through an MR, since dev takes no direct commits (P-GIT-1).\n",
 );
 process.exit(2);
