@@ -13,7 +13,7 @@ How work moves through this repo — branches, labels, merge requests, the Defin
 - **Mode:** team (P-TEAM-1…5, [ADR-0003](adr/0003-switch-to-team-mode.md)); team roster and roles in `team/TEAM.md`
 - **Git host / tracker:** GitLab — `htl-villach/it/classes/5bhitm-2026/itp/waent/project1/SJ26_27_5BHITM_ITP_trutscf1_project1`. People use `glab` as in `docs/git_workflow_commands.md`; agents use the REST API (`docs/agents/issue-tracker.md`). Mirror to GitHub with **all branches**; the GitHub user `gamgamstyle` gets the Reporter role (§18).
 - **Time tracking:** on for humans (P-TIME-1; school requirement, see "Time tracking")
-- **Host tier:** GitLab Premium/Ultimate, project in a group — determined by the agent's tier check on 2026-10-06 (the group epics API answers), not assumed, and re-checked before every `tickets` publish (P-TRK-4). Features are meant to be group epics with the story issues as native child items. The agent's project token may not create group epics, so the feature issues #87–#100 were created as project issues labelled `type::feature`, with a related-issue link from every story; a member with rights on the group promotes them with the `/promote` quick action.
+- **Host tier:** GitLab Premium/Ultimate, project in a group — determined by the agent's tier check on 2026-10-06 (the group epics API answers), not assumed, and re-checked before every `tickets` publish (P-TRK-4). Features are meant to be group epics with the story issues as native child items. The agent's project token may not create group epics, so the feature issues #87–#100 were created as project issues labelled `type::epic` (formerly `type::feature`), with a related-issue link from every story; a member with rights on the group promotes them with the `/promote` quick action.
 - **Merge policy:** the keys `env.GAM_ENGINEERING_MERGE`, `env.GAM_ENGINEERING_APPROVALS`, and `env.GAM_ENGINEERING_RELEASE_MERGE` in `.claude/settings.json` (P-MR-4…6). The values live only there; they are not copied into this file. Show or change them with `/gam-engineering settings`.
 
 ## Team
@@ -86,7 +86,7 @@ Every change starts with an issue (§3). Each issue has: description, acceptance
 
 | Label | Meaning |
 | --- | --- |
-| `type::feature` | Feature issue — a group epic here — parent of the feature's story issues (`work-items/<feature>/feature.md`, P-DOC-6, P-TRK-4) |
+| `type::epic` | Epic issue — a group epic here — parent of the epic's story issues (`work-items/E<nn>-<feature>/epic.md`, P-DOC-6, P-TRK-4); renamed from `type::feature` on 2026-11-10 |
 | `type::story` | User story issue (`US-n`), child of its feature issue; slice issues are children of their story |
 | `type::bug` | Defect against an existing requirement |
 | `type::concept` | Tracking issue for concept authoring on a `concept/…` branch, one per roadmap feature |
@@ -110,7 +110,7 @@ The GitLab issue board "Kanban" has one column per status label: Backlog, Ready,
 
 ### Templates
 
-GitLab — issues: `.gitlab/issue_templates/feature.md`, `.gitlab/issue_templates/user-story.md`, `.gitlab/issue_templates/bug.md`; merge requests: `.gitlab/merge_request_templates/default.md`.
+GitLab — issues: `.gitlab/issue_templates/epic.md`, `.gitlab/issue_templates/user-story.md`, `.gitlab/issue_templates/bug.md`; merge requests: `.gitlab/merge_request_templates/default.md`.
 
 ### Issues and weight
 

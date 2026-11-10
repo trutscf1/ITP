@@ -24,7 +24,7 @@ Open before Phase 4: the requirements below repeat their acceptance criterion on
 
 ## 3. User Stories & Acceptance Criteria
 
-The user stories and their acceptance criteria are the work items in [work-items/deployment/](../work-items/deployment/feature.md); they are not repeated here (P-DOC-6).
+The user stories and their acceptance criteria are the work items in [work-items/E14-deployment/](../work-items/E14-deployment/epic.md); they are not repeated here (P-DOC-6).
 
 ## 4. Functional Requirements
 

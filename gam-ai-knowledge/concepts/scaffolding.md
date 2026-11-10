@@ -100,7 +100,7 @@ Used only in this document:
 
 ## 3. User Stories & Acceptance Criteria
 
-The user stories and their acceptance criteria are the work items in [work-items/scaffolding/](../work-items/scaffolding/feature.md); they are not repeated here (P-DOC-6).
+The user stories and their acceptance criteria are the work items in [work-items/E01-scaffolding/](../work-items/E01-scaffolding/epic.md); they are not repeated here (P-DOC-6).
 
 ## 4. Functional Requirements
 

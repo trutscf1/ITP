@@ -24,7 +24,7 @@ Open before Phase 4: the requirements below repeat their acceptance criterion on
 
 ## 3. User Stories & Acceptance Criteria
 
-The user stories and their acceptance criteria are the work items in [work-items/design-system/](../work-items/design-system/feature.md); they are not repeated here (P-DOC-6).
+The user stories and their acceptance criteria are the work items in [work-items/E04-design-system/](../work-items/E04-design-system/epic.md); they are not repeated here (P-DOC-6).
 
 ## 4. Functional Requirements
 

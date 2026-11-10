@@ -62,7 +62,7 @@ function documentation({
 
 | Version | Feature | Serves | Status | Depends on | Feasibility |
 | --- | --- | --- | --- | --- | --- |
-| – | Alpha | G-1 | ${stage} | – | high |
+| 0.1.0 | Alpha | G-1 | ${stage} | – | high |
 `,
     "gam-ai-knowledge/concepts/alpha.md": `${frontmatter('doc: concept\ntitle: Alpha\nid-prefix: "ALP"\nserves: G-1')}# Alpha
 
@@ -75,11 +75,11 @@ function documentation({
 | --- | --- | --- | --- | --- | --- |
 | ALP-T-1 | Both | ALP-AC-1.1, ALP-AC-1.2, ALP-F-1, ALP-F-2 | a | b | c |
 ${untestedTable}`,
-    "gam-ai-knowledge/work-items/alpha/feature.md": `${frontmatter('doc: feature\ntitle: Alpha\nid-prefix: "ALP"\nconcept: "alpha.md"')}# Alpha
+    "gam-ai-knowledge/work-items/E01-alpha/epic.md": `${frontmatter('doc: epic\ntitle: Alpha\nid-prefix: "ALP"\nconcept: "alpha.md"\nrelease: "0.1.0"')}# Alpha
 
 - [ALP-US-1](ALP-US-1-one.md)
 `,
-    "gam-ai-knowledge/work-items/alpha/ALP-US-1-one.md": `${frontmatter('doc: story\ntitle: "ALP-US-1 One"\nid-prefix: "ALP"')}# ALP-US-1 One
+    "gam-ai-knowledge/work-items/E01-alpha/ALP-US-1-one.md": `${frontmatter('doc: story\ntitle: "ALP-US-1 One"\nid-prefix: "ALP"\nstatus: done')}# ALP-US-1 One
 
 | ID | Title | As a | I want | so that | Priority |
 | --- | --- | --- | --- | --- | --- |
@@ -174,7 +174,7 @@ describe("doc-check AC-TEST: severity follows the stage of the feature", () => {
     assert.equal(run.status, 1);
     assert.match(
       run.stdout,
-      /^ERROR\s+AC-TEST\s+documentation\/work-items\/alpha\/ALP-US-1-one\.md:\d+\s+ALP-AC-1\.2 — /m,
+      /^ERROR\s+AC-TEST\s+gam-ai-knowledge\/work-items\/E01-alpha\/ALP-US-1-one\.md:\d+\s+ALP-AC-1\.2 — /m,
     );
   });
 });

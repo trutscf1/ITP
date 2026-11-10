@@ -35,7 +35,7 @@ Consumes (interface fixed in `scaffolding.md`; work is never blocked, stub until
 
 ## Issues (Sprint 1)
 
-The issues #9, #10, #11, #17 of the first cut were deleted on 2026-09-29; the CI part of this track is now tracked by the story issues of SCF-US-5 and SCF-US-6 ([work items](../work-items/scaffolding/feature.md)):
+The issues #9, #10, #11, #17 of the first cut were deleted on 2026-09-29; the CI part of this track is now tracked by the story issues of SCF-US-5 and SCF-US-6 ([work items](../work-items/E01-scaffolding/epic.md)):
 
 - #42 SCF-US-5 slice 1 — pipeline runs and shows its status (SCF-AC-5.1, 5.4, 5.5)
 - #104 SCF-US-5 slice 2 — check steps and failing conditions (SCF-AC-5.2, 5.3)

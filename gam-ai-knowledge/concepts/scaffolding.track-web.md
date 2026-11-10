@@ -44,7 +44,7 @@ Requested from other tracks (one issue each, listed under "Issues"):
 
 ## Issues
 
-The issues #15 and #16 of the first cut were deleted on 2026-09-29. The work of this track is tracked by the story issues it delivers ([work items](../work-items/scaffolding/feature.md)):
+The issues #15 and #16 of the first cut were deleted on 2026-09-29. The work of this track is tracked by the story issues it delivers ([work items](../work-items/E01-scaffolding/epic.md)):
 
 - #113 — this plan (`type::concept`)
 - SCF-US-8 (units reachable and visible), slice 1: the `web` part of the health reports (M1, M2, M7, M8, M9); slice 2: the status page (M3, M4, M5). Their issues follow with `/gam-engineering tickets scaffolding`.
@@ -299,4 +299,4 @@ For `trutscf1`, the owner of `scaffolding.md`:
 - §8 or §16: state the rule that the service name of a unit in the stack definition equals the unit name (Q58 agreed it with the Platform track as an interface; the main concept does not say it).
 - §16: `tests/` is in no track's owned paths; name an owner or state that the author of a story's track writes the story's test files (Q57).
 - SCF-T-40 asks for 0 violations while `axe-check.ts` fails only on `critical`: say that SCF-T-40 is its own run (Q57).
-- `SCF-AC-3.1` (`gam-ai-knowledge/work-items/scaffolding/SCF-US-3-…`) and `DSA-AC-1.1` name `@nimbus/contracts` and `@nimbus/ui`; the packages are `@stash/contracts` and `@stash/ui` (F18).
+- `SCF-AC-3.1` (`gam-ai-knowledge/work-items/E01-scaffolding/SCF-US-3-…`) and `DSA-AC-1.1` name `@nimbus/contracts` and `@nimbus/ui`; the packages are `@stash/contracts` and `@stash/ui` (F18).

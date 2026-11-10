@@ -123,7 +123,7 @@ Used only in this document:
 
 ## 3. User Stories & Acceptance Criteria
 
-The user stories and their acceptance criteria are the work items in [work-items/observability/](../work-items/observability/feature.md); they are not repeated here (P-DOC-6).
+The user stories and their acceptance criteria are the work items in [work-items/E02-observability/](../work-items/E02-observability/epic.md); they are not repeated here (P-DOC-6).
 
 ## 4. Functional Requirements
 

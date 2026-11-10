@@ -109,7 +109,7 @@ Used only in this document:
 
 ## 3. User Stories & Acceptance Criteria
 
-The user stories and their acceptance criteria are the work items in [work-items/identity/](../work-items/identity/feature.md); they are not repeated here (P-DOC-6).
+The user stories and their acceptance criteria are the work items in [work-items/E03-identity/](../work-items/E03-identity/epic.md); they are not repeated here (P-DOC-6).
 
 ## 4. Functional Requirements
 

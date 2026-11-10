@@ -24,7 +24,7 @@ Open before Phase 4: the requirements below repeat their acceptance criterion on
 
 ## 3. User Stories & Acceptance Criteria
 
-The user stories and their acceptance criteria are the work items in [work-items/storage-core/](../work-items/storage-core/feature.md); they are not repeated here (P-DOC-6).
+The user stories and their acceptance criteria are the work items in [work-items/E05-storage-core/](../work-items/E05-storage-core/epic.md); they are not repeated here (P-DOC-6).
 
 ## 4. Functional Requirements
 
