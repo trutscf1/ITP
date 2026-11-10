@@ -31,6 +31,11 @@ describe("DSA-AC-3.1 One focus indicator for every control (DSA-T-12)", () => {
     assert.ok(focusRule, "tokens.css has no :focus-visible rule");
   });
 
+  it("DSA-AC-3.1 DSA-T-12 puts the rule in @layer base, so Tailwind utilities can still adjust it", () => {
+    assert.ok(focusRule, "tokens.css has no :focus-visible rule");
+    assert.deepEqual(focusRule.atRules, ["@layer base"]);
+  });
+
   it("DSA-AC-3.1 DSA-T-12 draws a 2 px solid outline in the accent colour with a 2 px offset", () => {
     assert.ok(focusRule, "tokens.css has no :focus-visible rule");
     assert.equal(
