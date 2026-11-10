@@ -12,11 +12,13 @@ function readYaml<T>(path: string): T {
 }
 
 describe("SCF-AC-5.1 Documentation checks in the pipeline", () => {
-  it("SCF-AC-5.1 keeps the documentation job of .gitlab/ci/docs.yml included", () => {
+  it("SCF-AC-5.1 keeps the documentation job of gam-engineering/ci/gitlab-docs.yml included", () => {
     const ci = readYaml<{ include?: { local?: string }[] }>(".gitlab-ci.yml");
     assert.ok(
-      ci.include?.some((entry) => entry.local === ".gitlab/ci/docs.yml"),
-      ".gitlab/ci/docs.yml not included",
+      ci.include?.some(
+        (entry) => entry.local === "gam-engineering/ci/gitlab-docs.yml",
+      ),
+      "gam-engineering/ci/gitlab-docs.yml not included",
     );
   });
 
@@ -24,7 +26,9 @@ describe("SCF-AC-5.1 Documentation checks in the pipeline", () => {
     const toolVersions = readFileSync(join(root, ".tool-versions"), "utf8");
     const pinned = toolVersions.match(/^nodejs\s+(\S+)$/m)?.[1];
     assert.ok(pinned, "nodejs entry missing");
-    const docs = readYaml<{ docs?: { image?: string } }>(".gitlab/ci/docs.yml");
+    const docs = readYaml<{ docs?: { image?: string } }>(
+      "gam-engineering/ci/gitlab-docs.yml",
+    );
     assert.equal(docs.docs?.image, `node:${pinned}-alpine`);
   });
 });

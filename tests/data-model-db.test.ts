@@ -1,5 +1,5 @@
 // Acceptance tests of SCF-US-4 that run against a PostgreSQL server
-// (documentation/concepts/scaffolding.md §17, SCF-T-19 to SCF-T-22). TEST_DATABASE_URL names a
+// (gam-ai-knowledge/concepts/scaffolding.md §17, SCF-T-19 to SCF-T-22). TEST_DATABASE_URL names a
 // database on that server whose user may create databases; every test works in a database of
 // its own that is created empty and dropped afterwards. Without the variable the tests are
 // skipped; the CI job `test` sets it.

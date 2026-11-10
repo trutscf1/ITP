@@ -1,4 +1,4 @@
-/** The configuration of the unit `web` (M1 of `documentation/concepts/scaffolding.track-web.md`). */
+/** The configuration of the unit `web` (M1 of `gam-ai-knowledge/concepts/scaffolding.track-web.md`). */
 export interface WebConfig {
   PORT: number;
   APP_VERSION: string;

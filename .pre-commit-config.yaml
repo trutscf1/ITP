@@ -41,7 +41,7 @@ repos:
         language: system
         pass_filenames: false
 
-      # Commit message format of documentation/WORKFLOW.md, configured in commitlint.config.ts
+      # Commit message format of gam-ai-knowledge/WORKFLOW.md, configured in commitlint.config.ts
       - id: commitlint
         name: commitlint
         entry: pnpm exec commitlint --edit

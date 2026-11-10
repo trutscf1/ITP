@@ -1,7 +1,7 @@
 import { ZodError } from "zod";
 import { z } from "./zod.ts";
 
-/** The stable codes of an error response (`documentation/concepts/scaffolding.md` §8). */
+/** The stable codes of an error response (`gam-ai-knowledge/concepts/scaffolding.md` §8). */
 export const errorCodes = [
   "validation-failed",
   "not-found",
