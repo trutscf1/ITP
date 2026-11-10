@@ -65,6 +65,26 @@ async function movingElements(page: Page): Promise<string[]> {
   });
 }
 
+/** Elements whose content sticks out of their own box, which is how a fixed width breaks at 200 %. */
+async function overflowingElements(page: Page): Promise<string[]> {
+  return page.evaluate((): string[] =>
+    [...document.querySelectorAll("body *")]
+      .filter((element: Element): boolean => {
+        const style: CSSStyleDeclaration = getComputedStyle(element);
+        return (
+          style.display !== "inline" &&
+          style.overflowX === "visible" &&
+          element.clientWidth > 0 &&
+          element.scrollWidth > element.clientWidth + 1
+        );
+      })
+      .map((element: Element): string => {
+        const text: string = (element.textContent ?? "").trim().slice(0, 20);
+        return `${element.tagName.toLowerCase()} "${text}"`;
+      }),
+  );
+}
+
 await waitForServer();
 const browser: Browser = await chromium.launch();
 let critical: number = 0;
@@ -105,6 +125,13 @@ try {
       fail(
         path,
         `horizontal scroll at 200 % font size (${scrollWidth} px wide in ${clientWidth} px)`,
+      );
+    }
+    const cutOff = await overflowingElements(page);
+    if (cutOff.length > 0) {
+      fail(
+        path,
+        `content wider than its box at 200 % font size (${cutOff.join(", ")})`,
       );
     }
     await page.close();
