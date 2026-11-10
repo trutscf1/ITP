@@ -12,7 +12,11 @@
 # field.
 FROM node:24.14.0-alpine
 
-RUN corepack enable
+# The Alpine packages are upgraded to their fixed versions (SCF-AC-2.5, SCF-NF-6, #160), as in
+# packages/db/Dockerfile; the contents depend on the build date, and the container scan rebuilds
+# and checks the image on every pipeline run.
+RUN apk upgrade --no-cache \
+  && corepack enable
 USER node
 WORKDIR /app
 

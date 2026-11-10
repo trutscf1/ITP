@@ -3,19 +3,8 @@
 # Trivy 0.69.3 on 2026-11-03, unfixed vulnerabilities are not reported (--ignore-unfixed).
 # docker/web.Dockerfile is a stop-gap that ships the whole repository with its development
 # dependencies until slice 1 of SCF-US-8 replaces it with apps/web/Dockerfile (track Web).
-# Every entry expires at the end of Sprint 2; #157 fixes the image, then this file is removed.
-
-# Alpine packages of the base image node:24.14.0-alpine (OpenSSL, musl, zlib); fixed versions
-# exist in Alpine. Fix requested in #157: upgrade the Alpine packages in the image.
-CVE-2026-14456 exp:2026-11-23
-CVE-2026-22184 exp:2026-11-23
-CVE-2026-28387 exp:2026-11-23
-CVE-2026-28388 exp:2026-11-23
-CVE-2026-28389 exp:2026-11-23
-CVE-2026-28390 exp:2026-11-23
-CVE-2026-31789 exp:2026-11-23
-CVE-2026-40200 exp:2026-11-23
-CVE-2026-45447 exp:2026-11-23
+# Every entry expires at the end of Sprint 2; #157 removes npm from the image, then this file is
+# removed. The Alpine packages are upgraded in the image since #160.
 
 # Packages of the npm bundled with Node.js (tar, minimatch, picomatch, pacote, sigstore,
 # ip-address); the stack runs pnpm through corepack, never npm. Fix requested in #157: remove
@@ -38,8 +27,3 @@ CVE-2026-9496 exp:2026-11-23
 # in #157: keep development dependencies out of the runtime image.
 CVE-2026-114125 exp:2026-11-23
 CVE-2026-114126 exp:2026-11-23
-
-# musl (integer overflow in regcomp) in the base image node:24.14.0-alpine, found on 2026-11-10
-# (#160); the fixed Alpine package exists. Fix requested in #157: upgrade the Alpine packages in
-# the image.
-CVE-2026-107891 exp:2026-11-23
