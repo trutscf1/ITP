@@ -1,4 +1,4 @@
-// Commit message format of documentation/WORKFLOW.md "Commit messages" (SCF-F-13, SCF-AC-6.1):
+// Commit message format of gam-ai-knowledge/WORKFLOW.md "Commit messages" (SCF-F-13, SCF-AC-6.1):
 // Conventional Commits 1.0.0 with the types of @commitlint/config-conventional (the same list as
 // WORKFLOW.md), a scope from the list below when one fits, a requirement ID in brackets at the
 // end of the subject or [no-req], and a BREAKING CHANGE footer for every "!".
