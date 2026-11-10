@@ -38,3 +38,8 @@ CVE-2026-9496 exp:2026-11-23
 # in #157: keep development dependencies out of the runtime image.
 CVE-2026-114125 exp:2026-11-23
 CVE-2026-114126 exp:2026-11-23
+
+# musl (integer overflow in regcomp) in the base image node:24.14.0-alpine, found on 2026-11-10
+# (#160); the fixed Alpine package exists. Fix requested in #157: upgrade the Alpine packages in
+# the image.
+CVE-2026-107891 exp:2026-11-23
