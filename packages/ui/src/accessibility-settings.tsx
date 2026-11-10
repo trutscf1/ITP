@@ -3,12 +3,12 @@
 import { Popover, RadioGroup, Switch } from "radix-ui";
 import { type ReactElement, useId, useState } from "react";
 import {
+  type AccessibilityModes,
   accessibilityCookie,
   applyAccessibility,
   type ColourVision,
   colourVisions,
   isColourVision,
-  type AccessibilityModes as Settings,
 } from "./accessibility.js";
 
 const colourVisionLabels: Record<ColourVision, string> = {
@@ -25,8 +25,8 @@ const thumbClasses =
   "block size-4 rounded-full bg-foreground data-[state=checked]:translate-x-4 data-[state=checked]:bg-accent-foreground";
 
 export interface AccessibilityControlsProps {
-  settings: Settings;
-  onChange: (settings: Settings) => void;
+  settings: AccessibilityModes;
+  onChange: (settings: AccessibilityModes) => void;
 }
 
 /**
@@ -110,7 +110,7 @@ export function AccessibilityControls({
 
 export interface AccessibilitySettingsProps {
   /** The settings the page was rendered with, read from the cookie on the server. */
-  initialSettings: Settings;
+  initialSettings: AccessibilityModes;
 }
 
 /**
@@ -121,9 +121,9 @@ export interface AccessibilitySettingsProps {
 export function AccessibilitySettings({
   initialSettings,
 }: AccessibilitySettingsProps): ReactElement {
-  const [settings, setSettings] = useState<Settings>(initialSettings);
+  const [settings, setSettings] = useState<AccessibilityModes>(initialSettings);
 
-  function change(next: Settings): void {
+  function change(next: AccessibilityModes): void {
     applyAccessibility(document.documentElement, next);
     // biome-ignore lint/suspicious/noDocumentCookie: one plain cookie, read on the server
     document.cookie = accessibilityCookie(next);
