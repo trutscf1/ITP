@@ -1,26 +1,40 @@
 #!/usr/bin/env node
-// Mechanical part of the engineering-human consistency check: checks documentation/ against the
-// Machine-Readable Contract of documentation/MANIFEST.md. No dependencies; Node 18+.
-// Usage: node tools/doc-check.mjs [documentation-dir] [--json]
+// Mechanical part of the consistency check of the skill gam-ai-knowledge: checks the knowledge folder gam-ai-knowledge/
+// against the Machine-Readable Contract of its MANIFEST.md. No dependencies; Node 18+.
+// Usage: node gam-ai-knowledge/tools/doc-check.mjs [knowledge-dir] [--json]
 //        [--status [--pending-title <MR title>] [--pending-branch <MR source branch>]]
 // --status also compares the ROADMAP stages and the position rows with the git history (S-3).
-// Rule AC-TEST looks for each acceptance criterion's ID in the test names of the code next to the
-// documentation folder; --pending-branch names the merge request whose slice must be tested.
+// Rule AC-TEST (project addition, #138) looks for each acceptance criterion's ID in the test names of the code next to
+// the knowledge folder; --pending-branch names the merge request whose slice must be tested.
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
-import { dirname, join, relative, resolve, posix } from "node:path";
+import { dirname, join, relative, posix, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
+import { pathToFileURL } from "node:url";
 
-const DOC_TYPES = ["goal", "manifest", "context", "adr", "concept", "feature", "story", "qa-log", "stack", "workflow", "roadmap", "roadmap-details", "inbox", "versioning", "team", "status"];
-const FORMATS = ["engineering-human/2", "legacy"];
+const DOC_TYPES = ["goal", "manifest", "context", "adr", "concept", "epic", "feature", "story", "backlog", "sprint", "qa-log", "stack", "workflow", "roadmap", "roadmap-details", "inbox", "versioning", "team", "status", "test-strategy", "deployment", "security", "test-data"];
+// "gam-engineering/2", "humanengineering/2", and "engineering-human/2" are the same format under its former names
+// (P-DOC-10, P-DOC-11); they are accepted during the transition period, with a warning inside gam-ai-knowledge/, and
+// `/gam-engineering migrate` rewrites them.
+const FORMAT = "gam-ai-knowledge/1";
+const FORMER_FORMATS = ["gam-engineering/2", "humanengineering/2", "engineering-human/2"];
+const FORMATS = [FORMAT, ...FORMER_FORMATS, "legacy"];
 const AUDIENCES = ["product", "developer", "reviewer", "agent"];
-const STAGES = ["idea", "concept", "ready", "in progress", "in dev", "released"];
+// The stage between "in progress" and "released" is named after the branch model (P-GIT-9): "in dev" when
+// finished work lands on dev, "merged" in trunk mode, where it lands on main. STAGES is set once the root is known.
+const INTEGRATED = { dev: "in dev", trunk: "merged" };
+const stagesFor = (model) => ["idea", "concept", "ready", "in progress", INTEGRATED[model], "released"];
 const EARLY_STAGES = ["idea", "concept"];
-const DONE_STAGES = ["in dev", "released"];
+const DONE_STAGES = ["in dev", "released", "merged"];
 const ADR_STATUS = ["proposed", "accepted", "rejected", "deprecated", "superseded"];
+const STORY_STATUS = ["backlog", "ready", "in-progress", "review", "done"];
+const SEMVER = /^\d+\.\d+\.\d+$/;
+const TAG = /^v\d+\.\d+\.\d+(?:[-+][\w.-]+)?$/;
+const EPIC_DIR = /^E(\d{2,})-[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const ID_TOKEN = /(?<![\w-])(?:[A-Z]{2,4}-AC-\d+\.\d+|[A-Z]{2,4}-(?:US|NF|F|U|C|E|T)-\d+|G-1(?:\.[SN]\d+)?|R-\d+)(?!\w)/g;
 const CONCEPT_ID = /^([A-Z]{2,4})-(US|NF|F|U|C|E|T)-(\d+)$/;
 const AC_ID = /^([A-Z]{2,4})-AC-(\d+)\.(\d+)$/;
+
 // Rule AC-TEST: test files, folders never searched, test calls with their name, AC IDs in a name.
 const TEST_FILE = /\.(?:test|spec)\.[cm]?[jt]sx?$/;
 const SKIPPED_DIRS = new Set(["node_modules", "dist", "build", "out", "coverage", "storybook-static"]);
@@ -34,7 +48,37 @@ const asJson = args.includes("--json");
 const statusMode = args.includes("--status");
 const pendingTitle = option("--pending-title");
 const pendingBranch = option("--pending-branch");
-const root = args.find((a, i) => !a.startsWith("--") && !VALUE_OPTIONS.includes(args[i - 1])) || "documentation";
+// The default knowledge-dir is gam-ai-knowledge, or a former folder in a project not yet moved (P-DOC-10, P-DOC-11).
+const KNOWLEDGE_DIRS = ["gam-ai-knowledge", "gam-engineering/documentation", "humanengineering/documentation"];
+const root = args.find((a, i) => !a.startsWith("--") && !VALUE_OPTIONS.includes(args[i - 1]))
+  || KNOWLEDGE_DIRS.find((dir) => existsSync(dir))
+  || KNOWLEDGE_DIRS[0];
+const inKnowledgeFolder = resolve(root).replace(/\\/g, "/").endsWith("/gam-ai-knowledge");
+
+// Repo root: git top level, else the folder above gam-ai-knowledge/ or two levels above a former documentation folder.
+function findRepoTop() {
+  try {
+    return execFileSync("git", ["rev-parse", "--show-toplevel"], { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+  } catch {
+    return inKnowledgeFolder ? resolve(root, "..") : resolve(root, "..", "..");
+  }
+}
+const repoTop = findRepoTop();
+
+// Branch model from env.GAM_ENGINEERING_BRANCHES in the committed .claude/settings.json of the repo root, or the
+// same key under a former prefix (P-DOC-10); missing or unknown means dev (P-GIT-9).
+function readBranchModel() {
+  try {
+    const env = JSON.parse(readFileSync(join(repoTop, ".claude", "settings.json"), "utf8"))?.env ?? {};
+    const value = env.GAM_ENGINEERING_BRANCHES ?? env.HUMANENGINEERING_BRANCHES ?? env.ENGINEERING_HUMAN_BRANCHES;
+    return value === "trunk" ? "trunk" : "dev";
+  } catch {
+    return "dev";
+  }
+}
+const branchModel = readBranchModel();
+const otherModel = branchModel === "trunk" ? "dev" : "trunk";
+const STAGES = stagesFor(branchModel);
 
 const findings = [];
 const report = (severity, code, file, line, id, message) => findings.push({ severity, code, file, line, id, message });
@@ -154,6 +198,7 @@ function tableKind(header) {
   if (header[0] === "slice" && has("delivers")) return "slices";
   if (has("feature") && has("branch") && has("next step")) return "positions";
   if (header.length === 2 && header[0] === "id" && has("reason")) return "untested";
+  if (has("story") && has("epic") && has("status")) return "backlog";
   return null;
 }
 
@@ -175,9 +220,11 @@ const roadmapRows = [];
 const positions = [];
 const stackIds = [];
 const roles = [];
-const features = []; // work-item tree (P-DOC-6): feature.md per folder
+const features = []; // work-item tree (P-DOC-6): epic.md (or legacy feature.md) per folder
 const storyFiles = []; // one user story per file
 const slices = []; // {acs, issues} per row of a story file's slice table
+const backlogs = []; // work-items/BACKLOG.md (P-DOC-8)
+const sprints = []; // work-items/sprints/sprint-<n>.md (P-DOC-8)
 let goalFound = false;
 
 function define(id, file, line) {
@@ -200,11 +247,17 @@ for (const path of listMarkdown(root)) {
   if (!DOC_TYPES.includes(d.doc)) fmError(`doc must be one of ${DOC_TYPES.join(", ")}`);
   if (!FORMATS.includes(d.format)) fmError(`format must be ${FORMATS.join(" or ")}`);
   if (d.format === "legacy" && d.doc !== "concept") fmError("format legacy is allowed only for concept documents");
+  if (inKnowledgeFolder && FORMER_FORMATS.includes(d.format))
+    report("warning", "FM", file, 1, "", `format ${d.format} is a former name of ${FORMAT}; /gam-engineering migrate rewrites it`);
   if (typeof d.title !== "string" || !d.title) fmError("title is missing");
   if (!Array.isArray(d.audience) || !d.audience.length || d.audience.some((a) => !AUDIENCES.includes(a)))
     fmError(`audience must be a list of ${AUDIENCES.join(", ")}`);
-  if (["concept", "feature", "story"].includes(d.doc) && !/^[A-Z]{2,4}$/.test(d["id-prefix"] || "")) fmError("id-prefix must be 2–4 capital letters");
-  if (d.doc === "feature" && !/\.md$/.test(d.concept || "")) fmError("concept must name the concept document's file (feature.md)");
+  if (["concept", "epic", "feature", "story"].includes(d.doc) && !/^[A-Z]{2,4}$/.test(d["id-prefix"] || "")) fmError("id-prefix must be 2–4 capital letters");
+  if ((d.doc === "epic" || d.doc === "feature") && !/\.md$/.test(d.concept || "")) fmError(`concept must name the concept document's file (${d.doc}.md)`);
+  if (d.doc === "epic" && !SEMVER.test(d.release || "")) fmError("release must be the ROADMAP Version of this epic, e.g. 0.19.0 (P-DOC-6)");
+  if (["epic", "story"].includes(d.doc) && d.shipped && !TAG.test(d.shipped)) fmError("shipped must be a release tag, e.g. v0.19.0 (P-DOC-6)");
+  if (d.doc === "story" && d.status !== undefined && !STORY_STATUS.includes(d.status)) fmError(`status must be one of ${STORY_STATUS.join(", ")}`);
+  if (["story", "sprint"].includes(d.doc) && d.sprint && !/^\d+$/.test(d.sprint)) fmError("sprint must be a sprint number");
   if (d.doc === "concept" && d.format !== "legacy" && !/^G-1(\.S\d+)?$/.test(d.serves || "")) fmError("serves must be G-1 or G-1.S<n>");
   if (d.doc === "adr") {
     if (!ADR_STATUS.includes(d.status)) fmError(`status must be one of ${ADR_STATUS.join(", ")}`);
@@ -225,13 +278,15 @@ for (const path of listMarkdown(root)) {
     if (concept.serves) refs.push({ id: concept.serves, file, line: 1, from: "serves" });
     if (concept.legacy) continue;
   }
-  if (d.doc === "feature") {
+  if (d.doc === "epic" || d.doc === "feature") {
     const links = [];
     for (const line of lines.slice(fm.end + 1))
       for (const m of line.matchAll(/\]\(([^)#\s]+\.md)(?:#[^)]*)?\)/g)) links.push(posix.join(posix.dirname(file), m[1]));
-    features.push({ file, dir: posix.dirname(file), prefix: d["id-prefix"], concept: d.concept, links });
+    features.push({ file, dir: posix.dirname(file), legacy: d.doc === "feature", title: d.title, prefix: d["id-prefix"], concept: d.concept, release: d.release, shipped: d.shipped, links });
   }
-  const story = d.doc === "story" ? { file, dir: posix.dirname(file), prefix: d["id-prefix"], stories: [], acs: [] } : null;
+  const story = d.doc === "story" ? { file, dir: posix.dirname(file), prefix: d["id-prefix"], status: d.status, sprint: d.sprint || "", shipped: d.shipped, stories: [], acs: [] } : null;
+  if (d.doc === "backlog") backlogs.push({ file, rows: [] });
+  if (d.doc === "sprint") sprints.push({ file, sprint: String(d.sprint ?? ""), rows: [] });
   if (story) storyFiles.push(story);
 
   for (const table of body.tables) {
@@ -257,8 +312,10 @@ for (const path of listMarkdown(root)) {
           const feature = bare(col(table, row, "feature"));
           const stage = bare(col(table, row, "status")).toLowerCase();
           const serves = col(table, row, "serves");
-          roadmapRows.push({ feature, stage, file, line: at });
-          if (!STAGES.includes(stage)) report("error", "ROAD", file, at, feature, `status "${stage}" is not one of ${STAGES.join(", ")} (P-ROAD-1)`);
+          roadmapRows.push({ feature, stage, version: bare(col(table, row, "version")), file, line: at });
+          if (stage === INTEGRATED[otherModel])
+            report("error", "STAGE-MODE", file, at, feature, `stage "${stage}" belongs to branch model ${otherModel}; this project uses ${branchModel}, write "${INTEGRATED[branchModel]}" (P-GIT-9)`);
+          else if (!STAGES.includes(stage)) report("error", "ROAD", file, at, feature, `status "${stage}" is not one of ${STAGES.join(", ")} (P-ROAD-1)`);
           const servesIds = ids(serves);
           if (!servesIds.length) report("error", "ROAD", file, at, feature, "Serves names no part of G-1");
           for (const id of servesIds) refs.push({ id, file, line: at, from: "Serves" });
@@ -266,14 +323,16 @@ for (const path of listMarkdown(root)) {
         }
         case "roadmap:stages": {
           const listed = table.rows.map((r) => bare(r.cells[0]).toLowerCase());
-          if (listed.join("|") !== STAGES.join("|"))
+          if (listed.join("|") === stagesFor(otherModel).join("|"))
+            report("error", "STAGE-MODE", file, table.line, "", `stage list is the one of branch model ${otherModel}; this project uses ${branchModel}, rename "${INTEGRATED[otherModel]}" to "${INTEGRATED[branchModel]}" (P-GIT-9)`);
+          else if (listed.join("|") !== STAGES.join("|"))
             report("error", "COPY", file, table.line, "", `stage list must be exactly ${STAGES.join(", ")} (copy of P-ROAD-1)`);
           table.rows.length = 0;
           break;
         }
         case "roadmap-details:positions":
         case "status:positions":
-          positions.push({ feature: bare(col(table, row, "feature")), branch: bare(col(table, row, "branch")), file, line: at });
+          positions.push({ feature: bare(col(table, row, "feature")), branch: bare(col(table, row, "branch")), phase: parseInt(bare(col(table, row, "phase")), 10), file, line: at });
           break;
         case "stack:stack":
           for (const id of ids(row.cells[0])) stackIds.push({ id, file, line: at });
@@ -282,6 +341,15 @@ for (const path of listMarkdown(root)) {
         case "story:acs":
           conceptRow(story, kind, table, row, rawId, file, at);
           break;
+        case "backlog:backlog":
+        case "sprint:backlog": {
+          const id = ids(col(table, row, "story")).find((i) => CONCEPT_ID.test(i));
+          const target = d.doc === "backlog" ? backlogs.at(-1) : sprints.at(-1);
+          const sprint = bare(col(table, row, "sprint"));
+          target.rows.push({ id, status: bare(col(table, row, "status")).toLowerCase(), sprint: /^\d+$/.test(sprint) ? sprint : "", file, line: at });
+          if (!id) report("error", "BL", file, at, "", "the Story column names no user story ID");
+          break;
+        }
         case "story:slices": {
           const delivers = ids(col(table, row, "delivers"));
           for (const id of delivers) refs.push({ id, file, line: at, from: "Delivers" });
@@ -305,7 +373,14 @@ function conceptRow(concept, kind, table, row, id, file, at) {
     }
     return;
   }
+  // A slice table in a concept document (§16) only references what its slices deliver.
+  if (kind === "slices") {
+    for (const ref of ids(col(table, row, "delivers"))) refs.push({ id: ref, file, line: at, from: "Delivers" });
+    return;
+  }
   const expectKind = { stories: ["US"], requirements: ["F", "U", "NF", "C", "E"], tests: ["T"] }[kind];
+  // Any other table kind (e.g. a positions table) defines no concept IDs.
+  if (!expectKind && kind !== "acs") return;
   if (kind === "acs") {
     const m = id.match(AC_ID);
     if (!m || m[1] !== concept.prefix) return report("error", "ID", file, at, id, `an acceptance criterion ID must be ${concept.prefix}-AC-<story>.<n>`);
@@ -335,22 +410,56 @@ function conceptRow(concept, kind, table, row, id, file, at) {
 
 // ---------- work-item tree (P-DOC-6) ----------
 
-// Stories and acceptance criteria live in documentation/work-items/<feature>/; they join the concept
+// Stories and acceptance criteria live in gam-ai-knowledge/work-items/E<nn>-<feature>/; they join the concept
 // with the same id-prefix, so the derivation checks below see one feature, wherever its rows stand.
+// An epic folder is E<nn>-<slug>; a folder with the older feature.md is migrated on touch (P-DOC-5).
+let tags = null; // git tags, read once; false when git is unavailable (P-GIT-7)
+function tagExists(tag) {
+  if (tags === null) {
+    try {
+      tags = new Set(execFileSync("git", ["tag", "--list"], { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).split(/\r?\n/).filter(Boolean));
+    } catch {
+      tags = false;
+    }
+  }
+  return tags === false || tags.has(tag);
+}
+const epicNumbers = new Map();
 for (const f of features) {
   const concept = concepts.find((c) => c.prefix === f.prefix);
   if (!concept) report("error", "WI", f.file, 1, f.prefix, "no concept document has this id-prefix");
   else if (posix.basename(concept.file) !== f.concept) report("error", "WI", f.file, 1, f.concept, `concept names ${f.concept}, but the ${f.prefix} concept is ${concept.file}`);
+  if (f.legacy) {
+    report("warning", "WI", f.file, 1, f.prefix, "work items before epics: number the folder E<nn>-<slug>, rename feature.md to epic.md, add release, shipped and the story status on the next change (P-DOC-6, P-DOC-5)");
+    continue;
+  }
+  const dir = posix.basename(f.dir);
+  const m = dir.match(EPIC_DIR);
+  if (!m) report("error", "WI", f.file, 1, dir, "an epic folder must be named E<nn>-<slug>, e.g. E07-class-management (P-DOC-6)");
+  else if (epicNumbers.has(m[1])) report("error", "WI", f.file, 1, `E${m[1]}`, `epic number used twice (also ${epicNumbers.get(m[1])})`);
+  else epicNumbers.set(m[1], f.file);
+  if (SEMVER.test(f.release || "") && roadmapRows.length) {
+    // Several features may share one release: the epic's own row is the one of this Version that names its title.
+    const rows = roadmapRows.filter((r) => r.version === f.release);
+    const row = rows.find((r) => r.feature.toLowerCase().includes((f.title || "").toLowerCase())) ?? rows[0];
+    if (!row) report("error", "WI", f.file, 1, f.release, "release matches no Version in ROADMAP.md (P-ROAD-1)");
+    else if (!row.feature.toLowerCase().includes((f.title || "").toLowerCase()))
+      report("warning", "WI", f.file, 1, f.release, `the ROADMAP row of ${f.release} does not name "${f.title}"`);
+  }
+  if (f.shipped && TAG.test(f.shipped) && !tagExists(f.shipped)) report("error", "WI", f.file, 1, f.shipped, "shipped names a tag that does not exist in git");
 }
 for (const s of storyFiles) {
   const concept = concepts.find((c) => c.prefix === s.prefix);
   const feature = features.find((f) => f.dir === s.dir);
   if (!concept) report("error", "WI", s.file, 1, s.prefix, "no concept document has this id-prefix");
-  if (!feature) report("error", "WI", s.file, 1, "", "no feature.md in this folder");
+  if (!feature) report("error", "WI", s.file, 1, "", "no epic.md in this folder");
   else {
-    if (feature.prefix !== s.prefix) report("error", "WI", s.file, 1, s.prefix, `id-prefix differs from feature.md (${feature.prefix})`);
-    if (!feature.links.includes(s.file)) report("error", "WI", feature.file, 1, s.stories[0]?.id ?? s.file, "feature.md does not list this story file");
+    const name = feature.legacy ? "feature.md" : "epic.md";
+    if (feature.prefix !== s.prefix) report("error", "WI", s.file, 1, s.prefix, `id-prefix differs from ${name} (${feature.prefix})`);
+    if (!feature.links.includes(s.file)) report("error", "WI", feature.file, 1, s.stories[0]?.id ?? s.file, `${name} does not list this story file`);
+    if (!feature.legacy && s.status === undefined) report("error", "FM", s.file, 1, "", `status is missing (one of ${STORY_STATUS.join(", ")}, P-DOC-6)`);
   }
+  if (s.shipped && TAG.test(s.shipped) && !tagExists(s.shipped)) report("error", "WI", s.file, 1, s.shipped, "shipped names a tag that does not exist in git");
   if (s.stories.length !== 1) report("error", "WI", s.file, 1, "", `a story file holds exactly one user story, found ${s.stories.length}`);
   for (const a of s.acs) {
     if (s.stories.length === 1 && a.story !== s.stories[0].id) report("error", "WI", a.file, a.line, a.id, `belongs to ${a.story}, not to this file's ${s.stories[0].id}`);
@@ -363,7 +472,50 @@ for (const s of storyFiles) {
 for (const c of concepts) {
   if (c.legacy) continue;
   const inConcept = c.stories.filter((s) => s.file === c.file);
-  if (inConcept.length) report("warning", "WI", c.file, inConcept[0].line, inConcept[0].id, "stories belong in documentation/work-items/ (P-DOC-6); move them on the next change (P-DOC-5)");
+  if (inConcept.length) report("warning", "WI", c.file, inConcept[0].line, inConcept[0].id, `stories belong in ${relative(repoTop, resolve(root)).replace(/\\/g, "/")}/work-items/ (P-DOC-6); move them on the next change (P-DOC-5)`);
+}
+
+// ---------- product and sprint backlogs (P-DOC-8) ----------
+
+// The story files are the source; BACKLOG.md and the sprint files mirror their status and sprint.
+const tracked = storyFiles.filter((s) => s.status !== undefined && s.stories.length === 1);
+if (tracked.some((s) => s.status !== "done") && !backlogs.length)
+  report("error", "BL", root, 0, "", "stories with a status exist, but no work-items/BACKLOG.md (doc: backlog) lists them (P-DOC-8)");
+if (backlogs.length > 1) report("error", "BL", backlogs[1].file, 1, "", `a second product backlog (first: ${backlogs[0].file})`);
+const backlog = backlogs[0];
+for (const s of tracked) {
+  const id = s.stories[0].id;
+  if (backlog) {
+    const rows = backlog.rows.filter((r) => r.id === id);
+    if (s.status === "done") {
+      if (rows.length) report("error", "BL", backlog.file, rows[0].line, id, "the story is done and leaves the product backlog");
+    } else if (!rows.length) report("error", "BL", backlog.file, 1, id, `missing: the story is ${s.status} (${s.file})`);
+    else {
+      if (rows.length > 1) report("error", "BL", backlog.file, rows[1].line, id, "listed twice");
+      if (rows[0].status !== s.status) report("error", "BL", backlog.file, rows[0].line, id, `status "${rows[0].status}" differs from the story file (${s.status})`);
+      if (rows[0].sprint !== s.sprint) report("error", "BL", backlog.file, rows[0].line, id, `sprint "${rows[0].sprint || "—"}" differs from the story file (${s.sprint || "—"})`);
+    }
+  }
+  if (s.sprint) {
+    const sprint = sprints.find((p) => p.sprint === s.sprint);
+    if (!sprint) report("error", "BL", s.file, 1, id, `sprint ${s.sprint} has no file work-items/sprints/sprint-${s.sprint}.md`);
+    else {
+      const row = sprint.rows.find((r) => r.id === id);
+      if (!row) report("error", "BL", sprint.file, 1, id, `missing: the story file names sprint ${s.sprint}`);
+      else if (row.status !== s.status) report("error", "BL", sprint.file, row.line, id, `status "${row.status}" differs from the story file (${s.status})`);
+    }
+  }
+}
+for (const r of backlog?.rows ?? []) {
+  if (r.id && !storyFiles.some((s) => s.stories[0]?.id === r.id)) report("error", "BL", r.file, r.line, r.id, "no story file holds this story");
+}
+for (const p of sprints) {
+  if (posix.basename(p.file) !== `sprint-${p.sprint}.md`) report("error", "BL", p.file, 1, p.sprint, "a sprint file is named sprint-<n>.md after its sprint field");
+  for (const r of p.rows) {
+    const s = storyFiles.find((f) => f.stories[0]?.id === r.id);
+    if (r.id && !s) report("error", "BL", r.file, r.line, r.id, "no story file holds this story");
+    else if (s && s.status !== undefined && s.sprint !== p.sprint) report("error", "BL", r.file, r.line, r.id, `the story file names sprint ${s.sprint || "—"}; a carried-over story moves to its new sprint file`);
+  }
 }
 
 // ---------- checks ----------
@@ -495,6 +647,66 @@ function withoutComments(source) {
   }
   return out;
 }
+checkPublishLists();
+await checkPipeline();
+
+// ---------- pipeline decision (PIPE) ----------
+
+// gam-engineering/pipeline.json is checked by the helper's validate (P-PIPE-1, PP-F-17);
+// doc-check only reads the file and turns each finding into an error. Without the file there is nothing to check.
+async function checkPipeline() {
+  const decision = join(repoTop, "gam-engineering", "pipeline.json");
+  if (!existsSync(decision)) return;
+  const file = relative(process.cwd(), decision).replace(/\\/g, "/");
+  const helper = join(repoTop, "gam-engineering", "tools", "pipeline.mjs");
+  if (!existsSync(helper))
+    return report("error", "PIPE", file, 0, "", "gam-engineering/tools/pipeline.mjs missing; run /gam-engineering migrate tools");
+  const { validate } = await import(pathToFileURL(helper).href);
+  for (const f of validate(readFileSync(decision, "utf8"), (path) => existsSync(join(repoTop, path))))
+    report("error", f.code, file, 0, "", f.message);
+}
+
+// ---------- publish lists (P-DOC-9) ----------
+
+// Project documents never ship with the product. Checks the lists whose effect is clear without running a
+// tool: a .deployignore, and an npm package that is not private.
+function checkPublishLists() {
+  const rootFile = (name) => relative(process.cwd(), join(repoTop, name)).replace(/\\/g, "/");
+  const read = (name) => (existsSync(join(repoTop, name)) ? readFileSync(join(repoTop, name), "utf8") : null);
+  // The project folders are gam-ai-knowledge/ and gam-engineering/, or the former humanengineering/ in a project not
+  // yet renamed (P-DOC-10, P-DOC-11).
+  const processFolder = !existsSync(join(repoTop, "gam-engineering")) && existsSync(join(repoTop, "humanengineering")) ? "humanengineering" : "gam-engineering";
+  const folders = ["gam-ai-knowledge", processFolder].filter((name) => existsSync(join(repoTop, name)));
+  for (const folder of folders.length ? folders : [processFolder]) checkPublishList(folder, rootFile, read);
+}
+
+function checkPublishList(folder, rootFile, read) {
+  const entry = new RegExp(`^/?${folder}/?(\\*\\*?)?$`);
+  const excludes = (text) => text.split(/\r?\n/).some((l) => entry.test(l.trim()));
+
+  const deployIgnore = read(".deployignore");
+  if (deployIgnore !== null && !excludes(deployIgnore))
+    report("warning", "PUBLISH-LEAK", rootFile(".deployignore"), 0, "", `does not exclude ${folder}/, so the project documents are deployed with the product (P-DOC-9)`);
+
+  const pkgText = read("package.json");
+  if (pkgText === null) return;
+  let pkg;
+  try {
+    pkg = JSON.parse(pkgText);
+  } catch {
+    return;
+  }
+  if (pkg.private === true) return;
+  if (Array.isArray(pkg.files)) {
+    if (pkg.files.some((f) => new RegExp(`^(\\./)?${folder}(/|$)`).test(String(f))))
+      report("warning", "PUBLISH-LEAK", rootFile("package.json"), 0, "", `files lists ${folder}/, so the project documents ship with the npm package (P-DOC-9)`);
+    return;
+  }
+  const npmIgnore = read(".npmignore");
+  if (npmIgnore === null || !excludes(npmIgnore))
+    report("warning", "PUBLISH-LEAK", rootFile(npmIgnore === null ? "package.json" : ".npmignore"), 0, "",
+      `the npm package has no files list and no .npmignore entry for ${folder}/, so the project documents would ship with it (P-DOC-9)`);
+}
 
 // ---------- status against git (--status) ----------
 
@@ -514,7 +726,15 @@ function checkStatus() {
   }
   if (shallow) return report("error", "STATUS", rootFile, 0, "", "the clone is shallow; fetch the full history (GitLab: GIT_DEPTH: 0, GitHub: fetch-depth: 0)");
 
-  const merges = git("log", "--merges", "--format=%H%n%B%x1e", "HEAD")
+  // A repository without a commit has no HEAD, so there is no history to read: no story counts as merged.
+  let hasCommit = true;
+  try {
+    git("rev-parse", "--verify", "--quiet", "HEAD");
+  } catch {
+    hasCommit = false;
+  }
+
+  const merges = (hasCommit ? git("log", "--merges", "--format=%H%n%B%x1e", "HEAD") : "")
     .split("\x1e")
     .map((entry) => entry.trim())
     .filter(Boolean)
@@ -542,7 +762,10 @@ function checkStatus() {
     if (c.legacy || !c.stories.length) continue;
     const row = roadmapRows.find((r) => r.feature.toLowerCase() === (c.title || "").toLowerCase());
     if (!row || !STAGES.includes(row.stage)) continue;
+    // A story with a story file counts only once that file says done: a merge of one of its slices names it too (#11).
     const evidence = c.stories.map((s) => {
+      const status = storyFiles.find((f) => f.stories[0]?.id === s.id)?.status;
+      if (status !== undefined && status !== "done") return [];
       const named = new RegExp(`(?<![\\w-])${s.id}(?!\\w)`);
       return merges.filter((m) => named.test(m.body));
     });
@@ -551,7 +774,7 @@ function checkStatus() {
     const released = evidence.filter((e) => e.some((m) => inTag(m.sha))).length;
     let allowed;
     if (released === total) allowed = ["released"];
-    else if (merged === total) allowed = ["in dev"];
+    else if (merged === total) allowed = [INTEGRATED[branchModel]];
     else if (merged > 0) allowed = ["in progress"];
     else allowed = ["concept", "ready", "in progress"];
     if (!allowed.includes(row.stage))
@@ -560,7 +783,9 @@ function checkStatus() {
   }
 
   for (const p of positions) {
-    if (mergedBranches.has(p.branch))
+    // A concept branch may be merged at a phase gate and continued (Phases 1-6); only delivery positions must move on.
+    const continuedConcept = p.branch?.startsWith("concept/") && p.phase < 7;
+    if (mergedBranches.has(p.branch) && !continuedConcept)
       report("error", "STATUS", p.file, p.line, p.feature, `position row still names branch ${p.branch}, which is already merged`);
   }
 }

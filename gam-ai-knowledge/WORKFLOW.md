@@ -155,7 +155,7 @@ Every sprint runs the same five steps; the exit criteria of each milestone are i
 - Title: plain-language summary with the story ID, e.g. `SCF-US-3 Status page: one row per unit`.
 - Description (MR template): `Closes #<issue>`, what changes for the user, summary of the implementation, tested functions, consistency-check result, and the Definition of Done check — IDs always with their titles.
 - Reviewer: a person other than the author checks the acceptance criteria and the DoD explicitly and leaves a short, content-related comment (§10, P-MR-2).
-- Merging: the author never merges their own MR (§11); an agent merges only via `/gam-engineering merge` under the merge policy (P-MR-4).
+- Merging: the author never merges their own MR (§11); an agent merges only via `/gam-engineering merge` under the merge policy (P-MR-4). To merge by hand — after *I merge myself*, or without an agent — follow `gam-engineering/tools/MERGING.md` or run `gam-engineering/tools/merge.ps1`.
 - Every review thread is resolved and the pipeline is green before merging.
 - Merge method: merge commit (no squash, P-GIT-3).
 
@@ -193,7 +193,7 @@ Items 15 and 16 apply from the day the sprint plan is merged into `dev`, to work
 
 ## Releases (P-VER-1…3)
 
-Run `/gam-engineering release [<version>]`:
+Run `/gam-engineering release [<version>]`, or by hand `gam-engineering/tools/merge.ps1 -Release <version> -Via Host` (steps in `gam-engineering/tools/MERGING.md`):
 
 1. Merge `dev` → `main` via a release MR (§15.1) that includes the curated `CHANGELOG.md` section, as the release merge key allows (P-MR-5).
 2. Create the annotated tag `v<version>` on `main` (§15.2).

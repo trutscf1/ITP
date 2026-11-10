@@ -1,2 +1,4 @@
 # Line ends are LF on every system, so tests and checks behave the same on Windows.
 * text=auto eol=lf
+*.cmd text eol=crlf
+*.bat text eol=crlf

@@ -8,9 +8,11 @@ title = "gitleaks config"
 useDefault = true
 
 [allowlist]
-description = "Generated files and the dummy value of .env.example"
+description = "Generated files, git-ignored files the gam checks write on purpose, and the dummy value of .env.example"
 paths = [
   '''src/generated/.*''',
+  '''(^|/)\.env\.sonar$''',
+  '''(^|/)\.scannerwork/''',
 ]
 regexes = [
   '''change-me''',

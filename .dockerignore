@@ -10,4 +10,8 @@
 .env.*
 !.env.example
 /gam-ai-knowledge/
+/gam-engineering/
+/gam-ai-memory/
+CLAUDE.md
+CONTEXT-MAP.md
 docs

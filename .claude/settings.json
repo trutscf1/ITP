@@ -1,8 +1,19 @@
 {
+  "plansDirectory": "./gam-ai-memory/plans",
   "env": {
+    "GAM_ENGINEERING_BRANCHES": "dev",
+    "GAM_ENGINEERING_FLOW": "full",
     "GAM_ENGINEERING_MERGE": "ask",
     "GAM_ENGINEERING_APPROVALS": "1",
-    "GAM_ENGINEERING_RELEASE_MERGE": "ask"
+    "GAM_ENGINEERING_RELEASE_MERGE": "ask",
+    "GAM_ENGINEERING_MODEL_JUDGE": "opus",
+    "GAM_ENGINEERING_MODEL_DRAFT": "sonnet",
+    "GAM_ENGINEERING_MODEL_CHECK": "haiku",
+    "GAM_ENGINEERING_SESSION_THRESHOLD": "50",
+    "GAM_ENGINEERING_DELEGATE_MIN_FILES": "5",
+    "GAM_ENGINEERING_DELEGATE_MIN_OUTPUT_LINES": "200",
+    "GAM_ENGINEERING_PROJECT_KIND": "student",
+    "GAM_ENGINEERING_PROMPT_EXPORT": "local"
   },
   "permissions": {
     "ask": [
@@ -21,6 +32,30 @@
           {
             "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/gam-engineering/tools/status-reminder.mjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/gam-engineering/tools/open-work-reminder.mjs\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/gam-engineering/tools/inbox-names.mjs\""
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/gam-engineering/tools/format-on-write.mjs\""
           }
         ]
       }
