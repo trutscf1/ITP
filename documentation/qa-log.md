@@ -1543,3 +1543,11 @@ Answer: "Slices schneiden + Slice 1 (Recommended)".
 **Q278 - Flow:** In .claude/settings.json ist kein GAM_ENGINEERING_FLOW gesetzt. Welcher Ablauf gilt für dieses Projekt?
 
 Answer: "full (Recommended)".
+
+**Q279 - Veröffentlichen #71:** Branch feature/71-accessibility-modes pushen, MR nach dev öffnen (Titel „DSA-US-2 Accessibility modes, slice 1: modes in the browser“, Beschreibung nach Template inkl. Testtabelle und Merge danger), #71 auf status::review setzen und das Child-Issue „DSA-US-2 slice 2: Accessibility settings in the profile“ anlegen (Part of #71, DSA-AC-2.4, blockiert durch #46 und #112, Sprint 5, Weight 2, dir zugewiesen, status::backlog)?
+
+Answer: "Alles veröffentlichen (Recommended)". The child issue is #161.
+
+**Q280 - Issue #71 beim Merge:** Laut Slice-Tabelle liefert #71 Slice 1, die Story DSA-US-2 ist aber erst mit Slice 2 fertig. Soll der MR #71 schließen?
+
+Answer: "Closes #71 (Recommended)".

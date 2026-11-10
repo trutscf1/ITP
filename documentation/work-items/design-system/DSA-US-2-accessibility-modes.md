@@ -32,7 +32,7 @@ The vertical slices that deliver this story. One slice is delivered by the story
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
 | 1 — modes in the browser | DSA-AC-2.1, DSA-AC-2.2, DSA-AC-2.3, DSA-AC-2.5; DSA-AC-2.4 up to the browser | — | #71 |
-| 2 — settings in the profile | DSA-AC-2.4 | IDN-US-2 (#46), DSA-US-1 slice 3 (#112) | child issue of #71, still to be cut |
+| 2 — settings in the profile | DSA-AC-2.4 | IDN-US-2 (#46), DSA-US-1 slice 3 (#112) | #161 |
 
 - **Story issue:** #71
 - **Weight:** 5
