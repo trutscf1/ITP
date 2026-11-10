@@ -1,4 +1,4 @@
-/** M3 Redactor (`documentation/concepts/observability.md` §8 and §16). No side effect, no dependency. */
+/** M3 Redactor (`gam-ai-knowledge/concepts/observability.md` §8 and §16). No side effect, no dependency. */
 
 export const redacted = "[redacted]";
 
@@ -44,8 +44,10 @@ export function redactAttributes(
 
 const email = /[^\s@]+@[^\s@]+\.[^\s@]+/g;
 const ipv4 = /(?<!\d)(?<!\d\.)\d{1,3}(?:\.\d{1,3}){3}(?!\d)(?!\.\d)/g;
+// Not directly preceded or followed by a letter, digit, underscore, or colon (section 8), so that
+// `std::vector` and `Foo::bar` are kept; the colon before an address is part of the boundary.
 const colonRun =
-  /(?<![0-9a-fA-F:])[0-9a-fA-F]*(?::[0-9a-fA-F]*)+(?![0-9a-fA-F:])/g;
+  /(?<![0-9A-Za-z_:])[0-9a-fA-F]*(?::[0-9a-fA-F]*)+(?![0-9A-Za-z_:])/g;
 
 function isIpv6(candidate: string): boolean {
   const groups = candidate.split(":");

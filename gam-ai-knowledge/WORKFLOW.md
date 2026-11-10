@@ -78,6 +78,7 @@ Presented at the final presentation (`docs/anforderungen_software_projekte.md`, 
 | --- | --- | --- |
 | CI/CD with GitHub Actions | GitLab CI | Repository, MRs, reviews, and merge checks live on GitLab; GitHub is only a mirror and cannot block a GitLab merge. |
 | Reverse proxy Traefik ≥ 3.6.10 with Let's Encrypt (HTTP-01), an optional extra requirement of the school (`docs/anforderungen_software_projekte.md`, "Eventuelle Zusatzanforderungen") | Caddy (`caddy:2.11-alpine`) in the local stack and on the server, with its automatic HTTPS from Let's Encrypt (HTTP-01) | One proxy for both: the local stack, the routes of `docker/Caddyfile`, and the session check of the observability dashboards (`forward_auth`, `STACK.md` OBS-C-7) already use Caddy; a second proxy would double the configuration. The school's TLS and routing requirements (§9) are met either way (Q265). |
+| Observability through OpenTelemetry | The units report through the own package `packages/telemetry`, which speaks the OpenTelemetry protocol (OTLP over HTTP) without the OpenTelemetry SDK; the collector and the stores are the planned OpenTelemetry components. | [ADR-0009](adr/0009-units-encode-otlp-themselves.md): the logs packages of the SDK are experimental (Definition of Done item 18), its exporters have no bounded buffer (OBS-E-1), and the supply-chain rules apply to every package. |
 
 ## Tracker (P-TRK-1…4)
 

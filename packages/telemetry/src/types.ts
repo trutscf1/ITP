@@ -1,4 +1,4 @@
-/** Record types of `documentation/concepts/observability.md` §8 and the seams of §16. */
+/** Record types of `gam-ai-knowledge/concepts/observability.md` §8 and the seams of §16. */
 
 export const unitNames = [
   "web",
