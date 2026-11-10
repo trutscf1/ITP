@@ -52,7 +52,7 @@ export function ThemeSwitcher({
         <ToggleGroup.Item
           key={name}
           value={name}
-          className="rounded-md px-snug py-tight text-sm text-foreground data-[state=on]:bg-accent data-[state=on]:text-accent-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="rounded-md px-snug py-tight text-sm text-foreground data-[state=on]:bg-accent data-[state=on]:text-accent-foreground"
         >
           {labels[name]}
         </ToggleGroup.Item>

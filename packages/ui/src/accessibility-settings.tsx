@@ -19,7 +19,7 @@ const colourVisionLabels: Record<ColourVision, string> = {
 };
 
 const switchClasses =
-  "inline-flex h-6 w-11 shrink-0 items-center rounded-full border border-muted bg-surface p-tight data-[state=checked]:border-accent data-[state=checked]:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+  "inline-flex h-6 w-11 shrink-0 items-center rounded-full border border-muted bg-surface p-tight data-[state=checked]:border-accent data-[state=checked]:bg-accent";
 
 const thumbClasses =
   "block size-4 rounded-full bg-foreground data-[state=checked]:translate-x-4 data-[state=checked]:bg-accent-foreground";
@@ -73,7 +73,7 @@ export function AccessibilityControls({
               <RadioGroup.Item
                 id={`${id}-vision-${name}`}
                 value={name}
-                className="flex size-5 shrink-0 items-center justify-center rounded-full border border-muted bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="flex size-5 shrink-0 items-center justify-center rounded-full border border-muted bg-surface"
               >
                 <RadioGroup.Indicator className="block size-3 rounded-full bg-accent" />
               </RadioGroup.Item>
@@ -132,7 +132,7 @@ export function AccessibilitySettings({
 
   return (
     <Popover.Root>
-      <Popover.Trigger className="rounded-md border border-muted bg-surface px-snug py-tight text-sm text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+      <Popover.Trigger className="rounded-md border border-muted bg-surface px-snug py-tight text-sm text-foreground">
         Accessibility
       </Popover.Trigger>
       <Popover.Portal>

@@ -10,6 +10,7 @@
  *     palette for light and sepia, a dark one for dark and night (DSA-F-6, DSA-F-8);
  *   - data-colour-vision: replaces the status colours (DSA-F-7);
  *   - data-motion="reduced" and prefers-reduced-motion: stops all motion (DSA-F-8).
+ * One global :focus-visible rule gives every control the same visible focus indicator (DSA-F-11).
  * Type and spacing tokens stay in rem so that the browser's font size scales
  * the layout (DSA-F-10).
  */
@@ -99,6 +100,17 @@
   --color-status-warning: #fbbf24;
   --color-status-danger: #f87171;
   --color-status-info: #60a5fa;
+}
+
+/*
+ * Focus indicator (DSA-F-11): 2 px solid in the accent colour, 2 px away from the control, so it
+ * stays visible on the control's own background. The accent colour reaches 3:1 against background
+ * and surface in every theme and contrast mode (WCAG 2.4.7, 1.4.11). Components set no outline of
+ * their own, and nothing may remove it without an equal replacement.
+ */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 /*
