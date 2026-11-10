@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import * as a11y from "../packages/ui/src/accessibility.ts";
 
-type Settings = a11y.AccessibilitySettings;
+type Settings = a11y.AccessibilityModes;
 
 /** A stand-in for `document.documentElement`: only the dataset is used. */
 function fakeRoot(): { dataset: Record<string, string | undefined> } {

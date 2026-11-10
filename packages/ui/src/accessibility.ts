@@ -17,13 +17,13 @@ export type ColourVision = (typeof colourVisions)[number];
 export type Motion = (typeof motions)[number];
 
 /** The three accessibility settings, independent of each other and of the theme (DSA-F-17). */
-export interface AccessibilitySettings {
+export interface AccessibilityModes {
   contrast: Contrast;
   colourVision: ColourVision;
   motion: Motion;
 }
 
-export const defaultAccessibility: AccessibilitySettings = {
+export const defaultAccessibility: AccessibilityModes = {
   contrast: "system",
   colourVision: "none",
   motion: "system",
@@ -50,7 +50,7 @@ export function isMotion(value: unknown): value is Motion {
  * The cookie string that remembers `settings` for a year on the whole site. The value
  * `contrast:high.vision:none.motion:system` has only characters RFC 6265 allows in a cookie.
  */
-export function accessibilityCookie(settings: AccessibilitySettings): string {
+export function accessibilityCookie(settings: AccessibilityModes): string {
   const value = `contrast:${settings.contrast}.vision:${settings.colourVision}.motion:${settings.motion}`;
   return `${accessibilityCookieName}=${value}; Path=/; Max-Age=${oneYearInSeconds}; SameSite=Lax`;
 }
@@ -61,8 +61,8 @@ export function accessibilityCookie(settings: AccessibilitySettings): string {
  */
 export function readAccessibilityCookie(
   cookieHeader: string | undefined,
-): AccessibilitySettings {
-  const settings: AccessibilitySettings = { ...defaultAccessibility };
+): AccessibilityModes {
+  const settings: AccessibilityModes = { ...defaultAccessibility };
   for (const pair of (cookieHeader ?? "").split(";")) {
     const separator = pair.indexOf("=");
     if (separator < 0) continue;
@@ -87,7 +87,7 @@ export function readAccessibilityCookie(
  * default, so the stylesheet can switch on them (the layout renders them on the server).
  */
 export function accessibilityAttributes(
-  settings: AccessibilitySettings,
+  settings: AccessibilityModes,
 ): Record<string, string> {
   const attributes: Record<string, string> = {};
   if (settings.contrast !== defaultAccessibility.contrast) {
@@ -105,7 +105,7 @@ export function accessibilityAttributes(
 /** Applies the settings in place on the root element; a setting at its default removes its attribute. */
 export function applyAccessibility(
   root: { dataset: Record<string, string | undefined> },
-  settings: AccessibilitySettings,
+  settings: AccessibilityModes,
 ): void {
   const attributes = accessibilityAttributes(settings);
   const set = (key: string, attribute: string): void => {
