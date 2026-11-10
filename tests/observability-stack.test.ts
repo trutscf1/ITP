@@ -7,7 +7,7 @@ import { after, before, describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
 
-// Observability stack, slice 1 of OBS-US-1 (documentation/concepts/observability.md §16 and §17).
+// Observability stack, slice 1 of OBS-US-1 (gam-ai-knowledge/concepts/observability.md §16 and §17).
 // The file tests read the stack definition and the files of docker/observability as data; the
 // stack tests at the end start the real stack and run only with STACK_TEST=1 (§17, "CI Test
 // Constraints": until the pipeline offers a container runtime they run locally and the result is
