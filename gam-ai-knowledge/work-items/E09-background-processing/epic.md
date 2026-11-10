@@ -21,7 +21,7 @@ The parent work item of this epic: its user stories in the order they are built,
 
 In dependency order; each file holds the story, its acceptance criteria, and its slices.
 
-1. [BGP-US-1 Background processing with BullMQ](BGP-US-1-background-processing-with-bullmq.md)
+1. [BGP-US-1 Background processing with a job queue](BGP-US-1-background-processing-with-a-job-queue.md)
 2. [BGP-US-2 Virus scan of uploaded files](BGP-US-2-virus-scan-of-uploaded-files.md)
 3. [BGP-US-3 Generate thumbnails](BGP-US-3-generate-thumbnails.md)
 4. [BGP-US-4 Text recognition (OCR)](BGP-US-4-text-recognition-ocr.md)

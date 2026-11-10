@@ -1,13 +1,13 @@
 ---
 doc: story
 format: gam-ai-knowledge/1
-title: "BGP-US-1 Background processing with BullMQ"
+title: "BGP-US-1 Background processing with a job queue"
 audience: [product, developer, reviewer, agent]
 id-prefix: "BGP"
 status: backlog
 sprint: 5
 ---
-# BGP-US-1 Background processing with BullMQ
+# BGP-US-1 Background processing with a job queue
 
 One user story of [Background processing: thumbnails, virus scan, OCR, scheduled jobs](epic.md) and the acceptance criteria that decide when it is done. This file is the single source for both; the story issue copies them verbatim (P-DOC-6, P-TRK-2). The story was written by the team as tracker issue US-26 and brought into this form on 2026-10-06; its owner reviews the wording.
 
@@ -15,7 +15,7 @@ One user story of [Background processing: thumbnails, virus scan, OCR, scheduled
 
 | ID | Title | As a | I want | so that | Priority |
 | --- | --- | --- | --- | --- | --- |
-| BGP-US-1 | Background processing with BullMQ | operator | a job queue for background tasks | costly processing such as thumbnails or virus scans is decoupled from the upload | Must |
+| BGP-US-1 | Background processing with a job queue | operator | a job queue for background tasks | costly processing such as thumbnails or virus scans is decoupled from the upload | Must |
 
 ## Acceptance criteria
 

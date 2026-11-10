@@ -546,7 +546,7 @@ The slices and their issues stand in the story files (P-DOC-6); this table only 
 | SCF-US-1 Set up the monorepo | Platform & cms |
 | SCF-US-2 Local development environment with Docker Compose | Platform & cms; each owner adds the container build of their unit |
 | SCF-US-3 Shared contracts with Zod and OpenAPI | Contracts, storage & worker |
-| SCF-US-4 Data model and Prisma schema | Identity & CI; implemented by `trutscf1` since 2026-10-27 (A21) |
+| SCF-US-4 Data model and relational schema | Identity & CI; implemented by `trutscf1` since 2026-10-27 (A21) |
 | SCF-US-5 CI pipeline with quality and security checks | Identity & CI |
 | SCF-US-6 Conventional Commits and generated changelog | Identity & CI (hooks, changelog draft, release job; #44); Platform & cms merges the release |
 | SCF-US-7 Project documentation and Definition of Done | shared by all four |
