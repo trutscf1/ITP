@@ -83,6 +83,24 @@ Draft for DSA-US-2, written on 2026-11-10 when its owner chose to cut the story 
 | `@stash/ui` accessibility settings and status badge | The controls for the three settings (Radix primitives) and the badge with icon and text | Rendered with `react-dom/server`; one story each in Storybook |
 | `web` root layout | Reads the cookie and renders the attributes on `<html>`, shows the controls next to the theme switcher | The running web client, checked in the accessibility job of CI |
 
+### Slices of DSA-US-3
+
+Cut on 2026-11-10, when its owner chose to build what does not wait for the file browser (Q277 of the chat session `844a9ca5`, confirmed by Q349). Every decision below is an assumption the grilling of this concept may change.
+
+| Slice | Requirements | Issue | Blocked by |
+| --- | --- | --- | --- |
+| 1 — keyboard, skip link, checks | DSA-F-11, DSA-F-12, DSA-F-14, DSA-F-15 (DSA-AC-3.1, 3.2, 3.4, 3.5 for the pages and controls that exist) | #72 | — |
+| 2 — screen reader for files | DSA-F-13 (DSA-AC-3.3); DSA-AC-3.1 and 3.5 for the new screens | child issue of #72, still to be cut | the file browser of WEB-US-1 (#69) and the upload |
+
+### Decisions of slice 1 of DSA-US-3 (assumptions)
+
+- **A11 — One main landmark, one skip link.** The root layout renders a skip link "Skip to main content" as the first focusable element and wraps every page in one `<main id="main-content" tabindex="-1">`; a page holds no `<main>` of its own. The link is hidden until it gets focus and then shown in the top corner.
+- **A12 — One focus indicator for everything.** A global `:focus-visible` outline of 2 px in the accent colour with a 2 px offset, defined once in the token stylesheet, so every control has the same visible focus; it reaches 3:1 against background and surface in every theme and contrast mode (WCAG 2.4.7, 1.4.11). No control removes the outline without an equal replacement.
+- **A13 — Tab order is reading order.** No positive `tabIndex` anywhere; the order of the controls follows the source order, header before main content.
+- **A14 — The manual tests are a protocol in the repository.** The NVDA (Windows, Firefox or Chrome) and VoiceOver (macOS, Safari) runs follow a written protocol with steps per page and control and a result table (date, tester handle, screen reader and version, browser, result, findings). The agent writes the protocol; the runs are done by a person, and DSA-AC-3.4 counts as met once one run per screen reader is recorded.
+- **A15 — axe in every theme and contrast mode.** The automated check runs axe on every page in each of the four themes, with and without high contrast, and fails on a critical violation.
+- **A16 — The keyboard walk is a browser check.** In the running web client, Tab from the top of each page reaches every control in source order, each with a visible focus indicator, and the first Tab plus Enter moves focus to the main content.
+
 ## 17. Test Concept & TDD Contract
 
 Draft. DSA-T-1 to DSA-T-5, DSA-T-7, DSA-T-8, DSA-T-17, and the stylesheet parts of DSA-T-9 and DSA-T-11 exist and run with `pnpm test` (`tests/design-system.test.ts`, `tests/theme.test.ts`, `tests/contrast.test.ts`, `tests/storybook.test.ts`, `tests/accessibility-settings.test.ts`, `tests/accessibility-tokens.test.ts`, `tests/accessibility-components.test.ts`; seams agreed in `qa-log.md`, Q75; Storybook itself is built with `pnpm --filter @stash/ui run build-storybook`); the browser parts are in the accessibility check `tests/accessibility/axe-check.ts`, which the CI job `accessibility` runs against the built web client (`pnpm run test:accessibility`) and which also runs axe and the 200 % check with the settings popover open: DSA-T-7 and DSA-T-9 (with `prefers-contrast: more` emulated, `<body>` shows the high-contrast palette; no running animation under `prefers-reduced-motion` and under `data-motion="reduced"`), DSA-T-11 (200 % root font size, no horizontal scroll at 1280 px, no content wider than its box, no text cut off by `overflow`), and DSA-T-17 (the high-contrast switch sets `data-contrast` at once and keeps it after a reload); every other row is a planned test that its slice writes first and that the grilling of this concept may sharpen. Each test name carries the `AC` ID it covers (`STACK.md` §6).

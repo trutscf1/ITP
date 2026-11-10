@@ -25,7 +25,7 @@ The story files are the source: their `status` and `sprint` fields decide what s
 | 11 | [IDN-US-7 Operator role and session check](E03-identity/IDN-US-7-operator-role-and-session-check.md) | E03 Identity: accounts, external login, MFA | backlog | — | 2 | — |
 | 12 | [IDN-US-8 Delete my account](E03-identity/IDN-US-8-delete-my-account.md) | E03 Identity: accounts, external login, MFA | backlog | — | 3 | — |
 | 13 | [DSA-US-2 Accessibility modes](E04-design-system/DSA-US-2-accessibility-modes.md) | E04 Design system & accessibility modes | in-progress | 2 | 5 | #71 |
-| 14 | [DSA-US-3 Keyboard operation and screen reader support](E04-design-system/DSA-US-3-keyboard-operation-and-screen-reader-support.md) | E04 Design system & accessibility modes | ready | 2 | 5 | #72 |
+| 14 | [DSA-US-3 Keyboard operation and screen reader support](E04-design-system/DSA-US-3-keyboard-operation-and-screen-reader-support.md) | E04 Design system & accessibility modes | in-progress | 2 | 5 | #72 |
 | 15 | [STO-US-1 Connect the storage backend to SeaweedFS](E05-storage-core/STO-US-1-connect-the-storage-backend-to-seaweedfs.md) | E05 Storage core: folders, resumable upload, deduplication | ready | 2 | 5 | #56 |
 | 16 | [STO-US-2 Upload files](E05-storage-core/STO-US-2-upload-files.md) | E05 Storage core: folders, resumable upload, deduplication | ready | 2 | 5 | #57 |
 | 17 | [STO-US-3 Chunked upload with resume](E05-storage-core/STO-US-3-chunked-upload-with-resume.md) | E05 Storage core: folders, resumable upload, deduplication | backlog | 3 | 8 | #58 |

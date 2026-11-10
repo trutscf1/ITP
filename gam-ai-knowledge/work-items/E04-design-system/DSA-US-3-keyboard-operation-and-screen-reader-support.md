@@ -4,7 +4,7 @@ format: gam-ai-knowledge/1
 title: "DSA-US-3 Keyboard operation and screen reader support"
 audience: [product, developer, reviewer, agent]
 id-prefix: "DSA"
-status: ready
+status: in-progress
 sprint: 2
 ---
 # DSA-US-3 Keyboard operation and screen reader support
@@ -29,11 +29,12 @@ One user story of [Design system & accessibility modes](epic.md) and the accepta
 
 ## Slices
 
-The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it. A story of this weight needs more than one slice of at most 4 h (`WORKFLOW.md`, "Issues and weight"); its owner cuts them in the concept document.
+The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it. The cut and its decisions are in the concept document, §16 (Q349).
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
-| 1 — whole story | DSA-AC-3.1, DSA-AC-3.2, DSA-AC-3.3, DSA-AC-3.4, DSA-AC-3.5 | — | #72 |
+| 1 — keyboard, skip link, checks | DSA-AC-3.1, DSA-AC-3.2, DSA-AC-3.4, DSA-AC-3.5 for the pages and controls that exist | — | #72 |
+| 2 — screen reader for files | DSA-AC-3.3; DSA-AC-3.1 and DSA-AC-3.5 for the new screens | WEB-US-1 (#69) | child issue of #72, still to be cut |
 
 - **Story issue:** #72
 - **Weight:** 5
