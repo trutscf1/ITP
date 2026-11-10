@@ -21,6 +21,6 @@ Every story whose `sprint` field is 5, in the order of the product backlog. A st
 | --- | --- | --- | --- | --- |
 | [WEB-US-4 End-to-end tests of the core flows](../E06-web-client/WEB-US-4-end-to-end-tests-of-the-core-flows.md) | E06 Web client: dashboard, file browser, preview | backlog | 5 | #74 |
 | [TPM-US-2 Inherited folder permissions](../E07-teams-permissions/TPM-US-2-inherited-folder-permissions.md) | E07 Teams, roles, inherited permissions, quotas, audit log | backlog | 8 | #52 |
-| [BGP-US-1 Background processing with BullMQ](../E09-background-processing/BGP-US-1-background-processing-with-bullmq.md) | E09 Background processing: thumbnails, virus scan, OCR, scheduled jobs | backlog | 5 | #63 |
+| [BGP-US-1 Background processing with a job queue](../E09-background-processing/BGP-US-1-background-processing-with-a-job-queue.md) | E09 Background processing: thumbnails, virus scan, OCR, scheduled jobs | backlog | 5 | #63 |
 | [BGP-US-4 Text recognition (OCR)](../E09-background-processing/BGP-US-4-text-recognition-ocr.md) | E09 Background processing: thumbnails, virus scan, OCR, scheduled jobs | backlog | 5 | #66 |
 | [OFF-US-2 Make files available offline](../E12-offline-mode/OFF-US-2-make-files-available-offline.md) | E12 Offline mode: installable web app with sync and conflict handling | backlog | 8 | #76 |

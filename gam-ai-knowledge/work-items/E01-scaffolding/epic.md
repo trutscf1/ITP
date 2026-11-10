@@ -24,7 +24,7 @@ In dependency order; each file holds the story, its acceptance criteria, and its
 1. [SCF-US-1 Set up the monorepo](SCF-US-1-set-up-the-monorepo.md)
 2. [SCF-US-2 Local development environment with Docker Compose](SCF-US-2-local-development-environment-with-docker-compose.md)
 3. [SCF-US-3 Shared contracts with Zod and OpenAPI](SCF-US-3-shared-contracts-with-zod-and-openapi.md)
-4. [SCF-US-4 Data model and Prisma schema](SCF-US-4-data-model-and-prisma-schema.md)
+4. [SCF-US-4 Data model and relational schema](SCF-US-4-data-model-and-relational-schema.md)
 5. [SCF-US-5 CI pipeline with quality and security checks](SCF-US-5-ci-pipeline-with-quality-and-security-checks.md)
 6. [SCF-US-6 Conventional Commits and generated changelog](SCF-US-6-conventional-commits-and-generated-changelog.md)
 7. [SCF-US-7 Project documentation and Definition of Done](SCF-US-7-project-documentation-and-definition-of-done.md)
