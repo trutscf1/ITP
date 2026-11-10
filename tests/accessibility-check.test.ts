@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it } from "node:test";
-import { root } from "./helpers/tokens-css.ts";
+import { root } from "./helpers/paths.ts";
 
 const check: string = readFileSync(
   join(root, "tests/accessibility/axe-check.ts"),

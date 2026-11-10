@@ -2,28 +2,38 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it } from "node:test";
-import { root } from "./helpers/tokens-css.ts";
+import { root } from "./helpers/paths.ts";
+import { openingTag, withoutComments } from "./helpers/source.ts";
 
-const layout: string = readFileSync(
-  join(root, "apps/web/src/app/layout.tsx"),
-  "utf8",
-);
-const page: string = readFileSync(
-  join(root, "apps/web/src/app/page.tsx"),
-  "utf8",
-);
-
-/** The opening tag that contains `needle`, from its `<` to its `>` (the sources have no `>` inside attributes). */
-function tagWith(source: string, needle: string): string {
-  const at = source.indexOf(needle);
-  assert.ok(at >= 0, `${needle} not found`);
-  const start = source.lastIndexOf("<", at);
-  return source.slice(start, source.indexOf(">", at) + 1);
+/** A source of the web client without its comments, so a match in a comment does not count. */
+function code(file: string): string {
+  return withoutComments(readFileSync(join(root, file), "utf8"));
 }
+
+const layout: string = code("apps/web/src/app/layout.tsx");
+const page: string = code("apps/web/src/app/page.tsx");
+
+describe("DSA-AC-3.2 The source helpers behind the skip link test (DSA-T-13)", () => {
+  it("DSA-AC-3.2 DSA-T-13 ignores a match in a comment", () => {
+    const source = withoutComments(
+      '// <main id="a">\n/* <main> */\nconst a = "//kept";',
+    );
+    assert.doesNotMatch(source, /<main/);
+    assert.match(source, /"\/\/kept"/);
+  });
+
+  it("DSA-AC-3.2 DSA-T-13 finds the end of a tag with a > inside an attribute value", () => {
+    const tag = openingTag(
+      '<a title="a > b" href="#x" data-n={1 > 0 ? "y" : "z"}>text</a>',
+      'href="#x"',
+    );
+    assert.equal(tag, '<a title="a > b" href="#x" data-n={1 > 0 ? "y" : "z"}>');
+  });
+});
 
 describe("DSA-AC-3.2 Skip link to the main content (DSA-T-13)", () => {
   it('DSA-AC-3.2 DSA-T-13 renders a link "Skip to main content" that targets #main-content', () => {
-    const tag = tagWith(layout, 'href="#main-content"');
+    const tag = openingTag(layout, 'href="#main-content"');
     assert.match(tag, /^<a\b/, "the skip link is not an anchor");
     assert.match(layout, /Skip to main content/);
   });
@@ -50,7 +60,7 @@ describe("DSA-AC-3.2 Skip link to the main content (DSA-T-13)", () => {
   });
 
   it("DSA-AC-3.2 DSA-T-13 hides the skip link until it has focus and then shows it in the top corner", () => {
-    const tag = tagWith(layout, 'href="#main-content"');
+    const tag = openingTag(layout, 'href="#main-content"');
     assert.match(tag, /\bsr-only\b/);
     assert.match(tag, /focus:not-sr-only/);
     assert.match(tag, /focus:absolute/);
@@ -64,7 +74,7 @@ describe("DSA-AC-3.2 Skip link to the main content (DSA-T-13)", () => {
       1,
       "not exactly one <main>",
     );
-    const tag = tagWith(layout, 'id="main-content"');
+    const tag = openingTag(layout, 'id="main-content"');
     assert.match(tag, /^<main\b/);
     assert.match(tag, /tabIndex=\{-1\}/);
     const open = layout.indexOf(tag);

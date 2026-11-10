@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { createRequire } from "node:module";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { root } from "./tokens-css.ts";
+import { root } from "./paths.ts";
 
 const ui: string = join(root, "packages/ui");
 const requireFromUi: NodeJS.Require = createRequire(join(ui, "package.json"));

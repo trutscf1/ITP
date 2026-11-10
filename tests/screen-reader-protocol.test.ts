@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it } from "node:test";
-import { root } from "./helpers/tokens-css.ts";
+import { root } from "./helpers/paths.ts";
 
 const file = join(root, "gam-ai-knowledge/tests/screen-reader-protocol.md");
 const protocol: string = existsSync(file) ? readFileSync(file, "utf8") : "";

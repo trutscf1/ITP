@@ -1,15 +1,11 @@
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join, relative } from "node:path";
+import { readFileSync } from "node:fs";
+import { relative } from "node:path";
 import { describe, it } from "node:test";
 import { contrast } from "./helpers/colour.ts";
-import {
-  root,
-  rules,
-  themes,
-  tokensOf,
-  type Visit,
-} from "./helpers/tokens-css.ts";
+import { root, sourceFiles, unitSourceFolders } from "./helpers/paths.ts";
+import { withoutComments } from "./helpers/source.ts";
+import { rules, themes, tokensOf, type Visit } from "./helpers/tokens-css.ts";
 
 /** The contrast settings a visit can have: none, set by hand, or asked for by the system. */
 const contrastModes: [string, Partial<Visit>][] = [
@@ -18,10 +14,9 @@ const contrastModes: [string, Partial<Visit>][] = [
   ["prefers-contrast: more", { systemContrast: true }],
 ];
 
-/** The global focus rule: a style rule for `:focus-visible` outside any at-rule. */
-const focusRule = rules.find(
-  (rule) =>
-    rule.atRules.length === 0 && rule.selectors.includes(":focus-visible"),
+/** The global focus rule: a style rule for `:focus-visible`. */
+const focusRule = rules.find((rule) =>
+  rule.selectors.includes(":focus-visible"),
 );
 
 /** The colour of a token in a visit, failing the test if the stylesheet does not set it. */
@@ -62,39 +57,14 @@ describe("DSA-AC-3.1 One focus indicator for every control (DSA-T-12)", () => {
   }
 });
 
-/** Source files (not tests, builds, or dependencies) of the apps and packages. */
-function sourceFiles(directory: string): string[] {
-  const found: string[] = [];
-  for (const entry of readdirSync(directory)) {
-    if (
-      ["node_modules", ".next", "dist", ".cache", "storybook-static"].includes(
-        entry,
-      )
-    )
-      continue;
-    const path = join(directory, entry);
-    if (statSync(path).isDirectory()) found.push(...sourceFiles(path));
-    else if (/\.(tsx?|jsx?|css|mdx)$/.test(entry)) found.push(path);
-  }
-  return found;
-}
-
-const sources: string[] = ["apps", "packages"].flatMap((area) =>
-  readdirSync(join(root, area)).flatMap((unit) => {
-    const src = join(root, area, unit, "src");
-    return statSync(join(root, area, unit)).isDirectory() &&
-      safeIsDirectory(src)
-      ? sourceFiles(src)
-      : [];
-  }),
+/** Source files of the apps and packages (builds and dependencies left out). */
+const sources: string[] = unitSourceFolders().flatMap(
+  (folder: string): string[] => sourceFiles(folder, /\.(tsx?|jsx?|css|mdx)$/),
 );
 
-function safeIsDirectory(path: string): boolean {
-  try {
-    return statSync(path).isDirectory();
-  } catch {
-    return false;
-  }
+/** The source of a file without its comments, so a match in a comment does not count. */
+function code(file: string): string {
+  return withoutComments(readFileSync(file, "utf8"));
 }
 
 /** A tabindex above zero in JSX, HTML, or an object: `tabIndex={2}`, `tabindex="3"`, `tabIndex: 1`. */
@@ -130,7 +100,7 @@ describe("DSA-AC-3.1 The tab order is the reading order (DSA-T-12)", () => {
 
   it("DSA-AC-3.1 DSA-T-12 sets no positive tabIndex in apps/ or packages/", () => {
     const offenders = sources.filter((file) =>
-      positiveTabIndex.test(readFileSync(file, "utf8")),
+      positiveTabIndex.test(code(file)),
     );
     assert.deepEqual(
       offenders.map((file) => relative(root, file)),
@@ -140,9 +110,7 @@ describe("DSA-AC-3.1 The tab order is the reading order (DSA-T-12)", () => {
 
   it("DSA-AC-3.1 DSA-T-12 removes no outline without an equal replacement", () => {
     const removes = /outline-(none|hidden|0)\b|outline\s*:\s*(none|0)\b/;
-    const offenders = sources.filter((file) =>
-      removes.test(readFileSync(file, "utf8")),
-    );
+    const offenders = sources.filter((file) => removes.test(code(file)));
     assert.deepEqual(
       offenders.map((file) => relative(root, file)),
       [],
