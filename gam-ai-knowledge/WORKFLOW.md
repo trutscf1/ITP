@@ -68,6 +68,7 @@ Where `docs/` and a profile decision disagree, `docs/` wins.
 | --- | --- | --- |
 | P-GIT-2 (work branches are deleted after merge) | Feature, fix, concept, and chore branches are **never deleted** after merge. | School requirement (`docs/anforderungen_software_projekte.md` §2, §5): the per-branch history is graded. |
 | P-GIT-2 (`concept/…` branches need no issue) | Every `concept/…` branch has a `type::concept` issue. | School requirement: every change starts with an issue (§3). |
+| P-GIT-8 (no AI attribution by default) | Commits carry the `Co-Authored-By` trailer and MR descriptions the *Generated with Claude Code* line; `.claude/settings.json` has no `attribution` key, so Claude Code adds them. | Developer decision on 2026-11-10 (Q11, migration MR !52): the project has credited the AI in its commits from the start, and the AI share of the work stays visible. |
 
 ## Deviations from the project proposal
 
