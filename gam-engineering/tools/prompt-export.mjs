@@ -150,7 +150,8 @@ const SECRET_PATTERNS = [
   /\bsk-(?:ant-|proj-)?[A-Za-z0-9_-]{20,}/g,
   /\bgh[pousr]_[A-Za-z0-9]{30,}/g,
   /\bgithub_pat_[A-Za-z0-9_]{20,}/g,
-  /\bglpat-[A-Za-z0-9_-]{20,}/g,
+  // A GitLab token, with the part after ".01." of the current format, also when the chat shows only its start.
+  /\bglpat-[A-Za-z0-9_.-]+/g,
   /\bxox[abprs]-[A-Za-z0-9-]{10,}/g,
   /\bAKIA[0-9A-Z]{16}\b/g,
   /\bAIza[0-9A-Za-z_-]{35}\b/g,
