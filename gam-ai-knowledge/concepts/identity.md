@@ -504,13 +504,17 @@ function countRequest(ip) -> ok | refused(retryAfterSeconds)      // registratio
 
 ```text
 reset request: Throttle.countRequest(ip) (E-3), BotCheck (E-2), validate ResetRequestInput (E-1);
-               known address: replace its reset links by a new one (identifier "reset:" + hash);
-               answer 202 Accepted; the e-mail goes out after the answer
+               answer 202 Accepted; after the answer, for a known address only: replace its reset
+               links by a new one (identifier "reset:" + hash) and send the e-mail, so neither the
+               answer nor its time tells whether the address has an account
 new password:  validate NewPasswordInput (E-1, the link stays usable);
                the link must exist and be unexpired (E-7) before the password is hashed;
+               delete every session of account-sessions:<accountId> (a failing session store
+               stops here, E-10, and the old password stays);
                one transaction: delete the link (only the request that deletes it goes on), replace
-               the hash, set emailVerified = true, delete every reset link of the account;
-               then delete every session of account-sessions:<accountId>; answer 204
+               the hash or create the credential of an account without one, set
+               emailVerified = true, delete every reset link of the account;
+               delete the sessions again (a login under way); answer 204
 ```
 
 **M1 registration order** — Traces to: IDN-F-1, IDN-F-5, IDN-F-6, IDN-F-30, IDN-F-35.
