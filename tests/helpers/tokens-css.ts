@@ -1,13 +1,6 @@
 import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-
-/** The root of the repository. */
-export const root: string = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "..",
-  "..",
-);
+import { join } from "node:path";
+import { root } from "./paths.ts";
 
 /** The token stylesheet of `@stash/ui`. */
 export const tokensCss: string = readFileSync(
