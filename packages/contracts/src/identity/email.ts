@@ -1,4 +1,5 @@
 import { z } from "../zod.ts";
+import { emailPattern, maxEmailLength } from "./email-pattern.ts";
 
 /**
  * An e-mail address (concept §8): 3 to 254 characters after trimming, lower case, one `@` with
@@ -9,8 +10,8 @@ export const emailSchema = z
   .trim()
   .toLowerCase()
   .min(3)
-  .max(254)
-  .regex(/^[^@\s]+@[^@\s]+\.[^@\s]+$/, "not an e-mail address")
+  .max(maxEmailLength)
+  .regex(emailPattern, "not an e-mail address")
   .openapi("Email", { example: "ada@example.org" });
 
 export type Email = z.infer<typeof emailSchema>;

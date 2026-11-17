@@ -1,8 +1,9 @@
 // The session store of IDN-US-2 as far as IDN-US-1 needs it: creating a session at login
 // (IDN-F-7, concept §8 "Session store keys"). Reading, renewing, and deleting sessions, the
 // session check, and logout are IDN-US-2. Only a hash of the token is kept (IDN-NF-2).
-import { createHash, randomBytes } from "node:crypto";
+import { randomBytes } from "node:crypto";
 import type { Redis } from "ioredis";
+import { hashToken } from "./token-hash.ts";
 
 export interface SessionRecord {
   accountId: string;
@@ -22,10 +23,6 @@ export interface SessionStore {
   }): Promise<{ token: string; maxAgeSeconds: number }>;
 }
 
-export function hashSessionToken(token: string): string {
-  return createHash("sha256").update(token).digest("hex");
-}
-
 export function createSessionStore(
   redis: Redis,
   config: { SESSION_TTL_DAYS: number },
@@ -34,7 +31,7 @@ export function createSessionStore(
   return {
     async create({ accountId, userId, ipAddress, userAgent, now }) {
       const token = randomBytes(32).toString("base64url");
-      const tokenHash = hashSessionToken(token);
+      const tokenHash = hashToken(token);
       const record: SessionRecord = {
         accountId,
         userId,

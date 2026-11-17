@@ -1,3 +1,5 @@
+import { emailPattern, maxEmailLength } from "./email-pattern.ts";
+
 /**
  * The configuration of the unit `identity` (`gam-ai-knowledge/concepts/identity.md` §8,
  * "Configuration of `identity`"; SCF-F-11, SCF-F-17). Same shape and signature as the
@@ -88,7 +90,7 @@ const boolean: Parse<boolean> = (value) =>
   value === "true" ? true : value === "false" ? false : undefined;
 
 const emailAddress: Parse<string> = (value) =>
-  value.length <= 254 && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)
+  value.length <= maxEmailLength && emailPattern.test(value)
     ? value
     : undefined;
 

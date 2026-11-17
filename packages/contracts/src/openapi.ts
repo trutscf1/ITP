@@ -7,6 +7,7 @@ import { healthReportSchema } from "./health.ts";
 import { acceptedSchema } from "./identity/accepted.ts";
 import { confirmQuerySchema } from "./identity/confirm-query.ts";
 import { loginInputSchema } from "./identity/login-input.ts";
+import { identityApiPath } from "./identity/paths.ts";
 import { registrationInputSchema } from "./identity/registration-input.ts";
 import { sessionInfoSchema } from "./identity/session-info.ts";
 
@@ -45,7 +46,7 @@ export function generateOpenApiDocument(
   // The endpoints of `identity` (concepts/identity.md §8), below the prefix /api/identity.
   registry.registerPath({
     method: "post",
-    path: "/api/identity/register",
+    path: identityApiPath("register"),
     summary: "Register by e-mail",
     request: {
       body: {
@@ -66,7 +67,7 @@ export function generateOpenApiDocument(
 
   registry.registerPath({
     method: "get",
-    path: "/api/identity/confirm",
+    path: identityApiPath("confirm"),
     summary: "Open the confirmation link of an e-mail",
     request: { query: confirmQuerySchema },
     responses: {
@@ -79,7 +80,7 @@ export function generateOpenApiDocument(
 
   registry.registerPath({
     method: "post",
-    path: "/api/identity/login",
+    path: identityApiPath("login"),
     summary: "Log in with e-mail address and password",
     request: {
       body: { content: { "application/json": { schema: loginInputSchema } } },
