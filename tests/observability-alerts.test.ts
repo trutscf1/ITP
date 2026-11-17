@@ -85,10 +85,12 @@ const dockerImage =
   spawnSync("docker", ["image", "inspect", prometheusImage], {
     encoding: "utf8",
   }).status === 0;
+// The pipeline job `rule-test` sets RULE_TEST_REQUIRED=1: there a missing tool fails the test.
+const ruleToolRequired = process.env.RULE_TEST_REQUIRED === "1";
 const ruleToolSkip =
-  localPromtool || dockerImage
+  localPromtool || dockerImage || ruleToolRequired
     ? false
-    : "offline rule test: neither promtool nor the pinned metric store image is available locally (OBS-T-33 runs where one of them is, §17; the pipeline job `rule-test` of #164 runs it on the pinned image)";
+    : "offline rule test: neither promtool nor the pinned metric store image is available locally (OBS-T-33 runs where one of them is, §17; the pipeline job `rule-test` runs it on the pinned image)";
 
 /**
  * The offline rule test of OBS-C-3: a local `promtool`, or the pinned image of the metric store

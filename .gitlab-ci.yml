@@ -158,6 +158,32 @@ container-scan:
         exit 1
       fi
 
+# The offline rule test of the alert rule "High error rate" (OBS-T-33, OBS-AC-2.3, #164): the job
+# `test` has neither promtool nor Docker and skips it, so this job copies promtool out of the
+# pinned image of the metric store (the image of docker-compose.yml, like Trivy in
+# `container-scan`) and runs the test file; RULE_TEST_REQUIRED turns a missing tool into a failure.
+rule-test:
+  extends: .pnpm
+  stage: test
+  cache:
+    - *pnpm-store
+  services:
+    - name: docker:29.9.2-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: /certs
+    DOCKER_TLS_VERIFY: "1"
+    DOCKER_CERT_PATH: /certs/client
+    RULE_TEST_REQUIRED: "1"
+  script:
+    - apk add --no-cache docker-cli
+    - docker create --name promtool prom/prometheus:v3.15.1
+    - docker cp promtool:/bin/promtool /usr/local/bin/promtool
+    - docker rm promtool
+    - promtool --version
+    - pnpm --filter @stash/tests exec node --test observability-alerts.test.ts
+
 # Secrets in the history of the checked-out commit (SCF-F-15, docs/security_next_js.md).
 secret-scan:
   stage: test
