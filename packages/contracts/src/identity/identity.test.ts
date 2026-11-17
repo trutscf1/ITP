@@ -68,7 +68,30 @@ describe("IDN-T-22 IDN-AC-1.1 IDN-F-1 registration input", () => {
     ["a name of spaces only", { name: "   " }, "name"],
     ["a name of 101 characters", { name: "a".repeat(101) }, "name"],
     ["the address ada@example", { email: "ada@example" }, "email"],
+    // Review of !62 (schwaigc #3): a list of addresses must never pass as one (IDN-F-1).
+    [
+      "the address a,victim@example.org",
+      { email: "a,victim@example.org" },
+      "email",
+    ],
+    ["the address a;b@example.org", { email: "a;b@example.org" }, "email"],
+    ["the address <a>@example.org", { email: "<a>@example.org" }, "email"],
+    ['the address "a"@example.org', { email: '"a"@example.org' }, "email"],
+    ["the address a@exa,mple.org", { email: "a@exa,mple.org" }, "email"],
   ];
+
+  it("IDN-T-22 IDN-F-1 accepts the usual signs of the local part", () => {
+    for (const email of [
+      "o'brien+tag@example.org",
+      "first.last-1_x@sub.example.org",
+    ]) {
+      assert.equal(
+        registrationInputSchema.safeParse({ ...valid, email }).success,
+        true,
+        email,
+      );
+    }
+  });
   for (const [title, change, field] of cases) {
     it(`IDN-T-22 IDN-AC-1.1 refuses ${title} and names the field ${field}`, () => {
       const result = registrationInputSchema.safeParse({ ...valid, ...change });

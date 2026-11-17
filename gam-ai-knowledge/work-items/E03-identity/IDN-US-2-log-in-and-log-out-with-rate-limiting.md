@@ -4,7 +4,7 @@ format: gam-ai-knowledge/1
 title: "IDN-US-2 Log in and log out with rate limiting"
 audience: [product, developer, reviewer, agent]
 id-prefix: "IDN"
-status: done
+status: in-progress
 sprint: 2
 ---
 # IDN-US-2 Log in and log out with rate limiting
@@ -33,7 +33,7 @@ One user story of [Identity: accounts, external login, MFA](epic.md) and the acc
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
 | 1 — login, logout, session check, locks (`tschudea07`) | IDN-AC-2.1, IDN-AC-2.2, IDN-AC-2.3, IDN-AC-2.5 (server), IDN-AC-2.6 | IDN-US-1 slice 1 | #46 |
-| 2 — login page, logout button, route guard (`schwaigc`) | IDN-AC-2.4, IDN-AC-2.5 (page) | slice 1 | — |
+| 2 — login page, logout button, route guard (`schwaigc`) | IDN-AC-2.2 (logout button), IDN-AC-2.3 (message), IDN-AC-2.4, IDN-AC-2.5 (page) | slice 1 | #169 |
 
 - **Story issue:** #46
 - **Weight:** 3

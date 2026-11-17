@@ -94,7 +94,8 @@ export function createMailer(
     try {
       await transport.sendMail({
         from: config.SMTP_FROM,
-        to,
+        // One address object: the transport never splits it into several recipients.
+        to: { name: "", address: to },
         subject: template.subject,
         text: template.text,
       });
