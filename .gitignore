@@ -1,6 +1,3 @@
-# local AI chat export (GAM_ENGINEERING_PROMPT_EXPORT=local): chats are not published in this public repo
-/docs/prompts/
-
 # personal Claude Code files (P-TEAM-2)
 CLAUDE.local.md
 .claude/settings.local.json

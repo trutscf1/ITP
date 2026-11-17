@@ -294,8 +294,8 @@ The secret key fragments and the secret keys are part of the contract of the pac
 | Pattern | Matches |
 | --- | --- |
 | E-mail address | one or more characters other than white space and `@`, then `@`, then one or more such characters, a `.`, and one or more such characters |
-| IPv4 address | four groups of 1 to 3 digits separated by `.`, not part of a longer run of digits and dots |
-| IPv6 address | 3 to 8 groups of 1 to 4 hexadecimal digits separated by `:` that contain `::`, or exactly 8 such groups; a time such as `10:00:00` has no `::` and fewer than 8 groups and is kept |
+| IPv4 address | four groups of 1 to 3 digits separated by `.`, not part of a longer run of digits and dots; one full stop directly after the address is not part of the run, so the address in `from 203.0.113.7.` is redacted |
+| IPv6 address | 1 to 7 groups of 1 to 4 hexadecimal digits separated by `:` that contain `::` (`fe80::1`, `::1`), or exactly 8 such groups; not directly preceded or followed by a letter, digit, underscore, or `:`, so that `std::vector` is kept; a time such as `10:00:00` has no `::` and fewer than 8 groups and is kept; an address written directly after a colon without a space (`ip:2001:db8::1`) is not redacted, because the colon before it is part of the boundary, while `client=2001:db8::1` and `[2001:db8::1]:443` are |
 
 **Operations overview** (the operations dashboard of [OBS-F-6]; every value over the 5 minutes before each point in time, all units or the unit chosen in the unit selector):
 
@@ -597,6 +597,8 @@ The slices and their issues stand in the story files (P-DOC-6); this table only 
 | OBS-US-2 | 4 — storage, queue, and silent-unit alerts, after R5 and R9 | Platform & cms | M6 (thresholds), M9 (alert rules) |
 | OBS-US-2 | 5 — login through `identity` over HTTPS, after R3 and R14 | Platform & cms | M9 (proxy header), M10 (route, session check) |
 
+Slice 1 of `OBS-US-2` stores the dashboard "Operations overview" with the three panels that carry the log link of [OBS-F-7] ("Requests per second", "Server errors", "Latency (95th percentile)"); slice 3 adds the other three panels (round 62 of the question log, A1).
+
 The metrics of [OBS-F-21] to [OBS-F-23] are emitted by modules of R5 and R9 (§15); until then their panels show "No data" and their rules are normal. Slice 1 of `OBS-US-1` depends only on R1; the slices that wait for R3, R5, R9, or R14 say so in their story file (A19).
 
 ### Module Specifications
@@ -691,8 +693,11 @@ function check(environment: map<string, string>) -> exit code
   1. For each variable of §8 "Configuration of the observability stack": missing and no default,
      or outside its valid values → one line "  <NAME>: <reason>"; never the value.
   2. If any line: print "Invalid configuration for the observability stack:" and the lines; exit 1.
-  3. Write the alert rule files from their templates in the repository, replacing the placeholders
-     of the four alert thresholds and of OBS_ALERT_SILENT_MINUTES with the values; exit 0.
+  3. Write the trace store configuration from its template, with the retention in hours, and the alert
+     rule file `alert-rules.yml` from its template `alert-rules.template.yml` in the repository,
+     replacing every placeholder (a variable name between two double underscores) with its checked value;
+     slice 2 of OBS-US-2 has the placeholders of OBS_ALERT_ERROR_RATE_PERCENT and OBS_ALERT_MIN_REQUESTS,
+     slice 4 adds those of the storage and queue thresholds and of OBS_ALERT_SILENT_MINUTES; exit 0.
 ```
 
 **M7 CollectorPipeline** — Traces to: OBS-F-2, OBS-F-29, OBS-NF-2, OBS-NF-3, OBS-NF-7, OBS-E-2. Requires: OBS-C-2.
@@ -702,6 +707,8 @@ Order for every received batch: (1) drop span attributes not in the allowed list
 **M8 Stores** — Traces to: OBS-NF-4, OBS-NF-7. Requires: OBS-C-3, OBS-C-4, OBS-C-5. Each store keeps its data in a named volume of the stack, so it survives a restart, and deletes by the retention variable of §8.
 
 **M9 DashboardProvisioning** — Traces to: OBS-F-6, OBS-F-7, OBS-F-8, OBS-F-9, OBS-F-10, OBS-F-17 to OBS-F-20, OBS-F-27, OBS-U-1 to OBS-U-4, OBS-NF-1, OBS-NF-5, OBS-NF-6, OBS-E-5, OBS-E-8. Requires: OBS-C-3, OBS-C-6. Files in the repository: three data sources (metric store, log store with a link from `traceId` to the trace store, trace store with a link to log entries by trace ID); the dashboard "Operations overview" with the panels of §8 and the links of [OBS-F-7]; the alert rule templates of §8; the settings of the dashboard tool (until TLS: anonymous read-only access on the local port; with TLS: the person taken from the header of the reverse proxy and anonymous access off; never self-registration, a login form, or a password; update checks and usage reporting off; served under `/observability`; loaded files not savable).
+
+**Form of the alert rules (M9, from slice 2 of OBS-US-2).** The rules are Prometheus rules in the template `docker/observability/alert-rules.template.yml`, in one group evaluated every 60 seconds; the metric store reads the rendered file from the volume of the configuration step at its start only, so after a change of a threshold the metric store is restarted, and the data source "Metrics" lets the dashboard tool list them read-only. "High error rate" has two recording rules, one per unit: the exact number of requests and the exact number of requests with a status code from 500 to 599 in the 5 minutes before the evaluation, each as the counter now minus the counter 5 minutes ago (a series that is new inside the window starts at 0; `increase()` would extrapolate and break the threshold of 20 requests; after a restart of a unit the count is too low, and after a gap of more than 5 minutes in its data it can be too high for one window). The alert rule has no pending period.
 
 **M10 ProfileAndRoute** — Traces to: OBS-F-5, OBS-F-16, OBS-F-24, OBS-F-27, OBS-NF-7, OBS-NF-8, OBS-E-3, OBS-E-5. Requires: OBS-C-7, [SCF-C-6], [SCF-C-7]. The example configuration names the profile in `COMPOSE_PROFILES`. Start order inside the profile: M6 → the three stores and the collector (after M6 exited with 0) → the dashboard tool (after the stores report healthy). No container of the profile publishes a host port except the dashboard tool, whose port `OBS_DASHBOARD_PORT` is bound to `127.0.0.1` until TLS exists; with TLS the port is removed, and the reverse proxy reaches the dashboard tool on the internal network after the session check of `identity` ([OBS-F-27]).
 
@@ -862,7 +869,7 @@ The values of §10 are the test data: the log entry, the redaction table, the ro
 
 ### CI Test Constraints
 
-The unit tests ([OBS-T-21] to [OBS-T-38]) and the file tests ([OBS-T-11] parsing, [OBS-T-17], [OBS-T-19]) run in the `test` job without network; the rule tests use the offline rule test of [OBS-C-3]. The stack tests — [OBS-T-1] to [OBS-T-10], [OBS-T-11] (start and save), [OBS-T-12] to [OBS-T-16], [OBS-T-18], [OBS-T-20], and [OBS-T-39] — run in one CI job `stack-test`, which starts the local stack with the observability profile, as soon as the pipeline offers a container runtime (SCF-US-5, track Identity & CI; Q39). Until then they are run locally and their result is stated in the merge request, as for R1 ([scaffolding.md](scaffolding.md) §17). [OBS-T-12] needs TLS and the operator login of `identity`, so it runs from slice 5 of `OBS-US-2` on. No test calls a service on the internet. [OBS-T-1] and [OBS-T-3] cover only the units that are runnable at the time; the criterion is met when all five are.
+The unit tests ([OBS-T-21] to [OBS-T-38]) and the file tests ([OBS-T-11] parsing, [OBS-T-17], [OBS-T-19]) run in the `test` job without network; the rule tests use the offline rule test of [OBS-C-3], which needs `promtool` or Docker, so the job `test` skips them with a written reason until the job `rule-test` (issue #164) runs them on the pinned image of the metric store. The stack tests — [OBS-T-1] to [OBS-T-10], [OBS-T-11] (start and save), [OBS-T-12] to [OBS-T-16], [OBS-T-18], [OBS-T-20], and [OBS-T-39] — run in one CI job `stack-test`, which starts the local stack with the observability profile, as soon as the pipeline offers a container runtime (SCF-US-5, track Identity & CI; Q39). Until then they are run locally and their result is stated in the merge request, as for R1 ([scaffolding.md](scaffolding.md) §17). [OBS-T-12] needs TLS and the operator login of `identity`, so it runs from slice 5 of `OBS-US-2` on. No test calls a service on the internet. [OBS-T-1] and [OBS-T-3] cover only the units that are runnable at the time; the criterion is met when all five are.
 
 ### Test Coverage Matrix & Untested Justifications
 
