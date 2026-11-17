@@ -24,12 +24,12 @@
   },
   "devDependencies": {
     "@stash/config": "workspace:*",
-    "@types/mailparser": "^3.9.0",
-    "@types/node": "^24",
+    "@types/mailparser": "3.9.0",
+    "@types/node": "24.19.1",
     "@types/nodemailer": "8.0.2",
     "@types/pg": "8.20.4",
     "@types/smtp-server": "3.5.13",
-    "mailparser": "^3.14.3",
+    "mailparser": "3.14.3",
     "smtp-server": "3.21.4"
   }
 }
