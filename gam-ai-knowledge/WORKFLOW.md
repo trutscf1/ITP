@@ -70,6 +70,8 @@ Where `docs/` and a profile decision disagree, `docs/` wins.
 | P-GIT-2 (`concept/…` branches need no issue) | Every `concept/…` branch has a `type::concept` issue. | School requirement: every change starts with an issue (§3). |
 | P-GIT-8 (no AI attribution by default) | Commits carry the `Co-Authored-By` trailer and MR descriptions the *Generated with Claude Code* line; `.claude/settings.json` has no `attribution` key, so Claude Code adds them. | Developer decision on 2026-11-10 (Q11, migration MR !52): the project has credited the AI in its commits from the start, and the AI share of the work stays visible. |
 | P-TIME-1 (AI agents never book time) | An agent may post a time entry (`/spend`) for a developer, but only after that developer has confirmed the entry. At the end of each issue the agent proposes duration and activity; the developer answers yes or names another duration; only then does the agent post it. The time is the developer's own working time, never the agent's, and the agent never books on its own initiative. | The school only requires that time is recorded (`docs/anforderungen_software_projekte.md` §6) and does not say who posts it, so `docs/` does not override P-TIME-1; this is a project decision. The developer stays responsible for the entry, and each entry is at most 50 minutes. |
+| P-TRK-4 (Premium: the epic is a group epic) | The epics #88 to #100 are issues labelled `type::epic`; their stories link to them by `Part of` and a task list. | The agent's token has no membership in the group, and promoting an issue to a group epic needs one (inbox). They become group epics as soon as someone with group rights promotes them. Decision of 2026-11-10. |
+| Issue format of `gam-delivery` `tickets` (weight only, no time estimate) | A story also gets a time estimate (`/estimate`); 1 weight point is 0.75 h (`ROADMAP.md`, "Capacity"). Time is booked per work session (P-TIME-1). | `docs/git_workflow_commands.md` (`/estimate`) and the hours per person that the final presentation must show; `docs/` wins. Decision of 2026-11-10. |
 
 ## Deviations from the project proposal
 
@@ -88,7 +90,7 @@ Every change starts with an issue (§3). Each issue has: description, acceptance
 
 | Label | Meaning |
 | --- | --- |
-| `type::epic` | Epic issue — a group epic here — parent of the epic's story issues (`work-items/E<nn>-<feature>/epic.md`, P-DOC-6, P-TRK-4); renamed from `type::feature` on 2026-11-10 |
+| `type::epic` | Epic issue — an issue here, see the deviation from P-TRK-4 — parent of the epic's story issues (`work-items/E<nn>-<feature>/epic.md`, P-DOC-6, P-TRK-4); renamed from `type::feature` on 2026-11-10 |
 | `type::story` | User story issue (`US-n`), child of its feature issue; slice issues are children of their story |
 | `type::bug` | Defect against an existing requirement |
 | `type::concept` | Tracking issue for concept authoring on a `concept/…` branch, one per roadmap feature |
