@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
+  contentGroupDataSchema,
   contentLanguages,
   legalKinds,
   legalTemplate,
@@ -112,5 +113,37 @@ describe("PUB-AC-1.5 Seed content: the legal templates of the shared contracts",
         );
       }
     }
+  });
+});
+
+describe("PUB-AC-1.2 Content types: the shapes of the content interface", () => {
+  it("PUB-AC-1.2 PUB-F-5 accepts a legal group that holds only the published languages and refuses a language outside the two", () => {
+    const empty = {
+      landingSections: [],
+      images: [],
+      helpCategories: [],
+      helpArticles: [],
+      changelogEntries: [],
+    };
+    const legalPage = {
+      id: "0b5c8f56-6a39-4d3e-9c62-0f4f6f0d2b11",
+      kind: "privacy",
+      text: { de: { title: "Datenschutz", body: "Text" } },
+    };
+    assert.ok(
+      contentGroupDataSchema.safeParse({
+        ...empty,
+        group: "legal",
+        legalPages: [legalPage],
+      }).success,
+    );
+    const french = { ...legalPage, text: { fr: { title: "x", body: "y" } } };
+    assert.ok(
+      !contentGroupDataSchema.safeParse({
+        ...empty,
+        group: "legal",
+        legalPages: [french],
+      }).success,
+    );
   });
 });

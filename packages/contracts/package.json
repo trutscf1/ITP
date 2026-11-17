@@ -10,6 +10,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./cms": {
+      "types": "./dist/cms/index.d.ts",
+      "default": "./dist/cms/index.js"
+    },
     "./web": {
       "types": "./dist/web/config.d.ts",
       "default": "./dist/web/config.js"
