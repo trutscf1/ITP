@@ -21,7 +21,7 @@ The parent work item of this epic: its user stories in the order they are built,
 
 In dependency order; each file holds the story, its acceptance criteria, and its slices.
 
-1. [STO-US-1 Connect the storage backend to SeaweedFS](STO-US-1-connect-the-storage-backend-to-seaweedfs.md)
+1. [STO-US-1 Connect the storage backend to the object storage](STO-US-1-connect-the-storage-backend-to-the-object-storage.md)
 2. [STO-US-2 Upload files](STO-US-2-upload-files.md)
 3. [STO-US-3 Chunked upload with resume](STO-US-3-chunked-upload-with-resume.md)
 4. [STO-US-4 Deduplication by file hash](STO-US-4-deduplication-by-file-hash.md)
