@@ -1638,6 +1638,26 @@ Answer: "Fix mine, issue for web (Recommended)".
 
 Issue #157 created for `trutscf1` (Sprint 2, weight 2): fix the `web` image and the Prisma CLI findings; the exceptions expire on 2026-11-23.
 
+## Round 64 — 2026-11-03 — Review of the merge requests of `tschudea07`, Sprint 2, time booking (`trutscf1` (agent))
+
+Instruction of `trutscf1`, verbatim: "reviewe die merge requests von tschudea; arbeite die issues von mir von sprint 2 alle ab mit /grill-me und /engineering-human"
+
+**Q283 - Review !41 veröffentlichen:** Alle 4 Punkte aus dem 2. Durchgang sind erledigt, Pipeline `d7c2bf81` grün, kein Approval. Wie soll der 3. Durchgang auf !41 veröffentlicht werden?
+
+Answer: "Kommentar + Approve (Recommended)". Posted as a note on !41 and approved on GitLab; the merge is left to the merge policy (P-MR-4).
+
+**Q284 - Umfang Sprint 2:** Welche der neun offenen Sprint-2-Issues von `trutscf1` sollen abgearbeitet werden?
+
+Answer: "Alle OBS-Issues (Recommended)": #82 with #154 and #155, then #83 with #156, in dependency order; #151 (human task) and #152 (backlog, low) stay out.
+
+**Q285 - Stack-Test #82:** Der Docker-Daemon lief nicht; der Stack-Test (`STACK_TEST=1`) von #82 konnte nicht laufen. Wie weiter?
+
+Answer: "Ich starte Docker Desktop (Recommended)". Docker Desktop was started by `trutscf1` ("docker desktop ist nun auch gestartet, mache weiter").
+
+**A1 - Zeitbuchung durch den Agenten:** `docs/` (`anforderungen_software_projekte.md` §6, `git_workflow_commands.md` §9) requires time tracking but does not say who posts it, so it does not override P-TIME-1. `trutscf1` decided, verbatim: "schreibe den eintrag: du gibst mir am ende jedes issues deinen vorschlag, dann sage ich ja oder andere zeit, dann trägst du sie für mich ein". Recorded as a deviation from P-TIME-1 in `WORKFLOW.md`; it takes effect when this branch is merged into `dev`, so until then the agent books nothing.
+
+The numbers Q283 to Q285 are provisional until merged (P-TEAM-5).
+
 ## Round 65 — 2026-11-03 — Slice 1 dashboards (#83) (trutscf1 (agent))
 
 Instruction of `trutscf1`, verbatim (coordinator): implement #83, slice 1 of OBS-US-2 ("dashboard tool on the server itself, stored files, and links"), on top of the open !44; build no alert rule (slice 2, #156). The agent could not ask questions; each gap is closed with a default (P-GRILL-4).
@@ -1684,7 +1704,27 @@ Instruction of `trutscf1`, verbatim (coordinator): implement #156, slice 2 of OB
 
 The numbers Q320 to Q322 are provisional until merged (P-TEAM-5).
 
-## Round 68 — 2026-11-03 — Slice 2 telemetry package (#154) (trutscf1 (agent))
+## Round 68 — 2026-11-10 — Accessibility modes, slice 1 (`schwaigc` (agent))
+
+Instruction, verbatim: "ja starte #71 mit dem skill gam enginieering implement". Gate before the first change: the concept `design-system.md` is an ungrilled draft without §16, the story of weight 5 was not cut into slices, and DSA-AC-2.4 needs a profile store that does not exist yet (#112 waits for #46). The pop-ups were asked as Q277 to Q280; they are logged as Q340 to Q343 because open branches already use Q277 to Q331 and rounds 59 to 65.
+
+**Q340 - Umfang #71:** Wie soll DSA-US-2 (Accessibility modes) umgesetzt werden, obwohl das Konzept ein Entwurf ist, die Story noch nicht in Slices geschnitten ist und die Profilspeicherung (DSA-AC-2.4) noch fehlt?
+
+Answer: "Slices schneiden + Slice 1 (Recommended)".
+
+**Q341 - Flow:** In .claude/settings.json ist kein GAM_ENGINEERING_FLOW gesetzt. Welcher Ablauf gilt für dieses Projekt?
+
+Answer: "full (Recommended)".
+
+**Q342 - Veröffentlichen #71:** Branch feature/71-accessibility-modes pushen, MR nach dev öffnen (Titel „DSA-US-2 Accessibility modes, slice 1: modes in the browser“, Beschreibung nach Template inkl. Testtabelle und Merge danger), #71 auf status::review setzen und das Child-Issue „DSA-US-2 slice 2: Accessibility settings in the profile“ anlegen (Part of #71, DSA-AC-2.4, blockiert durch #46 und #112, Sprint 5, Weight 2, dir zugewiesen, status::backlog)?
+
+Answer: "Alles veröffentlichen (Recommended)". The child issue is #161.
+
+**Q343 - Issue #71 beim Merge:** Laut Slice-Tabelle liefert #71 Slice 1, die Story DSA-US-2 ist aber erst mit Slice 2 fertig. Soll der MR #71 schließen?
+
+Answer: "Closes #71 (Recommended)".
+
+## Round 70 — 2026-11-03 — Slice 2 telemetry package (#154) (trutscf1 (agent))
 
 Instruction of `trutscf1`, summarised: implement issue #154 (`OBS-US-1` slice 2, the shared package `telemetry`, modules M1 to M5 of `concepts/observability.md` §16) with `/engineering-human implement`. The agent could not ask pop-ups in this session; where the documents left a gap with a cheap default, it states an assumption (P-GRILL-4). `trutscf1` rejects an assumption by answering it in the review of the merge request.
 

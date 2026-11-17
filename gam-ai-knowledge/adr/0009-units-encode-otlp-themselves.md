@@ -17,7 +17,7 @@ Every unit reports metrics, log entries, and spans to the collector through the 
 
 ## Context
 
-The project proposal names observability through OpenTelemetry, and `STACK.md` section 1 left the choice of the instrumentation library "to be confirmed in slice 2". Slice 2 of OBS-US-1 (#154) builds the package. The assumption A1 of round 68 chose own code, and the review of !48 asked for a record of that choice, because it replaces the library that was planned and commits the team to maintain code.
+The project proposal names observability through OpenTelemetry, and `STACK.md` section 1 left the choice of the instrumentation library "to be confirmed in slice 2". Slice 2 of OBS-US-1 (#154) builds the package. The assumption A1 of round 70 chose own code, and the review of !48 asked for a record of that choice, because it replaces the library that was planned and commits the team to maintain code.
 
 ## Decision
 
