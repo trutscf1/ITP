@@ -19,7 +19,7 @@ The story files are the source: their `status` and `sprint` fields decide what s
 | 5 | [IDN-US-3 Log in with OAuth2 (GitHub, Google, Microsoft)](E03-identity/IDN-US-3-log-in-with-oauth2-github-google-microsoft.md) | E03 Identity: accounts, external login, MFA | backlog | 3 | 3 | #47 |
 | 6 | [IDN-US-4 Two-factor authentication with TOTP](E03-identity/IDN-US-4-two-factor-authentication-with-totp.md) | E03 Identity: accounts, external login, MFA | backlog | 3 | 3 | #48 |
 | 7 | [IDN-US-5 Log in with passkeys (WebAuthn)](E03-identity/IDN-US-5-log-in-with-passkeys-webauthn.md) | E03 Identity: accounts, external login, MFA | backlog | 3 | 3 | #49 |
-| 8 | [IDN-US-6 Reset the password](E03-identity/IDN-US-6-reset-the-password.md) | E03 Identity: accounts, external login, MFA | ready | 2 | 2 | #50 |
+| 8 | [IDN-US-6 Reset the password](E03-identity/IDN-US-6-reset-the-password.md) | E03 Identity: accounts, external login, MFA | in-progress | 2 | 2 | #50 |
 | 9 | [IDN-US-7 Operator role and session check](E03-identity/IDN-US-7-operator-role-and-session-check.md) | E03 Identity: accounts, external login, MFA | backlog | — | 2 | — |
 | 10 | [IDN-US-8 Delete my account](E03-identity/IDN-US-8-delete-my-account.md) | E03 Identity: accounts, external login, MFA | backlog | — | 3 | — |
 | 11 | [DSA-US-2 Accessibility modes](E04-design-system/DSA-US-2-accessibility-modes.md) | E04 Design system & accessibility modes | in-progress | 2 | 5 | #71 |
