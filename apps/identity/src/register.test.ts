@@ -10,7 +10,9 @@ import {
   address,
   botCheckStub,
   confirmationToken,
+  connectionFrom,
   password,
+  proxyAddress,
   type Running,
   randomIp,
   registration,
@@ -68,14 +70,18 @@ describe("IDN-US-1 register by e-mail", { skip }, () => {
 
     it("IDN-T-1 IDN-AC-1.1 refuses a body that is not JSON and one that is not an object", async () => {
       for (const body of ["{not json", "[]", "null"]) {
-        const response = await running.identity.app.request("/register", {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-            "x-forwarded-for": randomIp(),
+        const response = await running.identity.app.request(
+          "/register",
+          {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+              "x-forwarded-for": randomIp(),
+            },
+            body,
           },
-          body,
-        });
+          connectionFrom(proxyAddress),
+        );
         assert.equal(response.status, 400, body);
         assert.equal(
           ((await response.json()) as { code: string }).code,

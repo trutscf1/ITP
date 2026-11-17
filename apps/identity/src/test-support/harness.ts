@@ -15,6 +15,11 @@ export const password = "Drei-blaue-Wolken-7";
 /** The address of the reverse proxy in the tests (TRUSTED_PROXY, Q352). */
 export const proxyAddress = "192.0.2.1";
 
+/** A connection as @hono/node-server describes it, so the app sees the peer (Q352). */
+export function connectionFrom(peer: string) {
+  return { incoming: { socket: { remoteAddress: peer } } };
+}
+
 export interface Stack {
   database: TestDatabase;
   smtp: SmtpStub;
@@ -119,12 +124,7 @@ export async function startIdentity(
       headers["accept-language"] = requestOptions.language;
     if (requestOptions.cookie) headers.cookie = requestOptions.cookie;
     const started = performance.now();
-    // The connection as @hono/node-server describes it, so the app sees the peer (Q352).
-    const connection = {
-      incoming: {
-        socket: { remoteAddress: requestOptions.peer ?? proxyAddress },
-      },
-    };
+    const connection = connectionFrom(requestOptions.peer ?? proxyAddress);
     const response = await identity.app.request(
       path,
       {
