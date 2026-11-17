@@ -371,7 +371,7 @@ Character classes: lower-case letters, upper-case letters, digits, everything el
 
 ## 13. Resolved Questions & ADRs
 
-Verbatim rounds: [identity.qa-log.md](identity.qa-log.md). ADR: [ADR-0007](../adr/0007-session-check-through-identity.md) (session check through `identity`, Q9), which closes the question ADR-0001 left to R3.
+Verbatim rounds: [identity.qa-log.md](identity.qa-log.md). ADRs: [ADR-0007](../adr/0007-session-check-through-identity.md) (session check through `identity`, Q9), which closes the question ADR-0001 left to R3; [ADR-0009](../adr/0009-better-auth-as-library-behind-own-endpoints.md) (the authentication library behind the own endpoints of §8, Q342 of 2026-11-17).
 
 | Q | Title | Decision | Rationale |
 | --- | --- | --- | --- |
