@@ -8,6 +8,7 @@ import { createApp, type Probes } from "./app.ts";
 import { createAuthCore } from "./auth-core.ts";
 import { type BotCheck, createBotCheck } from "./bot-check.ts";
 import { createCleanup } from "./cleanup.ts";
+import { createClientAddress } from "./client-ip.ts";
 import { createLogger, type Logger } from "./logger.ts";
 import { createMailer, type Mailer } from "./mailer.ts";
 import { createSessionStore } from "./sessions.ts";
@@ -70,6 +71,10 @@ export async function createIdentity(
     afterAnswer,
     logger,
     clock,
+    clientAddress: createClientAddress(config.TRUSTED_PROXY, {
+      onResolveError: (error) =>
+        logger.error("TRUSTED_PROXY does not resolve", { error }),
+    }),
     probes: {
       database: options.probes?.database ?? (() => auth.checkDatabase()),
       sessionStore:
