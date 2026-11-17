@@ -23,8 +23,9 @@ One user story of [Offline mode: installable web app with sync and conflict hand
 | --- | --- | --- | --- | --- |
 | OFF-AC-1.1 | Manifest | The web client | A browser reads the web app manifest | It holds name, icons, and theme colour |
 | OFF-AC-1.2 | Start without network | An installed app whose service worker cached the app shell | A member starts it without a network | The app starts |
-| OFF-AC-1.3 | Installation | A member | They install the app in Chrome or Edge, or through "Add to Home Screen" on iOS | The installation works |
+| OFF-AC-1.3 | Installation | A member | They install the app in Chrome or Edge | The installation works |
 | OFF-AC-1.4 | Offline status | A member whose device is offline | They look at the interface | The offline status is shown |
+| OFF-AC-1.5 | Installation on iOS | A member with an iPhone or iPad | They add the app to the Home Screen | The app opens in its own window with its name and icon; checked by hand once a device is available (best effort, concept Q338) |
 
 ## Slices
 
@@ -32,7 +33,7 @@ The vertical slices that deliver this story. One slice is delivered by the story
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
-| 1 — whole story | OFF-AC-1.1, OFF-AC-1.2, OFF-AC-1.3, OFF-AC-1.4 | — | #75 |
+| 1 — whole story | OFF-AC-1.1, OFF-AC-1.2, OFF-AC-1.3, OFF-AC-1.4, OFF-AC-1.5 | — | #75 |
 
 - **Story issue:** #75
 - **Weight:** 3

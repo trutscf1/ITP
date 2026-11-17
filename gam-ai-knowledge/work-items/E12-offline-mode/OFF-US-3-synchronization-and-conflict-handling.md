@@ -23,8 +23,10 @@ One user story of [Offline mode: installable web app with sync and conflict hand
 | --- | --- | --- | --- | --- |
 | OFF-AC-3.1 | Queue | A member who is offline | They rename, move, delete, or upload | The action is put into a queue |
 | OFF-AC-3.2 | Automatic sync | Queued actions | The connection returns | They are synchronized automatically and the progress is visible |
-| OFF-AC-3.3 | Conflicts | A file changed on the server in the meantime | The member's queued change is synchronized | The conflict is detected and the member chooses their own version, the server version, or keep both |
+| OFF-AC-3.3 | Conflicts | A file whose content, name, location, or existence changed on the server in the meantime, or an upload whose name now exists in the folder | The member's queued change is synchronized | The conflict is detected and the member chooses their own version, the server version, or keep both; "keep both" is preselected |
 | OFF-AC-3.4 | No data loss | The documented test scenarios | They are run | No data is lost |
+| OFF-AC-3.5 | File removed on the server | A file marked for offline that another member deleted on the server | The device synchronizes | The offline copy is removed and the member sees a notice; a change of the member to that file is a conflict |
+| OFF-AC-3.6 | Rejected actions stay visible | A queued action the server refuses, for example because the member lost the permission | The device synchronizes | The action stays in the queue marked as rejected with its reason and is never dropped silently |
 
 ## Slices
 
@@ -32,8 +34,10 @@ The vertical slices that deliver this story. One slice is delivered by the story
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
-| 1 — whole story | OFF-AC-3.1, OFF-AC-3.2, OFF-AC-3.3, OFF-AC-3.4 | — | #77 |
+| 1 — queue and automatic synchronization (`trutscf1`) | OFF-AC-3.1, OFF-AC-3.2, OFF-AC-3.6 | OFF-US-2 slice 1 | #77 |
+| 2 — conflicts and removed files (`trutscf1`) | OFF-AC-3.3, OFF-AC-3.5 | slice 1 | — |
+| 3 — no-data-loss scenarios (`trutscf1`) | OFF-AC-3.4 | slice 2 | — |
 
 - **Story issue:** #77
-- **Weight:** 8
+- **Weight:** 8 (slice 1: 3, slice 2: 3, slice 3: 2)
 - **Depends on:** OFF-US-2 (Make files available offline, #76)
