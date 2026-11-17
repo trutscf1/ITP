@@ -4,6 +4,11 @@ import {
 } from "@asteasolutions/zod-to-openapi";
 import { errorResponseSchema } from "./errors.ts";
 import { healthReportSchema } from "./health.ts";
+import { acceptedSchema } from "./identity/accepted.ts";
+import { confirmQuerySchema } from "./identity/confirm-query.ts";
+import { loginInputSchema } from "./identity/login-input.ts";
+import { registrationInputSchema } from "./identity/registration-input.ts";
+import { sessionInfoSchema } from "./identity/session-info.ts";
 
 /** The generated OpenAPI 3.1 description. */
 export type OpenApiDocument = ReturnType<
@@ -29,6 +34,64 @@ export function generateOpenApiDocument(
         description: "The check failed",
         content: { "application/json": { schema: errorResponseSchema } },
       },
+    },
+  });
+
+  const error = (description: string) => ({
+    description,
+    content: { "application/json": { schema: errorResponseSchema } },
+  });
+
+  // The endpoints of `identity` (concepts/identity.md §8), below the prefix /api/identity.
+  registry.registerPath({
+    method: "post",
+    path: "/api/identity/register",
+    summary: "Register by e-mail",
+    request: {
+      body: {
+        content: { "application/json": { schema: registrationInputSchema } },
+      },
+    },
+    responses: {
+      202: {
+        description:
+          "Always, for a valid registration: check the mailbox (IDN-F-6)",
+        content: { "application/json": { schema: acceptedSchema } },
+      },
+      400: error("Invalid input or failed bot check"),
+      403: error("The registration is closed"),
+      429: error("Too many requests from this address"),
+    },
+  });
+
+  registry.registerPath({
+    method: "get",
+    path: "/api/identity/confirm",
+    summary: "Open the confirmation link of an e-mail",
+    request: { query: confirmQuerySchema },
+    responses: {
+      303: {
+        description:
+          "To /login?confirmed=1, or to /link-invalid?kind=confirm for an invalid link",
+      },
+    },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/identity/login",
+    summary: "Log in with e-mail address and password",
+    request: {
+      body: { content: { "application/json": { schema: loginInputSchema } } },
+    },
+    responses: {
+      200: {
+        description: "The member; the session cookie is set",
+        content: { "application/json": { schema: sessionInfoSchema } },
+      },
+      400: error("Invalid input"),
+      401: error("Wrong e-mail address or password"),
+      403: error("The e-mail address is not confirmed"),
     },
   });
 
