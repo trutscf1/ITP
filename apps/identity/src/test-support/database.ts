@@ -25,6 +25,11 @@ export const skip: string | false = !adminUrl
     ? "TEST_REDIS_URL is not set"
     : false;
 
+/** The `skip` option of a `describe` that needs only the Redis. */
+export const skipRedis: string | false = !redisUrl
+  ? "TEST_REDIS_URL is not set"
+  : false;
+
 const prismaCli = join(
   dirname(
     createRequire(join(dbPackage, "package.json")).resolve(
