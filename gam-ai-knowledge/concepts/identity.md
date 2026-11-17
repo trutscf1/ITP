@@ -292,7 +292,7 @@ Character classes: lower-case letters, upper-case letters, digits, everything el
 | `CAPTCHA_SITE_KEY`, `CAPTCHA_SECRET_KEY` | non-empty when `CAPTCHA_ENABLED=true` | — |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_FROM` | host, 1..65535, e-mail address | `mailpit`, `1025`, `no-reply@stash.local` |
 | `SESSION_CHECK_TIMEOUT_MS` | 100..5000 (also read by `web` and `storage`) | `1000` |
-| `TRUSTED_PROXY` | host name or IP address of the reverse proxy (Q352); set to `proxy` in `docker-compose.yml`, not in `.env.example` | `proxy` |
+| `TRUSTED_PROXY` | host name or IP address of the reverse proxy (Q352); fixed to `proxy` in `docker-compose.yml`, a commented default in `.env.example` | `proxy` |
 
 **Message texts (German).** IDN-U-3: „Prüfe dein Postfach. Wenn die Adresse verwendet werden kann, haben wir dir eine E-Mail geschickt.“ IDN-U-4: „E-Mail-Adresse oder Passwort ist falsch.“, „Bitte bestätige zuerst deine E-Mail-Adresse. Wir haben dir einen neuen Link geschickt.“, „Zu viele Versuche. Versuche es in 15 Minuten wieder oder setze dein Passwort zurück.“ IDN-U-5: „Dein Passwort wurde geändert. Bitte melde dich neu an.“ IDN-U-6: „Die Registrierung ist geschlossen. Frag den Betreiber dieser Installation nach einem Konto.“ IDN-U-7: „Dieser Link ist ungültig oder abgelaufen.“
 
