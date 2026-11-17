@@ -50,7 +50,8 @@ describe("IDN-F-5 IDN-E-2 bot check against the provider", () => {
     // The check posts to the real address; the test redirects that one address to the stand-in.
     const fetchStub: typeof fetch = (input, init) => {
       assert.equal(String(input), siteverifyUrl);
-      return fetch(`http://127.0.0.1:${port}/siteverify`, init);
+      // Only the local stand-in of this test is called, never an address from input.
+      return fetch(`http://127.0.0.1:${port}/siteverify`, init); // nosemgrep: nextjs-ssrf-fetch
     };
     return { seen, fetch: fetchStub };
   }
