@@ -17,7 +17,7 @@ Positions live in one STATUS file per developer (P-TEAM-3). This index only says
 | Scaffolding & shared contracts (R1) | trutscf1 | 7, implement | [team/trutscf1/STATUS.md](team/trutscf1/STATUS.md) |
 | Observability baseline (R2) | trutscf1 | 7, implement | [team/trutscf1/STATUS.md](team/trutscf1/STATUS.md) |
 | Identity: accounts, external login, MFA (R3) | tschudea07 | 1, grill (draft from the tracker issues) | [team/tschudea07/STATUS.md](team/tschudea07/STATUS.md) |
-| Design system & accessibility modes (R4) | schwaigc | 4, review gate (grilled 2026-11-17, Q377–Q401; concept MR of #116 open) | [team/schwaigc/STATUS.md](team/schwaigc/STATUS.md) |
+| Design system & accessibility modes (R4) | schwaigc | 4, review gate (grilled 2026-11-17, Q377–Q401; concept MR !65 of #116 open) | [team/schwaigc/STATUS.md](team/schwaigc/STATUS.md) |
 | Storage core: folders, resumable upload, deduplication (R5) | schauby1 | 1, grill (draft from the tracker issues) | [team/schauby1/STATUS.md](team/schauby1/STATUS.md) |
 | Web client: dashboard, file browser, preview (R6) | schwaigc | 1, grill (draft from the tracker issues) | [team/schwaigc/STATUS.md](team/schwaigc/STATUS.md) |
 | Teams, roles, inherited permissions, quotas, audit log (R7) | tschudea07 | 1, grill (draft from the tracker issues) | [team/tschudea07/STATUS.md](team/tschudea07/STATUS.md) |
