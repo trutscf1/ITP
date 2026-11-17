@@ -6,6 +6,7 @@ import { type IdentityConfig, loadIdentityConfig } from "@stash/contracts";
 import type { BotCheck } from "../bot-check.ts";
 import { createIdentity, type Identity } from "../identity.ts";
 import { createLogger } from "../logger.ts";
+import type { Mailer } from "../mailer.ts";
 import { createTestDatabase, redisUrl, type TestDatabase } from "./database.ts";
 import { type SmtpStub, startSmtpStub } from "./smtp-stub.ts";
 
@@ -42,6 +43,8 @@ export interface Reply {
   headers: Headers;
   /** The parsed JSON body, or undefined for an empty one. */
   body: Record<string, unknown> | undefined;
+  /** Milliseconds from the request to its answer (the answer, not what runs after it). */
+  elapsedMs: number;
 }
 
 export interface RequestOptions {
@@ -65,6 +68,7 @@ export interface StartOptions {
   env?: Record<string, string>;
   clock?: () => Date;
   botCheck?: BotCheck;
+  mailer?: Mailer;
   probes?: Parameters<typeof createIdentity>[0]["probes"];
 }
 
@@ -90,6 +94,7 @@ export async function startIdentity(
     config: loaded.config,
     clock: options.clock,
     botCheck: options.botCheck,
+    mailer: options.mailer,
     probes: options.probes,
     logger: createLogger((line: string) => logs.push(line)),
   });
@@ -107,12 +112,14 @@ export async function startIdentity(
     if (requestOptions.language)
       headers["accept-language"] = requestOptions.language;
     if (requestOptions.cookie) headers.cookie = requestOptions.cookie;
+    const started = performance.now();
     const response = await identity.app.request(path, {
       method,
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),
       redirect: "manual",
     });
+    const elapsedMs = performance.now() - started;
     const text = await response.text();
     let parsed: Record<string, unknown> | undefined;
     try {
@@ -120,7 +127,12 @@ export async function startIdentity(
     } catch {
       parsed = undefined;
     }
-    return { status: response.status, headers: response.headers, body: parsed };
+    return {
+      status: response.status,
+      headers: response.headers,
+      body: parsed,
+      elapsedMs,
+    };
   }
 
   const running: Running = {

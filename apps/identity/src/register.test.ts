@@ -4,6 +4,7 @@
 import assert from "node:assert/strict";
 import { after, before, describe, it } from "node:test";
 import { registrationInputSchema } from "@stash/contracts";
+import type { Mailer } from "./mailer.ts";
 import { skip } from "./test-support/database.ts";
 import {
   address,
@@ -297,6 +298,164 @@ describe("IDN-US-1 register by e-mail", { skip }, () => {
     });
   });
 
+  describe("IDN-F-38 IDN-T-26 language of the e-mail over HTTP", () => {
+    it("IDN-F-38 sends the confirmation in English for Accept-Language en-GB,de;q=0.5 and in German for fr", async () => {
+      const english = address("en");
+      const german = address("fr");
+      const en = await running.post("/register", registration(english), {
+        language: "en-GB,de;q=0.5",
+      });
+      const fr = await running.post("/register", registration(german), {
+        language: "fr",
+      });
+      assert.equal(en.status, 202);
+      assert.equal(fr.status, 202);
+      assert.equal(
+        stack.smtp.to(english)[0]?.subject,
+        "Confirm your e-mail address for stash",
+      );
+      assert.equal(
+        stack.smtp.to(german)[0]?.subject,
+        "Bestätige deine E-Mail-Adresse für stash",
+      );
+    });
+  });
+
+  describe("IDN-F-6 IDN-E-11 the answer does not wait for the e-mail and does not tell the state of the address", () => {
+    it("IDN-F-6 IDN-E-11 answers 202 while the SMTP host has not taken the e-mail yet, and sends it afterwards", async () => {
+      let release: () => void = () => {};
+      const gate = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      const handed: string[] = [];
+      const slow: Mailer = {
+        async sendConfirmation({ to }) {
+          await gate;
+          handed.push(to);
+          return true;
+        },
+        async sendNotice({ to }) {
+          await gate;
+          handed.push(to);
+          return true;
+        },
+        async sendReset({ to }) {
+          await gate;
+          handed.push(to);
+          return true;
+        },
+      };
+      const email = address("slow");
+      const instance = await startIdentity(stack, { mailer: slow });
+      try {
+        const answered = await Promise.race([
+          instance.post("/register", registration(email)),
+          new Promise<"waited">((resolve) =>
+            setTimeout(() => resolve("waited"), 3000),
+          ),
+        ]);
+        assert.notEqual(answered, "waited", "the answer waited for the e-mail");
+        assert.equal((answered as { status: number }).status, 202);
+        assert.deepEqual(handed, []);
+      } finally {
+        release();
+      }
+      for (let tries = 0; handed.length === 0 && tries < 100; tries += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 20));
+      }
+      assert.deepEqual(handed, [email]);
+      await instance.close();
+    });
+
+    it("IDN-F-6 answers a new, an unconfirmed, and a confirmed address in comparable time (median difference below 50 ms)", async () => {
+      const median = (values: number[]) =>
+        [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)] ?? 0;
+      const confirmed = address("known");
+      await running.post("/register", registration(confirmed));
+      await running.get(
+        `/confirm?token=${confirmationToken(stack.smtp.to(confirmed)[0]?.text ?? "")}`,
+      );
+      const pending = address("pending");
+      await running.post("/register", registration(pending));
+
+      const times = {
+        fresh: [] as number[],
+        pending: [] as number[],
+        known: [] as number[],
+      };
+      for (let round = 0; round < 15; round += 1) {
+        times.fresh.push(
+          (await running.post("/register", registration(address("fresh"))))
+            .elapsedMs,
+        );
+        times.pending.push(
+          (await running.post("/register", registration(pending))).elapsedMs,
+        );
+        times.known.push(
+          (await running.post("/register", registration(confirmed))).elapsedMs,
+        );
+      }
+      const [fresh, unconfirmed, known] = [
+        median(times.fresh),
+        median(times.pending),
+        median(times.known),
+      ];
+      for (const [name, a, b] of [
+        ["new and unconfirmed", fresh, unconfirmed],
+        ["new and confirmed", fresh, known],
+        ["unconfirmed and confirmed", unconfirmed, known],
+      ] as const) {
+        assert.ok(
+          Math.abs(a - b) < 50,
+          `${name}: ${a.toFixed(1)} ms against ${b.toFixed(1)} ms`,
+        );
+      }
+    });
+  });
+
+  describe("IDN-E-1 SCF-F-21 body size limit", () => {
+    it("IDN-E-1 answers 400 validation-failed for a registration body above 16 KiB and still accepts one below it", async () => {
+      const big = await running.post(
+        "/register",
+        registration(address(), { padding: "x".repeat(17 * 1024) }),
+      );
+      assert.equal(big.status, 400);
+      assert.deepEqual(big.body, {
+        code: "validation-failed",
+        message: "The request body is not valid.",
+      });
+      const small = await running.post(
+        "/register",
+        registration(address(), { padding: "x".repeat(8 * 1024) }),
+      );
+      assert.equal(small.status, 202);
+    });
+
+    it("IDN-E-1 answers 400 validation-failed for a login body above 16 KiB and stores nothing for an oversized registration", async () => {
+      const login = await running.post("/login", {
+        email: address(),
+        password,
+        padding: "x".repeat(17 * 1024),
+      });
+      assert.equal(login.status, 400);
+      assert.equal(login.body?.code, "validation-failed");
+      const email = address("oversize");
+      await running.post(
+        "/register",
+        registration(email, { padding: "x".repeat(17 * 1024) }),
+      );
+      assert.equal(
+        (
+          await stack.database.query(
+            "SELECT 1 FROM auth_users WHERE email = $1",
+            [email],
+          )
+        ).length,
+        0,
+      );
+    });
+  });
+
   describe("IDN-T-9 IDN-AC-1.9 IDN-F-35 IDN-E-3 registration throttled", () => {
     it("IDN-T-9 IDN-AC-1.9 refuses the 6th registration of one address within a minute with 429 too-many-requests and Retry-After", async () => {
       const ip = randomIp();
@@ -479,7 +638,11 @@ describe(
         env: { REGISTRATION_ENABLED: "false" },
       });
       const email = address();
-      const refused = await closed.post("/register", registration(email));
+      const refused = await closed.post(
+        "/register",
+        registration(email, { name: "", password: "x" }),
+      );
+      assert.equal(refused.status, 403);
       assert.equal(refused.body?.code, "registration-closed");
       const stored = await stack.database.query(
         "SELECT 1 FROM auth_users WHERE email = $1",

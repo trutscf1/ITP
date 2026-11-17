@@ -122,6 +122,32 @@ describe("IDN-US-1 clean-up of unconfirmed accounts", { skip }, () => {
     );
   });
 
+  it("IDN-F-31 Q346 restarts the period with a new registration of the unconfirmed address: re-registered 6.9 days ago it stays, re-registered 7.1 days ago it goes", async () => {
+    const stays = address("again-stays");
+    const goes = address("again-goes");
+    for (const [email, second] of [
+      [stays, 6.9],
+      [goes, 7.1],
+    ] as const) {
+      await registerAged(email, 8 * day);
+      await registerAged(email, second * day);
+    }
+    await running.identity.runCleanup();
+    assert.ok(await exists(stays));
+    assert.equal(await exists(goes), undefined);
+  });
+
+  it("IDN-F-31 never removes an account that was confirmed in the meantime, however old", async () => {
+    const email = address("confirmed-late");
+    await registerAged(email, 20 * day);
+    await stack.database.query(
+      "UPDATE auth_users SET email_verified = true WHERE email = $1",
+      [email],
+    );
+    await running.identity.runCleanup();
+    assert.ok(await exists(email));
+  });
+
   it("IDN-F-31 honours UNCONFIRMED_ACCOUNT_TTL_DAYS", async () => {
     const email = address();
     await registerAged(email, 2 * day);

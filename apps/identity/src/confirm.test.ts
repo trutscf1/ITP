@@ -4,7 +4,8 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { after, before, describe, it } from "node:test";
-import { skip } from "./test-support/database.ts";
+import { Redis } from "ioredis";
+import { redisUrl, skip } from "./test-support/database.ts";
 import {
   address,
   confirmationToken,
@@ -34,9 +35,7 @@ describe("IDN-US-1 confirm the e-mail address", { skip }, () => {
   it("IDN-T-4 IDN-AC-1.4 IDN-F-4 IDN-F-32 IDN-E-5 IDN-E-7 refuses the login before the link, takes the link once, and logs in afterwards", async () => {
     const email = address();
     await running.post("/register", registration(email));
-    const mail = stack.smtp.to(email)[0];
-    assert.ok(mail);
-    const token = confirmationToken(mail.text);
+    assert.ok(stack.smtp.to(email)[0]);
 
     const before = await running.post("/login", { email, password });
     assert.equal(before.status, 403);
@@ -45,6 +44,10 @@ describe("IDN-US-1 confirm the e-mail address", { skip }, () => {
       message: "Please confirm your e-mail address first.",
     });
     assert.equal(before.headers.get("set-cookie"), null);
+    // The refused login sent a new link (IDN-E-5), which replaced the one of the registration.
+    const resent = stack.smtp.to(email)[1];
+    assert.ok(resent);
+    const token = confirmationToken(resent.text);
 
     const opened = await running.get(`/confirm?token=${token}`);
     assert.equal(opened.status, 303);
@@ -120,7 +123,64 @@ describe("IDN-US-1 confirm the e-mail address", { skip }, () => {
     assert.equal(login.status, 403);
   });
 
-  it("IDN-T-4 IDN-E-5 sends a new link with the refused login only when no valid one exists, at most once per validity period", async () => {
+  it("IDN-T-4 IDN-E-5 Q345 sends a new link with the first refused login, none with the next ones, and replaces the older link", async () => {
+    const email = address();
+    await running.post("/register", registration(email));
+    assert.equal(stack.smtp.to(email).length, 1);
+    const registrationLink = confirmationToken(
+      stack.smtp.to(email)[0]?.text ?? "",
+    );
+
+    const first = await running.post("/login", { email, password });
+    assert.equal(first.status, 403);
+    assert.equal(first.body?.code, "address-not-confirmed");
+    assert.equal(stack.smtp.to(email).length, 2);
+    const second = await running.post("/login", { email, password });
+    assert.equal(second.status, 403);
+    assert.equal(stack.smtp.to(email).length, 2);
+
+    // The link of the registration is invalid now; the new one works.
+    assert.equal(
+      (await running.get(`/confirm?token=${registrationLink}`)).headers.get(
+        "location",
+      ),
+      "/link-invalid?kind=confirm",
+    );
+    const token = confirmationToken(stack.smtp.to(email)[1]?.text ?? "");
+    assert.equal(
+      (await running.get(`/confirm?token=${token}`)).headers.get("location"),
+      "/login?confirmed=1",
+    );
+  });
+
+  it("IDN-T-4 IDN-E-5 Q345 keeps the resend mark for CONFIRMATION_LINK_TTL_HOURS and sends one more link when it is gone", async () => {
+    const email = address();
+    await running.post("/register", registration(email));
+    await running.post("/login", { email, password });
+    assert.equal(stack.smtp.to(email).length, 2);
+
+    const id = (
+      await stack.database.query<{ id: string }>(
+        "SELECT id FROM auth_users WHERE email = $1",
+        [email],
+      )
+    )[0]?.id;
+    const redis = new Redis(redisUrl ?? "");
+    try {
+      const seconds = await redis.ttl(`resend:${id}`);
+      assert.ok(
+        seconds > 24 * 3600 - 60 && seconds <= 24 * 3600,
+        `resend:<id> expires in ${seconds} s`,
+      );
+      await redis.del(`resend:${id}`);
+    } finally {
+      redis.disconnect();
+    }
+    await running.post("/login", { email, password });
+    assert.equal(stack.smtp.to(email).length, 3);
+  });
+
+  it("IDN-T-4 IDN-E-5 sends a new link with the first refused login after the link of the registration has expired", async () => {
     const email = address();
     const old = await startIdentity(stack, {
       clock: () => new Date(Date.now() - 25 * hour),
@@ -132,10 +192,6 @@ describe("IDN-US-1 confirm the e-mail address", { skip }, () => {
     const first = await running.post("/login", { email, password });
     assert.equal(first.status, 403);
     assert.equal(stack.smtp.to(email).length, 2);
-    const second = await running.post("/login", { email, password });
-    assert.equal(second.status, 403);
-    assert.equal(stack.smtp.to(email).length, 2);
-
     const token = confirmationToken(stack.smtp.to(email)[1]?.text ?? "");
     assert.equal(
       (await running.get(`/confirm?token=${token}`)).headers.get("location"),
