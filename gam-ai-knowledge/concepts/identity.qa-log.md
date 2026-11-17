@@ -145,3 +145,19 @@ Assumption stated with the implementation, not rejected:
 **Q350 - Stage R3:** Der Statuscheck (auch in der CI) verlangt nach dem Merge von IDN-US-1 zwingend 'in progress' für R3. Das widerspricht Q341 ('concept' lassen). Mit 'in progress' braucht doc-check Testzeilen für die Entwurfs-ACs von IDN-US-3, -4, -5, -7, -8. Lösung?
 
 Answer: Geplante Testzeilen (Recommended). R3 goes to `in progress`; §17 gets one planned test row per draft acceptance criterion (IDN-T-29 to IDN-T-45), written out when its story is grilled; the deviation of Q341 is removed from `WORKFLOW.md` (2026-11-17).
+
+## Round 7 — 2026-11-17 — implementation of IDN-US-2, slice 1 (`tschudea07`)
+
+From the review of #45 (inbox of `tschudea07`), asked when #46 started; answers verbatim in the AI chat export of `tschudea07`.
+
+**Q352 - X-Forwarded-For:** Wie soll identity den Header nur vom Reverse-Proxy annehmen?
+
+Answer: TRUSTED_PROXY per DNS (Recommended). New variable `TRUSTED_PROXY` (default `proxy`); `identity` resolves it and reads `X-Forwarded-For` only from that address; every other peer is counted by its connection address (§8 "Client address").
+
+**Q353 - Kosten von /login begrenzen:** Wie begrenzen, wenn der Fehlversuch erst nach der Argon2id-Prüfung gezählt wird?
+
+Answer: Vorab reservieren (Recommended). The attempt is counted before the password check; beyond `LOGIN_MAX_FAILURES` the login is refused with [IDN-E-6] without a hash run ([IDN-F-9], M4).
+
+**Q354 - Issue #46:** Beschreibung aus der Story-Datei aktualisieren?
+
+Answer: Ja, aktualisieren (Recommended). #46 carries the story sentence and IDN-AC-2.1 to IDN-AC-2.6 of the story file.

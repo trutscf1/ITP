@@ -63,6 +63,7 @@ Every acceptance criterion of the three ready stories has one acceptance test in
 | Q6, Q7 New stories | IDN-US-7 operator role from a configured address list; IDN-US-8 delete my account | R2 needs operator logins; the right to deletion |
 | Q8 Lock | IP and account counted separately, 15 minutes; reset stays possible | Guessing is stopped without letting strangers lock a member out |
 | Q9 Session check | Every unit asks `identity` per request (ADR-0007) | Logout takes effect everywhere at once |
+| Q352, Q353 Guessing protection | Only the reverse proxy may name the client address; an attempt is counted before the password is checked | No other container can choose the counted address, and no flood of attempts runs the costly password hash |
 | Q10, Q11 Technology | Turnstile, Hono (`STACK.md` §3) | No Google tracking; small TypeScript server |
 | Q13 Pages | Built by the owner of `web` as slice 2 of each story | Tracks stay separate |
 
@@ -125,7 +126,7 @@ Rows of IDN-US-1, -2, and -6 are binding. Rows marked *draft* belong to stories 
 | IDN-F-6 | No account disclosure | A valid registration MUST always be answered with HTTP 202 and `{ "status": "check-mailbox" }`. For an address of a confirmed account, `identity` MUST NOT change the account and MUST send the notice e-mail instead of a confirmation link. For an address of an unconfirmed account, it MUST keep the account, replace its name and password hash by the new ones, and send a new confirmation link (A15). | IDN-AC-1.6 (No account disclosure) |
 | IDN-F-7 | Password login | `POST /api/identity/login` with the e-mail address and password of a confirmed account MUST create a session ([IDN-F-34]) and answer 200 with the `SessionInfo` of §8 and the session cookie. | IDN-AC-2.1 (Password login) |
 | IDN-F-8 | Logout | `POST /api/identity/logout` MUST delete the session of the session cookie from the session store, answer 204, and clear the cookie. From then on, a session check with that token MUST answer "no session" ([IDN-F-37]). Without a valid session it MUST also answer 204. | IDN-AC-2.2 (Logout ends the session) |
-| IDN-F-9 | Lock after failed logins | `identity` MUST count failed logins per IP address and, separately, per e-mail address (also for addresses without an account) in windows of `LOGIN_FAILURE_WINDOW_SECONDS` seconds. When a counter reaches `LOGIN_MAX_FAILURES`, it MUST lock that IP address for every login, or that e-mail address for the password login, for `LOGIN_LOCK_MINUTES` minutes and answer [IDN-E-6]. A lock of an e-mail address MUST NOT block the reset request or the new password of [IDN-US-6]. A successful login MUST reset the counter of its e-mail address. | IDN-AC-2.3 (Lock after failed logins) |
+| IDN-F-9 | Lock after failed logins | `identity` MUST count failed logins per IP address and, separately, per e-mail address (also for addresses without an account) in windows of `LOGIN_FAILURE_WINDOW_SECONDS` seconds. When a counter reaches `LOGIN_MAX_FAILURES`, it MUST lock that IP address for every login, or that e-mail address for the password login, for `LOGIN_LOCK_MINUTES` minutes and answer [IDN-E-6]. A lock of an e-mail address MUST NOT block the reset request or the new password of [IDN-US-6]. A successful login MUST reset the counter of its e-mail address. An attempt MUST be counted before its password is checked; an attempt that finds `LOGIN_MAX_FAILURES` attempts of its IP or e-mail address already counted in the window MUST be answered with [IDN-E-6] without a password check (Q353). | IDN-AC-2.3 (Lock after failed logins) |
 | IDN-F-10 | Protected pages | A request to a page of `web` under `/files`, `/settings`, or `/dashboard` without a valid session MUST be redirected with 303 to `/login?next=<path>`, where `<path>` is the requested path; after a successful login `web` MUST go to `<path>` if it starts with a single `/`, else to `/dashboard`. | IDN-AC-2.4 (Protected pages) |
 | IDN-F-11 | Generic login error | A login with an unknown e-mail address or a wrong password MUST be answered with [IDN-E-4], with the same status, body, and, within 50 ms, the same answer time in both cases. | IDN-AC-2.5 (Generic error) |
 | IDN-F-12 | Provider buttons (*draft*) | The login page MUST show one login button for each external login provider configured, and none for the others. | IDN-AC-3.1 (Provider buttons) |
@@ -212,8 +213,8 @@ session:<token-hash>         -> SessionRecord, expiry = SESSION_TTL_DAYS days, r
 account-sessions:<accountId> -> set of token hashes (for IDN-F-27)
 fail:ip:<ip>                 -> counter, expiry = LOGIN_FAILURE_WINDOW_SECONDS
 fail:email:<email-lowercase> -> counter, expiry = LOGIN_FAILURE_WINDOW_SECONDS
-lock:ip:<ip>                 -> 1, expiry = LOGIN_LOCK_MINUTES
-lock:email:<email-lowercase> -> 1, expiry = LOGIN_LOCK_MINUTES
+lock:ip:<ip>                 -> end time of the lock (ms), expiry = LOGIN_LOCK_MINUTES
+lock:email:<email-lowercase> -> end time of the lock (ms), expiry = LOGIN_LOCK_MINUTES
 req:ip:<ip>                  -> counter, expiry = 60 s (IDN-F-35)
 resend:<accountId>           -> 1, expiry = CONFIRMATION_LINK_TTL_HOURS (IDN-E-5, Q345)
 
@@ -251,7 +252,7 @@ Character classes: lower-case letters, upper-case letters, digits, everything el
 | `POST /password-reset/request` | `ResetRequestInput` | 202 `Accepted` | E-1, E-2, E-3 |
 | `POST /password-reset` | `NewPasswordInput` | 204 | E-1, E-7 |
 
-**Client address.** The throttle counts the address the reverse proxy writes as the last entry of `X-Forwarded-For`; the proxy replaces what the client sent, and `identity` publishes no port. Without the header (a call inside the stack) it counts the address of the connection.
+**Client address.** The throttle counts the address the reverse proxy writes as the last entry of `X-Forwarded-For`; the proxy replaces what the client sent, and `identity` publishes no port. The header is read only from a connection whose address is the one `TRUSTED_PROXY` names, resolved by the name service and kept for 30 seconds (Q352); every other peer, such as another unit on the network `frontend`, and a call without the header, is counted by the address of its connection.
 
 **Confirmation tokens.** A confirmation token has 256 random bits. `auth_verifications` holds `identifier = "confirm:" + hex(SHA-256(token))` and `value = account id`, so the token itself is stored nowhere ([IDN-NF-5]). "At most once per `CONFIRMATION_LINK_TTL_HOURS`" in [IDN-E-5] means (Q345): the first refused login of an unconfirmed account sends a new link, which replaces every older link of the account, and sets `resend:<accountId>` with that expiry; further refused logins send no link while the key exists. Registering again ([IDN-F-6]) also replaces the older links. The e-mails of [IDN-F-6] and [IDN-E-5] are sent after the answer, so the answer does not wait for the SMTP host ([IDN-E-11]).
 
@@ -291,6 +292,7 @@ Character classes: lower-case letters, upper-case letters, digits, everything el
 | `CAPTCHA_SITE_KEY`, `CAPTCHA_SECRET_KEY` | non-empty when `CAPTCHA_ENABLED=true` | — |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_FROM` | host, 1..65535, e-mail address | `mailpit`, `1025`, `no-reply@stash.local` |
 | `SESSION_CHECK_TIMEOUT_MS` | 100..5000 (also read by `web` and `storage`) | `1000` |
+| `TRUSTED_PROXY` | host name or IP address of the reverse proxy (Q352); set to `proxy` in `docker-compose.yml`, not in `.env.example` | `proxy` |
 
 **Message texts (German).** IDN-U-3: „Prüfe dein Postfach. Wenn die Adresse verwendet werden kann, haben wir dir eine E-Mail geschickt.“ IDN-U-4: „E-Mail-Adresse oder Passwort ist falsch.“, „Bitte bestätige zuerst deine E-Mail-Adresse. Wir haben dir einen neuen Link geschickt.“, „Zu viele Versuche. Versuche es in 15 Minuten wieder oder setze dein Passwort zurück.“ IDN-U-5: „Dein Passwort wurde geändert. Bitte melde dich neu an.“ IDN-U-6: „Die Registrierung ist geschlossen. Frag den Betreiber dieser Installation nach einem Konto.“ IDN-U-7: „Dieser Link ist ungültig oder abgelaufen.“
 
@@ -390,6 +392,8 @@ Verbatim rounds: [identity.qa-log.md](identity.qa-log.md). ADRs: [ADR-0007](../a
 | Q12 | Shared understanding | Confirmed | — |
 | Q13 | Pages in `web` | Slice 2 of each story, built by schwaigc | Tracks stay separate |
 | Q14 | Merge request | Reviewed by `trutscf1`; its approval is the Phase 4 gate | Most affected by §15 |
+| Q352 | Client address | `X-Forwarded-For` only from the address `TRUSTED_PROXY` names (§8) | Another container on the network `frontend` could choose the counted address |
+| Q353 | Cost of a login | Count the attempt before the password check ([IDN-F-9], M4) | A flood of parallel attempts would otherwise run the 19 MiB hash before the lock answers |
 
 **Open questions for the school management** (legal; not decided by the team or an agent):
 
@@ -473,22 +477,26 @@ function strength(password) -> Strength
 **M4 Throttle** — Traces to: IDN-F-9, IDN-F-35. Requires: IDN-C-6.
 
 ```text
-function beforeLogin(ip, email) -> ok | locked(retryAfterSeconds)
-  1. if lock:ip:<ip> or lock:email:<email> exists: return locked(longest remaining expiry)
-function afterLogin(ip, email, success)
-  1. if success: delete fail:email:<email>; return
-  2. increment fail:ip:<ip> and fail:email:<email> (expiry set on first increment)
-  3. for each counter that reached LOGIN_MAX_FAILURES: set its lock key with expiry LOGIN_LOCK_MINUTES
+function reserveLogin(ip, email, now) -> reservation(ipCount, emailCount) | locked(retryAfterSeconds)
+  1. if lock:ip:<ip> or lock:email:<email> holds a time after now: return locked(seconds to the later one)
+  2. increment fail:ip:<ip> and fail:email:<email> (expiry set on first increment, one transaction)
+  3. if either count is above LOGIN_MAX_FAILURES: take both increments back and
+     return locked(remaining window of that counter)          // parallel attempts, Q353
+  4. return reservation
+function settleLogin(reservation, success, now)
+  1. if success: delete fail:email:<email>, take the increment of fail:ip:<ip> back; return
+  2. for each count of the reservation that reached LOGIN_MAX_FAILURES: set its lock key to
+     now + LOGIN_LOCK_MINUTES with that expiry and delete its counter, so counting starts afresh
 function countRequest(ip) -> ok | refused(retryAfterSeconds)      // registration and reset request
 ```
 
-**M2 AuthCore login order** — Traces to: IDN-F-7, IDN-F-9, IDN-F-11, IDN-E-5.
+**M2 AuthCore login order** (`apps/identity/src/login.ts`) — Traces to: IDN-F-7, IDN-F-9, IDN-F-11, IDN-E-5.
 
 ```text
 1. validate LoginInput (E-1)
-2. Throttle.beforeLogin (E-6)
+2. Throttle.reserveLogin (E-6): a locked login costs no password check (Q353)
 3. verify password; for an unknown address hash a dummy password, so both cases take the same time
-4. Throttle.afterLogin(success)
+4. Throttle.settleLogin(success)
 5. wrong: E-4; unconfirmed: E-5; else create session, set cookie, answer SessionInfo
 ```
 
@@ -529,7 +537,8 @@ stateDiagram-v2
 ### Design for Testability
 
 - **M3** is pure: tests call `passwordProblems` and `strength` with the values of §10, example 1.
-- **M4** takes the session store and a clock as parameters; tests use a real store from the test stack and a fixed clock.
+- **M4** takes the session store and a clock as parameters; tests use a real store from the test stack and a fixed clock. A lock holds the time it ends and a session its expiry, both read against that clock; the expiry of the keys only removes them afterwards. The failure window itself runs on the time of the session store, so a test of it sends its attempts within that window.
+- **Client address** takes a name resolver; tests pass the address of the connection the way the HTTP server does and a stub resolver (Q352).
 - **`identity` over HTTP**: tests start M1 with the test database (`TEST_DATABASE_URL`), a session store, a recording SMTP stub, and a bot-check stub that answers yes or no; they call the endpoints of §8 and read the stub's e-mails.
 - **`web` pages**: the end-to-end runner of `STACK.md` §4 against `web` with `identity` running (slices 2).
 
