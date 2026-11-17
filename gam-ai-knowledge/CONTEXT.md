@@ -124,3 +124,27 @@ The check before registration and password reset that the request comes from a p
 **Operator role**:
 The right of an account to open the operations dashboards; given to accounts whose address the operator lists in the configuration.
 *Avoid*: admin, superuser
+
+**Offline mark**:
+The choice of a member that a file or folder is available without a network on one device; a folder mark includes everything inside it.
+*Avoid*: favourite, pin, sync flag
+
+**Offline copy**:
+The content of a marked file that the app keeps on the device.
+*Avoid*: cache, download
+
+**Offline overview**:
+The screen that lists the offline marks of a member with the used offline storage and lets them remove each mark.
+*Avoid*: offline manager
+
+**Queued action**:
+A rename, move, delete, or upload that a member made without a network and that waits to be synchronized.
+*Avoid*: pending change, outbox entry
+
+**Conflict**:
+The case that a file or folder changed on the server after the revision a queued action was made against, or that its name is taken; the member chooses their version, the server version, or keeps both.
+*Avoid*: merge problem, sync error
+
+**Offline storage limit**:
+The most storage that the offline copies of one device may use, set by the operator.
+*Avoid*: quota (the quotas of teams are a different thing)

@@ -20,7 +20,7 @@ Every row traces to the capability IDs (`SCF-C-x`, later other prefixes) that de
 
 ## Capability index
 
-Every capability of `concepts/scaffolding.md` §7, `concepts/public-content.md` §7, `concepts/observability.md` §7, and `concepts/identity.md` §7 and where its technology stands. The index only points to the track sections; it holds no technology of its own, except the capabilities added on 2026-10-13 that no section maps yet. Their owner moves the row into the own section when the technology is chosen.
+Every capability of `concepts/scaffolding.md` §7, `concepts/public-content.md` §7, `concepts/observability.md` §7, `concepts/identity.md` §7, and `concepts/offline-mode.md` §7, and where its technology stands. The index only points to the track sections; it holds no technology of its own, except the capabilities added on 2026-10-13 that no section maps yet. Their owner moves the row into the own section when the technology is chosen.
 
 | ID | Capability | Technology | Owner |
 | --- | --- | --- | --- |
@@ -56,6 +56,11 @@ Every capability of `concepts/scaffolding.md` §7, `concepts/public-content.md` 
 | OBS-C-5 | Trace store | section 1 | `trutscf1` |
 | OBS-C-6 | Dashboard tool | section 1 | `trutscf1` |
 | OBS-C-7 | Session check in the reverse proxy | section 1 | `trutscf1` |
+| OFF-C-1 | Installable web app | section 1 | `trutscf1` |
+| OFF-C-2 | Device content store | section 1 | `trutscf1` |
+| OFF-C-3 | Metadata replication | section 1 | `trutscf1` |
+| OFF-C-4 | Persistent action queue | section 1 | `trutscf1` |
+| OFF-C-5 | Connectivity signal | section 1 | `trutscf1` |
 | IDN-C-1 | Authentication library | section 3 | `tschudea07` |
 | IDN-C-2 | Password hash | section 3 | `tschudea07` |
 | IDN-C-3 | Shared schema library | section 3 | `tschudea07` |
@@ -85,6 +90,11 @@ Every capability of `concepts/scaffolding.md` §7, `concepts/public-content.md` 
 | OBS-C-5 trace store | Grafana Tempo with OTLP ingestion | Tempo 2.x, exact image tag pinned | Block retention from `OBS_TRACES_RETENTION_DAYS`. Memory limit 256 MB. |
 | OBS-C-6 dashboard tool | Grafana with file provisioning of data sources and dashboards, served from the sub-path `/observability`, authentication by proxy header (`auth.proxy`) | Grafana ≥ 12, `grafana/grafana:13.2.5` (exact tag, pinned in `docker-compose.yml`) | Settings for OBS-F-9 (`allowUiUpdates: false`), OBS-F-10 and OBS-F-27 (`auth.proxy` with the header of OBS-C-7; `auth.anonymous` with role Viewer only while OBS-F-24 binds the port to `127.0.0.1`; `disable_login_form`, `users.allow_sign_up` off), OBS-NF-1 (`analytics.reporting_enabled`, `check_for_updates` off, no plugins). Links of OBS-F-7: Loki derived fields `traceId` and `trace_id` (the stack stores `trace_id`) → Tempo, Tempo trace-to-logs → Loki. Memory limit 256 MB; configuration step (`node:24.14-alpine`) 64 MB — 1472 MB in total (OBS-NF-8). The images of the profile are scanned by `container-scan` (#149, SCF-NF-6). |
 | OBS-C-7 session check in the reverse proxy | Caddy `forward_auth` to the session check of `identity` | `caddy:2.11-alpine` (SCF-C-6) | For OBS-F-27: header `X-Stash-Operator`, removed from every incoming request; active with TLS (R14). The address in `identity` is set by R3. |
+| OFF-C-1 installable web app | to be chosen by the owner before the first slice of OFF-US-1 (web app manifest and a service worker are the browser mechanisms) | | Served from the root path through the reverse proxy (SCF-C-6); the script must not be cached by the proxy. |
+| OFF-C-2 device content store | to be chosen by the owner before the first slice of OFF-US-2 | | Needs complete-or-nothing writes, a bytes-used query, and deletion per account (OFF-F-8, OFF-F-11, OFF-F-12). |
+| OFF-C-3 metadata replication | to be chosen by the owner; the project proposal names CouchDB (SCF-C-7 already runs `couchdb:3.5`) and PouchDB | | Replicates metadata documents with a revision per document; the file content does not travel through it. |
+| OFF-C-4 persistent action queue | to be chosen by the owner | | May share the store of OFF-C-2 or OFF-C-3 if state changes stay atomic (OFF-F-20). |
+| OFF-C-5 connectivity signal | to be chosen by the owner; the browser online/offline events plus a probe of `/health` | | Probe address from the health endpoint of SCF-F-6. |
 
 Module mapping (folder layout), set by #38:
 
