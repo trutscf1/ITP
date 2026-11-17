@@ -4,7 +4,7 @@ format: gam-ai-knowledge/1
 title: "IDN-US-2 Log in and log out with rate limiting"
 audience: [product, developer, reviewer, agent]
 id-prefix: "IDN"
-status: ready
+status: in-progress
 sprint: 2
 ---
 # IDN-US-2 Log in and log out with rate limiting
