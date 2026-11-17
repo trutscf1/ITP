@@ -35,4 +35,94 @@ describe("prompt export redacts GitLab tokens completely", () => {
     const out = redact(`GITLAB_TOKEN='${prefix}_WSx…`, "");
     assert.ok(!out.includes(`${prefix}_WS`), out);
   });
+
+  // Every GitLab token type, not only personal access tokens (review of !56, point 2).
+  for (const type of [
+    "oas",
+    "ptt",
+    "dt",
+    "rt",
+    "rtr",
+    "soat",
+    "cbt",
+    "ft",
+    "imt",
+    "agent",
+    "wt",
+    "ffct",
+  ]) {
+    it(`removes a token with the prefix gl${type}-`, () => {
+      const out = redact(`curl -H "Job: gl${type}-${body}"`, "");
+      assert.ok(!out.includes(body), out);
+      assert.match(out, /\[redacted\]/);
+    });
+  }
+});
+
+// The secret after a name such as CI_JOB_TOKEN, private_token, or Bearer (review of !56, point 3).
+describe("prompt export redacts named secrets", () => {
+  const secret = "s3cr3tValue42";
+  const cases = {
+    "a job token variable": `CI_JOB_TOKEN=${secret}`,
+    "an exported GitLab token variable": `export GITLAB_TOKEN=${secret}`,
+    "a private_token query parameter": `https://gitlab.com/api/v4/projects?private_token=${secret}`,
+    "a Bearer header": `Authorization: Bearer ${secret}`,
+  };
+  for (const [name, text] of Object.entries(cases)) {
+    it(`removes ${name}`, () => {
+      const out = redact(text, "");
+      assert.ok(!out.includes(secret), out);
+      assert.match(out, /\[redacted\]/);
+    });
+  }
+});
+
+describe("prompt export keeps prose about secrets readable", () => {
+  it("keeps the word after Bearer when it is no credential", () => {
+    const text = "The API expects Bearer authentication.";
+    assert.equal(redact(text, ""), text);
+  });
+});
+
+// The home folder in every form a chat can show it, so the user name never reaches the public
+// repository (review of !56, point 1).
+describe("prompt export removes the home folder in every form", () => {
+  const user = "alicewonder";
+  const cases: Record<string, [home: string, text: string]> = {
+    "the literal macOS path": [
+      "/Users/alicewonder",
+      "cd /Users/alicewonder/Developer/app",
+    ],
+    "the folder name Claude Code encodes from a macOS path": [
+      "/Users/alicewonder",
+      "/private/tmp/claude-501/-Users-alicewonder-Developer-app/scratchpad",
+    ],
+    "the folder name Claude Code encodes from a Windows path": [
+      "C:\\Users\\alicewonder",
+      "C:\\Users\\alicewonder\\.claude\\projects\\C--Users-alicewonder-Developer-app",
+    ],
+    "the Git Bash path": [
+      "C:\\Users\\alicewonder",
+      "cd /c/Users/alicewonder/Developer/app",
+    ],
+    "the WSL path": [
+      "C:\\Users\\alicewonder",
+      "ls /mnt/c/Users/alicewonder/Developer",
+    ],
+  };
+  for (const [name, [home, text]] of Object.entries(cases)) {
+    it(`removes ${name}`, () => {
+      const out = redact(text, home);
+      assert.ok(!out.includes(user), out);
+    });
+  }
+
+  it("keeps a longer user name that only starts with the home folder's name", () => {
+    for (const text of [
+      "/Users/alicewonderland/notes",
+      "-Users-alicewonderland-x",
+    ]) {
+      assert.equal(redact(text, "/Users/alicewonder"), text);
+    }
+  });
 });
