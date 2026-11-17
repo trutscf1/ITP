@@ -7,6 +7,7 @@ import { dirname, join } from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
+import { loadIdentityConfig } from "../packages/contracts/src/identity/config.ts";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -120,6 +121,25 @@ describe("IDN-US-1 identity in the local stack (SCF-F-1, SCF-F-20, IDN-F-4)", ()
       (documented.get("IDENTITY_AUTH_SECRET") ?? "").length >= 32,
       "the placeholder of IDENTITY_AUTH_SECRET must pass the check of 32 characters",
     );
+  });
+
+  it("IDN-AC-1.5 documents every variable that loadIdentityConfig reads in .env.example, as a setting or as a commented default [SCF-F-11]", () => {
+    const loaded = loadIdentityConfig({
+      DATABASE_URL: "postgresql://localhost/none",
+      REDIS_URL: "redis://localhost:6379",
+      IDENTITY_AUTH_SECRET: "0123456789abcdef0123456789abcdef",
+    });
+    assert.ok(loaded.ok);
+    const names = Object.keys(loaded.config);
+    assert.ok(names.length > 20, "the configuration lists its variables");
+    const text = read(".env.example");
+    for (const name of names) {
+      assert.match(
+        text,
+        new RegExp(`^(# )?${name}=`, "m"),
+        `${name} is missing in .env.example`,
+      );
+    }
   });
 
   it("IDN-AC-1.4 routes /api/identity to identity without the prefix, so /api/identity/health reaches /health [SCF-F-4]", () => {
