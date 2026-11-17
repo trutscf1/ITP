@@ -135,7 +135,9 @@ describe("SCF-AC-2.2 Configuration by environment", () => {
     ]);
     const unused = [...documentedVariables().keys()].filter(
       (name) =>
-        name !== "COMPOSE_PROFILES" && !readByUnits.has(name) && !used.has(name),
+        name !== "COMPOSE_PROFILES" &&
+        !readByUnits.has(name) &&
+        !used.has(name),
     );
     assert.deepEqual(unused, []);
   });
