@@ -1572,4 +1572,3 @@ Answer: "Alles veröffentlichen (Recommended)". The child issue is #161.
 **Q343 - Issue #71 beim Merge:** Laut Slice-Tabelle liefert #71 Slice 1, die Story DSA-US-2 ist aber erst mit Slice 2 fertig. Soll der MR #71 schließen?
 
 Answer: "Closes #71 (Recommended)".
-||||||| 4e36e0823
