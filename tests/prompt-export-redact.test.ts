@@ -132,11 +132,19 @@ describe("prompt export removes the home folder in every form", () => {
 // (review of !56, point 1: "neu exportieren").
 describe("prompt export redacts existing exports again", () => {
   it("redacts an export whose session is gone, and leaves manual/ and other folders alone", async () => {
-    const { mkdtempSync, mkdirSync, writeFileSync, readFileSync, realpathSync } = await import("node:fs");
+    const {
+      mkdtempSync,
+      mkdirSync,
+      writeFileSync,
+      readFileSync,
+      realpathSync,
+    } = await import("node:fs");
     const { tmpdir } = await import("node:os");
     const { exportPrompts } = (await import(
       pathToFileURL(join(repo, "gam-engineering/tools/prompt-export.mjs")).href
-    )) as { exportPrompts: (options: Record<string, unknown>) => Promise<unknown> };
+    )) as {
+      exportPrompts: (options: Record<string, unknown>) => Promise<unknown>;
+    };
     const root = realpathSync(mkdtempSync(join(tmpdir(), "prompt-export-")));
     const home = join(root, "home");
     const work = join(root, "repo");
