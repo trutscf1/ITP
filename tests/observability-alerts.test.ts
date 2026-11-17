@@ -272,6 +272,79 @@ describe(
 );
 
 // ---------------------------------------------------------------------------------------------
+// Pipeline job `rule-test` (#164, OBS-T-33): the offline rule test runs in the pipeline on the
+// pinned image of the metric store instead of being skipped.
+// ---------------------------------------------------------------------------------------------
+
+type CiJob = {
+  stage?: string;
+  services?: (string | { name: string; alias?: string })[];
+  variables?: Record<string, string>;
+  script?: string[];
+  rules?: unknown;
+  only?: unknown;
+  except?: unknown;
+};
+
+function ciJob(name: string): CiJob {
+  const ci = parse(readText(".gitlab-ci.yml")) as Record<string, CiJob>;
+  const job = ci[name];
+  assert.ok(job, `job ${name} missing in .gitlab-ci.yml`);
+  return job;
+}
+
+describe("OBS-AC-2.3 Pipeline job rule-test (OBS-T-33, #164)", () => {
+  it("OBS-AC-2.3 runs the job rule-test in every pipeline, in the first stage", () => {
+    const job = ciJob("rule-test");
+    assert.equal(job.stage, "test");
+    assert.equal(job.rules, undefined);
+    assert.equal(job.only, undefined);
+    assert.equal(job.except, undefined);
+  });
+
+  it("OBS-AC-2.3 takes promtool from the pinned image of the metric store through a Docker daemon (OBS-T-33)", () => {
+    const job = ciJob("rule-test");
+    const script = (job.script ?? []).join("\n");
+    assert.equal(prometheusImage, "prom/prometheus:v3.15.1");
+    assert.ok(
+      script.includes(`docker create --name promtool ${prometheusImage}`),
+      "the job does not create a container of the pinned image",
+    );
+    assert.match(script, /docker cp promtool:\/bin\/promtool /);
+    const services = (job.services ?? []).map((service) =>
+      typeof service === "string" ? service : service.name,
+    );
+    assert.ok(
+      services.some((name) => /^docker:[\d.]+-dind$/.test(name)),
+      "no Docker daemon service",
+    );
+  });
+
+  it("OBS-AC-2.3 runs the rule test of this file and makes a missing tool a failure instead of a skip (OBS-T-33)", () => {
+    const job = ciJob("rule-test");
+    assert.equal(job.variables?.RULE_TEST_REQUIRED, "1");
+    assert.match(
+      (job.script ?? []).join("\n"),
+      /node --test observability-alerts\.test\.ts/,
+    );
+    assert.match(
+      readText("tests/observability-alerts.test.ts"),
+      /process\.env\.RULE_TEST_REQUIRED === "1"/,
+    );
+  });
+
+  it("OBS-AC-2.3 names the job rule-test in the skip reason and in section 17 of the concept (OBS-T-33)", () => {
+    assert.match(
+      readText("tests/observability-alerts.test.ts"),
+      /the pipeline job `rule-test` runs it on the pinned image/,
+    );
+    const concept = readText("gam-ai-knowledge/concepts/observability.md");
+    assert.match(concept, /the job `rule-test` runs them on the pinned image/);
+    assert.doesNotMatch(concept, /issue #164/);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------
 // Stack test (OBS-T-10): the started stack with the profile. STACK_TEST=1 switches it on.
 // ---------------------------------------------------------------------------------------------
 
