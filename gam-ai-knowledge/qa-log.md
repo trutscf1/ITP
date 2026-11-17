@@ -4,6 +4,7 @@ format: gam-ai-knowledge/1
 title: "Question log — project"
 audience: [developer, reviewer, agent]
 ---
+
 # Question log — project
 
 The verbatim record of every question round, for anyone who wants to know why a decision was made and who answered what (P-GRILL-2). Answers are quoted exactly and never rewritten; the distilled decisions live in the concept's §13 or in an ADR.
@@ -1682,6 +1683,7 @@ Instruction of `trutscf1`, verbatim (coordinator): implement #156, slice 2 of OB
 **A6 - Test data in the rule test file:** The series of example 5 are the `input_series` of one `promtool` test file, `tests/data/observability/alert-error-rate.test.yml`, kept as data next to the tests (§17); the file that also feeds the dashboard test is part of slice 3.
 
 The numbers Q320 to Q322 are provisional until merged (P-TEAM-5).
+
 ## Round 68 — 2026-11-03 — Slice 2 telemetry package (#154) (trutscf1 (agent))
 
 Instruction of `trutscf1`, summarised: implement issue #154 (`OBS-US-1` slice 2, the shared package `telemetry`, modules M1 to M5 of `concepts/observability.md` §16) with `/engineering-human implement`. The agent could not ask pop-ups in this session; where the documents left a gap with a cheap default, it states an assumption (P-GRILL-4). `trutscf1` rejects an assumption by answering it in the review of the merge request.
