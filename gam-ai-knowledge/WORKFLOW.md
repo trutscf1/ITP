@@ -83,6 +83,14 @@ Presented at the final presentation (`docs/anforderungen_software_projekte.md`, 
 | Reverse proxy Traefik ≥ 3.6.10 with Let's Encrypt (HTTP-01), an optional extra requirement of the school (`docs/anforderungen_software_projekte.md`, "Eventuelle Zusatzanforderungen") | Caddy (`caddy:2.11-alpine`) in the local stack and on the server, with its automatic HTTPS from Let's Encrypt (HTTP-01) | One proxy for both: the local stack, the routes of `docker/Caddyfile`, and the session check of the observability dashboards (`forward_auth`, `STACK.md` OBS-C-7) already use Caddy; a second proxy would double the configuration. The school's TLS and routing requirements (§9) are met either way (Q265). |
 | Observability through OpenTelemetry | The units report through the own package `packages/telemetry`, which speaks the OpenTelemetry protocol (OTLP over HTTP) without the OpenTelemetry SDK; the collector and the stores are the planned OpenTelemetry components. | [ADR-0009](adr/0009-units-encode-otlp-themselves.md): the logs packages of the SDK are experimental (Definition of Done item 18), its exporters have no bounded buffer (OBS-E-1), and the supply-chain rules apply to every package. |
 
+## Open deviations from the Definition of Done
+
+Temporary; each row names the issue that ends it, and the row is removed with that issue.
+
+| DoD item | Where | Rule until then | Ends with |
+| --- | --- | --- | --- |
+| 17 (database access through `@stash/db`, SCF-C-19) | `apps/identity/src/auth-core.ts` (lookup of the `users` row) and the database probe of the health report of `identity` | They use the `pg` pool that the authentication library needs anyway (`STACK.md` IDN-C-1, ADR-0009) and only read; no other code of `identity` writes SQL. Recorded in the review of !62 (`trutscf1`, `schwaigc`). | #167 |
+
 ## Tracker (P-TRK-1…4)
 
 Every change starts with an issue (§3). Each issue has: description, acceptance criteria, weight, assignee, sprint milestone, exactly one `type::` label, and exactly one `status::` label. Bugs and defects are always recorded as their own issue.

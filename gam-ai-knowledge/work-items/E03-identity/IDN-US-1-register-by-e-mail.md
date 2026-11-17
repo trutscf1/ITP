@@ -4,7 +4,7 @@ format: gam-ai-knowledge/1
 title: "IDN-US-1 Register by e-mail"
 audience: [product, developer, reviewer, agent]
 id-prefix: "IDN"
-status: done
+status: in-progress
 sprint: 2
 ---
 # IDN-US-1 Register by e-mail
@@ -33,12 +33,12 @@ One user story of [Identity: accounts, external login, MFA](epic.md) and the acc
 
 ## Slices
 
-The vertical slices that deliver this story (concept §16, Q13). Slice 1 is delivered by the story issue itself; slice 2 becomes a child issue of it with `/gam-engineering tickets identity`.
+The vertical slices that deliver this story (concept §16, Q13). Slice 1 is delivered by the story issue itself; slice 2 is #168 (cut on 2026-11-17 after the review of !62, Q376); the story is `done` when both slices are merged.
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
 | 1 — registration API, confirmation, clean-up, `identity` in the local stack (`tschudea07`) | IDN-AC-1.1 (server), IDN-AC-1.2 (server), IDN-AC-1.3, IDN-AC-1.4, IDN-AC-1.5, IDN-AC-1.6, IDN-AC-1.7 (server), IDN-AC-1.8, IDN-AC-1.9 | — (the error codes of `scaffolding.md` §8 are added in #45, Q336) | #45 |
-| 2 — registration page and confirmation result (`schwaigc`) | IDN-AC-1.1 (page), IDN-AC-1.2 (strength bar), IDN-AC-1.7 (page) | slice 1 | — |
+| 2 — registration page and confirmation result (`schwaigc`) | IDN-AC-1.1 (page), IDN-AC-1.2 (strength bar), IDN-AC-1.4 (pages), IDN-AC-1.5 (no widget when off), IDN-AC-1.6 (message), IDN-AC-1.7 (page) | slice 1 | #168 |
 
 - **Story issue:** #45
 - **Weight:** 5
