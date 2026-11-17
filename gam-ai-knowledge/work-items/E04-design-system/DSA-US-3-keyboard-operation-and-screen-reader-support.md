@@ -5,7 +5,7 @@ title: "DSA-US-3 Keyboard operation and screen reader support"
 audience: [product, developer, reviewer, agent]
 id-prefix: "DSA"
 status: ready
-sprint: 2
+sprint: 3
 ---
 # DSA-US-3 Keyboard operation and screen reader support
 

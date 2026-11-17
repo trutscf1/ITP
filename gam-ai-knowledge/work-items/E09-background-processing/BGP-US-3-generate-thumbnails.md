@@ -36,4 +36,4 @@ The vertical slices that deliver this story. One slice is delivered by the story
 
 - **Story issue:** #65
 - **Weight:** 3
-- **Depends on:** BGP-US-1 (Background processing with BullMQ, #63)
+- **Depends on:** BGP-US-1 (Background processing with a job queue, #63)
