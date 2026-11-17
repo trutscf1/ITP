@@ -4,7 +4,7 @@ format: gam-ai-knowledge/1
 title: "IDN-US-1 Register by e-mail"
 audience: [product, developer, reviewer, agent]
 id-prefix: "IDN"
-status: ready
+status: in-progress
 sprint: 2
 ---
 # IDN-US-1 Register by e-mail
@@ -37,7 +37,7 @@ The vertical slices that deliver this story (concept §16, Q13). Slice 1 is deli
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
-| 1 — registration API, confirmation, clean-up, `identity` in the local stack (`tschudea07`) | IDN-AC-1.1 (server), IDN-AC-1.2 (server), IDN-AC-1.3, IDN-AC-1.4, IDN-AC-1.5, IDN-AC-1.6, IDN-AC-1.7 (server), IDN-AC-1.8, IDN-AC-1.9 | new error codes in `scaffolding.md` §8 (`trutscf1`) | #45 |
+| 1 — registration API, confirmation, clean-up, `identity` in the local stack (`tschudea07`) | IDN-AC-1.1 (server), IDN-AC-1.2 (server), IDN-AC-1.3, IDN-AC-1.4, IDN-AC-1.5, IDN-AC-1.6, IDN-AC-1.7 (server), IDN-AC-1.8, IDN-AC-1.9 | — (the error codes of `scaffolding.md` §8 are added in #45, Q336) | #45 |
 | 2 — registration page and confirmation result (`schwaigc`) | IDN-AC-1.1 (page), IDN-AC-1.2 (strength bar), IDN-AC-1.7 (page) | slice 1 | — |
 
 - **Story issue:** #45

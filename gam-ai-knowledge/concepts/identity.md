@@ -408,7 +408,7 @@ Verbatim rounds: [identity.qa-log.md](identity.qa-log.md). ADR: [ADR-0007](../ad
 
 | Document | Change | Reason | Carried out by |
 | --- | --- | --- | --- |
-| [scaffolding.md](scaffolding.md) §8, `ErrorResponse` | Add the seven codes of §8 to the enum and the code table. | [SCF-F-21] | `trutscf1`, inbox; before slice 1 of IDN-US-1 is merged |
+| [scaffolding.md](scaffolding.md) §8, `ErrorResponse` | Add the seven codes of §8 to the enum and the code table. | [SCF-F-21] | done by `tschudea07` in slice 1 of IDN-US-1 (#45) on 2026-11-17 (Q336), reviewed by `trutscf1` in its merge request |
 | [observability.md](observability.md) §8, secret key list | Add `botToken`, `confirmationToken`, `resetToken`. | [IDN-NF-4] | `trutscf1`, inbox |
 | [public-content.md](public-content.md) [PUB-F-22] | Name the periods of [IDN-F-31], [IDN-NF-2], and [IDN-NF-3] in the paragraphs on member accounts and IP addresses. | Privacy | `trutscf1`, inbox |
 | `web` (schwaigc) | Slices 2 of IDN-US-1, -2, -6: pages, forms, route guard. | Q13 | `schwaigc`, issues cut with `tickets` |

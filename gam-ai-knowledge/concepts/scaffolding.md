@@ -203,7 +203,7 @@ DependencyCheck {
 }
 
 ErrorResponse {
-  code: enum(validation-failed|not-found|method-not-allowed|internal-error),  // stable, machine-readable
+  code: enum(validation-failed|not-found|method-not-allowed|internal-error|bot-check-failed|too-many-requests|invalid-credentials|address-not-confirmed|registration-closed|link-invalid|no-session),  // stable, machine-readable
   message: string                   // one plain sentence for the caller; no internals (SCF-NF-4)
 }
 ```
@@ -216,6 +216,13 @@ Every code has one HTTP status and one fixed message, never taken from the failu
 | `not-found` | 404 | The requested resource does not exist. |
 | `method-not-allowed` | 405 | The method is not allowed for this path. |
 | `internal-error` | 500 | The request could not be processed. |
+| `bot-check-failed` | 400 | The bot check failed. |
+| `too-many-requests` | 429 | Too many requests. Try again later. |
+| `invalid-credentials` | 401 | E-mail address or password is wrong. |
+| `address-not-confirmed` | 403 | Please confirm your e-mail address first. |
+| `registration-closed` | 403 | Registration is closed. |
+| `link-invalid` | 400 | This link is invalid or has expired. |
+| `no-session` | 401 | No valid session. |
 
 Unit routing table (defaults; every value is configuration, [SCF-NF-8]):
 
