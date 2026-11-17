@@ -2,7 +2,7 @@
 // password, against the test database, the test Redis, the SMTP stub, and a clock the test moves.
 // The forgot-password and new-password pages are slice 2 in `web`.
 import assert from "node:assert/strict";
-import { after, before, describe, it } from "node:test";
+import { after, before, beforeEach, describe, it } from "node:test";
 import { skip } from "./test-support/database.ts";
 import {
   address,
@@ -49,8 +49,10 @@ describe("IDN-US-6 reset the password", { skip }, () => {
     await running?.close();
     await stack?.stop();
   });
+  // A test that moved the clock and failed early leaves it moved; every test starts at zero.
+  beforeEach(() => later(0));
 
-  async function requestReset(email: string): Promise<string> {
+  async function requestResetLink(email: string): Promise<string> {
     const reply = await running.post("/password-reset/request", { email });
     assert.equal(reply.status, 202);
     return resetToken(stack.smtp.to(email).at(-1)?.text ?? "");
@@ -60,8 +62,8 @@ describe("IDN-US-6 reset the password", { skip }, () => {
     later(0);
     const email = address();
     await confirmedAccount(stack, running, email);
-    const first = await requestReset(email);
-    const second = await requestReset(email);
+    const first = await requestResetLink(email);
+    const second = await requestResetLink(email);
 
     const replaced = await running.post("/password-reset", {
       token: first,
@@ -82,7 +84,7 @@ describe("IDN-US-6 reset the password", { skip }, () => {
     assert.equal(late.body?.code, "link-invalid");
 
     later(0);
-    const fresh = await requestReset(email);
+    const fresh = await requestResetLink(email);
     later(29);
     const used = await running.post("/password-reset", {
       token: fresh,
@@ -113,7 +115,7 @@ describe("IDN-US-6 reset the password", { skip }, () => {
   it("IDN-T-16 IDN-NF-5 gives the reset link at least 128 random bits and stores only a hash of it", async () => {
     const email = address();
     await confirmedAccount(stack, running, email);
-    const token = await requestReset(email);
+    const token = await requestResetLink(email);
     assert.ok(Buffer.from(token, "base64url").length >= 16);
     const rows = await stack.database.query<{ identifier: string }>(
       "SELECT identifier FROM auth_verifications WHERE identifier LIKE 'reset:%'",
@@ -126,7 +128,7 @@ describe("IDN-US-6 reset the password", { skip }, () => {
   it("IDN-T-17 IDN-AC-6.2 IDN-F-26 IDN-E-1 refuses password1234 like the registration and keeps the link", async () => {
     const email = address();
     await confirmedAccount(stack, running, email);
-    const token = await requestReset(email);
+    const token = await requestResetLink(email);
     const weak = await running.post("/password-reset", {
       token,
       password: "password1234",
@@ -145,7 +147,7 @@ describe("IDN-US-6 reset the password", { skip }, () => {
     await confirmedAccount(stack, running, email);
     const one = await running.post("/login", { email, password });
     const two = await running.post("/login", { email, password });
-    const token = await requestReset(email);
+    const token = await requestResetLink(email);
     assert.equal(
       (await running.post("/password-reset", { token, password: newPassword }))
         .status,
@@ -171,21 +173,54 @@ describe("IDN-US-6 reset the password", { skip }, () => {
     const known = address();
     const unknown = address("nobody");
     await confirmedAccount(stack, running, known);
-    const before = stack.smtp.to(known).length;
+    const sentBefore = stack.smtp.to(known).length;
     const a = await running.post("/password-reset/request", { email: known });
     const b = await running.post("/password-reset/request", { email: unknown });
     assert.equal(a.status, 202);
     assert.equal(b.status, 202);
     assert.deepEqual(a.body, { status: "check-mailbox" });
     assert.deepEqual(b.body, a.body);
-    assert.equal(stack.smtp.to(known).length, before + 1);
+    assert.equal(stack.smtp.to(known).length, sentBefore + 1);
     assert.equal(stack.smtp.to(unknown).length, 0);
   });
 
   it("IDN-T-20 IDN-AC-6.6 IDN-F-33 lets a never confirmed account log in after the reset", async () => {
     const email = address();
     await running.post("/register", registration(email));
-    const token = await requestReset(email);
+    const token = await requestResetLink(email);
+    assert.equal(
+      (await running.post("/password-reset", { token, password: newPassword }))
+        .status,
+      204,
+    );
+    assert.equal(
+      (await running.post("/login", { email, password: newPassword })).status,
+      200,
+    );
+  });
+
+  it("IDN-T-16 IDN-F-25 IDN-NF-5 lets only one of two parallel uses of one link through", async () => {
+    const email = address();
+    await confirmedAccount(stack, running, email);
+    const token = await requestResetLink(email);
+    const replies = await Promise.all([
+      running.post("/password-reset", { token, password: newPassword }),
+      running.post("/password-reset", {
+        token,
+        password: "Fuenf-rote-Haeuser-9",
+      }),
+    ]);
+    assert.deepEqual(replies.map((reply) => reply.status).sort(), [204, 400]);
+  });
+
+  it("IDN-T-18 IDN-F-27 sets a password for an account that has no password credential yet", async () => {
+    const email = address();
+    await confirmedAccount(stack, running, email);
+    await stack.database.query(
+      "DELETE FROM auth_accounts WHERE provider_id = 'credential' AND user_id = (SELECT id FROM auth_users WHERE email = $1)",
+      [email],
+    );
+    const token = await requestResetLink(email);
     assert.equal(
       (await running.post("/password-reset", { token, password: newPassword }))
         .status,
@@ -207,7 +242,7 @@ describe("IDN-US-6 reset the password", { skip }, () => {
       (await running.post("/login", { email, password })).status,
       429,
     );
-    const token = await requestReset(email);
+    const token = await requestResetLink(email);
     assert.equal(
       (await running.post("/password-reset", { token, password: newPassword }))
         .status,
