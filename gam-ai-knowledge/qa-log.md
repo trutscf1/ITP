@@ -4,6 +4,7 @@ format: gam-ai-knowledge/1
 title: "Question log — project"
 audience: [developer, reviewer, agent]
 ---
+
 # Question log — project
 
 The verbatim record of every question round, for anyone who wants to know why a decision was made and who answered what (P-GRILL-2). Answers are quoted exactly and never rewritten; the distilled decisions live in the concept's §13 or in an ADR.
@@ -1656,6 +1657,7 @@ Answer: "Ich starte Docker Desktop (Recommended)". Docker Desktop was started by
 **A1 - Zeitbuchung durch den Agenten:** `docs/` (`anforderungen_software_projekte.md` §6, `git_workflow_commands.md` §9) requires time tracking but does not say who posts it, so it does not override P-TIME-1. `trutscf1` decided, verbatim: "schreibe den eintrag: du gibst mir am ende jedes issues deinen vorschlag, dann sage ich ja oder andere zeit, dann trägst du sie für mich ein". Recorded as a deviation from P-TIME-1 in `WORKFLOW.md`; it takes effect when this branch is merged into `dev`, so until then the agent books nothing.
 
 The numbers Q283 to Q285 are provisional until merged (P-TEAM-5).
+
 ## Round 65 — 2026-11-03 — Slice 1 dashboards (#83) (trutscf1 (agent))
 
 Instruction of `trutscf1`, verbatim (coordinator): implement #83, slice 1 of OBS-US-2 ("dashboard tool on the server itself, stored files, and links"), on top of the open !44; build no alert rule (slice 2, #156). The agent could not ask questions; each gap is closed with a default (P-GRILL-4).
