@@ -1,6 +1,5 @@
-// IDN-T-4 (IDN-AC-1.4) over HTTP, with the minimal login of IDN-US-1 slice 1: the login answer
-// before and after the confirmation (IDN-E-5, IDN-F-7). Lock counters, logout, and the session
-// check are IDN-US-2.
+// IDN-T-4 (IDN-AC-1.4) over HTTP: the login answer before and after the confirmation (IDN-E-5,
+// IDN-F-7). Locks, logout, and the session check of IDN-US-2 are in login.test.ts.
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { after, before, describe, it } from "node:test";

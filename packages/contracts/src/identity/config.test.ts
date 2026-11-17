@@ -36,8 +36,20 @@ describe("SCF-F-11 IDN-AC-1.7 configuration of identity", () => {
         SMTP_PORT: 1025,
         SMTP_FROM: "no-reply@stash.local",
         SESSION_CHECK_TIMEOUT_MS: 1000,
+        TRUSTED_PROXY: "proxy",
       },
     });
+  });
+
+  it("IDN-F-9 Q352 takes TRUSTED_PROXY as a host name or address and refuses one with white space", () => {
+    const set = loadIdentityConfig({ ...required, TRUSTED_PROXY: "10.0.0.2" });
+    assert.ok(set.ok);
+    assert.equal(set.config.TRUSTED_PROXY, "10.0.0.2");
+    const invalid = loadIdentityConfig({ ...required, TRUSTED_PROXY: "a b" });
+    assert.deepEqual(
+      invalid.ok ? [] : invalid.problems.map((problem) => problem.name),
+      ["TRUSTED_PROXY"],
+    );
   });
 
   it("IDN-AC-1.7 reads REGISTRATION_ENABLED=false as the closed registration", () => {

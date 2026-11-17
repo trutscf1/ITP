@@ -12,6 +12,9 @@ import { type SmtpStub, startSmtpStub } from "./smtp-stub.ts";
 
 export const password = "Drei-blaue-Wolken-7";
 
+/** The address of the reverse proxy in the tests (TRUSTED_PROXY, Q352). */
+export const proxyAddress = "192.0.2.1";
+
 export interface Stack {
   database: TestDatabase;
   smtp: SmtpStub;
@@ -50,6 +53,8 @@ export interface Reply {
 export interface RequestOptions {
   /** The client address the proxy would put into X-Forwarded-For; a fresh one by default. */
   ip?: string;
+  /** The address of the connection; the reverse proxy by default. */
+  peer?: string;
   language?: string;
   cookie?: string;
 }
@@ -86,6 +91,7 @@ export async function startIdentity(
     IDENTITY_AUTH_SECRET: "0123456789abcdef0123456789abcdef",
     SMTP_HOST: "127.0.0.1",
     SMTP_PORT: String(stack.smtp.port),
+    TRUSTED_PROXY: proxyAddress,
     ...options.env,
   });
   if (!loaded.ok) throw new Error(JSON.stringify(loaded.problems));
@@ -113,12 +119,22 @@ export async function startIdentity(
       headers["accept-language"] = requestOptions.language;
     if (requestOptions.cookie) headers.cookie = requestOptions.cookie;
     const started = performance.now();
-    const response = await identity.app.request(path, {
-      method,
-      headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
-      redirect: "manual",
-    });
+    // The connection as @hono/node-server describes it, so the app sees the peer (Q352).
+    const connection = {
+      incoming: {
+        socket: { remoteAddress: requestOptions.peer ?? proxyAddress },
+      },
+    };
+    const response = await identity.app.request(
+      path,
+      {
+        method,
+        headers,
+        body: body === undefined ? undefined : JSON.stringify(body),
+        redirect: "manual",
+      },
+      connection,
+    );
     const elapsedMs = performance.now() - started;
     const text = await response.text();
     // The e-mails go out after the answer. With the real mailer the test reads them from the SMTP
@@ -181,4 +197,27 @@ export function registration(
 /** A new address under example.org, so tests never share accounts. */
 export function address(prefix = "ada"): string {
   return `${prefix}-${randomInt(1_000_000_000)}@example.org`;
+}
+
+/** Registers the address and opens its confirmation link, so it can log in. */
+export async function confirmedAccount(
+  stack: Stack,
+  running: Running,
+  email: string,
+): Promise<void> {
+  await running.post("/register", registration(email));
+  const token = confirmationToken(stack.smtp.to(email).at(-1)?.text ?? "");
+  const reply = await running.get(`/confirm?token=${token}`);
+  if (reply.headers.get("location") !== "/login?confirmed=1") {
+    throw new Error(
+      `confirmation failed: ${reply.status} ${reply.headers.get("location")}`,
+    );
+  }
+}
+
+/** The value of the session cookie a reply sets, or undefined. */
+export function sessionToken(reply: Reply): string | undefined {
+  return /stash_session=([\w-]*)/.exec(
+    reply.headers.get("set-cookie") ?? "",
+  )?.[1];
 }
