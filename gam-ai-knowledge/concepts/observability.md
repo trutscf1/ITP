@@ -29,7 +29,7 @@ Operators see metrics, log entries, and traces of every unit in operations dashb
 1. The operator starts the local stack with its usual command. The example configuration switches the observability profile on; an operator who does not want it removes it there ([OBS-AC-1.5] observability profile). A configuration step checks the retention times, the alert thresholds, and the port of the dashboard tool first; a wrong value stops only the observability stack, with one line per wrong value ([OBS-E-4] invalid stack configuration).
 2. Every unit starts its telemetry before it accepts requests, writes a start log entry, and reports a heartbeat every 15 seconds ([OBS-AC-1.1] instrumented units).
 3. Each request a unit answers is measured and traced under the route pattern it matched, never the raw address. When `web` calls `storage` and `storage` queues a job, the job carries the trace along, so the whole path is one trace ([OBS-AC-1.3] connected trace).
-4. Log entries are JSON lines; an entry written while a request or a job is handled carries its trace ID, and passwords and tokens are replaced by `[redacted]` in the unit ([OBS-AC-1.4] structured logs), and the collector removes e-mail addresses, IP addresses, and request details a second time before anything is stored ([OBS-AC-1.6] no person identifiers).
+4. Log entries are JSON lines; an entry written while a request or a job is handled carries its trace ID, and passwords and tokens are replaced by `[redacted]` in the unit ([OBS-AC-1.4] structured logs), and e-mail addresses and IP addresses are removed in the unit and again by the collector, which also removes request details, before anything is stored ([OBS-AC-1.6] no person identifiers).
 5. The collector sends metrics, log entries, and traces to their three stores within a minute ([OBS-AC-1.2] collector routing). Logs and traces are kept 7 days, metrics 15 days.
 6. The operator opens the operations dashboard "Operations overview" ([OBS-AC-2.1] operations overview) and follows links from a panel to log entries, from a log entry to its trace, and back ([OBS-AC-2.2] linked logs and traces). Until TLS exists (R14), the dashboard tool answers only on the server itself, for example through an SSH tunnel, and shows everything read-only. Afterwards it is served under `/observability` over HTTPS, and only a person with an operator session of `identity` gets in ([OBS-AC-2.5] login required).
 7. Every minute the alert rules are checked. A high error rate, almost full storage, a growing queue, or a unit that went silent appears in the alert list ([OBS-AC-2.3], [OBS-AC-2.6], [OBS-AC-2.7], [OBS-AC-2.8]). Nothing is sent outside the installation.
@@ -71,7 +71,7 @@ The decisions of 2026-10-27 were taken by the agent on the owner's standing inst
 | Q36 Address (replaces Q12) | On the server itself until TLS (R14), then `/observability` through the reverse proxy over HTTPS only | No login over plain HTTP |
 | Q37 Login (replaces Q22) | Through `identity`; the dashboard tool keeps no password | The school requires Argon2id hashes; `identity` has them |
 | Q13 Retention | Logs and traces 7 days, metrics 15 days | Enough to investigate an incident, small on disk |
-| Q17 Redaction | Two layers: the unit by attribute name, the collector by name and text pattern | One forgotten attribute must not leak a secret |
+| Q17 Redaction | Two layers: the unit by attribute name and text pattern, the collector by name, allow list, and text pattern | One forgotten attribute must not leak a secret |
 | Q21 Code location | New shared package `telemetry`; each owner adds the start call | One implementation, four tracks |
 | Q24 Outside trace headers | Removed by the reverse proxy | A browser cannot attach its requests to someone else's trace |
 | Q39 Stack tests (replaces Q31) | One CI job `stack-test` once the pipeline has a container runtime | Every acceptance test runs automatically |
@@ -142,7 +142,7 @@ The user stories and their acceptance criteria are the work items in [work-items
 | OBS-F-11 | Heartbeat | Every unit MUST set the metric `unit.running` (§8) to 1 at every export interval while it runs. | OBS-AC-1.1 (Instrumented units), OBS-AC-2.8 (Silent unit alert) |
 | OBS-F-12 | Request metric | Every unit MUST record the duration of each HTTP request it answers in the metric `http.server.request.duration` (§8). Requests to its health endpoint `/health` MUST NOT be recorded in a metric, a log entry, or a span. | OBS-AC-2.1 (Operations overview) |
 | OBS-F-13 | Route pattern | The route attribute and the name of a request span MUST use the route pattern the unit matched, with every path parameter written as `{name}`. A request that matches no route MUST have the route `unmatched`. The raw path and the query string MUST NOT be recorded. | OBS-AC-1.6 (No person identifiers) |
-| OBS-F-14 | Secret redaction in the unit | Before a log entry is written or exported, the logger MUST replace with `[redacted]` the value of every attribute whose key contains, ignoring case, one of the secret key fragments of §8, or equals, ignoring case, one of its secret keys. | OBS-AC-1.4 (Structured logs) |
+| OBS-F-14 | Redaction in the unit | Before a log entry is written or exported, the logger MUST replace with `[redacted]` the value of every attribute whose key contains, ignoring case, one of the secret key fragments of §8, or equals, ignoring case, one of its secret keys. It MUST also replace every text matching a pattern of §8 ("Redaction patterns") in the message and in the attribute values with `[redacted]`, so that standard output holds no e-mail address or IP address either (A2 of round 61). | OBS-AC-1.4 (Structured logs), OBS-AC-1.6 (No person identifiers) |
 | OBS-F-15 | Trace context in job payloads | The envelope of every job payload MUST have the optional field `traceContext` (§8). The unit that queues a job while a span is active MUST set it to the active trace context; `worker` MUST start the span of the job as a child of it, or as the root of a new trace when it is missing or invalid ([OBS-E-6]). | OBS-AC-1.3 (Connected trace) |
 | OBS-F-16 | Outside trace context removed | The reverse proxy MUST remove the request headers `traceparent`, `tracestate`, and `baggage` from every incoming request before forwarding it, so that every trace starts at the first unit. | OBS-AC-1.3 (Connected trace) |
 | OBS-F-17 | Error rate alert rule | For each unit `u`, at each evaluation time `t`: let `N` be the number of requests of `u` recorded in `http.server.request.duration` within the 5 minutes before `t`, and `E` the number of those with a status code from 500 to 599. The alert "High error rate" for `u` MUST be firing when `N` ≥ `OBS_ALERT_MIN_REQUESTS` and `E / N × 100` > `OBS_ALERT_ERROR_RATE_PERCENT`, and normal otherwise. | OBS-AC-2.3 (Error rate alert) |
@@ -219,6 +219,8 @@ LogEntry {
   attributes: map<string, string>     // keys 1..64 characters [a-zA-Z0-9._-]; values 0..500 characters
 }
 
+A key outside [a-zA-Z0-9._-] is written with `_` in place of each other character. A neutral name of §8 that has a space is written as a log attribute key in camel case: `job id` is `jobId`, as in example 2 (A3 of round 61).
+
 TraceContext = string matching 00-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}
                                        // the "traceparent" value of the W3C Trace Context format
 
@@ -292,8 +294,8 @@ The secret key fragments and the secret keys are part of the contract of the pac
 | Pattern | Matches |
 | --- | --- |
 | E-mail address | one or more characters other than white space and `@`, then `@`, then one or more such characters, a `.`, and one or more such characters |
-| IPv4 address | four groups of 1 to 3 digits separated by `.`, not part of a longer run of digits and dots |
-| IPv6 address | 3 to 8 groups of 1 to 4 hexadecimal digits separated by `:` that contain `::`, or exactly 8 such groups; a time such as `10:00:00` has no `::` and fewer than 8 groups and is kept |
+| IPv4 address | four groups of 1 to 3 digits separated by `.`, not part of a longer run of digits and dots; one full stop directly after the address is not part of the run, so the address in `from 203.0.113.7.` is redacted |
+| IPv6 address | 1 to 7 groups of 1 to 4 hexadecimal digits separated by `:` that contain `::` (`fe80::1`, `::1`), or exactly 8 such groups; not directly preceded or followed by a letter, digit, underscore, or `:`, so that `std::vector` is kept; a time such as `10:00:00` has no `::` and fewer than 8 groups and is kept; an address written directly after a colon without a space (`ip:2001:db8::1`) is not redacted, because the colon before it is part of the boundary, while `client=2001:db8::1` and `[2001:db8::1]:443` are |
 
 **Operations overview** (the operations dashboard of [OBS-F-6]; every value over the 5 minutes before each point in time, all units or the unit chosen in the unit selector):
 
@@ -332,7 +334,7 @@ Alert states: `normal`, `pending` (only "Storage almost full"), `firing` (§16, 
 | OBS-E-3 | Dashboard tool absent | A request to `/observability` arrives while the observability profile is switched off, before TLS exists ([OBS-F-24]), or before the dashboard tool is healthy. | The reverse proxy answers with an HTTP status from 500 to 599 or 404; every other route answers unchanged. | None. | OBS-AC-2.5 (Login required) |
 | OBS-E-4 | Invalid stack configuration | A variable of the observability stack (§8) is missing where required or outside its valid values. | The configuration step exits with a non-zero code and prints one line per invalid variable — name and reason, never the value — in the form of [SCF-E-1]. The stores and the dashboard tool do not start; the units and the data services start as without the profile. | None. | OBS-AC-1.5 (Observability profile) |
 | OBS-E-5 | No operator session | A request under `/observability` arrives without a session of `identity`, or with a session whose account lacks the operator role. | Without a session the reverse proxy answers with a redirect to the login of `identity`; with a session without the operator role it answers 403. The dashboard tool receives neither request. Wrong passwords and locked logins are handled by the login of `identity`. | None. | OBS-AC-2.5 (Login required) |
-| OBS-E-6 | Invalid trace context in a job | The field `traceContext` of a job payload does not match `TraceContext` (§8). | `worker` runs the job, starts its span as the root of a new trace, and writes a log entry with level `warn`, message `invalid trace context in job payload`, and the attributes `queue` and `job id`. | None. | OBS-AC-1.3 (Connected trace) |
+| OBS-E-6 | Invalid trace context in a job | The field `traceContext` of a job payload does not match `TraceContext` (§8). | `worker` runs the job, starts its span as the root of a new trace, and writes a log entry with level `warn`, message `invalid trace context in job payload`, and the attributes `queue` and `jobId`. | None. | OBS-AC-1.3 (Connected trace) |
 | OBS-E-7 | Invalid unit telemetry configuration | A variable of `TelemetryConfig` (§8) is outside its valid values. | The unit behaves as [SCF-E-1] (invalid configuration) of [scaffolding.md](scaffolding.md). | None. | OBS-AC-1.1 (Instrumented units) |
 | OBS-E-8 | Invalid provisioning file | A data source, operations dashboard, or alert rule file in the repository cannot be read. | The test of [OBS-T-11] fails in CI before the file reaches `dev`. At a start, the dashboard tool loads every other file and writes the name of the unreadable file to its log. | None. | OBS-AC-2.4 (Dashboards as code) |
 
@@ -595,6 +597,8 @@ The slices and their issues stand in the story files (P-DOC-6); this table only 
 | OBS-US-2 | 4 — storage, queue, and silent-unit alerts, after R5 and R9 | Platform & cms | M6 (thresholds), M9 (alert rules) |
 | OBS-US-2 | 5 — login through `identity` over HTTPS, after R3 and R14 | Platform & cms | M9 (proxy header), M10 (route, session check) |
 
+Slice 1 of `OBS-US-2` stores the dashboard "Operations overview" with the three panels that carry the log link of [OBS-F-7] ("Requests per second", "Server errors", "Latency (95th percentile)"); slice 3 adds the other three panels (round 62 of the question log, A1).
+
 The metrics of [OBS-F-21] to [OBS-F-23] are emitted by modules of R5 and R9 (§15); until then their panels show "No data" and their rules are normal. Slice 1 of `OBS-US-1` depends only on R1; the slices that wait for R3, R5, R9, or R14 say so in their story file (A19).
 
 ### Module Specifications
@@ -626,27 +630,32 @@ function startTelemetry(unit: UnitName, version: string, config: TelemetryConfig
   7. Return the Telemetry. Nothing in steps 3–6 waits for the collector.
 ```
 
-**M2 Logger** — Traces to: OBS-F-4, OBS-F-14, OBS-F-25, OBS-F-30. Requires: OBS-C-1.
+**M2 Logger** — Traces to: OBS-F-4, OBS-F-14, OBS-F-25, OBS-F-30, OBS-NF-2. Requires: OBS-C-1.
 
 ```text
 function log(level: LogLevel, message: string, attributes: map<string, string>) -> nothing
   1. If level is below config.logLevel: return.
   2. entry = LogEntry {
        time: now, level, unit, version,
-       message: if length(message) > 2000 then first 1999 characters + "…" else message,
+       message: Redactor.redactText(message), then if length > 2000 the first 1999 characters + "…",
        traceId, spanId: from the active span, or left out,
-       attributes: Redactor.redact(attributes) }
+       attributes: Redactor.redact(attributes), then Redactor.redactText of every value,
+                   cut to 500 characters, keys as in §8 }
   3. Write entry as one JSON line to standard output.
   4. Add entry to the log ExportBuffer.
 ```
 
-**M3 Redactor** — Traces to: OBS-F-14. Requires: none.
+**M3 Redactor** — Traces to: OBS-F-14, OBS-NF-2. Requires: none.
 
 ```text
 function redact(attributes: map<string, string>) -> map<string, string>
   For every key k: if lowercase(k) contains a secret key fragment of §8, or equals one of its secret keys,
   the value becomes "[redacted]".
   Every other pair is returned unchanged. The function has no side effect.
+
+function redactText(text: string) -> string
+  Replaces every match of the redaction patterns of §8 (e-mail address, IPv4 address, IPv6 address)
+  with "[redacted]". The function has no side effect.
 ```
 
 **M4 JobTrace** — Traces to: OBS-F-3, OBS-F-15, OBS-E-6. Requires: OBS-C-1.
@@ -658,7 +667,7 @@ function inject(envelope: JobEnvelope) -> JobEnvelope
 function run(envelope: JobEnvelope, queue: string, jobName: string, jobId: string,
              handler: function(JobEnvelope) -> nothing) -> nothing
   1. If envelope.traceContext matches TraceContext: parent = it. Else if it is present:
-     log warn "invalid trace context in job payload" with queue and job id (OBS-E-6); parent = none.
+     log warn "invalid trace context in job payload" with queue and jobId (OBS-E-6); parent = none.
   2. Start span "job <queue>/<jobName>" with parent, attributes queue, job name, job id.
   3. Run handler; end the span with outcome "ok", or "error" and error type if the handler failed;
      a failure is passed on to the caller unchanged.
@@ -684,8 +693,11 @@ function check(environment: map<string, string>) -> exit code
   1. For each variable of §8 "Configuration of the observability stack": missing and no default,
      or outside its valid values → one line "  <NAME>: <reason>"; never the value.
   2. If any line: print "Invalid configuration for the observability stack:" and the lines; exit 1.
-  3. Write the alert rule files from their templates in the repository, replacing the placeholders
-     of the four alert thresholds and of OBS_ALERT_SILENT_MINUTES with the values; exit 0.
+  3. Write the trace store configuration from its template, with the retention in hours, and the alert
+     rule file `alert-rules.yml` from its template `alert-rules.template.yml` in the repository,
+     replacing every placeholder (a variable name between two double underscores) with its checked value;
+     slice 2 of OBS-US-2 has the placeholders of OBS_ALERT_ERROR_RATE_PERCENT and OBS_ALERT_MIN_REQUESTS,
+     slice 4 adds those of the storage and queue thresholds and of OBS_ALERT_SILENT_MINUTES; exit 0.
 ```
 
 **M7 CollectorPipeline** — Traces to: OBS-F-2, OBS-F-29, OBS-NF-2, OBS-NF-3, OBS-NF-7, OBS-E-2. Requires: OBS-C-2.
@@ -696,9 +708,11 @@ Order for every received batch: (1) drop span attributes not in the allowed list
 
 **M9 DashboardProvisioning** — Traces to: OBS-F-6, OBS-F-7, OBS-F-8, OBS-F-9, OBS-F-10, OBS-F-17 to OBS-F-20, OBS-F-27, OBS-U-1 to OBS-U-4, OBS-NF-1, OBS-NF-5, OBS-NF-6, OBS-E-5, OBS-E-8. Requires: OBS-C-3, OBS-C-6. Files in the repository: three data sources (metric store, log store with a link from `traceId` to the trace store, trace store with a link to log entries by trace ID); the dashboard "Operations overview" with the panels of §8 and the links of [OBS-F-7]; the alert rule templates of §8; the settings of the dashboard tool (until TLS: anonymous read-only access on the local port; with TLS: the person taken from the header of the reverse proxy and anonymous access off; never self-registration, a login form, or a password; update checks and usage reporting off; served under `/observability`; loaded files not savable).
 
+**Form of the alert rules (M9, from slice 2 of OBS-US-2).** The rules are Prometheus rules in the template `docker/observability/alert-rules.template.yml`, in one group evaluated every 60 seconds; the metric store reads the rendered file from the volume of the configuration step at its start only, so after a change of a threshold the metric store is restarted, and the data source "Metrics" lets the dashboard tool list them read-only. "High error rate" has two recording rules, one per unit: the exact number of requests and the exact number of requests with a status code from 500 to 599 in the 5 minutes before the evaluation, each as the counter now minus the counter 5 minutes ago (a series that is new inside the window starts at 0; `increase()` would extrapolate and break the threshold of 20 requests; after a restart of a unit the count is too low, and after a gap of more than 5 minutes in its data it can be too high for one window). The alert rule has no pending period.
+
 **M10 ProfileAndRoute** — Traces to: OBS-F-5, OBS-F-16, OBS-F-24, OBS-F-27, OBS-NF-7, OBS-NF-8, OBS-E-3, OBS-E-5. Requires: OBS-C-7, [SCF-C-6], [SCF-C-7]. The example configuration names the profile in `COMPOSE_PROFILES`. Start order inside the profile: M6 → the three stores and the collector (after M6 exited with 0) → the dashboard tool (after the stores report healthy). No container of the profile publishes a host port except the dashboard tool, whose port `OBS_DASHBOARD_PORT` is bound to `127.0.0.1` until TLS exists; with TLS the port is removed, and the reverse proxy reaches the dashboard tool on the internal network after the session check of `identity` ([OBS-F-27]).
 
-**M11 UnitWiring** — Traces to: OBS-F-1, OBS-F-11, OBS-F-15, OBS-F-21, OBS-F-22, OBS-F-23, OBS-F-25. Requires: OBS-C-1. In each unit, before it accepts a request or a job: `startTelemetry(<unit>, <version>, config.telemetry)`, then `log(info, "unit started", {})`. Every queueing call passes the envelope through `inject`; every job handler of `worker` runs inside `run`. `storage` and `worker` emit the metrics of [OBS-F-21] to [OBS-F-23] when R5 and R9 build the parts they measure.
+**M11 UnitWiring** — Traces to: OBS-F-1, OBS-F-11, OBS-F-15, OBS-F-21, OBS-F-22, OBS-F-23, OBS-F-25. Requires: OBS-C-1. In each unit, before it accepts a request or a job: `startTelemetry(<unit>, <version>, config.telemetry)`, then `log(info, "unit started", {})`. Every queueing call passes the envelope through `inject`; every job handler of `worker` runs inside `run`. `storage` and `worker` emit the metrics of [OBS-F-21] to [OBS-F-23] when R5 and R9 build the parts they measure. In `cms`, the call sits in `boot` of `apps/cms/src/boot.ts`, which reads the telemetry variables, starts the telemetry, writes the start entry, and only then hands over to the code that accepts requests; the version is the one of `apps/cms/package.json` (assumptions A1 to A3, round 71 of [qa-log.md](../qa-log.md)). Until `cms` runs as a container of the local stack, [OBS-T-1] covers it at this seam.
 
 ### Pipeline Flow
 
@@ -785,7 +799,7 @@ The seams at which the tests of §17 run (P-DES-2):
 
 | Story | Requirements | Modules | Tests |
 | --- | --- | --- | --- |
-| OBS-US-1 | OBS-F-1 to F-5, F-11 to F-16, F-25, F-28 to F-31; OBS-NF-1 to NF-4, NF-8, NF-9; OBS-E-1, E-2, E-4, E-6, E-7; OBS-C-1, C-2, C-4, C-5 | M1 to M8, M10, M11 | OBS-T-1 to T-7, T-16 to T-19, T-21 to T-32, T-37, T-38 |
+| OBS-US-1 | OBS-F-1 to F-5, F-11 to F-16, F-25, F-28 to F-31; OBS-NF-1 to NF-4, NF-8, NF-9; OBS-E-1, E-2, E-4, E-6, E-7; OBS-C-1, C-2, C-4, C-5 | M1 to M8, M10, M11 | OBS-T-1 to T-7, T-16 to T-19, T-21 to T-32, T-37, T-38, T-40 |
 | OBS-US-2 | OBS-F-6 to F-10, F-17 to F-24, F-26, F-27; OBS-U-1 to U-4; OBS-NF-5 to NF-7; OBS-E-3, E-5, E-8; OBS-C-3, C-6, C-7 | M6, M9, M10, M11 | OBS-T-8 to T-15, T-20, T-33 to T-36, T-39 |
 
 ## 17. Test Concept & TDD Contract
@@ -798,6 +812,7 @@ Values from §10. Each test name in code carries its ID and the requirement IDs 
 | --- | --- | --- | --- | --- |
 | OBS-T-21 | M3 Redactor | `{ "password": "hunter2hunter2", "sessionToken": "s3cr3t", "X-Api-Key": "k-123", "reason": "locked" }` | `{ "password": "[redacted]", "sessionToken": "[redacted]", "X-Api-Key": "[redacted]", "reason": "locked" }` | OBS-F-14 |
 | OBS-T-22 | M3 Redactor | `{ "AUTHORIZATION": "Bearer x", "userTotpCode": "123456", "backupCodes": "a1,b2", "Code": "4711", "statusCode": "200", "fileCount": "3" }` | `{ "AUTHORIZATION": "[redacted]", "userTotpCode": "[redacted]", "backupCodes": "[redacted]", "Code": "[redacted]", "statusCode": "200", "fileCount": "3" }` | OBS-F-14 |
+| OBS-T-40 | M3 Redactor | the messages of §10, example 2, rows 1 to 3 | the "Stored" column of those rows | OBS-F-14, OBS-NF-2 |
 | OBS-T-23 | M2 Logger | the call of §10, example 1, with a fixed clock `2026-11-03T09:15:02.417Z` and an active span | exactly the JSON line of example 1; the same call without a span has no `traceId` and no `spanId` | OBS-F-4, OBS-F-25 |
 | OBS-T-24 | M2 Logger | message of 2500 characters `a` | message of 1999 characters `a` followed by `…` | OBS-F-4 |
 | OBS-T-25 | M2 Logger | `LOG_LEVEL` = `warn`; one entry each with level `info` and `error` | only the `error` entry on standard output and in the buffer | OBS-F-30 |
@@ -806,7 +821,7 @@ Values from §10. Each test name in code carries its ID and the requirement IDs 
 | OBS-T-28 | M1 startTelemetry | `TELEMETRY_EXPORT_INTERVAL_MS=500` | fails as SCF-E-1 with the line `TELEMETRY_EXPORT_INTERVAL_MS: expected an integer between 1000 and 60000` | OBS-E-7 |
 | OBS-T-29 | M5 ExportBuffer | limit 3, exporter stub silent, log entries L1 to L5; then the stub answers | buffer L3, L4, L5; standard output L1 to L5; after the next interval the stub received L3, L4, L5 and at most one `telemetry export failed` entry per minute was written | OBS-E-1, OBS-NF-9 |
 | OBS-T-30 | M4 JobTrace | `inject` inside span `00f067aa0ba902b7` of trace `4bf92f3577b34da6a3ce929d0e0e4736`; then `run` of that envelope | envelope `traceContext` = `00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01`; the job span has that trace ID and that parent | OBS-F-3, OBS-F-15 |
-| OBS-T-31 | M4 JobTrace | `run` with `traceContext` = `garbage`, queue `processing`, job id `j-881` | the handler runs; the job span is the root of a new trace; one `warn` entry `invalid trace context in job payload` with `queue` and `job id` | OBS-E-6 |
+| OBS-T-31 | M4 JobTrace | `run` with `traceContext` = `garbage`, queue `processing`, job id `j-881` | the handler runs; the job span is the root of a new trace; one `warn` entry `invalid trace context in job payload` with `queue` and `jobId` | OBS-E-6 |
 | OBS-T-32 | M7 CollectorPipeline | the eight rows of §10, example 2, sent to the collector with recording stubs | the stubs receive exactly the "Stored" column | OBS-F-29, OBS-NF-2 |
 | OBS-T-33 | M9 alert rule "High error rate" | the five rows of §10, example 5, as series | the states of example 5, the summary text of the firing row | OBS-F-17, OBS-F-8, OBS-U-4 |
 | OBS-T-34 | M9 alert rule "Storage almost full" | the series of §10, example 6 | the states of example 6 at each time; no data → normal | OBS-F-18, OBS-F-8 |
@@ -854,7 +869,7 @@ The values of §10 are the test data: the log entry, the redaction table, the ro
 
 ### CI Test Constraints
 
-The unit tests ([OBS-T-21] to [OBS-T-38]) and the file tests ([OBS-T-11] parsing, [OBS-T-17], [OBS-T-19]) run in the `test` job without network; the rule tests use the offline rule test of [OBS-C-3]. The stack tests — [OBS-T-1] to [OBS-T-10], [OBS-T-11] (start and save), [OBS-T-12] to [OBS-T-16], [OBS-T-18], [OBS-T-20], and [OBS-T-39] — run in one CI job `stack-test`, which starts the local stack with the observability profile, as soon as the pipeline offers a container runtime (SCF-US-5, track Identity & CI; Q39). Until then they are run locally and their result is stated in the merge request, as for R1 ([scaffolding.md](scaffolding.md) §17). [OBS-T-12] needs TLS and the operator login of `identity`, so it runs from slice 5 of `OBS-US-2` on. No test calls a service on the internet. [OBS-T-1] and [OBS-T-3] cover only the units that are runnable at the time; the criterion is met when all five are.
+The unit tests ([OBS-T-21] to [OBS-T-38]) and the file tests ([OBS-T-11] parsing, [OBS-T-17], [OBS-T-19]) run in the `test` job without network; the rule tests use the offline rule test of [OBS-C-3], which needs `promtool` or Docker, so the job `test` skips them with a written reason until the job `rule-test` (issue #164) runs them on the pinned image of the metric store. The stack tests — [OBS-T-1] to [OBS-T-10], [OBS-T-11] (start and save), [OBS-T-12] to [OBS-T-16], [OBS-T-18], [OBS-T-20], and [OBS-T-39] — run in one CI job `stack-test`, which starts the local stack with the observability profile, as soon as the pipeline offers a container runtime (SCF-US-5, track Identity & CI; Q39). Until then they are run locally and their result is stated in the merge request, as for R1 ([scaffolding.md](scaffolding.md) §17). [OBS-T-12] needs TLS and the operator login of `identity`, so it runs from slice 5 of `OBS-US-2` on. No test calls a service on the internet. [OBS-T-1] and [OBS-T-3] cover only the units that are runnable at the time; the criterion is met when all five are.
 
 ### Test Coverage Matrix & Untested Justifications
 

@@ -1,0 +1,28 @@
+{
+  "patterns": [
+    "/api/storage/files/{id}/download",
+    "/api/storage/files/{id}",
+    "/s/{token}",
+    "/api/storage/uploads"
+  ],
+  "rows": [
+    {
+      "method": "GET",
+      "path": "/api/storage/files/7c9e6679-7425-40de-944b-e07fc1f90ae7/download",
+      "route": "/api/storage/files/{id}/download",
+      "span": "GET /api/storage/files/{id}/download"
+    },
+    {
+      "method": "GET",
+      "path": "/s/AbCdEf123?x=1",
+      "route": "/s/{token}",
+      "span": "GET /s/{token}"
+    },
+    {
+      "method": "GET",
+      "path": "/no-such-page",
+      "route": "unmatched",
+      "span": "GET unmatched"
+    }
+  ]
+}

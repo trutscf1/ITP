@@ -109,7 +109,7 @@ The user stories and their acceptance criteria are the work items in [work-items
 | SCF-F-1 | Five units | The system MUST consist of exactly five units: `web`, `identity`, `storage`, `worker`, `cms`. Each MUST run as its own container. | SCF-AC-1.1 (Workspace layout), SCF-AC-2.1 (One start command) |
 | SCF-F-2 | One start command | One command MUST start the local stack: the reverse proxy, the data services — relational database [SCF-C-8], key-value store [SCF-C-14], document database [SCF-C-15], sync database [SCF-C-16], object storage [SCF-C-17], virus scanner [SCF-C-18] — and every unit. A unit joins the local stack in the merge request that makes it runnable; until then the stack starts without it. | SCF-AC-2.1 (One start command) |
 | SCF-F-3 | Native start | A second command MUST start all units natively with automatic reload on code change, using the reverse proxy and the data services from the container stack. | SCF-AC-2.7 (Native start) |
-| SCF-F-4 | One origin | The reverse proxy MUST serve `web`, `identity`, `storage`, and `cms` under one origin, routed by the path prefixes in §8. `worker` MUST NOT be reachable through the proxy. | SCF-AC-8.1 (One origin) |
+| SCF-F-4 | One origin | The reverse proxy MUST serve `web`, `identity`, `storage`, and `cms` under one origin, routed by the path prefixes in §8. `worker` MUST NOT be reachable through the proxy. The proxy MUST remove the request headers `traceparent`, `tracestate`, and `baggage` from every incoming request before forwarding it ([OBS-F-16] in [observability.md](observability.md)). | SCF-AC-8.1 (One origin) |
 | SCF-F-5 | Health endpoint | Every unit MUST expose a health endpoint that returns a health report (§8). For proxied units it MUST also be reachable through the proxy at `<prefix>/health`. | SCF-AC-8.1 (One origin), SCF-AC-8.2 (Health report) |
 | SCF-F-6 | Status of a health report | A health report's `status` MUST be `ok` when all dependency checks are `ok`, `degraded` when only non-essential checks are `down`, and `down` when at least one essential check is `down`. A unit without dependency checks reports `ok`. | SCF-AC-8.2 (Health report), SCF-AC-8.3 (Failed dependency) |
 | SCF-F-7 | Database check of `identity` | `identity` MUST check the relational database as an essential dependency, with the check name `relational-database`. This document defines no dependency check for the other units; the concept of the feature that gives a unit a dependency defines its check. | SCF-AC-8.3 (Failed dependency) |
@@ -123,7 +123,7 @@ The user stories and their acceptance criteria are the work items in [work-items
 | SCF-F-15 | CI pipeline | The CI pipeline MUST run on every push to a branch and on every merge request, with one pipeline per change. Its jobs are: lint, typecheck, test, build, commit-message check, accessibility check, secret scan, code scan, dependency audit, container image scan. A merge request MUST NOT be mergeable unless all jobs pass ([SCF-E-5], failed CI job), and its pipeline status MUST be visible on the merge request. | SCF-AC-5.1 (Pipeline triggers), SCF-AC-5.2 (Pipeline steps), SCF-AC-5.3 (Failing conditions), SCF-AC-5.5 (Visible status) |
 | SCF-F-16 | Changelog draft | `CHANGELOG.md` MUST follow Keep a Changelog 1.1.0. One command MUST generate a draft section for the next release from the commits since the last release tag (mapping in §10, example 5); the release merge request author edits the draft before merging. | SCF-AC-6.2 (Changelog from commits) |
 | SCF-F-17 | Example configuration | The repository MUST hold an example configuration file that lists every configuration variable of the local stack and of every unit with a dummy value. | SCF-AC-2.2 (Configuration by environment) |
-| SCF-F-18 | Workspace layout | The repository MUST be one workspace with one lockfile that holds the five units and the shared packages `contracts`, `ui`, and `config`. | SCF-AC-1.1 (Workspace layout) |
+| SCF-F-18 | Workspace layout | The repository MUST be one workspace with one lockfile that holds the five units and the shared packages `contracts`, `ui`, `config`, and `telemetry`. | SCF-AC-1.1 (Workspace layout) |
 | SCF-F-19 | Quick start | The README MUST contain a quick start of at most 30 lines that names every step from a fresh clone to the running project, and every command it names MUST exist in the repository. | SCF-AC-1.5 (Quick start) |
 | SCF-F-20 | Container health checks | Every long-running container of the local stack MUST define a health check. The container of a unit MUST start only after the containers it depends on report healthy; a one-shot container (`restart: "no"`, such as the migrating container of [SCF-F-26]) has no health check, and its dependents wait until it completed successfully (Q173). | SCF-AC-2.4 (Health checks) |
 | SCF-F-21 | Uniform error response | Every HTTP endpoint of a unit MUST answer a failed request with an `ErrorResponse` (§8) and the matching HTTP status. | SCF-AC-3.4 (Uniform error format) |
@@ -235,6 +235,8 @@ Unit routing table (defaults; every value is configuration, [SCF-NF-8]):
 | `cms` | `/cms` | `/cms/health` | 1337 | `trutscf1` |
 
 Every unit serves its health endpoint internally at `/health` on its internal port.
+
+The proxy removes the request headers `traceparent`, `tracestate`, and `baggage` from every request that arrives from outside, before it forwards the request to a unit, so that every trace starts at the first unit ([OBS-F-16] in [observability.md](observability.md), delivered with `OBS-US-1` slice 1). The row of `/observability` follows with `OBS-US-2` slice 5.
 
 ### Relational data model
 
@@ -539,6 +541,7 @@ repository root        workspace, root tasks, shared lint / format / type config
 ├── packages/contracts shared contracts: health, configuration helper, error response, OpenAPI generation
 ├── packages/ui        shared user-interface components
 ├── packages/config    shared type configuration
+├── packages/telemetry shared telemetry package of R2: start call, logger, redaction, job trace, export buffer
 ├── packages/db        relational schema definition, migrations, seed, database client (Q21)
 └── tests              acceptance tests of this document (§17)
 ```
@@ -686,7 +689,7 @@ One test per acceptance criterion; test names in code carry the `AC` ID. On `dev
 
 | ID | Title | Covers | Given | When | Then |
 | --- | --- | --- | --- | --- | --- |
-| SCF-T-1 | Workspace lists units and packages | SCF-AC-1.1, SCF-F-1, SCF-F-18 | a fresh clone | the workspace definition and the manifests are read | the units `web`, `identity`, `storage`, `worker`, `cms` and the packages `contracts`, `ui`, `config` are members of one workspace with one lockfile |
+| SCF-T-1 | Workspace lists units and packages | SCF-AC-1.1, SCF-F-1, SCF-F-18 | a fresh clone | the workspace definition and the manifests are read | the units `web`, `identity`, `storage`, `worker`, `cms` and the packages `contracts`, `ui`, `config`, `telemetry` are members of one workspace with one lockfile |
 | SCF-T-2 | Unspecified type fails lint | SCF-AC-1.2, SCF-NF-5 | a file `any-probe.ts` with `const x: any = 1` in a unit or package | `lint` runs in it | it exits with a non-zero code and names the unspecified type; the type configuration of every unit and package resolves to strict mode |
 | SCF-T-3 | Root tasks run everywhere | SCF-AC-1.3, SCF-F-12 | the repository on `dev` | the root commands for `lint`, `typecheck`, and `build` are read and run | each one runs its task in every unit and package and exits with 0; every unit and package defines `dev`, `build`, `lint`, `typecheck`, `test` |
 | SCF-T-4 | Versions are pinned | SCF-AC-1.4, SCF-NF-9 | the repository root | the version file and the package manifest are read | both name Node.js 24.14.0 or higher of the 24 line; the manifests name Next.js 16.3 or higher and React 19.2 or higher |
