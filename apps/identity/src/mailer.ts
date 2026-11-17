@@ -1,7 +1,7 @@
 // M6 Mailer (gam-ai-knowledge/concepts/identity.md §16, IDN-C-8, IDN-F-38, IDN-E-11): the e-mails
 // of the stories over SMTP. A failed delivery never fails the request: it is logged without the
 // address and the link, and reported as `false`.
-import type { IdentityConfig } from "@stash/contracts";
+import { type IdentityConfig, identityApiPath } from "@stash/contracts";
 import { createTransport } from "nodemailer";
 import type { Logger } from "./logger.ts";
 import {
@@ -112,7 +112,7 @@ export function createMailer(
         to,
         confirmationTemplate(
           language,
-          `${config.PUBLIC_ORIGIN}/api/identity/confirm?token=${encodeURIComponent(token)}`,
+          `${config.PUBLIC_ORIGIN}${identityApiPath("confirm")}?token=${encodeURIComponent(token)}`,
           config.CONFIRMATION_LINK_TTL_HOURS,
         ),
       ),

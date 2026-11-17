@@ -19,7 +19,10 @@ describe(
     });
 
     it("IDN-T-24 IDN-F-35 accepts 5 requests of one address within 60 s and refuses the 6th with the remaining seconds", async () => {
-      const throttle = createThrottle(redis, { REQUEST_LIMIT_PER_MINUTE: 5 });
+      const throttle = createThrottle(redis, {
+        REQUEST_LIMIT_PER_MINUTE: 5,
+        CONFIRMATION_LINK_TTL_HOURS: 24,
+      });
       const ip = randomIp();
       for (let i = 0; i < 5; i++) {
         assert.deepEqual(await throttle.countRequest(ip), { ok: true });
@@ -32,7 +35,10 @@ describe(
     });
 
     it("IDN-T-24 IDN-NF-3 keeps the counter in the key req:ip:<ip> and lets it expire within 60 seconds", async () => {
-      const throttle = createThrottle(redis, { REQUEST_LIMIT_PER_MINUTE: 2 });
+      const throttle = createThrottle(redis, {
+        REQUEST_LIMIT_PER_MINUTE: 2,
+        CONFIRMATION_LINK_TTL_HOURS: 24,
+      });
       const ip = randomIp();
       await throttle.countRequest(ip);
       const ttl = await redis.ttl(`req:ip:${ip}`);
@@ -40,7 +46,10 @@ describe(
     });
 
     it("IDN-T-24 IDN-F-35 follows REQUEST_LIMIT_PER_MINUTE", async () => {
-      const throttle = createThrottle(redis, { REQUEST_LIMIT_PER_MINUTE: 1 });
+      const throttle = createThrottle(redis, {
+        REQUEST_LIMIT_PER_MINUTE: 1,
+        CONFIRMATION_LINK_TTL_HOURS: 24,
+      });
       const ip = randomIp();
       assert.equal((await throttle.countRequest(ip)).ok, true);
       assert.equal((await throttle.countRequest(ip)).ok, false);

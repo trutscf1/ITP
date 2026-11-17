@@ -3,16 +3,20 @@
 // of SCF-F-21, and the health report of SCF-F-5. Everything the routes need is passed in, so the
 // tests start the same app with a stub for the bot check and a clock of their own.
 import {
+  confirmQuerySchema,
   type ErrorCode,
   errorReplies,
   type HealthReport,
   type IdentityConfig,
+  identityPaths,
   loginInputSchema,
   registrationInputSchema,
   type SessionInfo,
 } from "@stash/contracts";
 import { type Context, Hono } from "hono";
+import { bodyLimit } from "hono/body-limit";
 import { setCookie } from "hono/cookie";
+import type { AfterAnswer } from "./after-answer.ts";
 import type { AuthCore } from "./auth-core.ts";
 import type { BotCheck } from "./bot-check.ts";
 import { clientIp } from "./client-ip.ts";
@@ -23,6 +27,9 @@ import type { SessionStore } from "./sessions.ts";
 import type { Throttle } from "./throttle.ts";
 
 export const sessionCookie = "stash_session";
+
+/** The largest JSON body a route reads; a larger one is refused as invalid (IDN-E-1). */
+export const maxBodyBytes = 16 * 1024;
 
 /** The essential dependencies of `identity`, as checks that reject when the dependency is down. */
 export interface Probes {
@@ -38,6 +45,8 @@ export interface AppDeps {
   /** Used only while CAPTCHA_ENABLED is true. */
   botCheck: BotCheck;
   mailer: Mailer;
+  /** Runs the e-mails after the answer (IDN-F-6, IDN-E-11). */
+  afterAnswer: AfterAnswer;
   logger: Logger;
   clock: () => Date;
   probes: Probes;
@@ -87,9 +96,22 @@ async function within(
 }
 
 export function createApp(deps: AppDeps): Hono {
-  const { config, auth, sessions, throttle, botCheck, mailer, logger, clock } =
-    deps;
+  const {
+    config,
+    auth,
+    sessions,
+    throttle,
+    botCheck,
+    mailer,
+    afterAnswer,
+    logger,
+    clock,
+  } = deps;
   const app = new Hono();
+  const limitBody = bodyLimit({
+    maxSize: maxBodyBytes,
+    onError: (context) => fail(context, "validation-failed"),
+  });
 
   // One entry per request: the path without its query, because the query of the confirmation
   // link holds the token (IDN-NF-4).
@@ -104,7 +126,7 @@ export function createApp(deps: AppDeps): Hono {
     });
   });
 
-  app.get("/health", async (context) => {
+  app.get(identityPaths.health, async (context) => {
     const timeout = config.HEALTH_CHECK_TIMEOUT_MS;
     const [database, sessionStore] = await Promise.all([
       within(deps.probes.database, timeout),
@@ -123,10 +145,11 @@ export function createApp(deps: AppDeps): Hono {
     return context.json(report);
   });
 
-  // IDN-F-1 to IDN-F-6, IDN-F-30, IDN-F-35. Order: the request throttle counts every request,
-  // then the closed registration, then the bot check "before anything else" of the input
-  // (IDN-F-5), then the input (IDN-E-1).
-  app.post("/register", async (context) => {
+  // IDN-F-1 to IDN-F-6, IDN-F-30, IDN-F-35. Order: a body above maxBodyBytes is refused unread
+  // (IDN-E-1), then the request throttle counts every request, then the closed registration,
+  // then the bot check "before anything else" of the input (IDN-F-5), then the input (IDN-E-1).
+  // The e-mail goes out after the answer (IDN-F-6, IDN-E-11).
+  app.post(identityPaths.register, limitBody, async (context) => {
     const ip = clientIp(context);
     const counted = await throttle.countRequest(ip);
     if (!counted.ok) {
@@ -150,27 +173,28 @@ export function createApp(deps: AppDeps): Hono {
     const parsed = registrationInputSchema.safeParse(body);
     if (!parsed.success) return fail(context, "validation-failed");
 
-    await register(
+    const outgoing = await register(
       {
         auth,
         mailer,
-        logger,
         clock,
         confirmationLinkTtlHours: config.CONFIRMATION_LINK_TTL_HOURS,
       },
       parsed.data,
       chooseLanguage(context.req.header("accept-language")),
     );
+    if (outgoing) afterAnswer.run("registration", outgoing);
     return context.json({ status: "check-mailbox" as const }, 202);
   });
 
   // IDN-F-4, IDN-E-7: the link works once; every other case leads to the invalid-link page.
-  app.get("/confirm", async (context) => {
-    const token = context.req.query("token");
-    const confirmed =
-      token !== undefined && token.length > 0 && token.length <= 200
-        ? await auth.confirm(token, clock())
-        : false;
+  app.get(identityPaths.confirm, async (context) => {
+    const query = confirmQuerySchema.safeParse({
+      token: context.req.query("token"),
+    });
+    const confirmed = query.success
+      ? await auth.confirm(query.data.token, clock())
+      : false;
     return context.redirect(
       confirmed ? "/login?confirmed=1" : "/link-invalid?kind=confirm",
       303,
@@ -181,7 +205,7 @@ export function createApp(deps: AppDeps): Hono {
   // validate, verify the password (a dummy hash for an unknown address, so both take the same
   // time), then refuse an unconfirmed account or open the session. The throttle steps of the
   // login order (concept §16) are IDN-US-2.
-  app.post("/login", async (context) => {
+  app.post(identityPaths.login, limitBody, async (context) => {
     const parsed = loginInputSchema.safeParse(await readObject(context));
     if (!parsed.success) return fail(context, "validation-failed");
     const { email, password } = parsed.data;
@@ -196,19 +220,25 @@ export function createApp(deps: AppDeps): Hono {
     if (!account || !correct) return fail(context, "invalid-credentials");
 
     if (!account.emailVerified) {
-      // IDN-E-5: a new link, at most once per validity period.
-      const now = clock();
-      if (!(await auth.hasValidConfirmationLink(account.id, now))) {
-        const token = await auth.issueConfirmationToken(
-          account.id,
-          now,
-          config.CONFIRMATION_LINK_TTL_HOURS,
+      // IDN-E-5 (Q345): the first refused login sends a new link, which replaces the older
+      // ones; the next ones send none until CONFIRMATION_LINK_TTL_HOURS have passed.
+      if (await throttle.claimResend(account.id)) {
+        let token: string;
+        try {
+          token = await auth.replaceConfirmationLink(
+            account.id,
+            clock(),
+            config.CONFIRMATION_LINK_TTL_HOURS,
+          );
+        } catch (error) {
+          await throttle.releaseResend(account.id);
+          throw error;
+        }
+        const to = account.email;
+        const language = chooseLanguage(context.req.header("accept-language"));
+        afterAnswer.run("confirmation", () =>
+          mailer.sendConfirmation({ to, language, token }),
         );
-        await mailer.sendConfirmation({
-          to: account.email,
-          language: chooseLanguage(context.req.header("accept-language")),
-          token,
-        });
       }
       return fail(context, "address-not-confirmed");
     }
@@ -240,10 +270,10 @@ export function createApp(deps: AppDeps): Hono {
   // A known path with another method is 405, an unknown path 404, a failure inside 500; none of
   // them carries internals (SCF-F-21, SCF-NF-4).
   const methods: Record<string, string> = {
-    "/health": "GET",
-    "/register": "POST",
-    "/confirm": "GET",
-    "/login": "POST",
+    [identityPaths.health]: "GET",
+    [identityPaths.register]: "POST",
+    [identityPaths.confirm]: "GET",
+    [identityPaths.login]: "POST",
   };
   for (const [path, allowed] of Object.entries(methods)) {
     app.all(path, (context) =>

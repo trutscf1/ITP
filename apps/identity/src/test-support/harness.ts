@@ -121,6 +121,9 @@ export async function startIdentity(
     });
     const elapsedMs = performance.now() - started;
     const text = await response.text();
+    // The e-mails go out after the answer. With the real mailer the test reads them from the SMTP
+    // stub right after the request, so wait for them; a test with its own mailer waits itself.
+    if (!options.mailer) await identity.settled();
     let parsed: Record<string, unknown> | undefined;
     try {
       parsed = text ? (JSON.parse(text) as Record<string, unknown>) : undefined;

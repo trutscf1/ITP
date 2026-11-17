@@ -3,6 +3,7 @@
 import type { IdentityConfig } from "@stash/contracts";
 import type { Hono } from "hono";
 import { Redis } from "ioredis";
+import { createAfterAnswer } from "./after-answer.ts";
 import { createApp, type Probes } from "./app.ts";
 import { createAuthCore } from "./auth-core.ts";
 import { type BotCheck, createBotCheck } from "./bot-check.ts";
@@ -27,6 +28,9 @@ export interface Identity {
   runCleanup(): Promise<number>;
   /** Starts the hourly clean-up. */
   startCleanup(): void;
+  /** Resolves when the e-mails of the requests answered so far have been handed on or failed. */
+  settled(): Promise<void>;
+  /** Stops the clean-up, waits for the e-mails still being sent, and closes the connections. */
   close(): Promise<void>;
 }
 
@@ -53,6 +57,7 @@ export async function createIdentity(
     logger,
   });
   const cleanup = createCleanup(auth, config, clock, logger);
+  const afterAnswer = createAfterAnswer(logger);
 
   const app = createApp({
     config,
@@ -62,6 +67,7 @@ export async function createIdentity(
     botCheck:
       options.botCheck ?? createBotCheck({ secret: config.CAPTCHA_SECRET_KEY }),
     mailer: options.mailer ?? createMailer(config, logger),
+    afterAnswer,
     logger,
     clock,
     probes: {
@@ -79,12 +85,17 @@ export async function createIdentity(
     app,
     runCleanup: () => cleanup.run(),
     startCleanup: () => cleanup.start(),
+    settled: () => afterAnswer.settled(),
     async close() {
       if (closed) return;
       closed = true;
       cleanup.stop();
-      redis.disconnect();
-      await auth.close();
+      try {
+        await afterAnswer.settled();
+      } finally {
+        redis.disconnect();
+        await auth.close();
+      }
     },
   };
 }

@@ -5,16 +5,26 @@
 // accounts. Sessions are kept in the session store (sessions.ts), not by the library. The
 // `users` row is written only by the database trigger of SCF-F-24 (concept §14); nothing here
 // writes it, and `memberId` only reads it.
-import { createHash, randomBytes } from "node:crypto";
+import { randomBytes } from "node:crypto";
 import { hash, verify } from "@node-rs/argon2";
-import { betterAuth } from "better-auth";
+import { maxPasswordLength, minPasswordLength } from "@stash/contracts";
+import { betterAuth, type Where } from "better-auth";
 import pg from "pg";
 import type { Logger } from "./logger.ts";
+import { hashToken } from "./token-hash.ts";
 
 /** OWASP parameters for Argon2id (STACK.md §3): 19 MiB, 2 iterations, parallelism 1. */
 const argon2 = { memoryCost: 19_456, timeCost: 2, parallelism: 1 } as const;
 
 const confirmationPrefix = "confirm:";
+
+/** The open confirmation links of one account (concept §8, "Confirmation tokens"). */
+function confirmationLinksOf(id: string): Where[] {
+  return [
+    { field: "value", value: id },
+    { field: "identifier", operator: "starts_with", value: confirmationPrefix },
+  ];
+}
 
 export interface Account {
   id: string;
@@ -32,31 +42,47 @@ export interface AuthCore {
   /** Spends the time of a verification on a dummy hash, for an address without an account (IDN-F-11). */
   verifyDummy(password: string): Promise<void>;
   findAccount(email: string): Promise<Account | undefined>;
-  /** Creates an unconfirmed account with its credential; the database creates its `users` row. */
+  /**
+   * Creates an unconfirmed account with its credential and its confirmation link, in one
+   * transaction (IDN-F-4); the database creates its `users` row. Returns the id and the token.
+   */
   createAccount(input: {
     name: string;
     email: string;
     passwordHash: string;
     now: Date;
-  }): Promise<string>;
-  /** IDN-F-6: replaces name and hash of an unconfirmed account and invalidates its links. */
+    validityHours: number;
+  }): Promise<{ id: string; token: string }>;
+  /**
+   * IDN-F-6, IDN-F-31: replaces name and hash of an unconfirmed account, restarts its clean-up
+   * period, and replaces its links by a new one, in one transaction. Returns the new token.
+   */
   replaceUnconfirmed(
     id: string,
-    input: { name: string; passwordHash: string; now: Date },
-  ): Promise<void>;
-  /** Creates a confirmation link token, valid for `validityHours`; only its hash is stored (IDN-NF-5). */
-  issueConfirmationToken(
+    input: {
+      name: string;
+      passwordHash: string;
+      now: Date;
+      validityHours: number;
+    },
+  ): Promise<string>;
+  /**
+   * IDN-E-5: replaces the confirmation links of the account by a new one, valid for
+   * `validityHours`; only its hash is stored (IDN-NF-5). Returns the token.
+   */
+  replaceConfirmationLink(
     id: string,
     now: Date,
     validityHours: number,
   ): Promise<string>;
-  /** True while a confirmation link of the account has not expired. */
-  hasValidConfirmationLink(id: string, now: Date): Promise<boolean>;
   /** Uses the link once: confirms the address and returns true, or returns false for an invalid link. */
   confirm(token: string, now: Date): Promise<boolean>;
   /** The id of the `users` row of an account (SCF-F-24). */
   memberId(accountId: string): Promise<string | undefined>;
-  /** IDN-F-31: deletes the unconfirmed accounts created before `before`; returns how many. */
+  /**
+   * IDN-F-31: deletes the accounts still unconfirmed whose registration (`created_at`, set again
+   * by every new registration of the address) is older than `before`; returns how many.
+   */
   removeUnconfirmed(before: Date): Promise<number>;
   /** An essential dependency check (SCF-F-7): rejects when the database does not answer. */
   checkDatabase(): Promise<void>;
@@ -68,10 +94,6 @@ export interface AuthCoreOptions {
   secret: string;
   publicOrigin: string;
   logger: Logger;
-}
-
-export function hashToken(token: string): string {
-  return createHash("sha256").update(token).digest("hex");
 }
 
 export async function createAuthCore(
@@ -100,8 +122,8 @@ export async function createAuthCore(
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: true,
-      minPasswordLength: 12,
-      maxPasswordLength: 128,
+      minPasswordLength,
+      maxPasswordLength,
       password: {
         hash: (password) => hash(password, argon2),
         verify: async ({ hash: stored, password }) => {
@@ -161,18 +183,25 @@ export async function createAuthCore(
 
   const dummyHash = await hash(randomBytes(16).toString("hex"), argon2);
 
-  async function deleteConfirmationLinks(id: string): Promise<void> {
-    await adapter.deleteMany({
+  /** Stores a new confirmation link of the account through `db`; returns its token. */
+  async function insertConfirmationLink(
+    db: Pick<typeof adapter, "create">,
+    id: string,
+    now: Date,
+    validityHours: number,
+  ): Promise<string> {
+    const token = randomBytes(32).toString("base64url");
+    await db.create({
       model: "verification",
-      where: [
-        { field: "value", value: id },
-        {
-          field: "identifier",
-          operator: "starts_with",
-          value: confirmationPrefix,
-        },
-      ],
+      data: {
+        identifier: `${confirmationPrefix}${hashToken(token)}`,
+        value: id,
+        expiresAt: new Date(now.getTime() + validityHours * 3_600_000),
+        createdAt: now,
+        updatedAt: now,
+      },
     });
+    return token;
   }
 
   return {
@@ -200,53 +229,73 @@ export async function createAuthCore(
       };
     },
 
-    async createAccount({ name, email, passwordHash, now }) {
-      const user = await internalAdapter.createUser(
-        { name, email, emailVerified: false, createdAt: now, updatedAt: now },
-        { method: "email" },
-      );
-      await internalAdapter.createAccount({
-        userId: user.id,
-        providerId: "credential",
-        accountId: user.id,
-        password: passwordHash,
-        createdAt: now,
-        updatedAt: now,
-      });
-      return user.id;
-    },
-
-    async replaceUnconfirmed(id, { name, passwordHash, now }) {
-      await internalAdapter.updateUser(id, { name, updatedAt: now });
-      await internalAdapter.updatePassword(id, passwordHash);
-      await deleteConfirmationLinks(id);
-    },
-
-    async issueConfirmationToken(id, now, validityHours) {
-      const token = randomBytes(32).toString("base64url");
-      await internalAdapter.createVerificationValue({
-        identifier: `${confirmationPrefix}${hashToken(token)}`,
-        value: id,
-        expiresAt: new Date(now.getTime() + validityHours * 3_600_000),
-      });
-      return token;
-    },
-
-    async hasValidConfirmationLink(id, now) {
-      const links = await adapter.count({
-        model: "verification",
-        where: [
-          { field: "value", value: id },
-          {
-            field: "identifier",
-            operator: "starts_with",
-            value: confirmationPrefix,
+    createAccount: ({ name, email, passwordHash, now, validityHours }) =>
+      adapter.transaction(async (db) => {
+        const user = await db.create<Record<string, unknown>, { id: string }>({
+          model: "user",
+          data: {
+            name,
+            email,
+            emailVerified: false,
+            createdAt: now,
+            updatedAt: now,
           },
-          { field: "expiresAt", operator: "gt", value: now },
-        ],
-      });
-      return links > 0;
-    },
+        });
+        await db.create({
+          model: "account",
+          data: {
+            userId: user.id,
+            providerId: "credential",
+            accountId: user.id,
+            password: passwordHash,
+            createdAt: now,
+            updatedAt: now,
+          },
+        });
+        const token = await insertConfirmationLink(
+          db,
+          user.id,
+          now,
+          validityHours,
+        );
+        return { id: user.id, token };
+      }),
+
+    replaceUnconfirmed: (id, { name, passwordHash, now, validityHours }) =>
+      adapter.transaction(async (db) => {
+        // Only while the account is still unconfirmed; `createdAt` restarts the clean-up
+        // period of IDN-F-31 (Q346).
+        await db.update({
+          model: "user",
+          where: [
+            { field: "id", value: id },
+            { field: "emailVerified", value: false },
+          ],
+          update: { name, createdAt: now, updatedAt: now },
+        });
+        await db.updateMany({
+          model: "account",
+          where: [
+            { field: "userId", value: id },
+            { field: "providerId", value: "credential" },
+          ],
+          update: { password: passwordHash, updatedAt: now },
+        });
+        await db.deleteMany({
+          model: "verification",
+          where: confirmationLinksOf(id),
+        });
+        return insertConfirmationLink(db, id, now, validityHours);
+      }),
+
+    replaceConfirmationLink: (id, now, validityHours) =>
+      adapter.transaction(async (db) => {
+        await db.deleteMany({
+          model: "verification",
+          where: confirmationLinksOf(id),
+        });
+        return insertConfirmationLink(db, id, now, validityHours);
+      }),
 
     async confirm(token, now) {
       const link = await internalAdapter.consumeVerificationValue(
@@ -272,21 +321,47 @@ export async function createAuthCore(
       return rows.rows[0]?.id;
     },
 
-    async removeUnconfirmed(before) {
-      const stale = await adapter.findMany<{ id: string }>({
-        model: "user",
-        where: [
+    removeUnconfirmed: (before) =>
+      adapter.transaction(async (db) => {
+        const stale: Where[] = [
           { field: "emailVerified", value: false },
           { field: "createdAt", operator: "lt", value: before },
-        ],
-      });
-      for (const { id } of stale) {
-        await deleteConfirmationLinks(id);
-        // Removes the credentials; the database removes the `users` row with the account.
-        await internalAdapter.deleteUser(id);
-      }
-      return stale.length;
-    },
+        ];
+        const candidates = (
+          await db.findMany<{ id: string }>({ model: "user", where: stale })
+        ).map(({ id }) => id);
+        if (candidates.length === 0) return 0;
+        // One conditional delete: an account confirmed or registered again since the read
+        // above no longer matches and stays. Credentials and `users` row go with the account
+        // (foreign keys with ON DELETE CASCADE).
+        const removed = await db.deleteMany({
+          model: "user",
+          where: [{ field: "id", operator: "in", value: candidates }, ...stale],
+        });
+        const kept = new Set(
+          (
+            await db.findMany<{ id: string }>({
+              model: "user",
+              where: [{ field: "id", operator: "in", value: candidates }],
+            })
+          ).map(({ id }) => id),
+        );
+        const gone = candidates.filter((id) => !kept.has(id));
+        if (gone.length > 0) {
+          await db.deleteMany({
+            model: "verification",
+            where: [
+              { field: "value", operator: "in", value: gone },
+              {
+                field: "identifier",
+                operator: "starts_with",
+                value: confirmationPrefix,
+              },
+            ],
+          });
+        }
+        return removed;
+      }),
 
     async checkDatabase() {
       await pool.query("SELECT 1");
