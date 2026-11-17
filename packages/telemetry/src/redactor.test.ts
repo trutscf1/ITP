@@ -59,6 +59,29 @@ describe("M3 Redactor, text patterns", () => {
     );
   });
 
+  it("OBS-AC-1.6 OBS-F-14 keeps a C++ scope, a time, and a MAC address, which are no IPv6 addresses", () => {
+    assert.equal(redactText("std::vector overflow"), "std::vector overflow");
+    assert.equal(redactText("Foo::bar failed"), "Foo::bar failed");
+    assert.equal(
+      redactText("at 10:00:00 and 12:30:45"),
+      "at 10:00:00 and 12:30:45",
+    );
+    assert.equal(
+      redactText("mac 00:1a:2b:3c:4d:5e seen"),
+      "mac 00:1a:2b:3c:4d:5e seen",
+    );
+  });
+
+  it("OBS-AC-1.6 OBS-F-14 redacts an IPv6 address at the end of a sentence, after an equals sign, and in brackets", () => {
+    assert.equal(redactText("from 2001:db8::1."), "from [redacted].");
+    assert.equal(redactText("client=2001:db8::1"), "client=[redacted]");
+    assert.equal(redactText("[2001:db8::1]:443"), "[[redacted]]:443");
+  });
+
+  it("OBS-F-14 does not redact an address written directly after a colon, because that colon is part of the boundary (section 8)", () => {
+    assert.equal(redactText("ip:2001:db8::1"), "ip:2001:db8::1");
+  });
+
   it("OBS-AC-1.6 takes a four-part number as an address and keeps a version", () => {
     assert.equal(redactText("retry 1.2.3.4"), "retry [redacted]");
     assert.equal(redactText("retry 1.2.3.4."), "retry [redacted].");

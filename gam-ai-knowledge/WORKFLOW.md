@@ -69,6 +69,7 @@ Where `docs/` and a profile decision disagree, `docs/` wins.
 | P-GIT-2 (work branches are deleted after merge) | Feature, fix, concept, and chore branches are **never deleted** after merge. | School requirement (`docs/anforderungen_software_projekte.md` §2, §5): the per-branch history is graded. |
 | P-GIT-2 (`concept/…` branches need no issue) | Every `concept/…` branch has a `type::concept` issue. | School requirement: every change starts with an issue (§3). |
 | P-GIT-8 (no AI attribution by default) | Commits carry the `Co-Authored-By` trailer and MR descriptions the *Generated with Claude Code* line; `.claude/settings.json` has no `attribution` key, so Claude Code adds them. | Developer decision on 2026-11-10 (Q11, migration MR !52): the project has credited the AI in its commits from the start, and the AI share of the work stays visible. |
+| P-TIME-1 (AI agents never book time) | An agent may post a time entry (`/spend`) for a developer, but only after that developer has confirmed the entry. At the end of each issue the agent proposes duration and activity; the developer answers yes or names another duration; only then does the agent post it. The time is the developer's own working time, never the agent's, and the agent never books on its own initiative. | The school only requires that time is recorded (`docs/anforderungen_software_projekte.md` §6) and does not say who posts it, so `docs/` does not override P-TIME-1; this is a project decision. The developer stays responsible for the entry, and each entry is at most 50 minutes. |
 | P-TRK-4 (Premium: the epic is a group epic) | The epics #88 to #100 are issues labelled `type::epic`; their stories link to them by `Part of` and a task list. | The agent's token has no membership in the group, and promoting an issue to a group epic needs one (inbox). They become group epics as soon as someone with group rights promotes them. Decision of 2026-11-10. |
 | Issue format of `gam-delivery` `tickets` (weight only, no time estimate) | A story also gets a time estimate (`/estimate`); 1 weight point is 0.75 h (`ROADMAP.md`, "Capacity"). Time is booked per work session (P-TIME-1). | `docs/git_workflow_commands.md` (`/estimate`) and the hours per person that the final presentation must show; `docs/` wins. Decision of 2026-11-10. |
 
@@ -80,6 +81,7 @@ Presented at the final presentation (`docs/anforderungen_software_projekte.md`, 
 | --- | --- | --- |
 | CI/CD with GitHub Actions | GitLab CI | Repository, MRs, reviews, and merge checks live on GitLab; GitHub is only a mirror and cannot block a GitLab merge. |
 | Reverse proxy Traefik ≥ 3.6.10 with Let's Encrypt (HTTP-01), an optional extra requirement of the school (`docs/anforderungen_software_projekte.md`, "Eventuelle Zusatzanforderungen") | Caddy (`caddy:2.11-alpine`) in the local stack and on the server, with its automatic HTTPS from Let's Encrypt (HTTP-01) | One proxy for both: the local stack, the routes of `docker/Caddyfile`, and the session check of the observability dashboards (`forward_auth`, `STACK.md` OBS-C-7) already use Caddy; a second proxy would double the configuration. The school's TLS and routing requirements (§9) are met either way (Q265). |
+| Observability through OpenTelemetry | The units report through the own package `packages/telemetry`, which speaks the OpenTelemetry protocol (OTLP over HTTP) without the OpenTelemetry SDK; the collector and the stores are the planned OpenTelemetry components. | [ADR-0009](adr/0009-units-encode-otlp-themselves.md): the logs packages of the SDK are experimental (Definition of Done item 18), its exporters have no bounded buffer (OBS-E-1), and the supply-chain rules apply to every package. |
 
 ## Tracker (P-TRK-1…4)
 
@@ -164,7 +166,7 @@ Every sprint runs the same five steps; the exit criteria of each milestone are i
 
 ## Time tracking
 
-Record time on the issue or MR with `/spend` (§9): one entry per work session, **at most 50 minutes**, with the activity and the issue/MR reference. Review and MR work is recorded as well. Agents never book time (P-TIME-1).
+Record time on the issue or MR with `/spend` (§9): one entry per work session, **at most 50 minutes**, with the activity and the issue/MR reference. Review and MR work is recorded as well. Agents book time only for a developer and only after that developer confirmed the entry (deviation from P-TIME-1, see "Deviations from the profile"); a longer session is split into several entries of at most 50 minutes.
 
 ## Definition of Done
 
