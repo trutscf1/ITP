@@ -147,7 +147,7 @@ Rows of IDN-US-1, -2, and -6 are binding. Rows marked *draft* belong to stories 
 | IDN-F-28 | Identical answer | A valid reset request MUST be answered with HTTP 202 and `{ "status": "check-mailbox" }` whether an account with the address exists or not; for an unknown address no e-mail MUST be sent. | IDN-AC-6.4 (Identical answer) |
 | IDN-F-29 | Protected reset endpoint | The reset request MUST be counted by the request throttle of [IDN-F-35] and checked by the bot check of [IDN-F-5]. | IDN-AC-6.5 (Protected endpoint) |
 | IDN-F-30 | Registration closed | While `REGISTRATION_ENABLED` is false, `identity` MUST refuse every registration with [IDN-E-8] and `web` MUST show the page `/register` with the message of [IDN-U-6] instead of the form. Login, logout, and reset MUST work unchanged. | IDN-AC-1.7 (Registration closed) |
-| IDN-F-31 | Unconfirmed accounts removed | `identity` MUST delete, at least once per hour, every account with `emailVerified = false` created more than `UNCONFIRMED_ACCOUNT_TTL_DAYS` days ago, together with its `users` row, its credentials, and its open links. | IDN-AC-1.8 (Unconfirmed accounts removed) |
+| IDN-F-31 | Unconfirmed accounts removed | `identity` MUST delete, at least once per hour, every account with `emailVerified = false` created or last registered ([IDN-F-6], Q346) more than `UNCONFIRMED_ACCOUNT_TTL_DAYS` days ago, together with its `users` row, its credentials, and its open links. | IDN-AC-1.8 (Unconfirmed accounts removed) |
 | IDN-F-32 | Own users row | Creating an account MUST create its `users` row in the same transaction ([SCF-F-24]); no account MAY exist without one. | IDN-AC-1.4 (E-mail confirmation) |
 | IDN-F-33 | Reset confirms the address | A successful reset MUST set `emailVerified = true` (A9). | IDN-AC-6.6 (Reset confirms the address) |
 | IDN-F-34 | Session lifetime | A session MUST expire `SESSION_TTL_DAYS` days after its last renewal. A session check of a session older than one day since its last renewal MUST renew it. An expired session MUST be treated as no session and be deleted from the session store. | IDN-AC-2.6 (Session lifetime) |
@@ -215,6 +215,7 @@ fail:email:<email-lowercase> -> counter, expiry = LOGIN_FAILURE_WINDOW_SECONDS
 lock:ip:<ip>                 -> 1, expiry = LOGIN_LOCK_MINUTES
 lock:email:<email-lowercase> -> 1, expiry = LOGIN_LOCK_MINUTES
 req:ip:<ip>                  -> counter, expiry = 60 s (IDN-F-35)
+resend:<accountId>           -> 1, expiry = CONFIRMATION_LINK_TTL_HOURS (IDN-E-5, Q345)
 
 SessionRecord { accountId: string, userId: uuid, expiresAt: timestamp, ipAddress: string, userAgent: string }
 ```
@@ -252,7 +253,7 @@ Character classes: lower-case letters, upper-case letters, digits, everything el
 
 **Client address.** The throttle counts the address the reverse proxy writes as the last entry of `X-Forwarded-For`; the proxy replaces what the client sent, and `identity` publishes no port. Without the header (a call inside the stack) it counts the address of the connection.
 
-**Confirmation tokens.** A confirmation token has 256 random bits. `auth_verifications` holds `identifier = "confirm:" + hex(SHA-256(token))` and `value = account id`, so the token itself is stored nowhere ([IDN-NF-5]). A refused login ([IDN-E-5]) sends a new link only while the account has no unexpired one, which is what "at most once per `CONFIRMATION_LINK_TTL_HOURS`" means.
+**Confirmation tokens.** A confirmation token has 256 random bits. `auth_verifications` holds `identifier = "confirm:" + hex(SHA-256(token))` and `value = account id`, so the token itself is stored nowhere ([IDN-NF-5]). "At most once per `CONFIRMATION_LINK_TTL_HOURS`" in [IDN-E-5] means (Q345): the first refused login of an unconfirmed account sends a new link, which replaces every older link of the account, and sets `resend:<accountId>` with that expiry; further refused logins send no link while the key exists. Registering again ([IDN-F-6]) also replaces the older links. The e-mails of [IDN-F-6] and [IDN-E-5] are sent after the answer, so the answer does not wait for the SMTP host ([IDN-E-11]).
 
 **Error codes** added to the `ErrorResponse` table of `scaffolding.md` §8 (§15):
 

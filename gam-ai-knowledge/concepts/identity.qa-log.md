@@ -109,3 +109,35 @@ Answer: "Slice für schwaigc (Recommended)".
 **Q14 - Konzept-MR:** Branch `concept/identity` pushen und MR nach dev öffnen (Part of #115; die Freigabe des MR ist das Phase-4-Gate)? Wer soll reviewen?
 
 Answer: "Push + MR, Review trutscf1 (Recommended)".
+
+## Round 6 — 2026-11-17 — implementation of IDN-US-1, slice 1, and its review (`tschudea07`)
+
+Decisions taken during the implementation of #45 and its review, relayed by the coordinating agent; the answers are recorded as relayed.
+
+**Q336 - Fehlercodes:** Werden die Fehlercodes von `identity` innerhalb von #45 in die `ErrorResponse`-Tabelle von `scaffolding.md` §8 aufgenommen?
+
+Answer: the identity error codes are added to `scaffolding.md` §8 within #45.
+
+**Q341 - ROADMAP-Stufe R3:** Bleibt R3 Identity auf der Stufe `concept`, solange IDN-US-3, -4, -5, -7, -8 Entwürfe sind?
+
+Answer: R3 stays at the stage `concept`; recorded as a deviation from P-ROAD-4 in `WORKFLOW.md`.
+
+**Q342 - Better Auth:** Wird Better Auth als HTTP-Handler eingebunden oder als Bibliothek hinter eigenen Endpunkten?
+
+Answer: Better Auth as a library behind own endpoints ([ADR-0009](../adr/0009-better-auth-as-library-behind-own-endpoints.md)).
+
+**Q344 - Umfang der Review-Korrekturen:** Welche Punkte des Reviews von #45 werden behoben?
+
+Answer: the mandatory items plus the cheap smells (2026-11-17).
+
+**Q345 - Neuer Bestätigungslink beim Login:** Was heißt "höchstens einmal pro `CONFIRMATION_LINK_TTL_HOURS`" in [IDN-E-5]?
+
+Answer: a confirmation link is resent once per validity period: the first refused login sends a new link (the older one becomes invalid), further refused logins send none until `CONFIRMATION_LINK_TTL_HOURS` have passed since that resend (2026-11-17).
+
+**Q346 - Bereinigungsfrist bei erneuter Registrierung:** Startet eine erneute Registrierung einer unbestätigten Adresse die Frist von [IDN-F-31] neu?
+
+Answer: yes, a re-registration restarts the clean-up period (2026-11-17).
+
+Assumption stated with the implementation, not rejected:
+
+- **A17**: [IDN-F-5] runs the bot check after the request throttle ([IDN-F-35]) instead of "before anything else", because [IDN-T-20] needs the answer 429 before the bot check is asked.
