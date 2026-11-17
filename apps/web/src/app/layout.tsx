@@ -1,4 +1,10 @@
-import { readThemeCookie, ThemeSwitcher } from "@stash/ui";
+import {
+  AccessibilitySettings,
+  accessibilityAttributes,
+  readAccessibilityCookie,
+  readThemeCookie,
+  ThemeSwitcher,
+} from "@stash/ui";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { headers } from "next/headers";
@@ -23,20 +29,33 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: LayoutProps<"/">): Promise<ReactElement> {
-  // Rendering with the remembered theme avoids a flash of the default one.
-  const theme = readThemeCookie((await headers()).get("cookie") ?? undefined);
+  // Rendering with the remembered theme and accessibility modes avoids a flash of the defaults.
+  const cookies = (await headers()).get("cookie") ?? undefined;
+  const theme = readThemeCookie(cookies);
+  const accessibility = readAccessibilityCookie(cookies);
 
   return (
     <html
       lang="en"
       data-theme={theme}
+      {...accessibilityAttributes(accessibility)}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <header className="flex justify-end p-base">
+        {/* First focusable element: hidden until it has focus, then shown in the top corner (DSA-F-12). */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-base focus:top-base focus:z-50 focus:rounded-md focus:bg-accent focus:px-base focus:py-snug focus:text-accent-foreground"
+        >
+          Skip to main content
+        </a>
+        <header className="flex flex-wrap items-center justify-end gap-snug p-base">
           <ThemeSwitcher initialTheme={theme} />
+          <AccessibilitySettings initialSettings={accessibility} />
         </header>
-        {children}
+        <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col">
+          {children}
+        </main>
       </body>
     </html>
   );

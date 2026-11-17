@@ -61,3 +61,5 @@ services:
     ports: !reset []
   proxy:
     ports: !reset []
+  grafana:
+    ports: !reset []
