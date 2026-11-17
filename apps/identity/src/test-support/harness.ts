@@ -14,6 +14,8 @@ export const password = "Drei-blaue-Wolken-7";
 export interface Stack {
   database: TestDatabase;
   smtp: SmtpStub;
+  /** Every `identity` started on this stack; `stop` closes the ones the test left open. */
+  started: Running[];
   stop(): Promise<void>;
 }
 
@@ -21,10 +23,14 @@ export interface Stack {
 export async function startStack(): Promise<Stack> {
   const database = await createTestDatabase();
   const smtp = await startSmtpStub();
+  const started: Running[] = [];
   return {
     database,
     smtp,
+    started,
     async stop() {
+      // Closing twice is harmless, so a test may close its instance itself.
+      for (const running of started) await running.close();
       await smtp.close();
       await database.drop();
     },
@@ -117,7 +123,7 @@ export async function startIdentity(
     return { status: response.status, headers: response.headers, body: parsed };
   }
 
-  return {
+  const running: Running = {
     identity,
     config: loaded.config,
     logs,
@@ -127,6 +133,8 @@ export async function startIdentity(
       send("GET", path, undefined, requestOptions),
     close: () => identity.close(),
   };
+  stack.started.push(running);
+  return running;
 }
 
 /** A bot-check stub that answers yes or no and counts its calls (IDN-T-5). */
