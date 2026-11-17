@@ -1746,3 +1746,23 @@ Answer: none yet; assumption A1 stands until the review.
 Answer: none yet; assumption A2 stands until the review.
 
 The question numbers are provisional until merged into `dev` (P-TEAM-5).
+
+## Round 71 — 2026-11-03 — Slice 3 cms instrumented (#155) (trutscf1 (agent))
+
+Instruction of `trutscf1`, summarised: implement issue #155 (`OBS-US-1` slice 3, module M11 UnitWiring for `cms`, criterion `OBS-AC-1.1`) with `/engineering-human implement`. The agent could not ask pop-ups in this session; where the documents left a gap with a cheap default, it states an assumption (P-GRILL-4). `trutscf1` rejects an assumption by answering it in the review.
+
+- **A1:** The unit `cms` is a stub (`export const name`) and no Compose service exists for it; the `cms` unit with its health endpoint is #19. So M11 is wired at a seam: `boot(environment, accept, options)` in `apps/cms/src/boot.ts` reads the telemetry variables, calls `startTelemetry("cms", <version>, config)`, writes `log(info, "unit started", {})`, and only then calls `accept`, the place where the content management system will start to accept requests. `src/main.ts` is the process entry (`pnpm --filter @stash/cms start`); it prints an invalid configuration as SCF-E-1 and exits with 1.
+- **A2:** The version of the unit is the `version` of `apps/cms/package.json`, read at start from the file next to `dist/` (a test compares both), so it cannot drift.
+- **A3:** `OBS-AC-1.1` is proven for `cms` at the seam only: the real OTLP exporter of `@stash/telemetry` delivers to a collector stub on a local port, and the test reads `unit.running` = 1 and the entry `unit started` with the resource `service.name` = `cms`. The started-stack part ("after 60 seconds the metric store holds the heartbeat and the log store the start entry") is not proven for `cms`, because the unit does not run as a container. A stack test that starts `cms` outside Compose would prove the collector and the stores, which test `OBS-T-2` of slice 1 already does, but not the unit as a container; it is left to the slice that adds the `cms` service (#19 and its Compose service, `OBS-T-1`).
+- **A4:** The dependency `@stash/telemetry` (`workspace:*`) and `@types/node` are added to `apps/cms/package.json`; the build and typecheck of `cms` follow the pattern of `packages/telemetry` (`tsconfig.build.json` without tests, `.ts` import extensions rewritten).
+- **A5:** `cms` adds no variable of its own: it reads the telemetry variables of `TelemetryConfig`, whose defaults apply (collector at `http://collector:4318`). Review of !50 (DoD 12): they are now listed with default and range in `.env.example`, because `cms` is the first unit that reads them.
+
+**Q330 - Seam of the unit:** Where does `cms` call `startTelemetry` while the unit has no server? Decided by the agent as A1.
+
+Answer: none yet; assumption A1 stands until the review.
+
+**Q331 - Proof of OBS-AC-1.1 for a unit that is not a container:** Is a test at the seam enough for `cms` until #19 runs it in the stack? Decided by the agent as A3.
+
+Answer: none yet; assumption A3 stands until the review.
+
+The question numbers are provisional until merged into `dev` (P-TEAM-5).
