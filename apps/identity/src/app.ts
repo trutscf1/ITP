@@ -300,7 +300,15 @@ export function createApp(deps: AppDeps): Hono {
     return context.json(info);
   });
 
-  // IDN-F-25, IDN-F-28, IDN-F-29: the request throttle, then the bot check, then the input; the
+  const resetDeps = {
+    auth,
+    sessions,
+    mailer,
+    clock,
+    resetLinkTtlMinutes: config.RESET_LINK_TTL_MINUTES,
+  };
+
+  // IDN-F-25, IDN-F-28, IDN-F-29, IDN-F-35, IDN-F-5: the request throttle, then the bot check, then the input; the
   // answer is the same for every address, and the e-mail goes out after it (IDN-E-11).
   app.post(identityPaths.resetRequest, limitBody, async (context) => {
     const ip = await clientAddress(context);
@@ -317,13 +325,7 @@ export function createApp(deps: AppDeps): Hono {
     const parsed = resetRequestInputSchema.safeParse(body);
     if (!parsed.success) return fail(context, "validation-failed");
     const outgoing = await requestReset(
-      {
-        auth,
-        sessions,
-        mailer,
-        clock,
-        resetLinkTtlMinutes: config.RESET_LINK_TTL_MINUTES,
-      },
+      resetDeps,
       parsed.data,
       chooseLanguage(context.req.header("accept-language")),
     );
@@ -336,16 +338,7 @@ export function createApp(deps: AppDeps): Hono {
   app.post(identityPaths.reset, limitBody, async (context) => {
     const parsed = newPasswordInputSchema.safeParse(await readObject(context));
     if (!parsed.success) return fail(context, "validation-failed");
-    const done = await completeReset(
-      {
-        auth,
-        sessions,
-        mailer,
-        clock,
-        resetLinkTtlMinutes: config.RESET_LINK_TTL_MINUTES,
-      },
-      parsed.data,
-    );
+    const done = await completeReset(resetDeps, parsed.data);
     if (!done) return fail(context, "link-invalid");
     return context.body(null, 204);
   });

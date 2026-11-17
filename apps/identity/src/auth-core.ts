@@ -19,7 +19,7 @@ const argon2 = { memoryCost: 19_456, timeCost: 2, parallelism: 1 } as const;
 const confirmationPrefix = "confirm:";
 const resetPrefix = "reset:";
 
-/** The open links of one kind of one account (concept §8, "Confirmation tokens"). */
+/** The open links of one kind of one account (concept §8, "Confirmation and reset tokens"). */
 function linksOf(id: string, prefix: string): Where[] {
   return [
     { field: "value", value: id },
@@ -27,6 +27,7 @@ function linksOf(id: string, prefix: string): Where[] {
   ];
 }
 
+/** The open confirmation links of one account. */
 function confirmationLinksOf(id: string): Where[] {
   return linksOf(id, confirmationPrefix);
 }
@@ -233,6 +234,24 @@ export async function createAuthCore(
     return token;
   }
 
+  /** The account of a reset link that exists and has not expired at `now`. */
+  async function validResetLink(
+    db: Pick<typeof adapter, "findOne">,
+    token: string,
+    now: Date,
+  ): Promise<string | undefined> {
+    const link = await db.findOne<{ value: string; expiresAt: Date }>({
+      model: "verification",
+      where: [
+        { field: "identifier", value: `${resetPrefix}${hashToken(token)}` },
+      ],
+    });
+    if (!link || new Date(link.expiresAt).getTime() <= now.getTime()) {
+      return undefined;
+    }
+    return link.value;
+  }
+
   const insertConfirmationLink = (
     db: Pick<typeof adapter, "create">,
     id: string,
@@ -363,37 +382,21 @@ export async function createAuthCore(
         return insertLink(db, resetPrefix, id, now, validityMinutes * 60_000);
       }),
 
-    async resetLinkAccount(token, now) {
-      const link = await adapter.findOne<{ value: string; expiresAt: Date }>({
-        model: "verification",
-        where: [
-          { field: "identifier", value: `${resetPrefix}${hashToken(token)}` },
-        ],
-      });
-      if (!link || new Date(link.expiresAt).getTime() <= now.getTime()) {
-        return undefined;
-      }
-      return link.value;
-    },
+    resetLinkAccount: (token, now) => validResetLink(adapter, token, now),
 
     resetPassword: (token, passwordHash, now) =>
       adapter.transaction(async (db) => {
         const identifier = `${resetPrefix}${hashToken(token)}`;
-        const link = await db.findOne<{ value: string; expiresAt: Date }>({
-          model: "verification",
-          where: [{ field: "identifier", value: identifier }],
-        });
-        if (!link || new Date(link.expiresAt).getTime() <= now.getTime()) {
-          return undefined;
-        }
+        const link = await validResetLink(db, token, now);
+        if (!link) return undefined;
         // Only the request that deletes the link uses it (single use, IDN-F-25).
         const used = await db.deleteMany({
           model: "verification",
           where: [{ field: "identifier", value: identifier }],
         });
         if (used !== 1) return undefined;
-        const id = link.value;
-        await db.updateMany({
+        const id = link;
+        const replaced = await db.updateMany({
           model: "account",
           where: [
             { field: "userId", value: id },
@@ -401,6 +404,20 @@ export async function createAuthCore(
           ],
           update: { password: passwordHash, updatedAt: now },
         });
+        // An account without a password yet gets its credential now (IDN-F-27).
+        if (replaced === 0) {
+          await db.create({
+            model: "account",
+            data: {
+              userId: id,
+              providerId: "credential",
+              accountId: id,
+              password: passwordHash,
+              createdAt: now,
+              updatedAt: now,
+            },
+          });
+        }
         await db.update({
           model: "user",
           where: [{ field: "id", value: id }],

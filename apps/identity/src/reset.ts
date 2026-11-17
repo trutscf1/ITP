@@ -1,7 +1,10 @@
 // The password reset of IDN-US-6 (concept §8 and §9; IDN-F-25 to IDN-F-28, IDN-F-33, IDN-E-7).
-// The request answers alike for every address and sends the e-mail only after the answer
-// (IDN-F-28, IDN-E-11); the new password checks the link before it runs the password hash, so a
-// wrong token costs no hash run, and uses the link only in the transaction that replaces the hash.
+// The request answers alike for every address: the reset link is stored and sent only after the
+// answer (IDN-F-28, IDN-E-11), so neither the answer nor its time tells whether the address has an
+// account. The new password checks the link before it runs the password hash, so a wrong token
+// costs no hash run, and uses the link only in the transaction that replaces the hash. The
+// sessions are deleted before that transaction, so a failing session store leaves the old
+// password in place (IDN-E-10), and again after it, for a login that was under way.
 import type { NewPasswordInput, ResetRequestInput } from "@stash/contracts";
 import type { AuthCore } from "./auth-core.ts";
 import type { Language, Mailer } from "./mailer.ts";
@@ -25,13 +28,16 @@ export async function requestReset(
   const account = await deps.auth.findAccount(input.email);
   if (!account) return undefined;
   const validityMinutes = deps.resetLinkTtlMinutes;
-  const token = await deps.auth.replaceResetLink(
-    account.id,
-    deps.clock(),
-    validityMinutes,
-  );
+  const now = deps.clock();
   const to = account.email;
-  return () => deps.mailer.sendReset({ to, language, token, validityMinutes });
+  return async () => {
+    const token = await deps.auth.replaceResetLink(
+      account.id,
+      now,
+      validityMinutes,
+    );
+    return deps.mailer.sendReset({ to, language, token, validityMinutes });
+  };
 }
 
 /**
@@ -43,14 +49,14 @@ export async function completeReset(
   input: NewPasswordInput,
 ): Promise<boolean> {
   const { auth, sessions, clock } = deps;
-  if (!(await auth.resetLinkAccount(input.token, clock()))) return false;
-  const passwordHash = await auth.hashPassword(input.password);
-  const accountId = await auth.resetPassword(
-    input.token,
-    passwordHash,
-    clock(),
-  );
+  const accountId = await auth.resetLinkAccount(input.token, clock());
   if (!accountId) return false;
+  const passwordHash = await auth.hashPassword(input.password);
+  // Before the transaction: a failing session store stops the reset (IDN-E-10).
   await sessions.deleteAll(accountId);
+  const reset = await auth.resetPassword(input.token, passwordHash, clock());
+  if (!reset) return false;
+  // After it: a login with the old password that was under way may have opened one more.
+  await sessions.deleteAll(reset);
   return true;
 }
