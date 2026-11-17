@@ -85,41 +85,98 @@ const dockerImage =
   spawnSync("docker", ["image", "inspect", prometheusImage], {
     encoding: "utf8",
   }).status === 0;
+const ruleToolSkipReason =
+  "offline rule test: neither promtool nor the pinned metric store image is available locally (OBS-T-33 runs where one of them is, §17; the pipeline job `rule-test` runs it on the pinned image)";
+// The pipeline job `rule-test` sets RULE_TEST_REQUIRED=1: there a missing tool fails the test
+// instead of skipping it, so the rule test can never silently drop out of the pipeline (#164).
+const ruleToolRequired = process.env.RULE_TEST_REQUIRED === "1";
 const ruleToolSkip =
-  localPromtool || dockerImage
-    ? false
-    : "offline rule test: neither promtool nor the pinned metric store image is available locally (OBS-T-33 runs where one of them is, §17; the pipeline job `rule-test` of #164 runs it on the pinned image)";
+  localPromtool || dockerImage || ruleToolRequired ? false : ruleToolSkipReason;
 
 /**
  * The offline rule test of OBS-C-3: a local `promtool`, or the pinned image of the metric store
- * through Docker.
+ * through Docker. The files reach the container with `docker cp`, not a bind mount, because the
+ * Docker daemon of the pipeline job is a separate container that cannot see the job's folders.
  */
 function promtool(dir: string, testFile: string) {
-  const result = localPromtool
-    ? spawnSync("promtool", ["test", "rules", testFile], {
-        cwd: dir,
-        encoding: "utf8",
-      })
-    : spawnSync(
-        "docker",
-        [
-          "run",
-          "--rm",
-          "--entrypoint",
-          "promtool",
-          "-v",
-          `${dir}:/work`,
-          "-w",
-          "/work",
-          prometheusImage,
-          "test",
-          "rules",
-          testFile,
-        ],
-        { encoding: "utf8" },
-      );
-  return { status: result.status, output: `${result.stdout}${result.stderr}` };
+  if (localPromtool) {
+    const result = spawnSync("promtool", ["test", "rules", testFile], {
+      cwd: dir,
+      encoding: "utf8",
+    });
+    return {
+      status: result.status,
+      output: `${result.stdout}${result.stderr}`,
+    };
+  }
+  const docker = (...args: string[]) =>
+    spawnSync("docker", args, { encoding: "utf8" });
+  const created = docker(
+    "create",
+    "--entrypoint",
+    "promtool",
+    "-w",
+    "/work",
+    prometheusImage,
+    "test",
+    "rules",
+    testFile,
+  );
+  if (created.status !== 0) {
+    return { status: created.status, output: created.stderr };
+  }
+  const id = created.stdout.trim();
+  try {
+    const copied = docker("cp", `${dir}/.`, `${id}:/work`);
+    if (copied.status !== 0) {
+      return { status: copied.status, output: copied.stderr };
+    }
+    const run = docker("start", "-a", id);
+    return { status: run.status, output: `${run.stdout}${run.stderr}` };
+  } finally {
+    docker("rm", "-f", id);
+  }
 }
+
+describe("OBS-AC-2.3 Pipeline job rule-test (OBS-T-33, OBS-C-3, #164)", () => {
+  type CiJob = {
+    image?: string | { name: string };
+    services?: (string | { name: string })[];
+    variables?: Record<string, string>;
+    script?: string[];
+  };
+  const job = () => {
+    const found = (parse(readText(".gitlab-ci.yml")) as Record<string, CiJob>)[
+      "rule-test"
+    ];
+    assert.ok(found, "the pipeline has no job rule-test");
+    return found;
+  };
+
+  it("OBS-AC-2.3 runs the rule test in its own job with a Docker daemon, on the pinned image of the metric store", () => {
+    const script = (job().script ?? []).join("\n");
+    assert.match(script, new RegExp(`docker pull ${prometheusImage}`));
+    assert.match(script, /observability-alerts\.test\.ts/);
+    assert.ok(
+      (job().services ?? []).some((s) =>
+        (typeof s === "string" ? s : s.name).includes("dind"),
+      ),
+      "the job has no Docker daemon",
+    );
+  });
+
+  it("OBS-AC-2.3 fails the job instead of skipping the rule test when no tool is available (OBS-T-33)", () => {
+    assert.equal(job().variables?.RULE_TEST_REQUIRED, "1");
+    assert.match(
+      readText("tests/observability-alerts.test.ts"),
+      /RULE_TEST_REQUIRED/,
+    );
+  });
+
+  it("OBS-AC-2.3 names the job rule-test in the skip reason of the rule test (OBS-T-33)", () => {
+    assert.match(ruleToolSkipReason, /`rule-test`/);
+  });
+});
 
 describe("OBS-AC-2.3 Alert rule file, template (OBS-F-17, OBS-F-8, OBS-U-4)", () => {
   it("OBS-AC-2.3 keeps the alert rule 'High error rate' as a template with the placeholders of its two thresholds (OBS-F-17, OBS-F-28)", () => {

@@ -79,6 +79,28 @@ test:
   script:
     - pnpm test
 
+# The rule test of the alert rule "High error rate" (OBS-T-33, OBS-AC-2.3) runs `promtool test
+# rules` on the pinned image of the metric store; a test keeps the tag equal to the one in
+# docker-compose.yml. The job `test` has no Docker, so it skips this test with a written reason;
+# here the Docker daemon is a service, and RULE_TEST_REQUIRED turns a missing tool into a failure,
+# so the test can never silently drop out of the pipeline (#164).
+rule-test:
+  extends: .pnpm
+  stage: test
+  services:
+    - name: docker:29.9.2-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: /certs
+    DOCKER_TLS_VERIFY: "1"
+    DOCKER_CERT_PATH: /certs/client
+    RULE_TEST_REQUIRED: "1"
+  script:
+    - apk add --no-cache docker-cli
+    - docker pull prom/prometheus:v3.15.1
+    - cd tests && node --test observability-alerts.test.ts
+
 build:
   extends: .pnpm
   stage: test
