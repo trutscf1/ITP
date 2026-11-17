@@ -561,10 +561,12 @@
                 "nullable": true,
                 "on": {
                   "localFields": [
-                    "parentId"
+                    "parentId",
+                    "teamId"
                   ],
                   "targetFields": [
-                    "id"
+                    "id",
+                    "teamId"
                   ]
                 },
                 "to": {
@@ -1493,19 +1495,21 @@
                 },
                 {
                   "index": {
-                    "name": "folders_parent_id_idx_ab33b399"
+                    "name": "folders_parent_id_team_id_idx_18cc5ccc"
                   },
                   "onDelete": "cascade",
                   "source": {
                     "columns": [
-                      "parent_id"
+                      "parent_id",
+                      "team_id"
                     ],
                     "namespaceId": "public",
                     "tableName": "folders"
                   },
                   "target": {
                     "columns": [
-                      "id"
+                      "id",
+                      "team_id"
                     ],
                     "namespaceId": "public",
                     "tableName": "folders"
@@ -1524,10 +1528,11 @@
                 },
                 {
                   "columns": [
-                    "parent_id"
+                    "parent_id",
+                    "team_id"
                   ],
-                  "name": "folders_parent_id_idx_ab33b399",
-                  "prefix": "folders_parent_id_idx",
+                  "name": "folders_parent_id_team_id_idx_18cc5ccc",
+                  "prefix": "folders_parent_id_team_id_idx",
                   "unique": false
                 },
                 {
@@ -1545,6 +1550,12 @@
                 ]
               },
               "uniques": [
+                {
+                  "columns": [
+                    "id",
+                    "team_id"
+                  ]
+                },
                 {
                   "columns": [
                     "parent_id",
@@ -1785,7 +1796,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "d53d54568adb82119e7091260de3c25ea0dcc6de2123ef822f99d0e9922600ad"
+    "storageHash": "03d11f2141acff97e569a9e19b11b0cb9370016feb58cec31008be52b1334ab9"
   },
   "capabilities": {
     "postgres": {

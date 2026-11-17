@@ -23,7 +23,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'d53d54568adb82119e7091260de3c25ea0dcc6de2123ef822f99d0e9922600ad'>;
+  StorageHashBase<'03d11f2141acff97e569a9e19b11b0cb9370016feb58cec31008be52b1334ab9'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
@@ -877,7 +877,10 @@ type ContractBase = Omit<
                 };
               };
               primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [{ readonly columns: readonly ['parent_id', 'name'] }];
+              uniques: readonly [
+                { readonly columns: readonly ['id', 'team_id'] },
+                { readonly columns: readonly ['parent_id', 'name'] },
+              ];
               indexes: readonly [
                 {
                   readonly name: 'folders_one_root_per_team_4ec77325';
@@ -887,9 +890,9 @@ type ContractBase = Omit<
                   readonly unique: true;
                 },
                 {
-                  readonly name: 'folders_parent_id_idx_ab33b399';
-                  readonly prefix: 'folders_parent_id_idx';
-                  readonly columns: readonly ['parent_id'];
+                  readonly name: 'folders_parent_id_team_id_idx_18cc5ccc';
+                  readonly prefix: 'folders_parent_id_team_id_idx';
+                  readonly columns: readonly ['parent_id', 'team_id'];
                   readonly unique: false;
                 },
                 {
@@ -916,12 +919,12 @@ type ContractBase = Omit<
                   readonly source: {
                     readonly namespaceId: 'public' & NamespaceId;
                     readonly tableName: 'folders';
-                    readonly columns: readonly ['parent_id'];
+                    readonly columns: readonly ['parent_id', 'team_id'];
                   };
                   readonly target: {
                     readonly namespaceId: 'public' & NamespaceId;
                     readonly tableName: 'folders';
-                    readonly columns: readonly ['id'];
+                    readonly columns: readonly ['id', 'team_id'];
                   };
                 },
               ];
@@ -1444,8 +1447,8 @@ type ContractBase = Omit<
                 readonly cardinality: 'N:1';
                 readonly nullable: true;
                 readonly on: {
-                  readonly localFields: readonly ['parentId'];
-                  readonly targetFields: readonly ['id'];
+                  readonly localFields: readonly ['parentId', 'teamId'];
+                  readonly targetFields: readonly ['id', 'teamId'];
                 };
               };
               readonly team: {
