@@ -29,11 +29,12 @@ One user story of [Design system & accessibility modes](epic.md) and the accepta
 
 ## Slices
 
-The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it. A story of this weight needs more than one slice of at most 4 h (`WORKFLOW.md`, "Issues and weight"); its owner cuts them in the concept document.
+The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it. The cut and its decisions are in the concept document, §16 (`qa-log.md`, Q340).
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
-| 1 — whole story | DSA-AC-2.1, DSA-AC-2.2, DSA-AC-2.3, DSA-AC-2.4, DSA-AC-2.5 | — | #71 |
+| 1 — modes in the browser | DSA-AC-2.1, DSA-AC-2.2, DSA-AC-2.3, DSA-AC-2.5; DSA-AC-2.4 up to the browser | — | #71 |
+| 2 — settings in the profile | DSA-AC-2.4 | IDN-US-2 (#46), DSA-US-1 slice 3 (#112) | #161 |
 
 - **Story issue:** #71
 - **Weight:** 5
