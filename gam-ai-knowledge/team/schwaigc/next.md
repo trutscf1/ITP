@@ -11,6 +11,7 @@ New tasks and ideas for this developer land here first, before anyone plans them
 
 ## Open
 
+- [2026-11-17] From `trutscf1`, concept *Offline mode* (R12, `concepts/offline-mode.md` §11, §14): the file browser should offer the action "available offline" on a file and a folder and show the mark; the preview should accept the bytes of an offline copy as its source ([OFF-F-6], [OFF-F-9]). `trutscf1` builds the package `offline` and the wiring in `apps/web`; please review the changes in `apps/web` (track Web).
 - [2026-11-10] Noticed in slice 1 of DSA-US-3 (#72), not changed there: the root layout has a fixed `lang="en"`; the links of the placeholder page open a new tab with `target="_blank"` without saying so; `tests/design-system.test.ts` still defines its own `root` instead of `tests/helpers/paths.ts`; `@layer base` of the focus rule was checked at stylesheet level only, not in Storybook.
 
 - [2026-11-10] Noticed in slice 1 of DSA-US-2 (#71), not changed there: the theme switcher's `border-border` reaches about 1.5:1 on white, below the 3:1 for component boundaries (WCAG 1.4.11); Storybook has no toolbar item for the accessibility modes; the create-next-app placeholder still has the title "Create Next App" and fixed-pixel logos; a designer should look at the colour-blind status palettes (tuned by simulation, A8).
