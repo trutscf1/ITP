@@ -209,6 +209,8 @@ services:
       SMTP_PORT: "1025"
       SMTP_FROM: ${SMTP_FROM:?set SMTP_FROM in .env}
       SESSION_CHECK_TIMEOUT_MS: ${SESSION_CHECK_TIMEOUT_MS:?set SESSION_CHECK_TIMEOUT_MS in .env}
+      # Only the reverse proxy may set the client address of the throttle (Q352).
+      TRUSTED_PROXY: proxy
     depends_on:
       postgres:
         condition: service_healthy

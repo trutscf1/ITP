@@ -30,6 +30,8 @@ export interface IdentityConfig {
   SMTP_PORT: number;
   SMTP_FROM: string;
   SESSION_CHECK_TIMEOUT_MS: number;
+  /** The reverse proxy whose X-Forwarded-For is read (Q352): a host name or an address. */
+  TRUSTED_PROXY: string;
 }
 
 export interface IdentityConfigProblem {
@@ -162,6 +164,11 @@ const rules: { [K in keyof IdentityConfig]: Rule<IdentityConfig[K]> } = {
     reason: "expected an e-mail address",
   },
   SESSION_CHECK_TIMEOUT_MS: range(1000, 100, 5000),
+  TRUSTED_PROXY: {
+    fallback: "proxy",
+    parse: (value) => (/^[\w.:-]{1,255}$/.test(value) ? value : undefined),
+    reason: "expected a host name or an IP address",
+  },
 };
 
 /**
