@@ -7,5 +7,6 @@ export * from "./login-input.ts";
 export * from "./password.ts";
 export * from "./paths.ts";
 export * from "./registration-input.ts";
+export * from "./reset-input.ts";
 export * from "./rules.ts";
 export * from "./session-info.ts";

@@ -12,6 +12,8 @@ export const identityPaths = {
   login: "/login",
   logout: "/logout",
   session: "/session",
+  resetRequest: "/password-reset/request",
+  reset: "/password-reset",
 } as const;
 
 export type IdentityPathName = keyof typeof identityPaths;

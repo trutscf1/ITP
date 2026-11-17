@@ -35,6 +35,8 @@ export interface SessionStore {
   read(token: string, now: Date): Promise<ReadSession | undefined>;
   /** IDN-F-8: deletes the session of a token at once; an unknown token is ignored. */
   delete(token: string): Promise<void>;
+  /** IDN-F-27: deletes every session of an account at once. */
+  deleteAll(accountId: string): Promise<void>;
 }
 
 const daySeconds = 86_400;
@@ -116,6 +118,13 @@ export function createSessionStore(
         .exec();
       if (results?.[0]?.[1] !== "OK") return undefined;
       return { record: renewed, renewedMaxAgeSeconds: maxAgeSeconds };
+    },
+
+    async deleteAll(accountId) {
+      const hashes = await redis.smembers(accountKey(accountId));
+      const transaction = redis.multi();
+      for (const tokenHash of hashes) transaction.del(sessionKey(tokenHash));
+      await transaction.del(accountKey(accountId)).exec();
     },
 
     async delete(token) {
