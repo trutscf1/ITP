@@ -55,7 +55,8 @@ export interface AuthCore {
   }): Promise<{ id: string; token: string }>;
   /**
    * IDN-F-6, IDN-F-31: replaces name and hash of an unconfirmed account, restarts its clean-up
-   * period, and replaces its links by a new one, in one transaction. Returns the new token.
+   * period, and replaces its links by a new one, in one transaction. Returns the new token, or
+   * undefined, changing nothing, when the account was confirmed in the meantime.
    */
   replaceUnconfirmed(
     id: string,
@@ -65,7 +66,7 @@ export interface AuthCore {
       now: Date;
       validityHours: number;
     },
-  ): Promise<string>;
+  ): Promise<string | undefined>;
   /**
    * IDN-E-5: replaces the confirmation links of the account by a new one, valid for
    * `validityHours`; only its hash is stored (IDN-NF-5). Returns the token.
@@ -265,7 +266,9 @@ export async function createAuthCore(
       adapter.transaction(async (db) => {
         // Only while the account is still unconfirmed; `createdAt` restarts the clean-up
         // period of IDN-F-31 (Q346).
-        await db.update({
+        // A confirmation between the lookup of the registration and this update leaves no row to
+        // change; then nothing of the confirmed account is touched (IDN-F-6).
+        const unconfirmed = await db.updateMany({
           model: "user",
           where: [
             { field: "id", value: id },
@@ -273,6 +276,7 @@ export async function createAuthCore(
           ],
           update: { name, createdAt: now, updatedAt: now },
         });
+        if (unconfirmed !== 1) return undefined;
         await db.updateMany({
           model: "account",
           where: [
