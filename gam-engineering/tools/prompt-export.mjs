@@ -150,8 +150,9 @@ const SECRET_PATTERNS = [
   /\bsk-(?:ant-|proj-)?[A-Za-z0-9_-]{20,}/g,
   /\bgh[pousr]_[A-Za-z0-9]{30,}/g,
   /\bgithub_pat_[A-Za-z0-9_]{20,}/g,
-  // A GitLab token, with the part after ".01." of the current format, also when the chat shows only its start.
-  /\bglpat-[A-Za-z0-9_.-]+/g,
+  // A GitLab token of any type (personal, OAuth, trigger, deploy, runner, CI job, feed, …), with the part
+  // after ".01." of the current format, also when the chat shows only its start.
+  /(?<![A-Za-z0-9])gl(?:pat|oas|ptt|dt|rt|rtr|soat|cbt|ft|imt|agent|wt|ffct)-[A-Za-z0-9_.-]+/g,
   /\bxox[abprs]-[A-Za-z0-9-]{10,}/g,
   /\bAKIA[0-9A-Z]{16}\b/g,
   /\bAIza[0-9A-Za-z_-]{35}\b/g,
@@ -161,14 +162,30 @@ const SECRET_PATTERNS = [
 export function redact(text, home = homedir()) {
   let value = text;
   for (const pattern of SECRET_PATTERNS) value = value.replace(pattern, "[redacted]");
-  value = value.replace(/\b((?:password|passwd|pwd|secret|token|api[_-]?key|client[_-]?secret)\s*[:=]\s*)(["']?)[^\s"']{4,}\2/gi, "$1[redacted]");
+  // A secret after its name; the name may end a longer one (CI_JOB_TOKEN, GITLAB_TOKEN, ?private_token).
+  value = value.replace(/(?<![A-Za-z])((?:password|passwd|pwd|secret|private[_-]?token|token|api[_-]?key|client[_-]?secret)\s*[:=]\s*)(["']?)[^\s"'&]{4,}\2/gi, "$1[redacted]");
+  // A Bearer credential holds a digit, so prose such as "Bearer authentication" stays readable.
+  value = value.replace(/\b(Bearer\s+)(?=[A-Za-z._~+/=-]*[0-9])[A-Za-z0-9._~+/=-]{8,}/g, "$1[redacted]");
   value = value.replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, "[email]");
   if (home) {
-    for (const form of new Set([home, home.replace(/\\/g, "/"), home.replace(/\//g, "\\")])) {
-      value = value.split(form).join("~");
+    for (const form of homeForms(home)) {
+      const escaped = form.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      value = value.replace(new RegExp(`${escaped}(?![A-Za-z0-9])`, "g"), "~");
     }
   }
   return value;
+}
+
+// Every form in which a chat shows the home folder: as written, with either slash, as Git Bash and WSL
+// write a Windows drive (/c/Users/<name>, /mnt/c/…), and as Claude Code encodes it into a folder name
+// (every character that is not a letter or digit becomes "-": -Users-<name>, C--Users-<name>).
+function homeForms(home) {
+  const forward = home.replace(/\\/g, "/");
+  const forms = [home, forward, home.replace(/\//g, "\\"), home.replace(/[^A-Za-z0-9]/g, "-")];
+  const drive = /^([A-Za-z]):\//.exec(forward);
+  if (drive) forms.push(`/${drive[1].toLowerCase()}${forward.slice(2)}`, `/${drive[1].toUpperCase()}${forward.slice(2)}`);
+  // Longest first, so a longer form is replaced before a shorter one inside it.
+  return [...new Set(forms)].sort((a, b) => b.length - a.length);
 }
 
 // ---------- adapters ----------
@@ -854,6 +871,27 @@ function writeOwner(info) {
   writeFileSync(info.ownerFile, text);
 }
 
+// An export the run did not rebuild (its session is gone or was trimmed) keeps the redaction of the day it was
+// written; apply the current one in place, so a better redaction also reaches it. Only the tool folders of the
+// developer's own folder: manual/ is written by hand, and other folders belong to other developers.
+function redactExisting(folder, home, skip) {
+  const changed = [];
+  if (!existsSync(folder)) return changed;
+  for (const entry of readdirSync(folder, { withFileTypes: true })) {
+    if (!entry.isDirectory() || entry.name === "manual") continue;
+    for (const name of readdirSync(join(folder, entry.name))) {
+      const file = join(folder, entry.name, name);
+      if (!name.endsWith(".md") || skip.includes(file)) continue;
+      const current = readFileSync(file, "utf8");
+      const text = redact(current, home);
+      if (text === current) continue;
+      writeFileSync(file, text);
+      changed.push(file);
+    }
+  }
+  return changed;
+}
+
 export async function exportPrompts({ repo, home, appData, out = OUT, stage = false, env = process.env, fixedHome = false }) {
   const mode = readMode(repo, env);
   if (mode === "off") return { mode, written: [], sessions: 0 };
@@ -886,6 +924,7 @@ export async function exportPrompts({ repo, home, appData, out = OUT, stage = fa
       written.push(file);
     }
   }
+  written.push(...redactExisting(join(resolve(repo, out), user), home, written));
   if (count) writeOwner(info);
   if (mode === "local") ensureIgnored(repo);
   if (mode === "commit" && stage && existsSync(join(resolve(repo, out), user))) git(["add", "--", `${out}/${user}`], repo);
