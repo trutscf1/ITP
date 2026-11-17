@@ -161,3 +161,13 @@ Answer: Vorab reservieren (Recommended). The attempt is counted before the passw
 **Q354 - Issue #46:** Beschreibung aus der Story-Datei aktualisieren?
 
 Answer: Ja, aktualisieren (Recommended). #46 carries the story sentence and IDN-AC-2.1 to IDN-AC-2.6 of the story file.
+
+## Round 8 — 2026-11-17 — implementation of IDN-US-6, slice 1 (`tschudea07`)
+
+**Q358 - Issue #50:** Story-Satz und AC-Tabelle aus der Story-Datei IDN-US-6 übernehmen?
+
+Answer: Ja, aktualisieren (Recommended). #50 carries the story sentence and IDN-AC-6.1 to IDN-AC-6.6 of the story file.
+
+Assumption stated with the implementation, not rejected:
+
+- **A18**: the branch of #50 starts from `feature/46-log-in-and-log-out`, and its draft MR targets that branch, because !62 and the MR of #46 are not merged yet.

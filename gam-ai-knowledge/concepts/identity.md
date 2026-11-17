@@ -254,7 +254,7 @@ Character classes: lower-case letters, upper-case letters, digits, everything el
 
 **Client address.** The throttle counts the address the reverse proxy writes as the last entry of `X-Forwarded-For`; the proxy replaces what the client sent, and `identity` publishes no port. The header is read only from a connection whose address is the one `TRUSTED_PROXY` names, resolved by the name service and kept for 30 seconds (Q352); every other peer, such as another unit on the network `frontend`, and a call without the header, is counted by the address of its connection.
 
-**Confirmation tokens.** A confirmation token has 256 random bits. `auth_verifications` holds `identifier = "confirm:" + hex(SHA-256(token))` and `value = account id`, so the token itself is stored nowhere ([IDN-NF-5]). "At most once per `CONFIRMATION_LINK_TTL_HOURS`" in [IDN-E-5] means (Q345): the first refused login of an unconfirmed account sends a new link, which replaces every older link of the account, and sets `resend:<accountId>` with that expiry; further refused logins send no link while the key exists. Registering again ([IDN-F-6]) also replaces the older links. The e-mails of [IDN-F-6] and [IDN-E-5] are sent after the answer, so the answer does not wait for the SMTP host ([IDN-E-11]).
+**Confirmation and reset tokens.** A reset token has 256 random bits like a confirmation token; `auth_verifications` holds `identifier = "reset:" + hex(SHA-256(token))` and `value = account id`, and a new reset link deletes the older ones of the account ([IDN-F-25]). A confirmation token has 256 random bits. `auth_verifications` holds `identifier = "confirm:" + hex(SHA-256(token))` and `value = account id`, so the token itself is stored nowhere ([IDN-NF-5]). "At most once per `CONFIRMATION_LINK_TTL_HOURS`" in [IDN-E-5] means (Q345): the first refused login of an unconfirmed account sends a new link, which replaces every older link of the account, and sets `resend:<accountId>` with that expiry; further refused logins send no link while the key exists. Registering again ([IDN-F-6]) also replaces the older links. The e-mails of [IDN-F-6] and [IDN-E-5] are sent after the answer, so the answer does not wait for the SMTP host ([IDN-E-11]).
 
 **Error codes** added to the `ErrorResponse` table of `scaffolding.md` §8 (§15):
 
@@ -498,6 +498,19 @@ function countRequest(ip) -> ok | refused(retryAfterSeconds)      // registratio
 3. verify password; for an unknown address hash a dummy password, so both cases take the same time
 4. Throttle.settleLogin(success)
 5. wrong: E-4; unconfirmed: E-5; else create session, set cookie, answer SessionInfo
+```
+
+**M1 reset order** (`apps/identity/src/reset.ts`) — Traces to: IDN-F-25 to IDN-F-29, IDN-F-33, IDN-E-7.
+
+```text
+reset request: Throttle.countRequest(ip) (E-3), BotCheck (E-2), validate ResetRequestInput (E-1);
+               known address: replace its reset links by a new one (identifier "reset:" + hash);
+               answer 202 Accepted; the e-mail goes out after the answer
+new password:  validate NewPasswordInput (E-1, the link stays usable);
+               the link must exist and be unexpired (E-7) before the password is hashed;
+               one transaction: delete the link (only the request that deletes it goes on), replace
+               the hash, set emailVerified = true, delete every reset link of the account;
+               then delete every session of account-sessions:<accountId>; answer 204
 ```
 
 **M1 registration order** — Traces to: IDN-F-1, IDN-F-5, IDN-F-6, IDN-F-30, IDN-F-35.
