@@ -1,10 +1,9 @@
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import { contrast, labDistance, luminance, seenAs } from "./helpers/colour.ts";
+import { root, sourceFiles } from "./helpers/paths.ts";
 import {
-  root,
   rules,
   type Status,
   statuses,
@@ -272,12 +271,9 @@ describe("DSA-AC-2.5 Font size 200 % (DSA-T-11)", () => {
   });
 
   it("DSA-AC-2.5 DSA-T-11 sets no type or width of a component in pixels", () => {
-    const source = join(root, "packages/ui/src");
-    for (const file of readdirSync(source).filter((name) =>
-      name.endsWith(".tsx"),
-    )) {
+    for (const file of sourceFiles(`${root}/packages/ui/src`, /\.tsx$/)) {
       assert.doesNotMatch(
-        readFileSync(join(source, file), "utf8"),
+        readFileSync(file, "utf8"),
         /\b(?:text|w|h|min-w|min-h|max-w|max-h)-\[[^\]]*\d\s*px\]/,
         `${file} sets a size in pixels`,
       );

@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { after, before, describe, it } from "node:test";
-import { root, statuses } from "./helpers/tokens-css.ts";
+import { root } from "./helpers/paths.ts";
+import { statuses } from "./helpers/tokens-css.ts";
 import { type BuiltUi, buildUi } from "./helpers/ui-build.ts";
 
 let ui: BuiltUi;
