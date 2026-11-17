@@ -121,7 +121,7 @@ Rows of IDN-US-1, -2, and -6 are binding. Rows marked *draft* belong to stories 
 | IDN-F-2 | Password rules | A password MUST have 12 to 128 characters and MUST NOT equal, ignoring case, an entry of the common-password list. Both rules MUST be checked by `web` before sending and by `identity`. `web` MUST show a strength bar with the four levels `weak`, `fair`, `good`, `strong` computed by M3 (§8); the bar only advises and blocks nothing beyond the two rules. | IDN-AC-1.2 (Password rules) |
 | IDN-F-3 | Password hashing | `identity` MUST store a password only as a hash of the algorithm and parameters of [IDN-C-2]. A password MUST NOT be stored, logged, or returned in plain text anywhere. | IDN-AC-1.3 (Password hashing) |
 | IDN-F-4 | E-mail confirmation | After a registration with a new address, `identity` MUST create the account with `emailVerified = false` and send a confirmation e-mail with a confirmation link valid for `CONFIRMATION_LINK_TTL_HOURS` hours. Opening a valid link MUST set `emailVerified = true`, invalidate the link, and redirect to `/login?confirmed=1`. A login of an unconfirmed account MUST be refused with [IDN-E-5]. | IDN-AC-1.4 (E-mail confirmation) |
-| IDN-F-5 | Bot check | While `CAPTCHA_ENABLED` is true, `identity` MUST verify the bot-check token of every registration and reset request with the provider of [IDN-C-5] before anything else and refuse a missing or rejected token with [IDN-E-2]. While it is false, `web` MUST NOT load the bot check and `identity` MUST NOT require or send a token. | IDN-AC-1.5 (Bot check), IDN-AC-6.5 (Protected endpoint) |
+| IDN-F-5 | Bot check | While `CAPTCHA_ENABLED` is true, `identity` MUST verify the bot-check token of every registration and reset request with the provider of [IDN-C-5] after the request throttle ([IDN-F-35]) and before the input is checked or anything is stored, and refuse a missing or rejected token with [IDN-E-2]; a missing token is refused without a call to the provider. While it is false, `web` MUST NOT load the bot check and `identity` MUST NOT require or send a token. | IDN-AC-1.5 (Bot check), IDN-AC-6.5 (Protected endpoint) |
 | IDN-F-6 | No account disclosure | A valid registration MUST always be answered with HTTP 202 and `{ "status": "check-mailbox" }`. For an address of a confirmed account, `identity` MUST NOT change the account and MUST send the notice e-mail instead of a confirmation link. For an address of an unconfirmed account, it MUST keep the account, replace its name and password hash by the new ones, and send a new confirmation link (A15). | IDN-AC-1.6 (No account disclosure) |
 | IDN-F-7 | Password login | `POST /api/identity/login` with the e-mail address and password of a confirmed account MUST create a session ([IDN-F-34]) and answer 200 with the `SessionInfo` of §8 and the session cookie. | IDN-AC-2.1 (Password login) |
 | IDN-F-8 | Logout | `POST /api/identity/logout` MUST delete the session of the session cookie from the session store, answer 204, and clear the cookie. From then on, a session check with that token MUST answer "no session" ([IDN-F-37]). Without a valid session it MUST also answer 204. | IDN-AC-2.2 (Logout ends the session) |
@@ -226,7 +226,8 @@ RegistrationInput { name: string 1..100 after trim, email: Email, password: Pass
 LoginInput        { email: Email, password: string 1..128 }
 ResetRequestInput { email: Email, botToken: optional<string> }
 NewPasswordInput  { token: string 1..200, password: Password }
-Email    = string 3..254, lowercased and trimmed, one "@" with at least one character before it and a dot in the part after it
+Email    = string 3..254, lowercased and trimmed, without white space, one "@" with at least one character before it
+           and a dot in the part after it with at least one character on each side
 Password = string 12..128, not in the common-password list (case-insensitive)
 Strength = enum(weak|fair|good|strong)   // weak: < 12 chars or listed; fair: 12..15 chars of one character class;
                                          // good: 12..15 chars of two or more classes, or 16+ of one; strong: 16+ of two or more classes
@@ -240,6 +241,7 @@ Character classes: lower-case letters, upper-case letters, digits, everything el
 
 | Method and path | Body | Success | Errors |
 | --- | --- | --- | --- |
+| `GET /health` | — | 200 `HealthReport` of [SCF-F-5] with the essential checks `relational-database` and `session-store` (status `down` while either does not answer within `HEALTH_CHECK_TIMEOUT_MS`) | — |
 | `POST /register` | `RegistrationInput` | 202 `Accepted` | E-1, E-2, E-3, E-8 |
 | `GET /confirm?token=<t>` | — | 303 to `/login?confirmed=1` | 303 to `/link-invalid?kind=confirm` (E-7) |
 | `POST /login` | `LoginInput` | 200 `SessionInfo` + session cookie | E-1, E-4, E-5, E-6 |
@@ -247,6 +249,10 @@ Character classes: lower-case letters, upper-case letters, digits, everything el
 | `GET /session` | — | 200 `SessionInfo` | 401 E-9 |
 | `POST /password-reset/request` | `ResetRequestInput` | 202 `Accepted` | E-1, E-2, E-3 |
 | `POST /password-reset` | `NewPasswordInput` | 204 | E-1, E-7 |
+
+**Client address.** The throttle counts the address the reverse proxy writes as the last entry of `X-Forwarded-For`; the proxy replaces what the client sent, and `identity` publishes no port. Without the header (a call inside the stack) it counts the address of the connection.
+
+**Confirmation tokens.** A confirmation token has 256 random bits. `auth_verifications` holds `identifier = "confirm:" + hex(SHA-256(token))` and `value = account id`, so the token itself is stored nowhere ([IDN-NF-5]). A refused login ([IDN-E-5]) sends a new link only while the account has no unexpired one, which is what "at most once per `CONFIRMATION_LINK_TTL_HOURS`" means.
 
 **Error codes** added to the `ErrorResponse` table of `scaffolding.md` §8 (§15):
 
@@ -264,6 +270,10 @@ Character classes: lower-case letters, upper-case letters, digits, everything el
 
 | Variable | Valid values | Default |
 | --- | --- | --- |
+| `PORT` | 1..65535 | `3001` |
+| `APP_VERSION` | 1..64 characters | `0.0.0-dev` |
+| `HEALTH_CHECK_TIMEOUT_MS` | 1..60000 | `1000` |
+| `DATABASE_URL` | `postgresql://` URL | — (required) |
 | `PUBLIC_ORIGIN` | absolute `http://` or `https://` URL | `http://localhost:8080` |
 | `IDENTITY_AUTH_SECRET` | at least 32 characters | — (required) |
 | `REDIS_URL` | `redis://` URL | — (required) |
@@ -479,6 +489,19 @@ function countRequest(ip) -> ok | refused(retryAfterSeconds)      // registratio
 3. verify password; for an unknown address hash a dummy password, so both cases take the same time
 4. Throttle.afterLogin(success)
 5. wrong: E-4; unconfirmed: E-5; else create session, set cookie, answer SessionInfo
+```
+
+**M1 registration order** — Traces to: IDN-F-1, IDN-F-5, IDN-F-6, IDN-F-30, IDN-F-35.
+
+```text
+1. Throttle.countRequest(ip) (E-3)         // every request counts, valid or not
+2. REGISTRATION_ENABLED is false: E-8
+3. CAPTCHA_ENABLED: BotCheck.verify(botToken) (E-2); a missing token is refused without a call
+4. validate RegistrationInput (E-1)
+5. hash the password, also for the address of a confirmed account, so the answer time does not tell
+6. confirmed account: notice e-mail; unconfirmed: replace name and hash, delete its links, send a new link;
+   no account: create it (the database creates its users row), send a link
+7. answer 202 Accepted
 ```
 
 ### Inter-Module Interfaces
