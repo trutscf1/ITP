@@ -11,6 +11,12 @@
 		respond "ok" 200
 	}
 
+	# Every trace starts at the first unit: headers of the trace context that arrive from outside
+	# are removed before a request is forwarded (OBS-F-16).
+	request_header -traceparent
+	request_header -tracestate
+	request_header -baggage
+
 	handle {
 		reverse_proxy web:{$WEB_PORT}
 	}
