@@ -123,8 +123,19 @@ describe("SCF-AC-2.2 Configuration by environment", () => {
   it("SCF-AC-2.2 uses every variable of .env.example in docker-compose.yml", () => {
     const used = new Set(referencedVariables(compose));
     // COMPOSE_PROFILES is read by Docker Compose itself (OBS-F-5), not by a reference in the file.
+    // The telemetry variables are read by the units from their environment (OBS-F-1, section 8); a
+    // unit gets them in docker-compose.yml when it runs as a container (#19 for cms).
+    const readByUnits = new Set([
+      "TELEMETRY_ENABLED",
+      "TELEMETRY_ENDPOINT",
+      "TELEMETRY_EXPORT_INTERVAL_MS",
+      "TELEMETRY_TRACE_SAMPLE_RATIO",
+      "TELEMETRY_BUFFER_LIMIT",
+      "LOG_LEVEL",
+    ]);
     const unused = [...documentedVariables().keys()].filter(
-      (name) => name !== "COMPOSE_PROFILES" && !used.has(name),
+      (name) =>
+        name !== "COMPOSE_PROFILES" && !readByUnits.has(name) && !used.has(name),
     );
     assert.deepEqual(unused, []);
   });
