@@ -141,3 +141,7 @@ Answer: yes, a re-registration restarts the clean-up period (2026-11-17).
 Assumption stated with the implementation, not rejected:
 
 - **A17**: [IDN-F-5] runs the bot check after the request throttle ([IDN-F-35]) instead of "before anything else", because [IDN-T-20] needs the answer 429 before the bot check is asked.
+
+**Q350 - Stage R3:** Der Statuscheck (auch in der CI) verlangt nach dem Merge von IDN-US-1 zwingend 'in progress' für R3. Das widerspricht Q341 ('concept' lassen). Mit 'in progress' braucht doc-check Testzeilen für die Entwurfs-ACs von IDN-US-3, -4, -5, -7, -8. Lösung?
+
+Answer: Geplante Testzeilen (Recommended). R3 goes to `in progress`; §17 gets one planned test row per draft acceptance criterion (IDN-T-29 to IDN-T-45), written out when its story is grilled; the deviation of Q341 is removed from `WORKFLOW.md` (2026-11-17).

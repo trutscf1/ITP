@@ -582,6 +582,23 @@ One test per acceptance criterion; test names in code carry the `AC` ID.
 | IDN-T-18 | Reset ends every session | IDN-AC-6.3, IDN-F-27 | an account logged in on two devices | the password is reset | both old cookies get 401; login with the new password 200 |
 | IDN-T-19 | Identical reset answer | IDN-AC-6.4, IDN-F-28 | one known and one unknown address | a reset is requested for each | both 202 `{ "status": "check-mailbox" }`; only the known address gets an e-mail |
 | IDN-T-20 | Reset protected and confirms | IDN-AC-6.5, IDN-AC-6.6, IDN-F-29, IDN-F-33 | `CAPTCHA_ENABLED=true` with the stub answering no; an unconfirmed account | a reset request without a passing token; 6 requests within 60 s; then a reset of the unconfirmed account | 400 `bot-check-failed`; the 6th gets 429; after the reset the account logs in without confirming |
+| IDN-T-29 | Provider buttons (*draft*) | IDN-AC-3.1, IDN-F-12 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-30 | Account on first login (*draft*) | IDN-AC-3.2, IDN-F-13 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-31 | Link and unlink (*draft*) | IDN-AC-3.3, IDN-F-14 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-32 | Cancelled login (*draft*) | IDN-AC-3.4, IDN-F-15 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-33 | Activation (*draft*) | IDN-AC-4.1, IDN-F-16 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-34 | Code at login (*draft*) | IDN-AC-4.2, IDN-F-17 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-35 | Backup codes (*draft*) | IDN-AC-4.3, IDN-F-18 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-36 | Deactivation (*draft*) | IDN-AC-4.4, IDN-F-19 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-37 | Encrypted secrets (*draft*) | IDN-AC-4.5, IDN-F-20 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-38 | Manage passkeys (*draft*) | IDN-AC-5.1, IDN-F-21 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-39 | Browser support (*draft*) | IDN-AC-5.2, IDN-F-22 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-40 | Several passkeys (*draft*) | IDN-AC-5.3, IDN-F-23 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-41 | Counts as MFA (*draft*) | IDN-AC-5.4, IDN-F-24 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-42 | Role from the configuration (*draft*) | IDN-AC-7.1, IDN-F-39 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-43 | Check for the reverse proxy (*draft*) | IDN-AC-7.2, IDN-F-40 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-44 | Confirmed by password (*draft*) | IDN-AC-8.1, IDN-F-41 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-45 | Files deleted (*draft*) | IDN-AC-8.2, IDN-F-42 | planned; written out when its story is grilled (Q350) | — | — |
 
 ### Synthetic Test Data Strategy
 
