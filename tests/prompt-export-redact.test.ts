@@ -183,6 +183,7 @@ describe("prompt export redaction is idempotent", () => {
     `export GITLAB_TOKEN=${prefix}${body}; curl -H "PRIVATE-TOKEN: ${prefix}${body}" https://example.org/api`,
     "password: hunter2hunter2, then cd /Users/alicewonder/app && echo done",
     `Authorization: Bearer abc${body}9 and secret='quoted1234'`,
+    "an export written earlier: token='[redacted]' and GITLAB_TOKEN=[redacted];",
   ];
   for (const text of texts) {
     it(`changes nothing on a second run: ${text.slice(0, 32)}…`, () => {
