@@ -85,6 +85,20 @@ describe("IDN-E-11 IDN-AC-1.4 e-mail not delivered", () => {
     for (const stub of stubs) await stub.close();
   });
 
+  it("IDN-F-1 IDN-F-6 sends to exactly one recipient, even for an address that reads as a list", async () => {
+    const smtp = await startSmtpStub();
+    const mailer = createMailer(
+      { ...config, SMTP_HOST: "127.0.0.1", SMTP_PORT: smtp.port },
+      createLogger(() => {}),
+    );
+    try {
+      await mailer.sendNotice({ to: "a,victim@example.org", language: "en" });
+      assert.equal(smtp.to("victim@example.org").length, 0);
+    } finally {
+      await smtp.close();
+    }
+  });
+
   it("IDN-E-11 reports a refusing SMTP host as not delivered, never throws, and logs an error without the address or the link", async () => {
     const smtp = await startSmtpStub("refuse");
     stubs.push(smtp);
