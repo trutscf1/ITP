@@ -33,7 +33,7 @@ About 53 h per person, about 213 h for the team in total; this replaces the earl
 | Version | Feature | Serves | Status | Depends on | Feasibility | Owner | Ref |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 0.1.0 | Scaffolding & shared contracts | G-1.S1 (self-hosting) | in progress | – | high | trutscf1 | R1 |
-| 0.2.0 | Observability baseline | G-1 (on their own server) | concept | R1 | medium | trutscf1 | R2 |
+| 0.2.0 | Observability baseline | G-1 (on their own server) | in progress | R1 | medium | trutscf1 | R2 |
 | 0.3.0 | Identity: accounts, external login, MFA | G-1 (data under their control) | concept | R1 | high | tschudea07 | R3 |
 | 0.2.0 | Design system & accessibility modes | G-1.S2 (accessibility) | in progress | R1 | medium | schwaigc | R4 |
 | 0.4.0 | Storage core: folders, resumable upload, deduplication | G-1 (store and organize files) | concept | R3 | medium | schauby1 | R5 |
