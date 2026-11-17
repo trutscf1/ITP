@@ -5,6 +5,11 @@ global:
   scrape_interval: 60s
   evaluation_interval: 60s
 
+# The alert rule file is written by the configuration step (OBS-F-28) into the volume that is
+# mounted here; the metric store sends no alert anywhere (OBS-F-8).
+rule_files:
+  - /etc/prometheus/generated/alert-rules.yml
+
 otlp:
   # The unit and its version stay labels of every metric (OBS-F-11).
   promote_resource_attributes:

@@ -2,8 +2,9 @@
 // OBS-E-4). It runs once in the container `obs-config` before the stores and the dashboard tool
 // start. It checks the nine variables of §8 ("Configuration of the observability stack"), prints
 // one line per invalid variable (name and reason, never the value) and exits with 1, or writes the
-// configuration of the trace store with its retention in hours and exits with 0. The alert rule
-// files with the thresholds follow with the alert rules of OBS-US-2 (slices 2 and 4).
+// configuration of the trace store with its retention in hours and the alert rule file with the
+// thresholds (OBS-US-2: "High error rate" in slice 2, the other three alerts in slice 4) and exits
+// with 0.
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -110,12 +111,27 @@ export function checkConfig(
       given === undefined || given === "" ? variable.fallback : given;
     const problem = problemOf(variable, value);
     if (problem === undefined) {
-      values[variable.name] = value;
+      // Written without leading zeros: PromQL reads 020 as an octal literal.
+      values[variable.name] = String(Number(value));
     } else {
       lines.push(`  ${variable.name}: ${problem}`);
     }
   }
   return lines.length === 0 ? { ok: true, values } : { ok: false, lines };
+}
+
+/**
+ * Replaces every placeholder `__<VARIABLE>__` of an alert rule template with the checked value of
+ * that variable (OBS-F-28). The alert thresholds and the silent minutes are numbers, so no value
+ * can change the structure of the rule file.
+ */
+export function fillPlaceholders(
+  template: string,
+  values: Record<string, string>,
+): string {
+  return template.replace(/__(OBS_[A-Z_]+)__/g, (placeholder, name: string) =>
+    name in values ? values[name] : placeholder,
+  );
 }
 
 function main(): number {
@@ -133,8 +149,15 @@ function main(): number {
     join(templateDir, "tempo.template.yaml"),
     "utf8",
   ).replace("__OBS_TRACES_RETENTION_HOURS__", String(hours));
+  const alertRules = fillPlaceholders(
+    readFileSync(join(templateDir, "alert-rules.template.yml"), "utf8"),
+    result.values,
+  );
   mkdirSync(outputDir, { recursive: true });
   writeFileSync(join(outputDir, "tempo.yaml"), tempo, { mode: 0o644 });
+  writeFileSync(join(outputDir, "alert-rules.yml"), alertRules, {
+    mode: 0o644,
+  });
   return 0;
 }
 
