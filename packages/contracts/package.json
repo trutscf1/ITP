@@ -13,14 +13,18 @@
     "./web": {
       "types": "./dist/web/config.d.ts",
       "default": "./dist/web/config.js"
+    },
+    "./identity": {
+      "types": "./dist/identity/index.d.ts",
+      "default": "./dist/identity/index.js"
     }
   },
   "scripts": {
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
-    "build": "tsc && node src/generate-openapi.ts",
+    "build": "tsc -p tsconfig.build.json && node src/generate-openapi.ts",
     "dev": "tsc --watch --preserveWatchOutput",
-    "test": "node --test",
+    "test": "node --test \"src/**/*.test.ts\"",
     "openapi:generate": "node src/generate-openapi.ts"
   },
   "dependencies": {

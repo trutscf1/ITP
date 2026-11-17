@@ -3,16 +3,33 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/main.js",
   "scripts": {
-    "dev": "tsc --watch --preserveWatchOutput",
-    "build": "tsc",
+    "dev": "node --watch src/main.ts",
+    "start": "node dist/main.js",
+    "build": "tsc -p tsconfig.build.json",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
-    "test": "node --test"
+    "test": "node --test \"src/**/*.test.ts\""
+  },
+  "dependencies": {
+    "@hono/node-server": "2.1.6",
+    "@node-rs/argon2": "2.2.2",
+    "@stash/contracts": "workspace:*",
+    "better-auth": "1.7.19",
+    "hono": "4.13.17",
+    "ioredis": "6.0.0",
+    "nodemailer": "10.5.0",
+    "pg": "8.22.0"
   },
   "devDependencies": {
-    "@stash/config": "workspace:*"
+    "@stash/config": "workspace:*",
+    "@types/mailparser": "^3.9.0",
+    "@types/node": "^24",
+    "@types/nodemailer": "8.0.2",
+    "@types/pg": "8.20.4",
+    "@types/smtp-server": "3.5.13",
+    "mailparser": "^3.14.3",
+    "smtp-server": "3.21.4"
   }
 }
