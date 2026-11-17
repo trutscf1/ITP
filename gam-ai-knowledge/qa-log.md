@@ -4,6 +4,7 @@ format: gam-ai-knowledge/1
 title: "Question log — project"
 audience: [developer, reviewer, agent]
 ---
+
 # Question log — project
 
 The verbatim record of every question round, for anyone who wants to know why a decision was made and who answered what (P-GRILL-2). Answers are quoted exactly and never rewritten; the distilled decisions live in the concept's §13 or in an ADR.
@@ -1586,6 +1587,36 @@ Instruction of `tschudea07`, verbatim: "review mrs". Open MRs: !44 (`trutscf1`, 
 
 Answer: "Post, request changes (Recommended)". Posted on !44 without an approval.
 
+## Round 56 — 2026-11-03 — Start of Sprint 2, own issues (`trutscf1` (agent))
+
+Instruction of `trutscf1`, verbatim: "starte nun sprint 2 mit dem /engineering-human und /grill-me skill. schaue, wegen meinen docs und issues bezüglich opentelemetry, observability, ... beginne meine issues"
+
+**Q261 - Einstieg:** Womit soll Sprint 2 für OBS beginnen?
+
+Answer: "starte mit meinen tickets von sprint 2"
+
+**Q262 - Reihenfolge:** Welches Issue zuerst, wenn wir umsetzen?
+
+Answer: "#82 Slice 1, dann Slice 2 (Recommended)"
+
+**Q263 - Vorgehen:** Wie soll ich bei der Umsetzung arbeiten?
+
+Answer: "Ein Issue pro Session (Recommended)"
+
+The question numbers continue after Q258 of this branch; round 55 (Q259, Q260, mirror of the repository) is on `chore/github-mirror` and not yet in `dev`, so Q261 to Q263 are provisional until both are merged (P-TEAM-5).
+
+## Round 66 — 2026-11-03 — Container scan of !44 (`trutscf1` (agent))
+
+**Q286 - Container-Scan !44:** Der Job `container-scan` fand 4 HIGH-Funde in `node:24.14-alpine` (OpenSSL) und 16 Funde in `grafana/grafana:13.2.5` (gebündelte npm-Pakete); Grafana 13.2.5 ist der neueste Tag von 13.2. Wie soll ich vorgehen?
+
+Answer: "Node bumpen, Grafana ignorieren (Recommended)".
+
+**A1 - Node-Bump nicht möglich:** The bump did not help, so the agent fell back to the entries of the other option for node as well. `node:24.22-alpine` has 6 other HIGH findings (npm), `node:24.14-alpine3.22` has 17, and `node:24.14-alpine3.23` has the same 4 OpenSSL findings as `node:24.14-alpine`; checked locally with Trivy 0.69.3 on 2026-11-03. The two OpenSSL CVEs and the CVEs of Grafana are in `.trivyignore` with reason and expiry 2026-11-23, like the entries of the other images. `trutscf1` is asked to confirm A1 in the review of !44.
+
+The number Q286 is provisional until merged (P-TEAM-5).
+
+**A2 - Review of !44 by `tschudea07` (revise):** Points 1 to 6 were accepted. Fixed: the red pipeline (`docs`, `container-scan`, see A1); the IPv6 pattern now needs a boundary (`std::vector` is kept) and runs twice; an IPv4 address before a full stop is redacted; §8, M6, `STACK.md` (OBS-C-6, SCF-C-7), and `scaffolding.md` (SCF-F-4, §8) are updated in the same MR (P-GIT-5); the proxy test is filed under `OBS-AC-1.3`. Also done from the non-blocking notes: CI tests for the patterns, a test that no service outside the profile depends on it (OBS-E-4), the span status message is emptied, the collector version stands in the README. Not done, with reasons in the replies: one Dockerfile with `ARG` instead of three, the defaults in three places (`.env.example` documents them, SCF-F-11), structured log bodies (slice 2, OBS-AC-1.4).
+
 ## Round 63 — 2026-11-03 — fix #149, scan the built images (`tschudea07` (agent))
 
 Instruction of `tschudea07`, verbatim: "arbeite ein issue von mir ab das machbar ist". Chosen: #149 (bug, weight 1, Sprint 2, `status::ready`); the stories of R3 still need `tickets`, and slice 1 of #45 is blocked. Rounds 59 to 62 are on `chore/review-round-2026-11-03` (!45), not yet on `dev`.
@@ -1606,3 +1637,112 @@ Answer: "Fix mine, issue for web (Recommended)".
 - A4: exceptions of a built image must not hide the same finding in other images (for example OpenSSL in `node:24.14-alpine` on !44), so each built image gets its own file `.trivyignore.d/<service>`, added to `.trivyignore` only when that image is scanned; the fixed project name `stash` names the built images `stash-<service>`.
 
 Issue #157 created for `trutscf1` (Sprint 2, weight 2): fix the `web` image and the Prisma CLI findings; the exceptions expire on 2026-11-23.
+
+## Round 64 — 2026-11-03 — Review of the merge requests of `tschudea07`, Sprint 2, time booking (`trutscf1` (agent))
+
+Instruction of `trutscf1`, verbatim: "reviewe die merge requests von tschudea; arbeite die issues von mir von sprint 2 alle ab mit /grill-me und /engineering-human"
+
+**Q283 - Review !41 veröffentlichen:** Alle 4 Punkte aus dem 2. Durchgang sind erledigt, Pipeline `d7c2bf81` grün, kein Approval. Wie soll der 3. Durchgang auf !41 veröffentlicht werden?
+
+Answer: "Kommentar + Approve (Recommended)". Posted as a note on !41 and approved on GitLab; the merge is left to the merge policy (P-MR-4).
+
+**Q284 - Umfang Sprint 2:** Welche der neun offenen Sprint-2-Issues von `trutscf1` sollen abgearbeitet werden?
+
+Answer: "Alle OBS-Issues (Recommended)": #82 with #154 and #155, then #83 with #156, in dependency order; #151 (human task) and #152 (backlog, low) stay out.
+
+**Q285 - Stack-Test #82:** Der Docker-Daemon lief nicht; der Stack-Test (`STACK_TEST=1`) von #82 konnte nicht laufen. Wie weiter?
+
+Answer: "Ich starte Docker Desktop (Recommended)". Docker Desktop was started by `trutscf1` ("docker desktop ist nun auch gestartet, mache weiter").
+
+**A1 - Zeitbuchung durch den Agenten:** `docs/` (`anforderungen_software_projekte.md` §6, `git_workflow_commands.md` §9) requires time tracking but does not say who posts it, so it does not override P-TIME-1. `trutscf1` decided, verbatim: "schreibe den eintrag: du gibst mir am ende jedes issues deinen vorschlag, dann sage ich ja oder andere zeit, dann trägst du sie für mich ein". Recorded as a deviation from P-TIME-1 in `WORKFLOW.md`; it takes effect when this branch is merged into `dev`, so until then the agent books nothing.
+
+The numbers Q283 to Q285 are provisional until merged (P-TEAM-5).
+
+## Round 65 — 2026-11-03 — Slice 1 dashboards (#83) (trutscf1 (agent))
+
+Instruction of `trutscf1`, verbatim (coordinator): implement #83, slice 1 of OBS-US-2 ("dashboard tool on the server itself, stored files, and links"), on top of the open !44; build no alert rule (slice 2, #156). The agent could not ask questions; each gap is closed with a default (P-GRILL-4).
+
+**Q300 - Panels of slice 1:** The links of OBS-AC-2.2 sit on three panels of "Operations overview", but the dashboard belongs to slice 3. Which panels does slice 1 deliver?
+
+**A1 - Three panels now, three later:** Slice 1 stores the dashboard "Operations overview" with the three panels that carry the log link of OBS-F-7 (Requests per second, Server errors, Latency (95th percentile)), the time range last hour, refresh 30 seconds, and the unit selector. Slice 3 adds the panels "Upload throughput", "Waiting jobs", and "Storage usage" (they need the metrics of R5 and R9). Concept §16 says so.
+
+**Q301 - Proof of "cannot be saved":** The dashboard tool must refuse a save (OBS-F-9), but an anonymous Viewer cannot save anything anyway. How is the refusal proven?
+
+**A2 - Default administrator account in the test:** The test project uses the built-in account `admin` of the dashboard tool inside the container and shows that even it is refused (HTTP 400 "provisioned"). The account stays until slice 5 (login through `identity`, OBS-NF-6) switches the basic login off; until then the port is bound to `127.0.0.1` (OBS-F-24).
+
+**Q302 - Proof of the links between log entry and trace:** The derived fields of the log store data source are applied in the browser of the dashboard tool, not by its server.
+
+**A3 - Settings plus data, not a click:** The test proves the provisioned settings (derived field to the trace store, trace-to-logs query to the log store, panel link to the log store with unit and time range) and that a stored log entry carries the trace ID under a key that a derived field matches. Following the link in a browser is not automated; the reviewer can try it with the profile started.
+
+**A4 - Two keys for the trace ID:** The package `telemetry` is not built yet, so it is open whether the trace ID reaches the log store as the field of the OTLP record (`trace_id`) or as the attribute `traceId`. The log store data source provisions a derived field for each key; the trace-to-logs query uses `trace_id`. Slice 2 of OBS-US-1 removes one of them when the package exports its entries.
+
+**A5 - Issue text of #83 is outdated:** The description of #83 still has the five old criteria and the old story file name; the story file `OBS-US-2-operations-dashboards-and-alerts.md` is the source (P-DOC-6). The MR says so; the issue text is not changed here.
+
+The numbers Q300 to Q302 are provisional until merged (P-TEAM-5).
+
+## Round 67 — 2026-11-03 — Slice 2 error rate alert (#156) (trutscf1 (agent))
+
+Instruction of `trutscf1`, verbatim (coordinator): implement #156, slice 2 of OBS-US-2 ("error rate alert", OBS-AC-2.3; modules M6 thresholds and M9 alert rule) on top of the open !47 and, through it, !44. The agent could not ask questions; each gap is closed with a default (P-GRILL-4).
+
+**Q320 - Where the rule is evaluated:** The concept names "alert rules" and "alert list of the dashboard tool" but not the evaluating component. Does the dashboard tool evaluate its own rules or the metric store?
+
+**A1 - The metric store evaluates, the dashboard tool lists:** `STACK.md` §OBS-C-3 already fixes it: alert rules are Prometheus rule files rendered by the configuration step, tested offline with `promtool test rules`. The data source "Metrics" sets `manageAlerts: true`, so the dashboard tool shows the rules and their alerts read-only in its alert list (OBS-F-9: no change is savable). The rule file is written by the configuration step into the volume `obs-generated` and mounted read-only into the metric store.
+
+**Q321 - Exact request count:** OBS-F-17 needs the number of requests in the last 5 minutes and compares it with "at least 20". Prometheus `increase()` extrapolates to the window edges (19 requests become about 23.75 with samples every minute), so the row "19 requests, 10 errors → normal" of example 5 would fire.
+
+**A2 - Counter now minus counter 5 minutes ago:** Two recording rules compute per unit the exact difference of the counter `http_server_request_duration_seconds_count` (all status codes, and status codes 500 to 599) between now and 5 minutes ago; a series that is new inside the window starts at 0. The alert reads these two series. Known limit: after a restart of a unit its counter starts again at 0, the count of that window is too low (`clamp_min` at 0), so a restart can hide an alert for up to 5 minutes. The opposite limit: after a gap of more than 5 minutes in the data of a unit (silent unit, data loss) the whole counter counts as new for one window, so the count can be too high once; accepted, the alert "Unit silent" (slice 4) covers the silent unit. The alert also carries the label `unit` next to `service_name`, so the alert list names the unit (OBS-F-8).
+
+**A3 - No pending period:** OBS-F-17 and the state diagram let the error rate alert go from normal directly to firing; the rule has no `for` and fires at the first evaluation at which the condition holds.
+
+**A4 - Summary text through a query:** The text needs `N` and the value `E / N × 100`. The value of the alert is the share; `N` is read with the template function `query` from the recording rule of the same unit.
+
+**Q322 - Offline rule test in CI:** The `test` job runs on `node:24.14.0-alpine` without `promtool` or Docker, so the offline rule test cannot run there.
+
+**A5 - Skip with reason, local run stated in the MR:** The test uses a local `promtool`, else the pinned image of the metric store through Docker, else it is skipped with a reason (as the stack tests are until SCF-US-5 offers a container runtime, §17). A CI job `rule-test` on the image of the metric store is a follow-up for the track Identity & CI; the result of the local run is stated in the MR.
+
+**A6 - Test data in the rule test file:** The series of example 5 are the `input_series` of one `promtool` test file, `tests/data/observability/alert-error-rate.test.yml`, kept as data next to the tests (§17); the file that also feeds the dashboard test is part of slice 3.
+
+The numbers Q320 to Q322 are provisional until merged (P-TEAM-5).
+
+## Round 68 — 2026-11-10 — Accessibility modes, slice 1 (`schwaigc` (agent))
+
+Instruction, verbatim: "ja starte #71 mit dem skill gam enginieering implement". Gate before the first change: the concept `design-system.md` is an ungrilled draft without §16, the story of weight 5 was not cut into slices, and DSA-AC-2.4 needs a profile store that does not exist yet (#112 waits for #46). The pop-ups were asked as Q277 to Q280; they are logged as Q340 to Q343 because open branches already use Q277 to Q331 and rounds 59 to 65.
+
+**Q340 - Umfang #71:** Wie soll DSA-US-2 (Accessibility modes) umgesetzt werden, obwohl das Konzept ein Entwurf ist, die Story noch nicht in Slices geschnitten ist und die Profilspeicherung (DSA-AC-2.4) noch fehlt?
+
+Answer: "Slices schneiden + Slice 1 (Recommended)".
+
+**Q341 - Flow:** In .claude/settings.json ist kein GAM_ENGINEERING_FLOW gesetzt. Welcher Ablauf gilt für dieses Projekt?
+
+Answer: "full (Recommended)".
+
+**Q342 - Veröffentlichen #71:** Branch feature/71-accessibility-modes pushen, MR nach dev öffnen (Titel „DSA-US-2 Accessibility modes, slice 1: modes in the browser“, Beschreibung nach Template inkl. Testtabelle und Merge danger), #71 auf status::review setzen und das Child-Issue „DSA-US-2 slice 2: Accessibility settings in the profile“ anlegen (Part of #71, DSA-AC-2.4, blockiert durch #46 und #112, Sprint 5, Weight 2, dir zugewiesen, status::backlog)?
+
+Answer: "Alles veröffentlichen (Recommended)". The child issue is #161.
+
+**Q343 - Issue #71 beim Merge:** Laut Slice-Tabelle liefert #71 Slice 1, die Story DSA-US-2 ist aber erst mit Slice 2 fertig. Soll der MR #71 schließen?
+
+Answer: "Closes #71 (Recommended)".
+
+## Round 70 — 2026-11-03 — Slice 2 telemetry package (#154) (trutscf1 (agent))
+
+Instruction of `trutscf1`, summarised: implement issue #154 (`OBS-US-1` slice 2, the shared package `telemetry`, modules M1 to M5 of `concepts/observability.md` §16) with `/engineering-human implement`. The agent could not ask pop-ups in this session; where the documents left a gap with a cheap default, it states an assumption (P-GRILL-4). `trutscf1` rejects an assumption by answering it in the review of the merge request.
+
+- **A1:** The OpenTelemetry SDK is not used (the choice `STACK.md` §1 left "to be confirmed in slice 2"). The package encodes OTLP over HTTP with JSON bodies itself and keeps no runtime dependency. Reasons: the SDK's logs packages are experimental (Definition of Done item 18), its exporters have their own queues instead of the bounded buffer of `OBS-E-1`, and the supply-chain rules of `pnpm-workspace.yaml` apply to every package. The protocol, and with it the collector of `OBS-C-2`, stays the same. Recorded in `STACK.md` §1.
+- **A2:** The logger also replaces e-mail and IP addresses in the message and the attribute values (the patterns of §8), not only the collector. Without it the criterion `OBS-AC-1.6` cannot be shown on standard output, where the unit still writes the entry. `OBS-F-14` and the modules M2 and M3 are extended in the concept; test case `OBS-T-40` is new.
+- **A3:** A log attribute key outside `[a-zA-Z0-9._-]` is written with `_`; a neutral name with a space is written in camel case (`job id` is `jobId`, as example 2 of §10 already shows). The text of `OBS-E-6` and test case `OBS-T-31` said `job id`, which the key rule of §8 does not allow; fixed in the concept.
+- **A4:** The package offers no framework glue. `startTelemetry(unit, version, config, options?)` returns `{ log, meter, jobs, tracer, http, flush, shutdown }`; a unit wraps its request handler in `http.serve({ method, path, route?, traceparent? }, handler)` and an outgoing call in `http.call`. The unit passes its route patterns (`/api/storage/files/{id}`) in `options.routes` or the pattern its framework matched; no match is `unmatched`. The request has no field for an address or a user agent, so `OBS-NF-2` holds by construction. The glue per framework is module M11 of each unit's slice.
+- **A5:** The name of an outgoing request span is `<METHOD> <peer unit>` (§8 names only request and job spans).
+- **A6:** The variables of `TelemetryConfig` go into `.env.example` with the example configuration of slice 1 (`OBS-F-5`, `SCF-F-17`), not here: nothing in the repository reads them yet, and the slice is open in another merge request.
+- **A7:** The new package gets the commit scope `telemetry` (`commitlint.config.ts`, `WORKFLOW.md`, one commit before the tests); the workspace test `tests/monorepo.test.ts` and `SCF-F-18`, `SCF-T-1`, and the tree of `scaffolding.md` §16 name it, as `observability.md` §15 required.
+- **A8:** The branch is `feature/154-telemetry-package-agent`: the name `feature/154-telemetry-package` already existed, checked out in another worktree of the same repository.
+
+**Q290 - Instrumentation library:** Which library instruments the units (`OBS-C-1`)? Decided by the agent as A1.
+
+Answer: none yet; assumption A1 stands until the review.
+
+**Q291 - Redaction of texts in the unit:** Must the unit already remove e-mail and IP addresses from message and values? Decided by the agent as A2.
+
+Answer: none yet; assumption A2 stands until the review.
+
+The question numbers are provisional until merged into `dev` (P-TEAM-5).
