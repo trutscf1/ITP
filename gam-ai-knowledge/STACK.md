@@ -152,4 +152,4 @@ Type mapping (neutral type → concrete type) and error mapping (`E-x` → concr
 
 ## 5. Stack ADRs
 
-Technology choices with lock-in are recorded in `gam-ai-knowledge/adr/`.§NL§§NL§
+Technology choices with lock-in are recorded in `gam-ai-knowledge/adr/`.

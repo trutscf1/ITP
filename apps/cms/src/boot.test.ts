@@ -7,7 +7,7 @@ import { InvalidConfigurationError } from "@stash/telemetry";
 import { boot, unitVersion } from "./boot.ts";
 
 // Slice 3 of OBS-US-1: the unit `cms` starts its telemetry before it accepts a request and writes
-// its start log entry (module M11 UnitWiring, documentation/concepts/observability.md §16, §17).
+// its start log entry (module M11 UnitWiring, gam-ai-knowledge/concepts/observability.md §16, §17).
 // `boot` is the seam: the code that accepts requests (the content management system) is handed
 // in as `accept` and runs only after the start call and the start log entry.
 

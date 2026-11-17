@@ -15,7 +15,7 @@ export const unitVersion = (
 ).version;
 
 /**
- * M11 UnitWiring for `cms` (documentation/concepts/observability.md §16, OBS-F-1, OBS-F-25):
+ * M11 UnitWiring for `cms` (gam-ai-knowledge/concepts/observability.md §16, OBS-F-1, OBS-F-25):
  * reads the telemetry configuration from the environment, starts the telemetry of the unit
  * (`startTelemetry("cms", …)`), writes the start log entry `unit started`, and only then calls
  * `accept`, the code that accepts requests (the content management system).
