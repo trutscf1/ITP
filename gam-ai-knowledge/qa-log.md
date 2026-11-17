@@ -4,6 +4,7 @@ format: gam-ai-knowledge/1
 title: "Question log — project"
 audience: [developer, reviewer, agent]
 ---
+
 # Question log — project
 
 The verbatim record of every question round, for anyone who wants to know why a decision was made and who answered what (P-GRILL-2). Answers are quoted exactly and never rewritten; the distilled decisions live in the concept's §13 or in an ADR.
@@ -1636,6 +1637,26 @@ Answer: "Fix mine, issue for web (Recommended)".
 - A4: exceptions of a built image must not hide the same finding in other images (for example OpenSSL in `node:24.14-alpine` on !44), so each built image gets its own file `.trivyignore.d/<service>`, added to `.trivyignore` only when that image is scanned; the fixed project name `stash` names the built images `stash-<service>`.
 
 Issue #157 created for `trutscf1` (Sprint 2, weight 2): fix the `web` image and the Prisma CLI findings; the exceptions expire on 2026-11-23.
+
+## Round 64 — 2026-11-03 — Review of the merge requests of `tschudea07`, Sprint 2, time booking (`trutscf1` (agent))
+
+Instruction of `trutscf1`, verbatim: "reviewe die merge requests von tschudea; arbeite die issues von mir von sprint 2 alle ab mit /grill-me und /engineering-human"
+
+**Q283 - Review !41 veröffentlichen:** Alle 4 Punkte aus dem 2. Durchgang sind erledigt, Pipeline `d7c2bf81` grün, kein Approval. Wie soll der 3. Durchgang auf !41 veröffentlicht werden?
+
+Answer: "Kommentar + Approve (Recommended)". Posted as a note on !41 and approved on GitLab; the merge is left to the merge policy (P-MR-4).
+
+**Q284 - Umfang Sprint 2:** Welche der neun offenen Sprint-2-Issues von `trutscf1` sollen abgearbeitet werden?
+
+Answer: "Alle OBS-Issues (Recommended)": #82 with #154 and #155, then #83 with #156, in dependency order; #151 (human task) and #152 (backlog, low) stay out.
+
+**Q285 - Stack-Test #82:** Der Docker-Daemon lief nicht; der Stack-Test (`STACK_TEST=1`) von #82 konnte nicht laufen. Wie weiter?
+
+Answer: "Ich starte Docker Desktop (Recommended)". Docker Desktop was started by `trutscf1` ("docker desktop ist nun auch gestartet, mache weiter").
+
+**A1 - Zeitbuchung durch den Agenten:** `docs/` (`anforderungen_software_projekte.md` §6, `git_workflow_commands.md` §9) requires time tracking but does not say who posts it, so it does not override P-TIME-1. `trutscf1` decided, verbatim: "schreibe den eintrag: du gibst mir am ende jedes issues deinen vorschlag, dann sage ich ja oder andere zeit, dann trägst du sie für mich ein". Recorded as a deviation from P-TIME-1 in `WORKFLOW.md`; it takes effect when this branch is merged into `dev`, so until then the agent books nothing.
+
+The numbers Q283 to Q285 are provisional until merged (P-TEAM-5).
 
 ## Round 65 — 2026-11-03 — Slice 1 dashboards (#83) (trutscf1 (agent))
 
