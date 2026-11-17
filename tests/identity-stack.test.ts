@@ -50,20 +50,20 @@ const configured = [
 ];
 
 describe("IDN-US-1 identity in the local stack (SCF-F-1, SCF-F-20, IDN-F-4)", () => {
-  it("IDN-AC-1.4 defines the service identity, built from the Dockerfile of its unit", () => {
+  it("SCF-F-1 defines the service identity, built from the Dockerfile of its unit", () => {
     assert.ok(identity, "service identity is missing");
     assert.equal(identity.build?.dockerfile, "apps/identity/Dockerfile");
     assert.ok(existsSync(join(root, "apps/identity/Dockerfile")));
   });
 
-  it("IDN-AC-1.4 gives it a health check on /health that fails for a report with status down [SCF-F-5]", () => {
+  it("SCF-F-5 gives it a health check on /health that fails for a report with status down", () => {
     const test = identity?.healthcheck?.test;
     const command = Array.isArray(test) ? test.join(" ") : (test ?? "");
     assert.match(command, /\/health/);
     assert.match(command, /"status":"down"/);
   });
 
-  it("IDN-AC-1.4 starts it after the database, the migrations, the session store, and the mail catcher [SCF-F-26]", () => {
+  it("SCF-F-20 SCF-F-26 starts it after the database, the migrations, the session store, and the mail catcher", () => {
     const needs = identity?.depends_on ?? {};
     assert.equal(needs.postgres?.condition, "service_healthy");
     assert.equal(needs.redis?.condition, "service_healthy");
@@ -85,7 +85,7 @@ describe("IDN-US-1 identity in the local stack (SCF-F-1, SCF-F-20, IDN-F-4)", ()
     assert.match(env.DATABASE_URL ?? "", /@postgres:5432\//);
   });
 
-  it("IDN-AC-1.4 publishes no port; it shares the frontend network with the proxy and the backend network with the data services", () => {
+  it("SCF-F-4 publishes no port; it shares the frontend network with the proxy and the backend network with the data services", () => {
     assert.equal(identity?.ports, undefined);
     assert.deepEqual([...(identity?.networks ?? [])].sort(), [
       "backend",
@@ -94,7 +94,7 @@ describe("IDN-US-1 identity in the local stack (SCF-F-1, SCF-F-20, IDN-F-4)", ()
     assert.ok(compose.services.proxy?.networks?.includes("frontend"));
   });
 
-  it("IDN-AC-1.7 takes every variable of the identity configuration from the environment of the stack, with the secrets as required values", () => {
+  it("SCF-F-11 takes every variable of the identity configuration from the environment of the stack, with the secrets as required values", () => {
     const env = identity?.environment ?? {};
     for (const name of configured) {
       assert.match(env[name] ?? "", /^\$\{/, `${name} is not read from .env`);
@@ -105,7 +105,7 @@ describe("IDN-US-1 identity in the local stack (SCF-F-1, SCF-F-20, IDN-F-4)", ()
     );
   });
 
-  it("IDN-AC-1.5 documents every variable in .env.example, with the bot check off and the registration open", () => {
+  it("IDN-NF-6 documents every variable in .env.example, with the bot check off and the registration open", () => {
     const documented = new Map<string, string>();
     for (const line of read(".env.example").split(/\r?\n/)) {
       const match = /^([A-Z][A-Z0-9_]*)=(.*)$/.exec(line);
@@ -123,7 +123,7 @@ describe("IDN-US-1 identity in the local stack (SCF-F-1, SCF-F-20, IDN-F-4)", ()
     );
   });
 
-  it("IDN-AC-1.5 documents every variable that loadIdentityConfig reads in .env.example, as a setting or as a commented default [SCF-F-11]", () => {
+  it("SCF-F-11 documents every variable that loadIdentityConfig reads in .env.example, as a setting or as a commented default", () => {
     const loaded = loadIdentityConfig({
       DATABASE_URL: "postgresql://localhost/none",
       REDIS_URL: "redis://localhost:6379",
@@ -142,7 +142,7 @@ describe("IDN-US-1 identity in the local stack (SCF-F-1, SCF-F-20, IDN-F-4)", ()
     }
   });
 
-  it("IDN-AC-1.4 routes /api/identity to identity without the prefix, so /api/identity/health reaches /health [SCF-F-4]", () => {
+  it("SCF-F-4 routes /api/identity to identity without the prefix, so /api/identity/health reaches /health", () => {
     const caddyfile = read("docker/Caddyfile");
     assert.match(
       caddyfile,
@@ -154,7 +154,7 @@ describe("IDN-US-1 identity in the local stack (SCF-F-1, SCF-F-20, IDN-F-4)", ()
     );
   });
 
-  it("IDN-AC-1.4 builds the image of identity on the Node.js of .tool-versions and runs it as the user node", () => {
+  it("SCF-F-1 builds the image of identity on the Node.js of .tool-versions and runs it as the user node", () => {
     const dockerfile = read("apps/identity/Dockerfile");
     assert.match(dockerfile, /^FROM node:24\.14\.0-alpine$/m);
     assert.match(dockerfile, /^USER node$/m);
@@ -170,7 +170,7 @@ describe("IDN-US-1 identity in CI (IDN-C-6, concept §17 CI Test Constraints)", 
     };
   };
 
-  it("IDN-AC-1.9 gives the job test a Redis service and its address in TEST_REDIS_URL", () => {
+  it("IDN-C-6 gives the job test a Redis service and its address in TEST_REDIS_URL", () => {
     const names = pipeline.test.services.map((service) => service.name);
     assert.ok(names.includes("redis:8.8-alpine"));
     assert.match(
@@ -179,7 +179,7 @@ describe("IDN-US-1 identity in CI (IDN-C-6, concept §17 CI Test Constraints)", 
     );
   });
 
-  it("IDN-AC-1.9 lets Turborepo pass TEST_REDIS_URL through to the tests", () => {
+  it("IDN-C-6 lets Turborepo pass TEST_REDIS_URL through to the tests", () => {
     const turbo = JSON.parse(read("turbo.json")) as {
       tasks: { test: { passThroughEnv: string[] } };
     };
@@ -187,7 +187,7 @@ describe("IDN-US-1 identity in CI (IDN-C-6, concept §17 CI Test Constraints)", 
     assert.ok(turbo.tasks.test.passThroughEnv.includes("TEST_DATABASE_URL"));
   });
 
-  it("IDN-AC-1.9 documents TEST_REDIS_URL in .env.example", () => {
+  it("IDN-C-6 documents TEST_REDIS_URL in .env.example", () => {
     assert.match(read(".env.example"), /^# TEST_REDIS_URL=/m);
   });
 });
