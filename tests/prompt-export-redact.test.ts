@@ -126,3 +126,43 @@ describe("prompt export removes the home folder in every form", () => {
     }
   });
 });
+
+// An export whose session the tool no longer holds is never rebuilt, so the export run redacts it again
+// in place; the developer's hand-written manual/ folder and other developers' folders stay untouched
+// (review of !56, point 1: "neu exportieren").
+describe("prompt export redacts existing exports again", () => {
+  it("redacts an export whose session is gone, and leaves manual/ and other folders alone", async () => {
+    const { mkdtempSync, mkdirSync, writeFileSync, readFileSync, realpathSync } = await import("node:fs");
+    const { tmpdir } = await import("node:os");
+    const { exportPrompts } = (await import(
+      pathToFileURL(join(repo, "gam-engineering/tools/prompt-export.mjs")).href
+    )) as { exportPrompts: (options: Record<string, unknown>) => Promise<unknown> };
+    const root = realpathSync(mkdtempSync(join(tmpdir(), "prompt-export-")));
+    const home = join(root, "home");
+    const work = join(root, "repo");
+    mkdirSync(home, { recursive: true });
+    mkdirSync(work, { recursive: true });
+    writeFileSync(join(work, "CLAUDE.local.md"), "Developer handle: tester\n");
+    const encoded = home.replace(/[^A-Za-z0-9]/g, "-");
+    const leak = `<output-file>/private/tmp/claude-501/${encoded}-app/x.output</output-file> gl${"cbt"}-${body}\n`;
+    const own = join(work, "docs/prompts/tester/claude/2026-01-01-gone.md");
+    const manual = join(work, "docs/prompts/tester/manual/2026-01-01.md");
+    const other = join(work, "docs/prompts/someone/claude/2026-01-01-gone.md");
+    for (const file of [own, manual, other]) {
+      mkdirSync(dirname(file), { recursive: true });
+      writeFileSync(file, leak);
+    }
+    await exportPrompts({
+      repo: work,
+      home,
+      out: "docs/prompts",
+      env: { GAM_ENGINEERING_PROMPT_EXPORT: "local" },
+      fixedHome: true,
+    });
+    const redacted = readFileSync(own, "utf8");
+    assert.ok(!redacted.includes(encoded), redacted);
+    assert.ok(!redacted.includes(body), redacted);
+    assert.equal(readFileSync(manual, "utf8"), leak);
+    assert.equal(readFileSync(other, "utf8"), leak);
+  });
+});
