@@ -45,7 +45,7 @@ Refs: #<issue>
 ```
 
 - Types: `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `style`, `build`, `ci`, `chore`, `revert`.
-- Scopes: a unit (`web`, `identity`, `storage`, `worker`, `cms`), a shared package (`contracts`, `ui`, `config`, `db`), `deps`, `ci`, `repo`. The scope may be left out when no single one fits (for example `ci: …` for a change to the pipeline itself).
+- Scopes: a unit (`web`, `identity`, `storage`, `worker`, `cms`), a shared package (`contracts`, `ui`, `config`, `db`, `telemetry`), `deps`, `ci`, `repo`. The scope may be left out when no single one fits (for example `ci: …` for a change to the pipeline itself).
 - Requirement ID per P-GIT-4; `[no-req]` for pure chores.
 - Breaking change: `!` after the scope and a `BREAKING CHANGE: <what>` footer.
 - Description in English, lowercase start, about 50 characters, understandable without looking the ID up.
@@ -81,6 +81,7 @@ Presented at the final presentation (`docs/anforderungen_software_projekte.md`, 
 | --- | --- | --- |
 | CI/CD with GitHub Actions | GitLab CI | Repository, MRs, reviews, and merge checks live on GitLab; GitHub is only a mirror and cannot block a GitLab merge. |
 | Reverse proxy Traefik ≥ 3.6.10 with Let's Encrypt (HTTP-01), an optional extra requirement of the school (`docs/anforderungen_software_projekte.md`, "Eventuelle Zusatzanforderungen") | Caddy (`caddy:2.11-alpine`) in the local stack and on the server, with its automatic HTTPS from Let's Encrypt (HTTP-01) | One proxy for both: the local stack, the routes of `docker/Caddyfile`, and the session check of the observability dashboards (`forward_auth`, `STACK.md` OBS-C-7) already use Caddy; a second proxy would double the configuration. The school's TLS and routing requirements (§9) are met either way (Q265). |
+| Observability through OpenTelemetry | The units report through the own package `packages/telemetry`, which speaks the OpenTelemetry protocol (OTLP over HTTP) without the OpenTelemetry SDK; the collector and the stores are the planned OpenTelemetry components. | [ADR-0009](adr/0009-units-encode-otlp-themselves.md): the logs packages of the SDK are experimental (Definition of Done item 18), its exporters have no bounded buffer (OBS-E-1), and the supply-chain rules apply to every package. |
 
 ## Tracker (P-TRK-1…4)
 
