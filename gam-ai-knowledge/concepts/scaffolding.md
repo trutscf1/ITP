@@ -109,7 +109,7 @@ The user stories and their acceptance criteria are the work items in [work-items
 | SCF-F-1 | Five units | The system MUST consist of exactly five units: `web`, `identity`, `storage`, `worker`, `cms`. Each MUST run as its own container. | SCF-AC-1.1 (Workspace layout), SCF-AC-2.1 (One start command) |
 | SCF-F-2 | One start command | One command MUST start the local stack: the reverse proxy, the data services — relational database [SCF-C-8], key-value store [SCF-C-14], document database [SCF-C-15], sync database [SCF-C-16], object storage [SCF-C-17], virus scanner [SCF-C-18] — and every unit. A unit joins the local stack in the merge request that makes it runnable; until then the stack starts without it. | SCF-AC-2.1 (One start command) |
 | SCF-F-3 | Native start | A second command MUST start all units natively with automatic reload on code change, using the reverse proxy and the data services from the container stack. | SCF-AC-2.7 (Native start) |
-| SCF-F-4 | One origin | The reverse proxy MUST serve `web`, `identity`, `storage`, and `cms` under one origin, routed by the path prefixes in §8. `worker` MUST NOT be reachable through the proxy. | SCF-AC-8.1 (One origin) |
+| SCF-F-4 | One origin | The reverse proxy MUST serve `web`, `identity`, `storage`, and `cms` under one origin, routed by the path prefixes in §8. `worker` MUST NOT be reachable through the proxy. The proxy MUST remove the request headers `traceparent`, `tracestate`, and `baggage` from every incoming request before forwarding it ([OBS-F-16] in [observability.md](observability.md)). | SCF-AC-8.1 (One origin) |
 | SCF-F-5 | Health endpoint | Every unit MUST expose a health endpoint that returns a health report (§8). For proxied units it MUST also be reachable through the proxy at `<prefix>/health`. | SCF-AC-8.1 (One origin), SCF-AC-8.2 (Health report) |
 | SCF-F-6 | Status of a health report | A health report's `status` MUST be `ok` when all dependency checks are `ok`, `degraded` when only non-essential checks are `down`, and `down` when at least one essential check is `down`. A unit without dependency checks reports `ok`. | SCF-AC-8.2 (Health report), SCF-AC-8.3 (Failed dependency) |
 | SCF-F-7 | Database check of `identity` | `identity` MUST check the relational database as an essential dependency, with the check name `relational-database`. This document defines no dependency check for the other units; the concept of the feature that gives a unit a dependency defines its check. | SCF-AC-8.3 (Failed dependency) |
@@ -228,6 +228,8 @@ Unit routing table (defaults; every value is configuration, [SCF-NF-8]):
 | `cms` | `/cms` | `/cms/health` | 1337 | `trutscf1` |
 
 Every unit serves its health endpoint internally at `/health` on its internal port.
+
+The proxy removes the request headers `traceparent`, `tracestate`, and `baggage` from every request that arrives from outside, before it forwards the request to a unit, so that every trace starts at the first unit ([OBS-F-16] in [observability.md](observability.md), delivered with `OBS-US-1` slice 1). The row of `/observability` follows with `OBS-US-2` slice 5.
 
 ### Relational data model
 
@@ -545,7 +547,7 @@ The slices and their issues stand in the story files (P-DOC-6); this table only 
 | SCF-US-1 Set up the monorepo | Platform & cms |
 | SCF-US-2 Local development environment with Docker Compose | Platform & cms; each owner adds the container build of their unit |
 | SCF-US-3 Shared contracts with Zod and OpenAPI | Contracts, storage & worker |
-| SCF-US-4 Data model and Prisma schema | Identity & CI; implemented by `trutscf1` since 2026-10-27 (A21) |
+| SCF-US-4 Data model and relational schema | Identity & CI; implemented by `trutscf1` since 2026-10-27 (A21) |
 | SCF-US-5 CI pipeline with quality and security checks | Identity & CI |
 | SCF-US-6 Conventional Commits and generated changelog | Identity & CI (hooks, changelog draft, release job; #44); Platform & cms merges the release |
 | SCF-US-7 Project documentation and Definition of Done | shared by all four |

@@ -1,13 +1,13 @@
 ---
 doc: story
 format: gam-ai-knowledge/1
-title: "PUB-US-1 Set up the headless CMS with Strapi"
+title: "PUB-US-1 Set up the headless CMS"
 audience: [product, developer, reviewer, agent]
 id-prefix: "PUB"
 status: ready
 sprint: 3
 ---
-# PUB-US-1 Set up the headless CMS with Strapi
+# PUB-US-1 Set up the headless CMS
 
 One user story of [Public content: landing page, help center, changelog, legal pages](epic.md) and the acceptance criteria that decide when it is done. This file is the single source for both; the story issue copies them verbatim (P-DOC-6, P-TRK-2). The story was written by the team as tracker issue US-41 and brought into this form on 2026-10-06; its owner reviews the wording.
 
@@ -15,7 +15,7 @@ One user story of [Public content: landing page, help center, changelog, legal p
 
 | ID | Title | As a | I want | so that | Priority |
 | --- | --- | --- | --- | --- | --- |
-| PUB-US-1 | Set up the headless CMS with Strapi | content editor | to maintain content through a headless CMS | landing page, help center, and changelog can be updated without a code change | Must |
+| PUB-US-1 | Set up the headless CMS | content editor | to maintain content through a headless CMS | landing page, help center, and changelog can be updated without a code change | Must |
 
 ## Acceptance criteria
 

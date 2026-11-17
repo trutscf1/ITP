@@ -1532,6 +1532,90 @@ Answer: "In WORKFLOW.md aufnehmen (Recommended)".
 
 Answer: "Alles veröffentlichen (Recommended)".
 
+## Round 59 — 2026-11-03 — review of the open merge requests (`tschudea07` (agent))
+
+Instruction of `tschudea07`, verbatim: "review alle merrequest die man revien kann"
+
+Reviewable for `tschudea07`: !40 and !42 (author `trutscf1`, reviewer `tschudea07`). Not reviewed: !43 and !41 (own MRs), !35 (draft of `schauby1`). Both MRs: `doc-check` 0 errors (the same 29 warnings as `dev`), markdownlint 0 issues, pipeline green; no issue (`chore/`), so no acceptance criteria.
+
+**Q272 - Review !40 (GitHub-Mirror, trutscf1):** Das GitHub-Repo trutscf1/ITP ist öffentlich, obwohl Q259 mit „Private“ beantwortet wurde. Das GitLab-Projekt ist privat, also sind jetzt alle 34 Branches öffentlich. Dazu kommen: ein Token wurde im Chat geteilt und seine Rotation steht nirgends als offene Aufgabe, und die Collaborator-Rolle weicht von docs §18 (Reporter) ab, ohne Eintrag in WORKFLOW.md. Was soll ich auf !40 posten?
+
+Answer: "Änderungen anfordern (Recommended)". Posted as a resolvable thread on !40, no approval.
+
+**Q273 - Review !42 (Schulanforderungen, Caddy statt Traefik, trutscf1):** Inhaltlich in Ordnung, und Caddy passt zu deinem Konzept deployment.md. Kleine Punkte: Die Traefik-Zeile steht in der Tabelle „Deviations from the project proposal“, obwohl Traefik aus den Schulanforderungen kommt. Der Schlussabsatz der DoD ist missverständlich formuliert. DoD-Punkt 20 macht „Mobile-First (empfohlen)“ samt 320 px verpflichtend. Was soll ich auf !42 posten?
+
+Answer: "Kommentar + Approve (Recommended)". Posted as a plain comment (not blocking) and approved by `tschudea07`.
+
+The question numbers are provisional until merged into `dev` (P-TEAM-5): Q259 to Q265 sit on open branches. Q264 is used twice, on `feature/153-sonarqube` and on `chore/school-requirements-gaps`; the branch merged second renumbers.
+
+## Round 60 — 2026-11-03 — merge conflicts of the own merge requests (`tschudea07` (agent))
+
+Instruction of `tschudea07`, verbatim: "Resolve meine merge conflicts mei meinen MRS"
+
+Open merge requests of `tschudea07` with conflicts: !43 (`concept/identity`) and !41 (`feature/153-sonarqube`). `dev` merged into each branch (`docs/git_workflow_commands.md` §7.1, no force push). Conflicts only in the append-only logs: `ROADMAP-DETAILS.md` (both branches) and `qa-log.md` (!41); both sides kept, entries of `dev` first. The questions of !41 (Q259 to Q264, without a round heading) collided with Q259 to Q265 on `dev` and became round 58, Q266 to Q271 (P-TEAM-5); the review round on this branch therefore moved from round 58, Q266 to Q267 to round 59, Q272 to Q273. `doc-check` 0 errors and markdownlint 0 issues on both merge results; GitLab reports both merge requests free of conflicts.
+
+**Q274 - Push:** Die Merge-Commits (dev → Branch, ohne Force-Push) für !43 concept/identity (nur ROADMAP-DETAILS-Log, beide Einträge behalten) und !41 feature/153-sonarqube (Logs behalten; deine Sonar-Fragen Q259–Q264 kollidierten mit dev und wurden zu Runde 58, Q266–Q271) pushen?
+
+Answer: "Beide pushen (Recommended)". Asked in the pop-up as Q272; renumbered here because round 59 holds Q272 and Q273. Pushed as `0d6d8d04b` (!43) and `2d7f143f6` (!41).
+
+Follow-up of `tschudea07`, verbatim: "ich kann den MR !41 noch nicht mergen". Cause: !43 was merged into `dev` (`f76a77bb4`) after the first merge, and both branches had appended to `ROADMAP-DETAILS.md` and changed the same spot in `STACK.md` (SCF-C-10 on `dev`, the new SonarQube row below it on !41). `dev` merged into `feature/153-sonarqube` again (`944082f5e`): the SCF-C-10 row of `dev` kept with the SonarQube row below it, both log entries kept. `doc-check` 0 errors, markdownlint 0 issues; GitLab reports !41 free of conflicts.
+
+## Round 61 — 2026-11-03 — session start and the open log branch (`tschudea07` (agent))
+
+Session started with `/engineering-human` without an argument. Stated assumption A1: entry point `tickets identity`, since the R3 position on `dev` is Phase 6 for IDN-US-1, -2, -6 and !43 (Phase 4 gate) is approved by `trutscf1`. Found: the log branch `chore/review-round-2026-11-03` holds three commits not on `dev` and has no merge request.
+
+**Q277 - Entry point:** Should this session continue with `/engineering-human tickets identity` (cut IDN-US-1, -2, -6 into issues; nothing gets published before you confirm the draft)?
+
+Answer: "tickets identity (Recommended)".
+
+**Q278 - Log branch:** The 3 log commits on `chore/review-round-2026-11-03` have no MR. What should happen to them?
+
+Answer: "Merge dev, push, MR (Recommended)". `dev` merged in; conflicts only in the append-only logs `ROADMAP-DETAILS.md` and `qa-log.md`, both sides kept, entries of `dev` first.
+
+**Q279 - CLAUDE.local.md:** It doesn't exist yet (open inbox item from 2026-10-06). Should I create it with `Developer handle: tschudea07`? It's gitignored and never committed.
+
+Answer: "Create it (Recommended)". Created; the inbox item is removed.
+
+Follow-up of `tschudea07`, verbatim: "review mrs", then "yes".
+
+## Round 62 — 2026-11-03 — review of !44 (`tschudea07` (agent))
+
+Instruction of `tschudea07`, verbatim: "review mrs". Open MRs: !44 (`trutscf1`, reviewer `tschudea07`), !35 (draft, not reviewed), !45 (own, not reviewed). !44 reviewed with `code-review` (standards and spec axes) against the merge base `4e36e0823` on `dev`, the story OBS-US-1, and `concepts/observability.md`; the redaction findings checked against `docker/observability/collector.yaml` lines 54–59.
+
+**Q280 - Review !44** (trutscf1, observability stack, slice 1 of #82): I'd request changes. Blocking: red pipeline (markdownlint + Grafana/Node CVEs), an IPv6 redaction that also hits text like `std::vector`, IPv4 addresses before a full stop not redacted, STACK.md/scaffolding.md/§8 not updated, and a test filed under the wrong AC. Post the drafted comment on !44 (without approval)?
+
+Answer: "Post, request changes (Recommended)". Posted on !44 without an approval.
+
+## Round 56 — 2026-11-03 — Start of Sprint 2, own issues (`trutscf1` (agent))
+
+Instruction of `trutscf1`, verbatim: "starte nun sprint 2 mit dem /engineering-human und /grill-me skill. schaue, wegen meinen docs und issues bezüglich opentelemetry, observability, ... beginne meine issues"
+
+**Q261 - Einstieg:** Womit soll Sprint 2 für OBS beginnen?
+
+Answer: "starte mit meinen tickets von sprint 2"
+
+**Q262 - Reihenfolge:** Welches Issue zuerst, wenn wir umsetzen?
+
+Answer: "#82 Slice 1, dann Slice 2 (Recommended)"
+
+**Q263 - Vorgehen:** Wie soll ich bei der Umsetzung arbeiten?
+
+Answer: "Ein Issue pro Session (Recommended)"
+
+The question numbers continue after Q258 of this branch; round 55 (Q259, Q260, mirror of the repository) is on `chore/github-mirror` and not yet in `dev`, so Q261 to Q263 are provisional until both are merged (P-TEAM-5).
+
+## Round 66 — 2026-11-03 — Container scan of !44 (`trutscf1` (agent))
+
+**Q286 - Container-Scan !44:** Der Job `container-scan` fand 4 HIGH-Funde in `node:24.14-alpine` (OpenSSL) und 16 Funde in `grafana/grafana:13.2.5` (gebündelte npm-Pakete); Grafana 13.2.5 ist der neueste Tag von 13.2. Wie soll ich vorgehen?
+
+Answer: "Node bumpen, Grafana ignorieren (Recommended)".
+
+**A1 - Node-Bump nicht möglich:** The bump did not help, so the agent fell back to the entries of the other option for node as well. `node:24.22-alpine` has 6 other HIGH findings (npm), `node:24.14-alpine3.22` has 17, and `node:24.14-alpine3.23` has the same 4 OpenSSL findings as `node:24.14-alpine`; checked locally with Trivy 0.69.3 on 2026-11-03. The two OpenSSL CVEs and the CVEs of Grafana are in `.trivyignore` with reason and expiry 2026-11-23, like the entries of the other images. `trutscf1` is asked to confirm A1 in the review of !44.
+
+The number Q286 is provisional until merged (P-TEAM-5).
+
+**A2 - Review of !44 by `tschudea07` (revise):** Points 1 to 6 were accepted. Fixed: the red pipeline (`docs`, `container-scan`, see A1); the IPv6 pattern now needs a boundary (`std::vector` is kept) and runs twice; an IPv4 address before a full stop is redacted; §8, M6, `STACK.md` (OBS-C-6, SCF-C-7), and `scaffolding.md` (SCF-F-4, §8) are updated in the same MR (P-GIT-5); the proxy test is filed under `OBS-AC-1.3`. Also done from the non-blocking notes: CI tests for the patterns, a test that no service outside the profile depends on it (OBS-E-4), the span status message is emptied, the collector version stands in the README. Not done, with reasons in the replies: one Dockerfile with `ARG` instead of three, the defaults in three places (`.env.example` documents them, SCF-F-11), structured log bodies (slice 2, OBS-AC-1.4).
+
 ## Round 63 — 2026-11-03 — fix #149, scan the built images (`tschudea07` (agent))
 
 Instruction of `tschudea07`, verbatim: "arbeite ein issue von mir ab das machbar ist". Chosen: #149 (bug, weight 1, Sprint 2, `status::ready`); the stories of R3 still need `tickets`, and slice 1 of #45 is blocked. Rounds 59 to 62 are on `chore/review-round-2026-11-03` (!45), not yet on `dev`.
@@ -1553,7 +1637,53 @@ Answer: "Fix mine, issue for web (Recommended)".
 
 Issue #157 created for `trutscf1` (Sprint 2, weight 2): fix the `web` image and the Prisma CLI findings; the exceptions expire on 2026-11-23.
 
-## Round 66 — 2026-11-10 — Accessibility modes, slice 1 (`schwaigc` (agent))
+## Round 65 — 2026-11-03 — Slice 1 dashboards (#83) (trutscf1 (agent))
+
+Instruction of `trutscf1`, verbatim (coordinator): implement #83, slice 1 of OBS-US-2 ("dashboard tool on the server itself, stored files, and links"), on top of the open !44; build no alert rule (slice 2, #156). The agent could not ask questions; each gap is closed with a default (P-GRILL-4).
+
+**Q300 - Panels of slice 1:** The links of OBS-AC-2.2 sit on three panels of "Operations overview", but the dashboard belongs to slice 3. Which panels does slice 1 deliver?
+
+**A1 - Three panels now, three later:** Slice 1 stores the dashboard "Operations overview" with the three panels that carry the log link of OBS-F-7 (Requests per second, Server errors, Latency (95th percentile)), the time range last hour, refresh 30 seconds, and the unit selector. Slice 3 adds the panels "Upload throughput", "Waiting jobs", and "Storage usage" (they need the metrics of R5 and R9). Concept §16 says so.
+
+**Q301 - Proof of "cannot be saved":** The dashboard tool must refuse a save (OBS-F-9), but an anonymous Viewer cannot save anything anyway. How is the refusal proven?
+
+**A2 - Default administrator account in the test:** The test project uses the built-in account `admin` of the dashboard tool inside the container and shows that even it is refused (HTTP 400 "provisioned"). The account stays until slice 5 (login through `identity`, OBS-NF-6) switches the basic login off; until then the port is bound to `127.0.0.1` (OBS-F-24).
+
+**Q302 - Proof of the links between log entry and trace:** The derived fields of the log store data source are applied in the browser of the dashboard tool, not by its server.
+
+**A3 - Settings plus data, not a click:** The test proves the provisioned settings (derived field to the trace store, trace-to-logs query to the log store, panel link to the log store with unit and time range) and that a stored log entry carries the trace ID under a key that a derived field matches. Following the link in a browser is not automated; the reviewer can try it with the profile started.
+
+**A4 - Two keys for the trace ID:** The package `telemetry` is not built yet, so it is open whether the trace ID reaches the log store as the field of the OTLP record (`trace_id`) or as the attribute `traceId`. The log store data source provisions a derived field for each key; the trace-to-logs query uses `trace_id`. Slice 2 of OBS-US-1 removes one of them when the package exports its entries.
+
+**A5 - Issue text of #83 is outdated:** The description of #83 still has the five old criteria and the old story file name; the story file `OBS-US-2-operations-dashboards-and-alerts.md` is the source (P-DOC-6). The MR says so; the issue text is not changed here.
+
+The numbers Q300 to Q302 are provisional until merged (P-TEAM-5).
+
+## Round 67 — 2026-11-03 — Slice 2 error rate alert (#156) (trutscf1 (agent))
+
+Instruction of `trutscf1`, verbatim (coordinator): implement #156, slice 2 of OBS-US-2 ("error rate alert", OBS-AC-2.3; modules M6 thresholds and M9 alert rule) on top of the open !47 and, through it, !44. The agent could not ask questions; each gap is closed with a default (P-GRILL-4).
+
+**Q320 - Where the rule is evaluated:** The concept names "alert rules" and "alert list of the dashboard tool" but not the evaluating component. Does the dashboard tool evaluate its own rules or the metric store?
+
+**A1 - The metric store evaluates, the dashboard tool lists:** `STACK.md` §OBS-C-3 already fixes it: alert rules are Prometheus rule files rendered by the configuration step, tested offline with `promtool test rules`. The data source "Metrics" sets `manageAlerts: true`, so the dashboard tool shows the rules and their alerts read-only in its alert list (OBS-F-9: no change is savable). The rule file is written by the configuration step into the volume `obs-generated` and mounted read-only into the metric store.
+
+**Q321 - Exact request count:** OBS-F-17 needs the number of requests in the last 5 minutes and compares it with "at least 20". Prometheus `increase()` extrapolates to the window edges (19 requests become about 23.75 with samples every minute), so the row "19 requests, 10 errors → normal" of example 5 would fire.
+
+**A2 - Counter now minus counter 5 minutes ago:** Two recording rules compute per unit the exact difference of the counter `http_server_request_duration_seconds_count` (all status codes, and status codes 500 to 599) between now and 5 minutes ago; a series that is new inside the window starts at 0. The alert reads these two series. Known limit: after a restart of a unit its counter starts again at 0, the count of that window is too low (`clamp_min` at 0), so a restart can hide an alert for up to 5 minutes. The opposite limit: after a gap of more than 5 minutes in the data of a unit (silent unit, data loss) the whole counter counts as new for one window, so the count can be too high once; accepted, the alert "Unit silent" (slice 4) covers the silent unit. The alert also carries the label `unit` next to `service_name`, so the alert list names the unit (OBS-F-8).
+
+**A3 - No pending period:** OBS-F-17 and the state diagram let the error rate alert go from normal directly to firing; the rule has no `for` and fires at the first evaluation at which the condition holds.
+
+**A4 - Summary text through a query:** The text needs `N` and the value `E / N × 100`. The value of the alert is the share; `N` is read with the template function `query` from the recording rule of the same unit.
+
+**Q322 - Offline rule test in CI:** The `test` job runs on `node:24.14.0-alpine` without `promtool` or Docker, so the offline rule test cannot run there.
+
+**A5 - Skip with reason, local run stated in the MR:** The test uses a local `promtool`, else the pinned image of the metric store through Docker, else it is skipped with a reason (as the stack tests are until SCF-US-5 offers a container runtime, §17). A CI job `rule-test` on the image of the metric store is a follow-up for the track Identity & CI; the result of the local run is stated in the MR.
+
+**A6 - Test data in the rule test file:** The series of example 5 are the `input_series` of one `promtool` test file, `tests/data/observability/alert-error-rate.test.yml`, kept as data next to the tests (§17); the file that also feeds the dashboard test is part of slice 3.
+
+The numbers Q320 to Q322 are provisional until merged (P-TEAM-5).
+
+## Round 68 — 2026-11-10 — Accessibility modes, slice 1 (`schwaigc` (agent))
 
 Instruction, verbatim: "ja starte #71 mit dem skill gam enginieering implement". Gate before the first change: the concept `design-system.md` is an ungrilled draft without §16, the story of weight 5 was not cut into slices, and DSA-AC-2.4 needs a profile store that does not exist yet (#112 waits for #46). The pop-ups were asked as Q277 to Q280; they are logged as Q340 to Q343 because open branches already use Q277 to Q331 and rounds 59 to 65.
 
@@ -1572,4 +1702,3 @@ Answer: "Alles veröffentlichen (Recommended)". The child issue is #161.
 **Q343 - Issue #71 beim Merge:** Laut Slice-Tabelle liefert #71 Slice 1, die Story DSA-US-2 ist aber erst mit Slice 2 fertig. Soll der MR #71 schließen?
 
 Answer: "Closes #71 (Recommended)".
-||||||| 4e36e0823

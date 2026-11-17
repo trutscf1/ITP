@@ -37,4 +37,4 @@ The vertical slices that deliver this story. One slice is delivered by the story
 
 - **Story issue:** #51
 - **Weight:** 5
-- **Depends on:** SCF-US-4 (Data model and Prisma schema, #41), IDN-US-2 (Log in and log out with rate limiting, #46)
+- **Depends on:** SCF-US-4 (Data model and relational schema, #41), IDN-US-2 (Log in and log out with rate limiting, #46)
