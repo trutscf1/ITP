@@ -2,7 +2,6 @@
   "model": "haiku",
   "plansDirectory": "./gam-ai-memory/plans",
   "attribution": {
-    "commit": "",
     "pr": ""
   },
   "env": {
