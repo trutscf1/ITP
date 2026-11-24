@@ -446,45 +446,24 @@ export async function createAuthCore(
     },
 
     removeUnconfirmed: (before) =>
-      adapter.transaction(async (db) => {
-        const stale: Where[] = [
-          { field: "emailVerified", value: false },
-          { field: "createdAt", operator: "lt", value: before },
-        ];
-        const candidates = (
-          await db.findMany<{ id: string }>({ model: "user", where: stale })
-        ).map(({ id }) => id);
-        if (candidates.length === 0) return 0;
-        // One conditional delete: an account confirmed or registered again since the read
-        // above no longer matches and stays. Credentials and `users` row go with the account
-        // (foreign keys with ON DELETE CASCADE).
-        const removed = await db.deleteMany({
-          model: "user",
-          where: [{ field: "id", operator: "in", value: candidates }, ...stale],
-        });
-        const kept = new Set(
-          (
-            await db.findMany<{ id: string }>({
-              model: "user",
-              where: [{ field: "id", operator: "in", value: candidates }],
-            })
-          ).map(({ id }) => id),
+      db.transaction(async (tx) => {
+        // One conditional delete, no read of candidates before it: an account confirmed or
+        // registered again meanwhile no longer matches and stays (IDN-F-31, Q346). Credentials
+        // and `users` row go with the account (foreign keys with ON DELETE CASCADE).
+        const { affectedRows } = await tx.execute(
+          tx.raw
+            .sql`DELETE FROM auth_users WHERE email_verified = false AND created_at < ${before.toISOString()}`
+            .affectedCount()
+            .build(),
         );
-        const gone = candidates.filter((id) => !kept.has(id));
-        if (gone.length > 0) {
-          await db.deleteMany({
-            model: "verification",
-            where: [
-              { field: "value", operator: "in", value: gone },
-              {
-                field: "identifier",
-                operator: "starts_with",
-                value: confirmationPrefix,
-              },
-            ],
-          });
-        }
-        return removed;
+        // The confirmation links of the accounts that are gone.
+        await tx.execute(
+          tx.raw
+            .sql`DELETE FROM auth_verifications v WHERE v.identifier LIKE ${`${confirmationPrefix}%`} AND NOT EXISTS (SELECT 1 FROM auth_users u WHERE u.id = v.value)`
+            .affectedCount()
+            .build(),
+        );
+        return affectedRows;
       }),
 
     async checkDatabase() {
