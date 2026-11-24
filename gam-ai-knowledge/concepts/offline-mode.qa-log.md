@@ -49,7 +49,7 @@ Answer: "Ja, Konzept schreiben (Recommended)"
 
 Source: `docs/prompts/trutscf1/claude/2026-11-24-606af888-3df3-4b99-83cf-b5193e0a6ae2.md`. The assumptions A8 to A12 were added while writing the concept and stated with Q372.
 
-**Q372 - Annahmen:** A1-A7 hast du am 17.11. bestätigt (Q339). A8-A12 kamen beim Schreiben dazu: A8 abgelaufene Session ist kein Sign-out (nichts wird gelöscht) | A9 kein Sync bei geschlossener App | A10 Kopiename '<name> (offline copy <date>)' mit Zähler, ohne Personennamen | A11 Standardlimit 500 MB, längste Retry-Pause 300 s | A12 Sign-out-Warnung bietet: erst synchronisieren, abbrechen, verwerfen. Bestätigst du sie?
+**Q372 - Annahmen:** A1-A7 hast du am 17.11. bestätigt (Q339). A8-A12 kamen beim Schreiben dazu: A8 abgelaufene Session ist kein Sign-out (nichts wird gelöscht) | A9 kein Sync bei geschlossener App | A10 Kopiename '`<name> (offline copy <date>)`' mit Zähler, ohne Personennamen | A11 Standardlimit 500 MB, längste Retry-Pause 300 s | A12 Sign-out-Warnung bietet: erst synchronisieren, abbrechen, verwerfen. Bestätigst du sie?
 (Optionen: Alle bestätigt (Recommended), Reviewer entscheiden, Keine davon)
 
 Answer: "Alle bestätigt (Recommended)"
