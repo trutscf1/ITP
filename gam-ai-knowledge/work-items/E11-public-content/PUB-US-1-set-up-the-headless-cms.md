@@ -4,7 +4,7 @@ format: gam-ai-knowledge/1
 title: "PUB-US-1 Set up the headless CMS"
 audience: [product, developer, reviewer, agent]
 id-prefix: "PUB"
-status: ready
+status: in-progress
 sprint: 3
 ---
 # PUB-US-1 Set up the headless CMS

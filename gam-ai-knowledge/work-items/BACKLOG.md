@@ -48,7 +48,7 @@ The story files are the source: their `status` and `sprint` fields decide what s
 | 34 | [BGP-US-3 Generate thumbnails](E09-background-processing/BGP-US-3-generate-thumbnails.md) | E09 Background processing: thumbnails, virus scan, OCR, scheduled jobs | backlog | 6 | 3 | #65 |
 | 35 | [BGP-US-4 Text recognition (OCR)](E09-background-processing/BGP-US-4-text-recognition-ocr.md) | E09 Background processing: thumbnails, virus scan, OCR, scheduled jobs | backlog | 5 | 5 | #66 |
 | 36 | [SRC-US-1 Full-text search](E10-search/SRC-US-1-full-text-search.md) | E10 Full-text search | backlog | 6 | 5 | #67 |
-| 37 | [PUB-US-1 Set up the headless CMS](E11-public-content/PUB-US-1-set-up-the-headless-cms.md) | E11 Public content: landing page, help center, changelog, legal pages | ready | 3 | 8 | #78 |
+| 37 | [PUB-US-1 Set up the headless CMS](E11-public-content/PUB-US-1-set-up-the-headless-cms.md) | E11 Public content: landing page, help center, changelog, legal pages | in-progress | 3 | 8 | #78 |
 | 38 | [PUB-US-2 Public landing page](E11-public-content/PUB-US-2-public-landing-page.md) | E11 Public content: landing page, help center, changelog, legal pages | backlog | 4 | 3 | #79 |
 | 39 | [PUB-US-3 Help center and changelog](E11-public-content/PUB-US-3-help-center-and-changelog.md) | E11 Public content: landing page, help center, changelog, legal pages | backlog | 4 | 3 | #80 |
 | 40 | [PUB-US-4 Legal pages (imprint, terms, privacy)](E11-public-content/PUB-US-4-legal-pages-imprint-terms-privacy.md) | E11 Public content: landing page, help center, changelog, legal pages | ready | 3 | 3 | #81 |
