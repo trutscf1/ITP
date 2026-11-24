@@ -114,3 +114,49 @@ Answer: "Server-Sent Events (Recommended)".
 **Q432 - Oberfläche der Upload-Stories:** STO-AC-2.1, 2.2, 2.4 und 2.5 sind Oberfläche im web-Client (R6, dein Bereich). Wo werden sie gebaut?
 
 Answer: "In R5, als web-Slice (Recommended)".
+
+## Round 6 — 2026-11-24 — STO-US-3 resumable upload, STO-US-4 deduplication (`schwaigc`)
+
+- **A10**: Deduplication happens only after the full upload, so no upload tells anyone whether another member holds the same file.
+- **A11**: Defaults in `.env`: at most 5 GiB per file, 8 MiB per chunk; both configurable.
+- **A12**: An unfinished upload counts as orphaned after 24 hours (STO-AC-3.5); configurable.
+
+**Q433 - tus-Server (STO-US-3):** Mit welcher Bibliothek nimmt storage tus-Uploads an?
+
+Answer: "@tus/server + S3-Store (Recommended)".
+
+**Q434 - Hash berechnen (STO-AC-4.1):** Ein tus-Upload kann über mehrere Verbindungen fortgesetzt werden, deshalb lässt sich der SHA-256 nicht einfach während des Empfangs mitrechnen. Wann wird er berechnet?
+
+Answer: "Nach Abschluss lesen (Recommended)".
+
+**Q435 - Cleanup-Jobs (STO-AC-3.5, 6.4 und das Netz aus Q426/Q428):** Wer führt die periodischen Aufräumjobs aus, solange R9 (Hintergrundverarbeitung, 0.6.0) noch nicht gebaut ist?
+
+Answer: "worker mit BullMQ jetzt (Recommended)".
+
+**Q436 - Dedup-Treffer (STO-AC-4.2):** Ein fertiger Upload hat denselben Hash wie ein vorhandenes Content object. Was passiert mit dem gerade hochgeladenen Objekt?
+
+Answer: "Neues löschen, verweisen (Recommended)".
+
+## Round 7 — 2026-11-24 — STO-US-5 folders, STO-US-6 trash, STO-US-7 download (`schwaigc`)
+
+- **A13**: A copied file is a new file that refers to the same content object; copying never duplicates content.
+- **A14**: Moving a folder into itself or one of its subfolders is rejected.
+- **A15**: The breadcrumb (STO-AC-5.5) and the confirmation dialog (STO-AC-6.3) belong to the web slice of their story, as in Q432.
+- **A16**: A download sends the stored detected type and the file name encoded for UTF-8.
+- **A17**: A deleted folder goes to the trash as one entry with its whole content.
+
+**Q437 - Namensregeln (STO-AC-5.3):** Welche Regeln gelten für Datei- und Ordnernamen?
+
+Answer: "Portable Regeln (Recommended)".
+
+**Q438 - Wiederherstellen bei Namenskonflikt (STO-AC-6.2):** Am ursprünglichen Ort liegt inzwischen ein Item mit gleichem Namen. Was passiert?
+
+Answer: "Wie Upload fragen (Recommended)".
+
+**Q439 - Papierkorb-Eintrag eines Ordners:** Kann ein Member aus einem gelöschten Ordner einzelne Dateien wiederherstellen?
+
+Answer: "Nur ganzer Eintrag (Recommended)".
+
+**Q440 - ZIP-Streaming (STO-AC-7.2):** Mit welcher Bibliothek baut storage das ZIP-Archiv als Stream (auch über 4 GB, also ZIP64)?
+
+Answer: "archiver (Recommended)".
