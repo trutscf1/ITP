@@ -289,7 +289,7 @@ An action in `done` or `discarded` is removed from the queue; no other state rem
 
 ## 13. Resolved Questions & ADRs
 
-Verbatim rounds: the AI chat export in `docs/prompts/` (P-GRILL-2). No ADR was needed: no decision changes `GOAL.md` or deviates from a `P-…` ID; the technology decision for the metadata replication is made in `STACK.md` when the first slice starts.
+Verbatim rounds: [offline-mode.qa-log.md](offline-mode.qa-log.md) (P-GRILL-2). No ADR was needed: no decision changes `GOAL.md` or deviates from a `P-…` ID; the technology decision for the metadata replication is made in `STACK.md` when the first slice starts.
 
 | Q | Title | Decision | Rationale |
 | --- | --- | --- | --- |
@@ -445,7 +445,7 @@ Values from §10. Each test name in code carries its ID and the requirement IDs 
 | OFF-T-34 | M5 | Four actions made offline, app restarted | The queue holds them in the order 1 to 4 with their base revisions | OFF-F-13 |
 | OFF-T-35 | M6 | Action 2 `syncing`, the app closed (stub) | At restart action 2 is `pending` or `done` as the revision of the server says; none is lost | OFF-F-20, OFF-NF-2 |
 | OFF-T-36 | M6 | Stub server answers `conflict` `changed`, `deleted`, `name-taken`, and `forbidden` | The states `conflict` (three kinds) and `rejected` with the code; other actions go on | OFF-F-15, OFF-F-19, OFF-E-4 |
-| OFF-T-37 | M7 | Choices "mine", "server", "both" for each kind | The effects of [OFF-F-16] and [OFF-F-17]; for `deleted` only two choices, the preselected one restores | OFF-F-16, OFF-E-8 |
+| OFF-T-37 | M7 | Choices "mine", "server", "both" for each kind. Target folder missing: the queued upload of `Plan.pdf` (2026-11-17) into the team folder `Archive`, which another member deleted on the server | The effects of [OFF-F-16] and [OFF-F-17]; for `deleted` only two choices, the preselected one restores. For the missing folder: conflict of the kind `deleted`; "restore my version" stores `Plan (offline copy 2026-11-17).pdf` in the root folder of the team, "accept the deletion" discards the action and stores nothing | OFF-F-16, OFF-E-8 |
 | OFF-T-38 | M7 | `Plan.pdf`, `Reports`, a name without extension, existing names | The names of §10, example 2, with counters; no name of a person | OFF-F-17 |
 | OFF-T-39 | M6 | The stub server unreachable for three runs, then back | Pauses double up to the maximum; the state is unchanged; the run then succeeds | OFF-F-14, OFF-E-2 |
 | OFF-T-40 | M6 | Session invalid when the connection returns | No synchronization, no deletion, the sign-in request of [OFF-E-3]; after the sign-in the run starts | OFF-E-3, OFF-F-20 |
