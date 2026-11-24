@@ -136,9 +136,21 @@ export async function createAuthCore(
   pool.on("error", (error) => {
     options.logger.warn("database connection lost", { error });
   });
-
   const db = createDb(options.databaseUrl);
+  try {
+    return await assemble(options, pool, db);
+  } catch (error) {
+    // A failed set-up leaves no open connections behind.
+    await Promise.allSettled([pool.end(), db.close()]);
+    throw error;
+  }
+}
 
+async function assemble(
+  options: AuthCoreOptions,
+  pool: pg.Pool,
+  db: ReturnType<typeof createDb>,
+): Promise<AuthCore> {
   const auth = betterAuth({
     baseURL: options.publicOrigin,
     secret: options.secret,
