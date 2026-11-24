@@ -4,7 +4,7 @@
 # gam-engineering/ci/gitlab-pipeline.yml (job gam-docs) since 2026-11-24 (Q364); this file keeps only the lint,
 # which the generated pipeline does not run (Q295).
 
-markdown-lint:
+docs:
   stage: test
   image: node:24.14.0-alpine
   rules:
