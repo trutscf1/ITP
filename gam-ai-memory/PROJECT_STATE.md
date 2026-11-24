@@ -37,7 +37,7 @@ See [GOAL.md](../gam-ai-knowledge/GOAL.md).
 <!-- agent-memory:auto -->
 - **Updated:** 2026-11-24
 - **Branch:** feature/45-register-by-e-mail
-- **Builds on:** 1aa09e96b chore(repo): merge dev into feature/45-register-by-e-mail [no-req]
+- **Builds on:** 6fa0f7137 chore(repo): merge dev into feature/45-register-by-e-mail [no-req]
 - **Commits since the reference point:** n/a (no reference point)
 - **Agent memory files:**
   - Codex: MEMORY.md (2026-06-22)
