@@ -35,7 +35,7 @@ The vertical slices that deliver this story. One slice is delivered by the story
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
-| 1 — mark, store, and open files and folders (`trutscf1`) | OFF-AC-2.1, OFF-AC-2.2, OFF-AC-2.3, OFF-AC-2.7 | OFF-US-1 | #76 |
+| 1 — mark, store, and open files and folders (`trutscf1`) | OFF-AC-2.1, OFF-AC-2.2, OFF-AC-2.3, OFF-AC-2.7 | OFF-US-1; R5 revision and conditional change (§15 of [offline-mode.md](../../concepts/offline-mode.md); not yet in [storage-core.md](../../concepts/storage-core.md)) | #76 |
 | 2 — offline overview and storage limit (`trutscf1`) | OFF-AC-2.4, OFF-AC-2.5 | slice 1 | — |
 | 3 — sign-out clears the device (`trutscf1`) | OFF-AC-2.6 | slice 1; the logout of IDN-US-2 | — |
 

@@ -34,7 +34,7 @@ The vertical slices that deliver this story. One slice is delivered by the story
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
-| 1 — queue and automatic synchronization (`trutscf1`) | OFF-AC-3.1, OFF-AC-3.2, OFF-AC-3.6 | OFF-US-2 slice 1 | #77 |
+| 1 — queue and automatic synchronization (`trutscf1`) | OFF-AC-3.1, OFF-AC-3.2, OFF-AC-3.6 | OFF-US-2 slice 1; R5 revision and conditional change (§15 of [offline-mode.md](../../concepts/offline-mode.md); not yet in [storage-core.md](../../concepts/storage-core.md)) | #77 |
 | 2 — conflicts and removed files (`trutscf1`) | OFF-AC-3.3, OFF-AC-3.5 | slice 1 | — |
 | 3 — no-data-loss scenarios (`trutscf1`) | OFF-AC-3.4 | slice 2 | — |
 
