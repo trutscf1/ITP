@@ -4,7 +4,7 @@ format: gam-ai-knowledge/1
 title: "IDN-US-1 Register by e-mail"
 audience: [product, developer, reviewer, agent]
 id-prefix: "IDN"
-status: in-progress
+status: done
 sprint: 2
 ---
 # IDN-US-1 Register by e-mail
