@@ -31,6 +31,8 @@ One user story of [Identity: accounts, external login, MFA](epic.md) and the acc
 | IDN-AC-1.8 | Unconfirmed accounts removed | An account not confirmed for more than 7 days | The hourly clean-up has run | The account and its data are gone, and the address can register again |
 | IDN-AC-1.9 | Registration throttled | One IP address | It sends 6 registrations within one minute | The 6th is refused with `too-many-requests` |
 
+IDN-AC-1.7: "login and reset still work" is tested for the login with this story (IDN-T-7) and for the reset with IDN-US-6 (#50, `apps/identity/src/reset.test.ts`).
+
 ## Slices
 
 The vertical slices that deliver this story (concept §16, Q13). Slice 1 is delivered by the story issue itself; slice 2 is #168 (cut on 2026-11-17 after the review of !62, Q376); the story is `done` when both slices are merged.
