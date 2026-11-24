@@ -24,7 +24,14 @@
         "tests/ci-pipeline.test.ts",
         "tests/observability-alerts.test.ts",
         "tests/observability-dashboards.test.ts",
-        "tests/observability-stack.test.ts"
+        "tests/observability-stack.test.ts",
+        "apps/identity/src/app.ts",
+        "apps/identity/src/auth-core.ts",
+        "apps/identity/src/identity.ts",
+        "apps/identity/src/login.ts",
+        "apps/identity/src/register.test.ts",
+        "packages/contracts/src/identity/common-passwords.ts",
+        "packages/contracts/src/openapi.ts"
       ]
     },
     {
