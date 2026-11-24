@@ -21,6 +21,11 @@ trustPolicyExclude:
   # (reviewed 2026-11-17, publish dates checked in the npm registry). Exactly these versions only.
   - react-redux@8.1.3
   - jose@4.15.9
+  # @strapi/admin pins webpack-dev-middleware 7.4.6, the release that fixes CVE-2026-76844 (path
+  # traversal, the container scan fails on 7.4.5). It was published 2026-09-03 without the trust
+  # evidence earlier releases carried; reviewed 2026-11-24, the release is older than
+  # minimumReleaseAge. Exactly this version only.
+  - webpack-dev-middleware@7.4.6
 
 # The pinned Prisma CLI (the image db-migrate runs it) pulls in hono 4.11.4, @hono/node-server
 # 1.19.9 (both via @prisma/dev) and lodash 4.17.21 (via chevrotain), which have known high
@@ -31,10 +36,10 @@ overrides:
   "hono@<4.12.25": ">=4.12.25 <5"
   "@hono/node-server@<1.19.10": ">=1.19.10 <2"
   "lodash@<4.18.0": ">=4.18.0 <5"
-  # @strapi/admin (the admin panel of the cms unit, PUB-US-1) pins webpack-dev-middleware 7.4.6,
-  # which pnpm refuses as a trust downgrade: published 2026-09-03 without the trust evidence that
-  # earlier releases carried. The panel needs the package for `strapi develop` only, never in the
-  # built image. The release before it (7.4.5) is pinned here instead of switching the trust
-  # check off for 7.4.6. Remove the override once a Strapi release depends on a version that
-  # passes the check.
-  "webpack-dev-middleware@7.4.6": "7.4.5"
+  # The admin panel and the core of Strapi (PUB-US-1, unit cms) pull in postcss 8.4.49 (via
+  # styled-components) and zod 4.4.3 and 3.25.76 (via @strapi/admin and koa-body), which have known
+  # high vulnerabilities with a fix (SCF-AC-5.2, SCF-NF-6). The override moves them to the patched
+  # releases; koa-body uses only basic zod schemas (object, boolean, string, union, nativeEnum),
+  # which zod 4 still supports. Remove an override once Strapi no longer needs it.
+  "postcss@<8.5.18": ">=8.5.18 <9"
+  "zod@<4.6.6": ">=4.6.6 <5"
