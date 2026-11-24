@@ -153,7 +153,6 @@ The at most four values a member chose in the appearance menu: theme, colour mod
 The member's own record in stash, at most one per member and separate from the account; today it holds the appearance preferences. The word names this record only, never the account.
 *Avoid*: account (for this record), settings
 
-
 **Offline mark**:
 The choice of a member that a file or folder is available without a network on one device; a folder mark includes everything inside it.
 *Avoid*: favourite, pin, sync flag
