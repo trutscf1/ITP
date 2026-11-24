@@ -26,6 +26,8 @@ The school requires Better Auth (`docs/anforderungen_software_projekte.md`, "bet
 ## Consequences
 
 - The confirmation, reset, and registration answers follow the concept exactly and are tested at the HTTP seam.
+- Accepted risk (review of !62): a registration again with the address of an unconfirmed account replaces its name and password ([IDN-F-6], A15). Someone who knows the address can therefore set the password of a pending registration of another person; the account is confirmed only through a link sent to that mailbox, every older link is deleted, and the owner who cannot log in afterwards resets the password ([IDN-F-33]). An account is never taken over after its confirmation.
+- Accepted risk (review of !62): `GET /confirm` changes state, so a link scanner of a mail provider that opens the link uses it. The account is then confirmed through the owner's mailbox all the same; the person who opens the link afterwards sees the invalid-link page ([IDN-U-7]) and can log in.
 - `identity` depends on the library's internal adapter, which is not a documented public interface: an update of `better-auth` must run the identity tests before it is merged, and the version stays pinned exactly.
 - External login, one-time codes, and passkeys (IDN-US-3, -4, -5) are decided again when those stories are grilled: they may mount the library's plugins for their own routes where those meet the concept.
 
