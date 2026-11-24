@@ -22,5 +22,8 @@ The parent work item of this epic: its user stories in the order they are built,
 In dependency order; each file holds the story, its acceptance criteria, and its slices.
 
 1. [DSA-US-1 Design system with design tokens and four themes](DSA-US-1-design-system-with-design-tokens-and-four-themes.md)
-2. [DSA-US-2 Accessibility modes](DSA-US-2-accessibility-modes.md)
-3. [DSA-US-3 Keyboard operation and screen reader support](DSA-US-3-keyboard-operation-and-screen-reader-support.md)
+2. [DSA-US-2 Colour modes](DSA-US-2-colour-modes.md)
+3. [DSA-US-4 Font size and reduced motion](DSA-US-4-font-size-and-reduced-motion.md)
+4. [DSA-US-3 Keyboard and screen reader shell](DSA-US-3-keyboard-and-screen-reader-shell.md)
+
+DSA-US-4 was cut out of DSA-US-2 on 2026-11-17 and has the number 4; the order of the list is the order of building (Q387).
