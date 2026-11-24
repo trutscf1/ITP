@@ -188,3 +188,46 @@ Answer: "Drei Ziele (Recommended)" — list a folder of 1 000 items in ≤ 300 m
 **Q444 - Gegenprüfung vor dem Phase-4-Gate:** R5 verarbeitet personenbezogene Daten und löscht endgültig (irreversible Wirkung). Soll vor dem Review ein unabhängiger Prüfer (gam-v-doubt-driven-development) die Ziel-Kette (§1) und Part H angreifen?
 
 Answer: "Ja, Gegenprüfung (Recommended)".
+
+## Round 10 — 2026-11-24 — shared understanding (`schwaigc`)
+
+**Q445 - Gemeinsames Verständnis:** Stimmt die Zusammenfassung (Fundament, Upload/Resume/Dedup, Ordner/Papierkorb/Download, Datenschutz, Leistung), sodass ich jetzt Konzept §1–§17 + Part H, Story-Dateien, Glossar und STACK.md §2 auf concept/storage-core schreibe?
+
+Answer: "Ja, schreiben (Recommended)".
+
+## Round 11 — 2026-11-24 — findings of the draft (`schwaigc`)
+
+The draft of the concept (written by a subagent) reported writing decisions W1–W12 and INVEST findings; this round settles them. Q446 and Q447 are not in this log because the project-wide counter had already been used by another session.
+
+- **A24**: STO-US-1 also depends on IDN-US-2 (session check); added to its "Depends on" line.
+- **A25**: After STO-US-6, only delete-for-good satisfies STO-AC-1.5; STO-T-5 already says so and stays.
+- **A26**: The weights of the stories are re-estimated at `tickets`, where the new slices become issues.
+- **A27**: STO-AC-4.5 stays a test criterion; its cases are named concretely.
+
+**Q448 - Tabelle folders:** Die vorhandene Tabelle folders (Scaffolding, Bereich trutscf1) verlangt eine team_id und hat einen Root pro Team, R5 ist aber nur für den Owner (Q420). Wie passt das zusammen?
+
+Answer: "owner_id ergänzen (Recommended)".
+
+**Q449 - Account löschen über identity:** Für Q441 ruft identity storage intern auf (gemeinsames Geheimnis), erst löscht storage alles, dann identity den Account. Soll das so ins Konzept, mit einem Inbox-Eintrag an tschudea07 für IDN-US-8?
+
+Answer: "So, + Inbox an tschudea07 (Recommended)".
+
+**Q450 - Gemeinsames Paket:** Die Aufräumlogik läuft in storage und worker. Der Entwurf legt dafür ein neues Paket packages/storage-core an (W7), das beide Units verwenden. Einverstanden?
+
+Answer: "Ja, ohne ADR (Recommended)".
+
+**Q451 - Schreibentscheidungen W1–W5, W8, W9, W12:** Der Entwurf hat Lücken selbst gefüllt, z. B. konkrete Namensregeln (255 Zeichen, NFC, reservierte Gerätenamen), eine Typ-Liste mit Default „alles erlaubt“, „Ersetzen“ = altes File normal löschen, Ersetzen nicht für Ordner, und Konflikt-Entscheidung beim Anlegen des Uploads. Sollen diese Werte so bleiben (in §13 aufgelistet, im Review änderbar)?
+
+Answer: "So lassen (Recommended)".
+
+**Q452 - Hash ab dem ersten Upload:** Ab dem ersten gespeicherten File braucht jedes Content object seinen SHA-256 (STO-AC-4.1), das AC steht aber in STO-US-4, das erst nach STO-US-3 kommt. Soll STO-AC-4.1 nach STO-US-2 wandern?
+
+Answer: "AC-4.1 nach US-2 (Recommended)".
+
+**Q453 - Überschneidung US-2/US-3:** Wegen Q429 (tus von Anfang an) baut STO-US-2 den Chunk-Upload schon, STO-AC-3.1 beschreibt ihn aber in US-3. Soll STO-AC-3.1 nach STO-US-2 wandern, sodass US-3 nur Resume, Pause, große Dateien und Cleanup enthält?
+
+Answer: "AC-3.1 nach US-2 (Recommended)".
+
+**Q454 - Speicherbelegung (OBS-F-23):** Die S3-Schnittstelle liefert keine belegte und keine Gesamtgröße. Woher nimmt storage die beiden Werte?
+
+Answer: "SeaweedFS-Master-API (Recommended)".

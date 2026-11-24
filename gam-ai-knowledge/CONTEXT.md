@@ -168,3 +168,27 @@ The facts derived from a file's content after it is stored, such as its detected
 **Owner**:
 The member who created a file or folder. Until teams and roles exist, only the owner can see or change it.
 *Avoid*: creator, uploader
+
+**Item**:
+A file or a folder. The word is used where a rule is the same for both, such as renaming, moving, copying, deleting, and restoring.
+*Avoid*: entry, node, object
+
+**Folder**:
+A named container in which a member keeps files and other folders. Folders nest to any depth and belong to one owner.
+*Avoid*: directory
+
+**Root folder**:
+The one folder of a member that has no parent. It is created when the member first uses their files, has no name of its own (the page calls it "My files"), and cannot be renamed, moved, copied, or deleted.
+*Avoid*: home folder, top folder, drive
+
+**Trash**:
+The place where an item a member deleted stays, restorable, until it is deleted for good by the member or automatically after 30 days (configurable).
+*Avoid*: recycle bin, bin
+
+**Trash entry**:
+An item a member deleted themselves, as the trash shows it. A deleted folder is one trash entry with everything in it; it is restored or deleted for good only as a whole.
+*Avoid*: deleted file, trash item
+
+**Upload**:
+The transfer of one file from a member's device to stash, in chunks, until its content is complete and stored as a file. An upload can be paused and continued after a dropped connection, and an unfinished one is removed after 24 hours (configurable).
+*Avoid*: import, transfer
