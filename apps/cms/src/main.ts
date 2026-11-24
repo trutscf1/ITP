@@ -1,16 +1,25 @@
+import { fileURLToPath } from "node:url";
 import { InvalidConfigurationError } from "@stash/telemetry";
+import { createStrapi } from "@strapi/strapi";
 import { boot } from "./boot.ts";
 
 // Process entry of the unit `cms` (`pnpm --filter @stash/cms start`). The telemetry starts
-// first (M11 UnitWiring, OBS-F-1); the callback below is where the content management system
-// starts to accept requests once the unit has one (#19). Until then the unit has no server, so the
-// process stays alive until a signal: the heartbeat of every export interval (OBS-F-11) needs a
-// running process.
+// first (M11 UnitWiring, OBS-F-1); Strapi starts afterwards and accepts requests, among them
+// GET /health. German is the default language of the content (PUB-F-5).
+process.env.STRAPI_TELEMETRY_DISABLED ??= "true";
+process.env.STRAPI_PLUGIN_I18N_INIT_LOCALE_CODE ??= "de";
 try {
-  const telemetry = await boot(process.env, () => {
-    // The content management system starts here.
+  const telemetry = await boot(process.env, async () => {
+    const appDir = fileURLToPath(new URL("..", import.meta.url));
+    const strapi = createStrapi({
+      appDir,
+      distDir: fileURLToPath(new URL(".", import.meta.url)),
+      autoReload: false,
+      serveAdminPanel: false,
+    });
+    await strapi.load();
+    await strapi.start();
   });
-  setInterval(() => undefined, 2 ** 30); // keeps the process running; ends with the signal below
   for (const signal of ["SIGINT", "SIGTERM"] as const) {
     process.once(signal, () => {
       void telemetry.shutdown().finally(() => process.exit(0));
