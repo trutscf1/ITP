@@ -10,7 +10,9 @@ import {
   type IdentityConfig,
   identityPaths,
   loginInputSchema,
+  newPasswordInputSchema,
   registrationInputSchema,
+  resetRequestInputSchema,
   type SessionInfo,
 } from "@stash/contracts";
 import { type Context, Hono } from "hono";
@@ -24,6 +26,7 @@ import type { Logger } from "./logger.ts";
 import { logIn } from "./login.ts";
 import { chooseLanguage, type Mailer } from "./mailer.ts";
 import { register } from "./registration.ts";
+import { completeReset, requestReset } from "./reset.ts";
 import type { SessionStore } from "./sessions.ts";
 import type { Throttle } from "./throttle.ts";
 
@@ -149,6 +152,18 @@ export function createApp(deps: AppDeps): Hono {
     return context.json(report);
   });
 
+  // IDN-F-5: while CAPTCHA_ENABLED is true, a missing token is refused without asking the
+  // provider; while it is false, no token is required.
+  async function passesBotCheck(
+    body: Record<string, unknown> | undefined,
+    ip: string,
+  ): Promise<boolean> {
+    if (!config.CAPTCHA_ENABLED) return true;
+    const token =
+      typeof body?.botToken === "string" ? body.botToken : undefined;
+    return token !== undefined && (await botCheck.verify(token, ip));
+  }
+
   // IDN-F-1 to IDN-F-6, IDN-F-30, IDN-F-35. Order: a body above maxBodyBytes is refused unread
   // (IDN-E-1), then the request throttle counts every request, then the closed registration,
   // then the bot check "before anything else" of the input (IDN-F-5), then the input (IDN-E-1).
@@ -165,13 +180,8 @@ export function createApp(deps: AppDeps): Hono {
       return fail(context, "registration-closed");
 
     const body = await readObject(context);
-    if (config.CAPTCHA_ENABLED) {
-      const token =
-        typeof body?.botToken === "string" ? body.botToken : undefined;
-      // A missing token is refused without asking the provider.
-      if (!token || !(await botCheck.verify(token, ip))) {
-        return fail(context, "bot-check-failed");
-      }
+    if (!(await passesBotCheck(body, ip))) {
+      return fail(context, "bot-check-failed");
     }
 
     const parsed = registrationInputSchema.safeParse(body);
@@ -290,6 +300,49 @@ export function createApp(deps: AppDeps): Hono {
     return context.json(info);
   });
 
+  const resetDeps = {
+    auth,
+    sessions,
+    mailer,
+    clock,
+    resetLinkTtlMinutes: config.RESET_LINK_TTL_MINUTES,
+  };
+
+  // IDN-F-25, IDN-F-28, IDN-F-29, IDN-F-35, IDN-F-5: the request throttle, then the bot check, then the input; the
+  // answer is the same for every address, and the e-mail goes out after it (IDN-E-11).
+  app.post(identityPaths.resetRequest, limitBody, async (context) => {
+    const ip = await clientAddress(context);
+    const counted = await throttle.countRequest(ip);
+    if (!counted.ok) {
+      return fail(context, "too-many-requests", {
+        "Retry-After": String(counted.retryAfterSeconds),
+      });
+    }
+    const body = await readObject(context);
+    if (!(await passesBotCheck(body, ip))) {
+      return fail(context, "bot-check-failed");
+    }
+    const parsed = resetRequestInputSchema.safeParse(body);
+    if (!parsed.success) return fail(context, "validation-failed");
+    const outgoing = await requestReset(
+      resetDeps,
+      parsed.data,
+      chooseLanguage(context.req.header("accept-language")),
+    );
+    if (outgoing) afterAnswer.run("reset", outgoing);
+    return context.json({ status: "check-mailbox" as const }, 202);
+  });
+
+  // IDN-F-25 to IDN-F-27, IDN-F-33, IDN-E-7: a password that breaks the rules is refused before
+  // the link is used (IDN-F-26).
+  app.post(identityPaths.reset, limitBody, async (context) => {
+    const parsed = newPasswordInputSchema.safeParse(await readObject(context));
+    if (!parsed.success) return fail(context, "validation-failed");
+    const done = await completeReset(resetDeps, parsed.data);
+    if (!done) return fail(context, "link-invalid");
+    return context.body(null, 204);
+  });
+
   // A known path with another method is 405, an unknown path 404, a failure inside 500; none of
   // them carries internals (SCF-F-21, SCF-NF-4).
   const methods: Record<string, string> = {
@@ -299,6 +352,8 @@ export function createApp(deps: AppDeps): Hono {
     [identityPaths.login]: "POST",
     [identityPaths.logout]: "POST",
     [identityPaths.session]: "GET",
+    [identityPaths.resetRequest]: "POST",
+    [identityPaths.reset]: "POST",
   };
   for (const [path, allowed] of Object.entries(methods)) {
     app.all(path, (context) =>

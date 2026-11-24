@@ -9,6 +9,10 @@ import { confirmQuerySchema } from "./identity/confirm-query.ts";
 import { loginInputSchema } from "./identity/login-input.ts";
 import { identityApiPath } from "./identity/paths.ts";
 import { registrationInputSchema } from "./identity/registration-input.ts";
+import {
+  newPasswordInputSchema,
+  resetRequestInputSchema,
+} from "./identity/reset-input.ts";
 import { sessionInfoSchema } from "./identity/session-info.ts";
 
 /** The generated OpenAPI 3.1 description. */
@@ -116,6 +120,44 @@ export function generateOpenApiDocument(
         content: { "application/json": { schema: sessionInfoSchema } },
       },
       401: error("No valid session"),
+    },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: identityApiPath("resetRequest"),
+    summary: "Request a reset link by e-mail",
+    request: {
+      body: {
+        content: { "application/json": { schema: resetRequestInputSchema } },
+      },
+    },
+    responses: {
+      202: {
+        description:
+          "Always, for a valid request: check the mailbox (IDN-F-28)",
+        content: { "application/json": { schema: acceptedSchema } },
+      },
+      400: error("Invalid input or failed bot check"),
+      429: error("Too many requests from this address"),
+    },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: identityApiPath("reset"),
+    summary: "Set a new password with the token of a reset link",
+    request: {
+      body: {
+        content: { "application/json": { schema: newPasswordInputSchema } },
+      },
+    },
+    responses: {
+      204: {
+        description:
+          "The password is replaced and every session of the account ended (IDN-F-27)",
+      },
+      400: error("Invalid input, or the link is invalid or expired"),
     },
   });
 

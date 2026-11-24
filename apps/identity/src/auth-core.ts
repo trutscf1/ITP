@@ -17,13 +17,19 @@ import { hashToken } from "./token-hash.ts";
 const argon2 = { memoryCost: 19_456, timeCost: 2, parallelism: 1 } as const;
 
 const confirmationPrefix = "confirm:";
+const resetPrefix = "reset:";
 
-/** The open confirmation links of one account (concept §8, "Confirmation tokens"). */
-function confirmationLinksOf(id: string): Where[] {
+/** The open links of one kind of one account (concept §8, "Confirmation and reset tokens"). */
+function linksOf(id: string, prefix: string): Where[] {
   return [
     { field: "value", value: id },
-    { field: "identifier", operator: "starts_with", value: confirmationPrefix },
+    { field: "identifier", operator: "starts_with", value: prefix },
   ];
+}
+
+/** The open confirmation links of one account. */
+function confirmationLinksOf(id: string): Where[] {
+  return linksOf(id, confirmationPrefix);
 }
 
 export interface Account {
@@ -79,6 +85,27 @@ export interface AuthCore {
   ): Promise<string>;
   /** Uses the link once: confirms the address and returns true, or returns false for an invalid link. */
   confirm(token: string, now: Date): Promise<boolean>;
+  /**
+   * IDN-F-25: replaces the reset links of the account by a new one, valid for `validityMinutes`;
+   * only its hash is stored (IDN-NF-5). Returns the token.
+   */
+  replaceResetLink(
+    id: string,
+    now: Date,
+    validityMinutes: number,
+  ): Promise<string>;
+  /** The account of a reset link that is still valid at `now`, without using it up. */
+  resetLinkAccount(token: string, now: Date): Promise<string | undefined>;
+  /**
+   * IDN-F-25 to IDN-F-27, IDN-F-33: uses the reset link once — replaces the password hash,
+   * confirms the address, and deletes every reset link of the account, in one transaction.
+   * Returns the account id, or undefined when the link was used or expired in the meantime.
+   */
+  resetPassword(
+    token: string,
+    passwordHash: string,
+    now: Date,
+  ): Promise<string | undefined>;
   /** The id of the `users` row of an account (SCF-F-24). */
   memberId(accountId: string): Promise<string | undefined>;
   /**
@@ -185,26 +212,52 @@ export async function createAuthCore(
 
   const dummyHash = await hash(randomBytes(16).toString("hex"), argon2);
 
-  /** Stores a new confirmation link of the account through `db`; returns its token. */
-  async function insertConfirmationLink(
+  /** Stores a new link of the account through `db`; returns its token (IDN-NF-5). */
+  async function insertLink(
     db: Pick<typeof adapter, "create">,
+    prefix: string,
     id: string,
     now: Date,
-    validityHours: number,
+    validityMs: number,
   ): Promise<string> {
     const token = randomBytes(32).toString("base64url");
     await db.create({
       model: "verification",
       data: {
-        identifier: `${confirmationPrefix}${hashToken(token)}`,
+        identifier: `${prefix}${hashToken(token)}`,
         value: id,
-        expiresAt: new Date(now.getTime() + validityHours * 3_600_000),
+        expiresAt: new Date(now.getTime() + validityMs),
         createdAt: now,
         updatedAt: now,
       },
     });
     return token;
   }
+
+  /** The account of a reset link that exists and has not expired at `now`. */
+  async function validResetLink(
+    db: Pick<typeof adapter, "findOne">,
+    token: string,
+    now: Date,
+  ): Promise<string | undefined> {
+    const link = await db.findOne<{ value: string; expiresAt: Date }>({
+      model: "verification",
+      where: [
+        { field: "identifier", value: `${resetPrefix}${hashToken(token)}` },
+      ],
+    });
+    if (!link || new Date(link.expiresAt).getTime() <= now.getTime()) {
+      return undefined;
+    }
+    return link.value;
+  }
+
+  const insertConfirmationLink = (
+    db: Pick<typeof adapter, "create">,
+    id: string,
+    now: Date,
+    validityHours: number,
+  ) => insertLink(db, confirmationPrefix, id, now, validityHours * 3_600_000);
 
   return {
     hashPassword: (password) => context.password.hash(password),
@@ -319,6 +372,63 @@ export async function createAuthCore(
       }
       return true;
     },
+
+    replaceResetLink: (id, now, validityMinutes) =>
+      adapter.transaction(async (db) => {
+        await db.deleteMany({
+          model: "verification",
+          where: linksOf(id, resetPrefix),
+        });
+        return insertLink(db, resetPrefix, id, now, validityMinutes * 60_000);
+      }),
+
+    resetLinkAccount: (token, now) => validResetLink(adapter, token, now),
+
+    resetPassword: (token, passwordHash, now) =>
+      adapter.transaction(async (db) => {
+        const identifier = `${resetPrefix}${hashToken(token)}`;
+        const link = await validResetLink(db, token, now);
+        if (!link) return undefined;
+        // Only the request that deletes the link uses it (single use, IDN-F-25).
+        const used = await db.deleteMany({
+          model: "verification",
+          where: [{ field: "identifier", value: identifier }],
+        });
+        if (used !== 1) return undefined;
+        const id = link;
+        const replaced = await db.updateMany({
+          model: "account",
+          where: [
+            { field: "userId", value: id },
+            { field: "providerId", value: "credential" },
+          ],
+          update: { password: passwordHash, updatedAt: now },
+        });
+        // An account without a password yet gets its credential now (IDN-F-27).
+        if (replaced === 0) {
+          await db.create({
+            model: "account",
+            data: {
+              userId: id,
+              providerId: "credential",
+              accountId: id,
+              password: passwordHash,
+              createdAt: now,
+              updatedAt: now,
+            },
+          });
+        }
+        await db.update({
+          model: "user",
+          where: [{ field: "id", value: id }],
+          update: { emailVerified: true, updatedAt: now },
+        });
+        await db.deleteMany({
+          model: "verification",
+          where: linksOf(id, resetPrefix),
+        });
+        return id;
+      }),
 
     async memberId(accountId) {
       const rows = await pool.query<{ id: string }>(
