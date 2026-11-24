@@ -36,12 +36,15 @@ export async function register(
   const validityHours = deps.confirmationLinkTtlHours;
   let token: string;
   if (existing) {
-    token = await auth.replaceUnconfirmed(existing.id, {
+    const replaced = await auth.replaceUnconfirmed(existing.id, {
       name: input.name,
       passwordHash,
       now,
       validityHours,
     });
+    // Confirmed since the lookup: treated like a confirmed account (IDN-F-6).
+    if (!replaced) return () => mailer.sendNotice({ to, language });
+    token = replaced;
   } else {
     try {
       ({ token } = await auth.createAccount({

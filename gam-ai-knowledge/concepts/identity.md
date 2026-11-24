@@ -228,8 +228,9 @@ RegistrationInput { name: string 1..100 after trim, email: Email, password: Pass
 LoginInput        { email: Email, password: string 1..128 }
 ResetRequestInput { email: Email, botToken: optional<string> }
 NewPasswordInput  { token: string 1..200, password: Password }
-Email    = string 3..254, lowercased and trimmed, without white space, one "@" with at least one character before it
-           and a dot in the part after it with at least one character on each side
+Email    = string 3..254, lowercased and trimmed; a local part of the signs of an RFC 5322 dot-atom (letters,
+           digits, !#$%&'*+/=?^_`{|}~.-), one "@", and a domain of letters, digits, and hyphens with at least
+           one dot between its labels; so no comma, semicolon, angle bracket, quote, or white space (review of !62)
 Password = string 12..128, not in the common-password list (case-insensitive)
 Strength = enum(weak|fair|good|strong)   // weak: < 12 chars or listed; fair: 12..15 chars of one character class;
                                          // good: 12..15 chars of two or more classes, or 16+ of one; strong: 16+ of two or more classes
