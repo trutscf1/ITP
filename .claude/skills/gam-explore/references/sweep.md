@@ -6,7 +6,7 @@ Call the Skill tool with `gam-v-codebase-design` first and use its terms exactly
 
 ## 1. Scope
 
-If the developer named an area, take it. Otherwise read a good stretch of `git log --oneline` and start with the hot spots: the files and areas that keep changing. Deepening pays off where change happens.
+If the developer named an area, take it. Otherwise run `node gam-engineering/tools/parallel-check.mjs` (on the check tier, [Models](../../gam-engineering/references/models.md)) and start with the program files its table lists, the hot spots: the files and areas that keep changing. Read a good stretch of `git log --oneline` instead only when the script is missing or the project has no git. Deepening pays off where change happens.
 
 ## 2. Explore
 
@@ -16,6 +16,7 @@ Read the glossary, the ADRs, and the concept documents for the area, then let a 
 - A module is shallow: its interface is almost as complex as its implementation (deletion test: would deleting it concentrate complexity, or only move it?).
 - Pure functions were extracted for testing, but the bugs hide in how they are called.
 - Modules leak across their seams, or a part is untested or hard to test through its interface.
+- A module blocks parallel work (P-ARCH-5): the script lists it as a hot file, or sessions in different worktrees would have to change it together ([parallel-work.md](../../gam-architecture-review/references/parallel-work.md)).
 
 ## 3. Drift sweep
 
@@ -30,9 +31,10 @@ In the same pass, check what only this profile knows:
 
 ## 4. Report
 
-Write a self-contained HTML file to the system temp directory (`%TEMP%` on Windows), named `gam-engineering-sweep-<timestamp>.html`, never into the repo, and open it. Tailwind and Mermaid may come from a CDN.
+Write a self-contained HTML file to the system temp directory (`%TEMP%` on Windows, `$TMPDIR` or `/tmp` elsewhere), named `gam-engineering-sweep-<timestamp>.html`, never into the repo, and open it. Tailwind and Mermaid may come from a CDN.
 
 - One card per candidate: the modules involved, the problem, the proposed change in plain words, the benefit in terms of locality and leverage, a before/after diagram, and a strength badge — *Strong*, *Worth exploring*, or *Speculative*.
+- A module that blocks parallel work is a candidate like the others, with the badge *Blocks parallel work*, its share of the units of work, and the overlap rate without it, both from the script's table.
 - A candidate that contradicts an ADR is shown only if the friction justifies reopening it, and is marked as such.
 - One section listing the drift findings as *document — row — what drifted*.
 - A closing *Top recommendation*.

@@ -2,16 +2,17 @@
 // Mechanical part of the consistency check of the skill gam-ai-knowledge: checks the knowledge folder gam-ai-knowledge/
 // against the Machine-Readable Contract of its MANIFEST.md. No dependencies; Node 18+.
 // Usage: node gam-ai-knowledge/tools/doc-check.mjs [knowledge-dir] [--json]
-//        [--status [--pending-title <MR title>] [--pending-branch <MR source branch>]]
-// --status also compares the ROADMAP stages and the position rows with the git history (S-3).
+//        [--status [--pending-title <MR title>] [--pending-branch <MR source branch>] [--release-tag <tag>]]
 // Rule AC-TEST (project addition, #138) looks for each acceptance criterion's ID in the test names of the code next to
 // the knowledge folder; --pending-branch names the merge request whose slice must be tested.
+// --status also compares the ROADMAP stages and the position rows with the git history (S-3). In a tag pipeline,
+// --release-tag names the tag being built (empty: ignored), whose status the release writes only after the tag (QA0064).
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { dirname, join, relative, posix, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 
-const DOC_TYPES = ["goal", "manifest", "context", "adr", "concept", "epic", "feature", "story", "backlog", "sprint", "qa-log", "stack", "workflow", "roadmap", "roadmap-details", "inbox", "versioning", "team", "status", "test-strategy", "deployment", "security", "test-data"];
+const DOC_TYPES = ["goal", "manifest", "context", "adr", "concept", "epic", "feature", "story", "backlog", "sprint", "qa-log", "stack", "workflow", "roadmap", "roadmap-details", "inbox", "versioning", "team", "status", "test-strategy", "deployment", "security", "test-data", "start"];
 // "gam-engineering/2", "humanengineering/2", and "engineering-human/2" are the same format under its former names
 // (P-DOC-10, P-DOC-11); they are accepted during the transition period, with a warning inside gam-ai-knowledge/, and
 // `/gam-engineering migrate` rewrites them.
@@ -24,7 +25,6 @@ const AUDIENCES = ["product", "developer", "reviewer", "agent"];
 const INTEGRATED = { dev: "in dev", trunk: "merged" };
 const stagesFor = (model) => ["idea", "concept", "ready", "in progress", INTEGRATED[model], "released"];
 const EARLY_STAGES = ["idea", "concept"];
-const DONE_STAGES = ["in dev", "released", "merged"];
 const ADR_STATUS = ["proposed", "accepted", "rejected", "deprecated", "superseded"];
 const STORY_STATUS = ["backlog", "ready", "in-progress", "review", "done"];
 const SEMVER = /^\d+\.\d+\.\d+$/;
@@ -35,19 +35,21 @@ const ID_TOKEN = /(?<![\w-])(?:[A-Z]{2,4}-AC-\d+\.\d+|[A-Z]{2,4}-(?:US|NF|F|U|C|
 const CONCEPT_ID = /^([A-Z]{2,4})-(US|NF|F|U|C|E|T)-(\d+)$/;
 const AC_ID = /^([A-Z]{2,4})-AC-(\d+)\.(\d+)$/;
 
+const args = process.argv.slice(2);
 // Rule AC-TEST: test files, folders never searched, test calls with their name, AC IDs in a name.
 const TEST_FILE = /\.(?:test|spec)\.[cm]?[jt]sx?$/;
 const SKIPPED_DIRS = new Set(["node_modules", "dist", "build", "out", "coverage", "storybook-static"]);
 const TEST_CALL = /(?<![\w$.])(?:test\.)?(?:describe|it|test|suite)(?:\.only)?\s*\(\s*(["'`])((?:\\[\s\S]|(?!\1)[^\\])*)\1/g;
 const AC_IN_NAME = /(?<![\w-])[A-Z]{2,4}-AC-\d+\.\d+(?!\w|\.\d)/g;
 
-const args = process.argv.slice(2);
-const VALUE_OPTIONS = ["--pending-title", "--pending-branch"];
+const VALUE_OPTIONS = ["--pending-title", "--pending-branch", "--release-tag"];
 const option = (name) => (args.includes(name) ? args[args.indexOf(name) + 1] ?? "" : "");
 const asJson = args.includes("--json");
 const statusMode = args.includes("--status");
 const pendingTitle = option("--pending-title");
 const pendingBranch = option("--pending-branch");
+const releaseTag = option("--release-tag").trim();
+let worktreeLine = ""; // the Worktrees line of --status (checkWorktrees)
 // The default knowledge-dir is gam-ai-knowledge, or a former folder in a project not yet moved (P-DOC-10, P-DOC-11).
 const KNOWLEDGE_DIRS = ["gam-ai-knowledge", "gam-engineering/documentation", "humanengineering/documentation"];
 const root = args.find((a, i) => !a.startsWith("--") && !VALUE_OPTIONS.includes(args[i - 1]))
@@ -64,6 +66,8 @@ function findRepoTop() {
   }
 }
 const repoTop = findRepoTop();
+// Runs git in the knowledge folder (inside the repository, so repo-wide queries work; use :(top) for paths from the repo root).
+const git = (...a) => execFileSync("git", a, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], maxBuffer: 1 << 28 });
 
 // Branch model from env.GAM_ENGINEERING_BRANCHES in the committed .claude/settings.json of the repo root, or the
 // same key under a former prefix (P-DOC-10); missing or unknown means dev (P-GIT-9).
@@ -80,14 +84,18 @@ const branchModel = readBranchModel();
 const otherModel = branchModel === "trunk" ? "dev" : "trunk";
 const STAGES = stagesFor(branchModel);
 
+const DONE_STAGES = ["in dev", "released", "merged"];
 const findings = [];
 const report = (severity, code, file, line, id, message) => findings.push({ severity, code, file, line, id, message });
 
 // ---------- parsing ----------
 
+// sources/ at the root of the folder holds a project's foreign documents unchanged (a requirements document and its
+// Markdown version, files an adoption could not map; P-GOAL-4): they carry no frontmatter and are never checked.
 function listMarkdown(dir) {
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name);
+    if (dir === root && name === "sources") return [];
     if (statSync(path).isDirectory()) return listMarkdown(path);
     return name.endsWith(".md") ? [path] : [];
   });
@@ -216,13 +224,13 @@ if (!existsSync(root) || !statSync(root).isDirectory()) {
 const defined = new Map(); // id -> {file, line}
 const refs = []; // {id, file, line, from}
 const concepts = [];
+const slices = []; // {acs, issues} per row of a story file's slice table
 const roadmapRows = [];
 const positions = [];
 const stackIds = [];
 const roles = [];
 const features = []; // work-item tree (P-DOC-6): epic.md (or legacy feature.md) per folder
 const storyFiles = []; // one user story per file
-const slices = []; // {acs, issues} per row of a story file's slice table
 const backlogs = []; // work-items/BACKLOG.md (P-DOC-8)
 const sprints = []; // work-items/sprints/sprint-<n>.md (P-DOC-8)
 let goalFound = false;
@@ -560,7 +568,283 @@ for (const s of stackIds) {
 }
 if (!goalFound) report("error", "FM", root, 0, "", "no document with doc: goal (GOAL.md) found");
 checkAcceptanceTests();
-if (statusMode) checkStatus();
+if (statusMode) {
+  checkStatus();
+  checkMemory();
+  await checkWorktrees();
+}
+checkPublishLists();
+await checkPipeline();
+
+// ---------- pipeline decision (PIPE) ----------
+
+// gam-engineering/pipeline.json is checked by the helper's validate (P-PIPE-1, PP-F-17);
+// doc-check only reads the file and turns each finding into an error. Without the file there is nothing to check.
+async function checkPipeline() {
+  const decision = join(repoTop, "gam-engineering", "pipeline.json");
+  if (!existsSync(decision)) return;
+  const file = relative(process.cwd(), decision).replace(/\\/g, "/");
+  const helper = join(repoTop, "gam-engineering", "tools", "pipeline.mjs");
+  if (!existsSync(helper))
+    return report("error", "PIPE", file, 0, "", "gam-engineering/tools/pipeline.mjs missing; run /gam-engineering migrate tools");
+  const { validate } = await import(pathToFileURL(helper).href);
+  for (const f of validate(readFileSync(decision, "utf8"), (path) => existsSync(join(repoTop, path))))
+    report("error", f.code, file, 0, "", f.message);
+}
+
+// ---------- publish lists (P-DOC-9) ----------
+
+// Project documents never ship with the product. Checks the lists whose effect is clear without running a
+// tool: a .deployignore, and an npm package that is not private.
+function checkPublishLists() {
+  const rootFile = (name) => relative(process.cwd(), join(repoTop, name)).replace(/\\/g, "/");
+  const read = (name) => (existsSync(join(repoTop, name)) ? readFileSync(join(repoTop, name), "utf8") : null);
+  // The project folders are gam-ai-knowledge/ and gam-engineering/, or the former humanengineering/ in a project not
+  // yet renamed (P-DOC-10, P-DOC-11).
+  const processFolder = !existsSync(join(repoTop, "gam-engineering")) && existsSync(join(repoTop, "humanengineering")) ? "humanengineering" : "gam-engineering";
+  const folders = ["gam-ai-knowledge", processFolder].filter((name) => existsSync(join(repoTop, name)));
+  for (const folder of folders.length ? folders : [processFolder]) checkPublishList(folder, rootFile, read);
+}
+
+function checkPublishList(folder, rootFile, read) {
+  const entry = new RegExp(`^/?${folder}/?(\\*\\*?)?$`);
+  const excludes = (text) => text.split(/\r?\n/).some((l) => entry.test(l.trim()));
+
+  const deployIgnore = read(".deployignore");
+  if (deployIgnore !== null && !excludes(deployIgnore))
+    report("warning", "PUBLISH-LEAK", rootFile(".deployignore"), 0, "", `does not exclude ${folder}/, so the project documents are deployed with the product (P-DOC-9)`);
+
+  const pkgText = read("package.json");
+  if (pkgText === null) return;
+  let pkg;
+  try {
+    pkg = JSON.parse(pkgText);
+  } catch {
+    return;
+  }
+  if (pkg.private === true) return;
+  if (Array.isArray(pkg.files)) {
+    if (pkg.files.some((f) => new RegExp(`^(\\./)?${folder}(/|$)`).test(String(f))))
+      report("warning", "PUBLISH-LEAK", rootFile("package.json"), 0, "", `files lists ${folder}/, so the project documents ship with the npm package (P-DOC-9)`);
+    return;
+  }
+  const npmIgnore = read(".npmignore");
+  if (npmIgnore === null || !excludes(npmIgnore))
+    report("warning", "PUBLISH-LEAK", rootFile(npmIgnore === null ? "package.json" : ".npmignore"), 0, "",
+      `the npm package has no files list and no .npmignore entry for ${folder}/, so the project documents would ship with it (P-DOC-9)`);
+}
+
+// ---------- status against git (--status) ----------
+
+// Mechanical part of consistency-check step 5. A story counts as merged when a merge commit on HEAD
+// names its ID (the MR title carries it, P-MR-1, and both hosts put the title into the merge commit),
+// and as released when a v* tag contains that merge. In an MR pipeline, --pending-title and
+// --pending-branch count as merged, because the MR carries the status for the state after the merge
+// (P-ROAD-4). In a tag pipeline, --release-tag names the tag being built: the release writes the stage "released" only
+// after the tag (release step 7), so a story that only this tag contains may still have the integrated stage (QA0064).
+// Whether issues are closed needs the host API and stays with the agent's check.
+function checkStatus() {
+  const rootFile = relative(process.cwd(), root).replace(/\\/g, "/") || ".";
+  let shallow;
+  try {
+    shallow = git("rev-parse", "--is-shallow-repository").trim() === "true";
+  } catch {
+    return report("error", "STATUS", rootFile, 0, "", "--status needs git and a checkout with history");
+  }
+  if (shallow) return report("error", "STATUS", rootFile, 0, "", "the clone is shallow; fetch the full history (GitLab: GIT_DEPTH: 0, GitHub: fetch-depth: 0)");
+
+  // A repository without a commit has no HEAD, so there is no history to read: no story counts as merged.
+  let hasCommit = true;
+  try {
+    git("rev-parse", "--verify", "--quiet", "HEAD");
+  } catch {
+    hasCommit = false;
+  }
+
+  const merges = (hasCommit ? git("log", "--merges", "--format=%H%n%B%x1e", "HEAD") : "")
+    .split("\x1e")
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((entry) => {
+      const [sha, ...body] = entry.split(/\r?\n/);
+      return { sha, body: body.join("\n") };
+    });
+  if (pendingTitle) merges.push({ sha: null, body: pendingTitle });
+
+  const mergedBranches = new Set(pendingBranch ? [pendingBranch] : []);
+  for (const m of merges) {
+    const subject = m.body.split("\n")[0];
+    const branch = subject.match(/^Merge branch '([^']+)'/)?.[1] ?? subject.match(/^Merge pull request #\d+ from [^/\s]+\/(\S+)/)?.[1];
+    if (branch && branch !== "dev" && branch !== "main") mergedBranches.add(branch);
+  }
+
+  const tagged = new Map();
+  const tagsOf = (sha) => {
+    if (!sha) return [];
+    if (!tagged.has(sha)) tagged.set(sha, git("tag", "--list", "v*", "--contains", sha).split(/\r?\n/).map((t) => t.trim()).filter(Boolean));
+    return tagged.get(sha);
+  };
+  const inTag = (sha) => tagsOf(sha).length > 0;
+  const inEarlierTag = (sha) => tagsOf(sha).some((t) => t !== releaseTag);
+
+  for (const c of concepts) {
+    if (c.legacy || !c.stories.length) continue;
+    const row = roadmapRows.find((r) => r.feature.toLowerCase() === (c.title || "").toLowerCase());
+    if (!row || !STAGES.includes(row.stage)) continue;
+    // A story with a story file counts only once that file says done: a merge of one of its slices names it too (#11).
+    const evidence = c.stories.map((s) => {
+      const status = storyFiles.find((f) => f.stories[0]?.id === s.id)?.status;
+      if (status !== undefined && status !== "done") return [];
+      const named = new RegExp(`(?<![\\w-])${s.id}(?!\\w)`);
+      return merges.filter((m) => named.test(m.body));
+    });
+    const total = c.stories.length;
+    const merged = evidence.filter((e) => e.length).length;
+    const released = evidence.filter((e) => e.some((m) => inTag(m.sha))).length;
+    const releasedBefore = evidence.filter((e) => e.some((m) => inEarlierTag(m.sha))).length;
+    let allowed;
+    if (released === total) allowed = releasedBefore === total ? ["released"] : [INTEGRATED[branchModel], "released"];
+    else if (merged === total) allowed = [INTEGRATED[branchModel]];
+    else if (merged > 0) allowed = ["in progress"];
+    else allowed = ["concept", "ready", "in progress"];
+    if (!allowed.includes(row.stage))
+      report("error", "STATUS", row.file, row.line, row.feature,
+        `stage "${row.stage}", but git shows ${merged} of ${total} stories merged and ${released} in a release tag; expected ${allowed.join(" or ")}`);
+  }
+
+  for (const p of positions) {
+    // A concept branch may be merged at a phase gate and continued (Phases 1-6); only delivery positions must move on.
+    const continuedConcept = p.branch?.startsWith("concept/") && p.phase < 7;
+    if (mergedBranches.has(p.branch) && !continuedConcept)
+      report("error", "STATUS", p.file, p.line, p.feature, `position row still names branch ${p.branch}, which is already merged`);
+  }
+}
+
+// ---------- worktree capacity (--status, Q560) ----------
+
+// With at least one linked worktree, reports how many exist against the limit of gam-engineering/tools/capacity.mjs
+// (cores, free RAM, free disk, or GAM_ENGINEERING_MAX_PARALLEL). Above the limit it is a warning (WORKTREES), never an error.
+async function checkWorktrees() {
+  const helper = join(repoTop, "gam-engineering", "tools", "capacity.mjs");
+  if (!existsSync(helper)) return;
+  let found;
+  try {
+    const { measure } = await import(pathToFileURL(helper).href);
+    found = await measure(repoTop);
+  } catch {
+    return;
+  }
+  if (found.linked < 1) return;
+  worktreeLine = `Worktrees: ${found.linked} of max ${found.limit} (${found.limitedBy})`;
+  if (found.linked > found.limit)
+    report("warning", "WORKTREES", relative(process.cwd(), repoTop).replace(/\\/g, "/") || ".", 0, "", `${found.linked} linked worktrees exceed the limit of ${found.limit} (${found.limitedBy}); finish or remove one before opening another (P-WS-13)`);
+}
+
+// ---------- memory behind the last merge (--status, P-DOC-13) ----------
+
+// Where the project has a memory in gam-ai-memory/ (CLAUDE.md, README_AI.md, or a running file; a folder with only
+// plans/ is none), the memory is brought up to date at every merge into the integration branch (`/gam-ai-memory
+// sync`). With gam-ai-memory/SESSION_LOG.md tracked:
+//   R = the local integration branch (main under trunk, else dev), else origin/<name>, else HEAD;
+//   M = the newest merge on the first-parent line of R that changes a file outside gam-ai-memory/ and docs/prompts/
+//       (a merge that only brings the remote branch in is skipped); no M, nothing is reported;
+//   T = HEAD when the tip of R is an ancestor of HEAD (a work branch ahead of R, or R itself), else R;
+//   S = the newest commit in M^1..T that changes SESSION_LOG.md; none is an error.
+// `updated:` of CURRENT_TASK.md and PROJECT_STATE.md must not be before the earlier of the dates of M and S, because
+// the sync of a merge is written on the work branch before the merge. Without a tracked SESSION_LOG.md (git-ignored
+// or untracked) only the dates are compared with the newest log row of ROADMAP-DETAILS.md. A missing running file
+// is an error; in team mode nothing is checked (a memory per developer is still to be designed). In a tag pipeline
+// (--release-tag) nothing is checked either: the memory sync of a release is written after the tag (QA0064).
+function checkMemory() {
+  if (releaseTag) return;
+  const MEMORY_FILES = ["CURRENT_TASK.md", "PROJECT_STATE.md", "SESSION_LOG.md"];
+  const PULL_MERGE = /^(Merge branch '[^']+' of |Merge remote-tracking branch )/;
+  const dir = join(repoTop, "gam-ai-memory");
+  const present = ["CLAUDE.md", "README_AI.md", ...MEMORY_FILES].some((name) => existsSync(join(dir, name)));
+  if (!present || existsSync(join(root, "team", "TEAM.md"))) return;
+  const fileOf = (name) => relative(process.cwd(), join(dir, name)).replace(/\\/g, "/");
+  const missing = MEMORY_FILES.filter((name) => !existsSync(join(dir, name)));
+  for (const name of missing) report("error", "MEMORY", fileOf(name), 0, "", "missing; run /gam-ai-memory init (P-DOC-13)");
+  if (missing.length) return;
+
+  // Reports `updated:` of the two status files when it is no date or lies before `since`.
+  const reportStaleUpdated = (since, what) => {
+    for (const name of ["CURRENT_TASK.md", "PROJECT_STATE.md"]) {
+      const updated = parseFrontmatter(readFileSync(join(dir, name), "utf8").split(/\r?\n/))?.data.updated;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(updated ?? "")) report("error", "MEMORY", fileOf(name), 1, "", "updated is missing or not YYYY-MM-DD; run /gam-ai-memory sync (P-DOC-13)");
+      else if (updated < since) report("error", "MEMORY", fileOf(name), 1, "", `updated ${updated} is before ${what}; run /gam-ai-memory sync (P-DOC-13)`);
+    }
+  };
+
+  const logPath = ":(top)gam-ai-memory/SESSION_LOG.md";
+  const gitOk = (...a) => {
+    try {
+      git(...a);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+  let tracked;
+  try {
+    tracked = git("ls-files", "--", logPath).trim() !== "";
+  } catch {
+    return; // no git: --status reports STATUS already
+  }
+
+  if (tracked) {
+    const name = branchModel === "trunk" ? "main" : "dev";
+    const ref = [`refs/heads/${name}`, `refs/remotes/origin/${name}`, "HEAD"].find((candidate) => gitOk("rev-parse", "--verify", "--quiet", `${candidate}^{commit}`));
+    if (!ref) return; // no commit yet
+    let last = null;
+    for (const line of git("log", "--first-parent", "--merges", "--date=short", "--format=%H%x09%ad%x09%s", ref).split(/\r?\n/).filter(Boolean)) {
+      const [sha, date, subject] = line.split("\t");
+      if (PULL_MERGE.test(subject)) continue;
+      const files = git("diff", "--name-only", "-z", `${sha}^1`, sha).split("\0").filter(Boolean);
+      if (files.some((f) => !f.startsWith("gam-ai-memory/") && !f.startsWith("docs/prompts/"))) {
+        last = { sha, date };
+        break;
+      }
+    }
+    if (!last) return;
+    const tip = gitOk("merge-base", "--is-ancestor", ref, "HEAD") ? "HEAD" : ref;
+    const [syncSha, syncDate] = git("log", "-1", "--date=short", "--format=%H %ad", `${last.sha}^1..${tip}`, "--", logPath).trim().split(" ");
+    const short = last.sha.slice(0, 7);
+    if (!syncSha) report("error", "MEMORY", fileOf("SESSION_LOG.md"), 0, "", `no change since the last merge (${short}, ${last.date}); the memory is behind, run /gam-ai-memory sync (P-DOC-13)`);
+    reportStaleUpdated(syncDate && syncDate < last.date ? syncDate : last.date, `the last merge (${short}, ${last.date}) or its sync`);
+    return;
+  }
+
+  const details = join(root, "ROADMAP-DETAILS.md");
+  if (!existsSync(details)) return;
+  let inLog = false;
+  let newest = "";
+  for (const line of readFileSync(details, "utf8").split(/\r?\n/)) {
+    const heading = line.match(/^##\s+(.*)/);
+    if (heading) inLog = /^log\b/i.test(heading[1]);
+    const row = inLog ? line.match(/^\|\s*(\d{4}-\d{2}-\d{2})\s*\|/) : null;
+    if (row && row[1] > newest) newest = row[1];
+  }
+  if (newest) reportStaleUpdated(newest, `the newest log row of ROADMAP-DETAILS.md (${newest})`);
+}
+
+// ---------- output ----------
+
+const errors = findings.filter((f) => f.severity === "error").length;
+const warnings = findings.length - errors;
+findings.sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line);
+
+if (asJson) {
+  console.log(JSON.stringify({ ok: errors === 0, errors, warnings, ...(worktreeLine ? { worktrees: worktreeLine } : {}), findings }, null, 2));
+} else {
+  for (const f of findings) {
+    const where = f.line ? `${f.file}:${f.line}` : f.file;
+    console.log(`${f.severity.toUpperCase().padEnd(7)} ${f.code.padEnd(8)} ${where}  ${f.id ? `${f.id} — ` : ""}${f.message}`);
+  }
+  if (worktreeLine) console.log(worktreeLine);
+  console.log(`\ndoc-check: ${errors} error(s), ${warnings} warning(s) in ${root}`);
+}
+process.exit(errors ? 1 : 0);
 
 // ---------- acceptance criteria against the test names in code (AC-TEST) ----------
 
@@ -647,162 +931,3 @@ function withoutComments(source) {
   }
   return out;
 }
-checkPublishLists();
-await checkPipeline();
-
-// ---------- pipeline decision (PIPE) ----------
-
-// gam-engineering/pipeline.json is checked by the helper's validate (P-PIPE-1, PP-F-17);
-// doc-check only reads the file and turns each finding into an error. Without the file there is nothing to check.
-async function checkPipeline() {
-  const decision = join(repoTop, "gam-engineering", "pipeline.json");
-  if (!existsSync(decision)) return;
-  const file = relative(process.cwd(), decision).replace(/\\/g, "/");
-  const helper = join(repoTop, "gam-engineering", "tools", "pipeline.mjs");
-  if (!existsSync(helper))
-    return report("error", "PIPE", file, 0, "", "gam-engineering/tools/pipeline.mjs missing; run /gam-engineering migrate tools");
-  const { validate } = await import(pathToFileURL(helper).href);
-  for (const f of validate(readFileSync(decision, "utf8"), (path) => existsSync(join(repoTop, path))))
-    report("error", f.code, file, 0, "", f.message);
-}
-
-// ---------- publish lists (P-DOC-9) ----------
-
-// Project documents never ship with the product. Checks the lists whose effect is clear without running a
-// tool: a .deployignore, and an npm package that is not private.
-function checkPublishLists() {
-  const rootFile = (name) => relative(process.cwd(), join(repoTop, name)).replace(/\\/g, "/");
-  const read = (name) => (existsSync(join(repoTop, name)) ? readFileSync(join(repoTop, name), "utf8") : null);
-  // The project folders are gam-ai-knowledge/ and gam-engineering/, or the former humanengineering/ in a project not
-  // yet renamed (P-DOC-10, P-DOC-11).
-  const processFolder = !existsSync(join(repoTop, "gam-engineering")) && existsSync(join(repoTop, "humanengineering")) ? "humanengineering" : "gam-engineering";
-  const folders = ["gam-ai-knowledge", processFolder].filter((name) => existsSync(join(repoTop, name)));
-  for (const folder of folders.length ? folders : [processFolder]) checkPublishList(folder, rootFile, read);
-}
-
-function checkPublishList(folder, rootFile, read) {
-  const entry = new RegExp(`^/?${folder}/?(\\*\\*?)?$`);
-  const excludes = (text) => text.split(/\r?\n/).some((l) => entry.test(l.trim()));
-
-  const deployIgnore = read(".deployignore");
-  if (deployIgnore !== null && !excludes(deployIgnore))
-    report("warning", "PUBLISH-LEAK", rootFile(".deployignore"), 0, "", `does not exclude ${folder}/, so the project documents are deployed with the product (P-DOC-9)`);
-
-  const pkgText = read("package.json");
-  if (pkgText === null) return;
-  let pkg;
-  try {
-    pkg = JSON.parse(pkgText);
-  } catch {
-    return;
-  }
-  if (pkg.private === true) return;
-  if (Array.isArray(pkg.files)) {
-    if (pkg.files.some((f) => new RegExp(`^(\\./)?${folder}(/|$)`).test(String(f))))
-      report("warning", "PUBLISH-LEAK", rootFile("package.json"), 0, "", `files lists ${folder}/, so the project documents ship with the npm package (P-DOC-9)`);
-    return;
-  }
-  const npmIgnore = read(".npmignore");
-  if (npmIgnore === null || !excludes(npmIgnore))
-    report("warning", "PUBLISH-LEAK", rootFile(npmIgnore === null ? "package.json" : ".npmignore"), 0, "",
-      `the npm package has no files list and no .npmignore entry for ${folder}/, so the project documents would ship with it (P-DOC-9)`);
-}
-
-// ---------- status against git (--status) ----------
-
-// Mechanical part of consistency-check step 5. A story counts as merged when a merge commit on HEAD
-// names its ID (the MR title carries it, P-MR-1, and both hosts put the title into the merge commit),
-// and as released when a v* tag contains that merge. In an MR pipeline, --pending-title and
-// --pending-branch count as merged, because the MR carries the status for the state after the merge
-// (P-ROAD-4). Whether issues are closed needs the host API and stays with the agent's check.
-function checkStatus() {
-  const rootFile = relative(process.cwd(), root).replace(/\\/g, "/") || ".";
-  const git = (...a) => execFileSync("git", a, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], maxBuffer: 1 << 28 });
-  let shallow;
-  try {
-    shallow = git("rev-parse", "--is-shallow-repository").trim() === "true";
-  } catch {
-    return report("error", "STATUS", rootFile, 0, "", "--status needs git and a checkout with history");
-  }
-  if (shallow) return report("error", "STATUS", rootFile, 0, "", "the clone is shallow; fetch the full history (GitLab: GIT_DEPTH: 0, GitHub: fetch-depth: 0)");
-
-  // A repository without a commit has no HEAD, so there is no history to read: no story counts as merged.
-  let hasCommit = true;
-  try {
-    git("rev-parse", "--verify", "--quiet", "HEAD");
-  } catch {
-    hasCommit = false;
-  }
-
-  const merges = (hasCommit ? git("log", "--merges", "--format=%H%n%B%x1e", "HEAD") : "")
-    .split("\x1e")
-    .map((entry) => entry.trim())
-    .filter(Boolean)
-    .map((entry) => {
-      const [sha, ...body] = entry.split(/\r?\n/);
-      return { sha, body: body.join("\n") };
-    });
-  if (pendingTitle) merges.push({ sha: null, body: pendingTitle });
-
-  const mergedBranches = new Set(pendingBranch ? [pendingBranch] : []);
-  for (const m of merges) {
-    const subject = m.body.split("\n")[0];
-    const branch = subject.match(/^Merge branch '([^']+)'/)?.[1] ?? subject.match(/^Merge pull request #\d+ from [^/\s]+\/(\S+)/)?.[1];
-    if (branch && branch !== "dev" && branch !== "main") mergedBranches.add(branch);
-  }
-
-  const tagged = new Map();
-  const inTag = (sha) => {
-    if (!sha) return false;
-    if (!tagged.has(sha)) tagged.set(sha, git("tag", "--list", "v*", "--contains", sha).trim() !== "");
-    return tagged.get(sha);
-  };
-
-  for (const c of concepts) {
-    if (c.legacy || !c.stories.length) continue;
-    const row = roadmapRows.find((r) => r.feature.toLowerCase() === (c.title || "").toLowerCase());
-    if (!row || !STAGES.includes(row.stage)) continue;
-    // A story with a story file counts only once that file says done: a merge of one of its slices names it too (#11).
-    const evidence = c.stories.map((s) => {
-      const status = storyFiles.find((f) => f.stories[0]?.id === s.id)?.status;
-      if (status !== undefined && status !== "done") return [];
-      const named = new RegExp(`(?<![\\w-])${s.id}(?!\\w)`);
-      return merges.filter((m) => named.test(m.body));
-    });
-    const total = c.stories.length;
-    const merged = evidence.filter((e) => e.length).length;
-    const released = evidence.filter((e) => e.some((m) => inTag(m.sha))).length;
-    let allowed;
-    if (released === total) allowed = ["released"];
-    else if (merged === total) allowed = [INTEGRATED[branchModel]];
-    else if (merged > 0) allowed = ["in progress"];
-    else allowed = ["concept", "ready", "in progress"];
-    if (!allowed.includes(row.stage))
-      report("error", "STATUS", row.file, row.line, row.feature,
-        `stage "${row.stage}", but git shows ${merged} of ${total} stories merged and ${released} in a release tag; expected ${allowed.join(" or ")}`);
-  }
-
-  for (const p of positions) {
-    // A concept branch may be merged at a phase gate and continued (Phases 1-6); only delivery positions must move on.
-    const continuedConcept = p.branch?.startsWith("concept/") && p.phase < 7;
-    if (mergedBranches.has(p.branch) && !continuedConcept)
-      report("error", "STATUS", p.file, p.line, p.feature, `position row still names branch ${p.branch}, which is already merged`);
-  }
-}
-
-// ---------- output ----------
-
-const errors = findings.filter((f) => f.severity === "error").length;
-const warnings = findings.length - errors;
-findings.sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line);
-
-if (asJson) {
-  console.log(JSON.stringify({ ok: errors === 0, errors, warnings, findings }, null, 2));
-} else {
-  for (const f of findings) {
-    const where = f.line ? `${f.file}:${f.line}` : f.file;
-    console.log(`${f.severity.toUpperCase().padEnd(7)} ${f.code.padEnd(8)} ${where}  ${f.id ? `${f.id} — ` : ""}${f.message}`);
-  }
-  console.log(`\ndoc-check: ${errors} error(s), ${warnings} warning(s) in ${root}`);
-}
-process.exit(errors ? 1 : 0);

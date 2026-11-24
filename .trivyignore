@@ -7,7 +7,9 @@
 # and the collector (0.165.0) were upgraded and are clean, the entries below are those no published
 # tag of the pinned version fixes (caddy:2.11-alpine of 2026-11-13, postgres:18-alpine of 2026-11-21,
 # mongo:8.0 of 2026-11-20, couchdb:3.5 of 2026-11-24, grafana/tempo:2.10.10 are the newest builds;
-# prometheus v3.16.0 and grafana 13.2.6 ship the same findings, node:24.22-alpine adds new ones).
+# prometheus v3.16.0 ships the same findings). #172 moved grafana to 13.2.6, which no longer carries
+# the npm packages and the go-jose finding, and removed npm from the configuration step image; the
+# go-jose exception of the Tempo image alone is in .trivyignore.d/tempo.
 
 # gosu in postgres:18-alpine and mongo:8.0 is built with Go 1.24.6 (stdlib); gosu only drops root
 # privileges at container start and opens no network or TLS connection. gosu 1.20 is still in no
@@ -36,7 +38,7 @@ CVE-2026-56860 exp:2027-01-11
 CVE-2026-56862 exp:2027-01-11
 
 # Go standard library (crypto/x509, net/http, …) in gosu of postgres:18-alpine and mongo:8.0 and in
-# the bundled data-source plugins of grafana/grafana:13.2.5 (stdlib 1.26.7). gosu opens no network
+# the bundled data-source plugins of grafana/grafana:13.2.6 (stdlib 1.26.7). gosu opens no network
 # connection; the dashboard tool listens only on 127.0.0.1 until TLS exists (R14) and the stack
 # configures only its Prometheus, Loki, and Tempo sources. Upstream must rebuild the images.
 CVE-2026-78667 exp:2027-01-11
@@ -65,39 +67,16 @@ CVE-2026-2332 exp:2027-01-11
 CVE-2026-10050 exp:2027-01-11
 CVE-2026-102554 exp:2027-01-11
 
-# go-jose v4.1.4/4.1.5 (denial of service when parsing JWKs with RSA keys, fixed in 4.1.6) in the
-# tempo binary of grafana/tempo:2.10.10 (newest release) and the grafana binary of grafana:13.2.5.
-# Both listen only on 127.0.0.1 or the internal network and parse no JWKs from outside.
-# Upstream must rebuild the images.
-CVE-2026-116587 exp:2027-01-11
-
-# npm packages bundled in node:24.14-alpine (the configuration step of the observability stack) and
-# in grafana/grafana:13.2.5 (brace-expansion, minimatch, pacote, ip-address and others; the Tempo
-# library in the Tempo data source). The configuration step opens no network connection; the
-# dashboard tool listens only on 127.0.0.1 until TLS exists (R14). node:24.22-alpine would trade
-# them for new undici findings. Upstream must update the bundled packages.
-CVE-2026-102276 exp:2027-01-11
-CVE-2026-102278 exp:2027-01-11
-CVE-2026-13149 exp:2027-01-11
-CVE-2026-14257 exp:2027-01-11
+# Grafana Tempo 1.5.1 in the Tempo data-source plugin bundled with grafana/grafana:13.2.6, fixed in
+# Tempo 2.10.3; 13.2.6 and 13.3.1 (2026-11-10) are the newest tags and still ship it. The plugin only
+# queries the trace store of the stack, and the dashboard tool listens only on 127.0.0.1 until TLS
+# exists (R14). Upstream must rebuild the plugin.
 CVE-2026-21728 exp:2027-01-11
-CVE-2026-27903 exp:2027-01-11
-CVE-2026-27904 exp:2027-01-11
 CVE-2026-28377 exp:2027-01-11
-CVE-2026-29786 exp:2027-01-11
-CVE-2026-31802 exp:2027-01-11
-CVE-2026-33671 exp:2027-01-11
-CVE-2026-48815 exp:2027-01-11
-CVE-2026-59873 exp:2027-01-11
-CVE-2026-59874 exp:2027-01-11
-CVE-2026-69152 exp:2027-01-11
-CVE-2026-69192 exp:2027-01-11
-CVE-2026-73566 exp:2027-01-11
-CVE-2026-9496 exp:2027-01-11
 
 # golang.org/x/net/html (denial of service when parsing crafted HTML, fixed in x/net 0.62.0) in the
 # caddy binary of caddy:2.11-alpine (x/net 0.60, build of 2026-11-13), the MongoDB database tools of
-# mongo:8.0, grafana:13.2.5 and its plugins, prometheus v3.15.1 (v3.16.0 still ships 0.61), and
+# mongo:8.0, grafana:13.2.6 and its plugins, prometheus v3.15.1 (v3.16.0 still ships 0.61), and
 # tempo 2.10.10. None of them parses HTML from outside: the local proxy forwards requests, the
 # stack never runs the database tools, and the observability services listen only on 127.0.0.1 or
 # the internal network. Upstream must rebuild the images.

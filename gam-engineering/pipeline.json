@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "location": "both",
+  "languages": [
+    "Node"
+  ],
+  "hostTier": "Premium",
+  "checks": [
+    {
+      "kind": "limits",
+      "language": "",
+      "tool": "architecture-check",
+      "threshold": "",
+      "native": false,
+      "exclude": [
+        ".claude",
+        "gam-ai-memory/tools",
+        "packages/db/migrations",
+        "packages/db/src/prisma/contract.d.ts",
+        "apps/web/src/app/page.tsx",
+        "packages/telemetry/src/meter.ts",
+        "packages/telemetry/src/start.test.ts",
+        "tests/accessibility/axe-check.ts",
+        "tests/ci-pipeline.test.ts",
+        "tests/observability-alerts.test.ts",
+        "tests/observability-dashboards.test.ts",
+        "tests/observability-stack.test.ts"
+      ]
+    },
+    {
+      "kind": "guard",
+      "language": "",
+      "tool": "floor-guard",
+      "threshold": "",
+      "native": false
+    },
+    {
+      "kind": "eol",
+      "language": "",
+      "tool": "eol-check",
+      "threshold": "",
+      "native": false
+    },
+    {
+      "kind": "architecture",
+      "language": "Node",
+      "tool": "dependency-cruiser",
+      "threshold": "",
+      "native": false
+    }
+  ],
+  "ci": "gam-engineering/ci/gitlab-pipeline.yml",
+  "localScript": "gam-engineering/local-pipeline.mjs",
+  "decidedOn": "2026-11-24"
+}

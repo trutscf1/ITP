@@ -1,19 +1,22 @@
 #!/usr/bin/env node
 // Copies the gam- folders of a project to a backup folder (stealth mode; plan gam-ai-memory/plans/2026-11-05-stealth-modus.md,
-// Q384-Q388). Node, no dependencies, Windows (robocopy).
+// Q384-Q388). Node, no dependencies; robocopy on Windows, Node cpSync on Linux and macOS.
 // Usage: node gam-engineering/tools/stealth-backup.mjs [--source=<project folder>] [--target=<folder>]
 // The source defaults to the working directory. The target defaults to the environment variable GAM_STEALTH_TARGET,
 // which the developer sets in .claude/settings.local.json (never committed, so no path lands in git).
 // Two generations: <target> and <target>-prev. Before each copy, <target>-prev is replaced by the current <target>; then
-// every gam- folder is copied with `robocopy /E` (never /MIR or /PURGE), so a file deleted in the project stays in the copy.
+// every gam- folder is copied with `robocopy /E` on Windows or a recursive `cpSync` elsewhere (never /MIR or /PURGE, never a delete
+// in the target), so a file deleted in the project stays in the copy.
 // A failed refresh of -prev stops the run before the target is touched, so the last good copy is never overwritten.
 // Exit codes: 0 copied, 1 failed (reported loudly; the caller goes on), 2 not configured (no target given, nothing copied).
 import { spawnSync } from "node:child_process";
-import { existsSync, rmSync, statSync } from "node:fs";
+import { cpSync, existsSync, rmSync, statSync } from "node:fs";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { pathToFileURL } from "node:url";
+import { GAM_FOLDERS } from "./footprint.mjs";
 
-export const GAM_FOLDERS = ["gam-ai-knowledge", "gam-engineering", "gam-ai-memory"];
+// The folder list lives in footprint.mjs (plan gam-ai-memory/plans/2026-11-21-minimal-mode.md); re-exported for callers.
+export { GAM_FOLDERS };
 
 // robocopy returns a bit mask: 0-7 are successes (copied, extra, mismatched files), 8 and above a failure.
 const ROBOCOPY_FAILED = 8;
@@ -22,7 +25,7 @@ export function previousGeneration(target) {
   return `${resolve(target)}-prev`;
 }
 
-// The default copier: a plain robocopy /E from one folder into another, no purge.
+// The Windows copier: a plain robocopy /E from one folder into another, no purge.
 export function robocopy(from, to) {
   const run = spawnSync("robocopy", [from, to, "/E", "/R:2", "/W:1", "/NFL", "/NDL", "/NJH", "/NJS", "/NP"], {
     encoding: "utf8",
@@ -31,6 +34,19 @@ export function robocopy(from, to) {
   return { ok: run.status < ROBOCOPY_FAILED, detail: `robocopy exit code ${run.status}` };
 }
 
+// The copier for Linux and macOS: the same contract as robocopy /E, copies and overwrites, never deletes in the target.
+export function nodeCopy(from, to) {
+  try {
+    cpSync(from, to, { recursive: true, force: true });
+    return { ok: true, detail: "cpSync" };
+  } catch (error) {
+    return { ok: false, detail: error.message };
+  }
+}
+
+// robocopy on Windows, cpSync elsewhere.
+export const defaultCopy = process.platform === "win32" ? robocopy : nodeCopy;
+
 function isInside(inner, outer) {
   const path = relative(outer, inner);
   return path === "" || (path.split(sep)[0] !== ".." && !isAbsolute(path));
@@ -38,7 +54,7 @@ function isInside(inner, outer) {
 
 // Copies the gam- folders of `source` to `target` and rotates the previous generation. `copy(from, to)` returns
 // { ok, detail }; a test passes its own copier.
-export function backup({ source, target, copy = robocopy }) {
+export function backup({ source, target, copy = defaultCopy }) {
   const from = resolve(source);
   const to = resolve(target);
   if (!existsSync(from) || !statSync(from).isDirectory()) return { ok: false, message: `source ${from} is not a folder` };

@@ -41,7 +41,7 @@ if (flag('json')) {
 } else {
   console.log(`Skills missing (${missing.length} of ${report.length}); the commands continue without them:`)
   for (const s of missing) console.log(`  [${s.tier}] ${s.name} (${s.used})`)
-  console.log('Deploy them: pwsh -File deploy_skill_wrapper.ps1 in the gam-engineering repo.')
+  console.log('Deploy them: deploy_skill_wrapper.sh (Windows: .cmd) in the gam-engineering repo.')
 }
 
 if (flag('once')) {

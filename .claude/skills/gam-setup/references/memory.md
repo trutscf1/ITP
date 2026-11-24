@@ -5,7 +5,7 @@ Loaded by rule 7 of [Before anything else](../../gam-engineering/SKILL.md#before
 ## When
 
 - **Once per session**, at the first gam- command; later commands of the same session skip it.
-- Only commands run it: the local pipeline and `doc-check` never check the skill.
+- Only commands run it: the local pipeline and `doc-check` never check the skill. `doc-check --status` does check the folder's own files and dates (rule `MEMORY`, P-DOC-13), never the installed skill.
 - **The chat-export hook, at the same moment.** With git and `gam-engineering/tools/prompt-export.mjs` in the project, run `node gam-engineering/tools/prompt-export.mjs install-hook` without asking, as rule 1 of the section *AI chat export* in [templates/CLAUDE.md](../../gam-engineering/templates/CLAUDE.md#ai-chat-export) says (P-TEAM-6): it changes nothing when the hook is active; on `username unknown` ask one `Q<n>`; when it cannot run, name the reason and the command.
 
 ## Where the skill counts as installed
@@ -17,18 +17,21 @@ Read the first file that exists:
 
 **Version mark.** The skill is *current* when its `SKILL.md` names the folder `` `gam-ai-memory/` `` (with the backticks and the slash). A `SKILL.md` without it is a version that still uses the former folder `aigamdocs/` and counts as *outdated*.
 
+**Second version mark (sync, P-DOC-13).** The skill has the command `sync` when its `SKILL.md` names `` `/gam-ai-memory sync` ``. A skill without it still counts as current for `init`, but is outdated for the merge step: [merge](../../gam-delivery/references/merge.md) step 4 then follows `gam-ai-memory/prompts/sync.md` of the project, and only where that file is missing too does it print the last hint line below (so the line appears only when no sync can run).
+
 ## The hint line
 
 Print the first line whose condition holds, as one plain line before the command's own output, then continue with the command. Nothing holds → print nothing.
 
 | Condition | Line |
 | --- | --- |
-| No `SKILL.md` in either place | `gam-ai-memory is not installed: git clone git@gitlab.com:htl-villach/it/teachers/gam/alltime/aiskills/gam-ai-memory.git, then run deploy_skill_wrapper.ps1 in the clone. This command continues without it.` |
-| `SKILL.md` without the version mark | `gam-ai-memory is outdated (it still uses aigamdocs/): git pull in its clone, then run deploy_skill_wrapper.ps1. This command continues.` |
+| No `SKILL.md` in either place | `gam-ai-memory is not installed: git clone git@gitlab.com:htl-villach/it/teachers/gam/alltime/aiskills/gam-ai-memory.git, then run deploy_skill_wrapper.sh (Windows: .cmd) in the clone. This command continues without it.` |
+| `SKILL.md` without the version mark | `gam-ai-memory is outdated (it still uses aigamdocs/): git pull in its clone, then run deploy_skill_wrapper.sh (Windows: .cmd). This command continues.` |
 | The project has `aigamdocs/` and no `gam-ai-memory/` | `aigamdocs/ is the former memory folder: /gam-engineering migrate moves it to gam-ai-memory/.` |
 | The project has no `gam-ai-memory/` | `This project has no short-term memory yet: run /gam-ai-memory init.` |
+| The project has a memory in `gam-ai-memory/`, `SKILL.md` lacks the second version mark, and the project has no `gam-ai-memory/prompts/sync.md` | `gam-ai-memory has no sync command yet: git pull in its clone, then run deploy_skill_wrapper.sh (Windows: .cmd). Merges continue; doc-check --status reports MEMORY until then.` |
 
-The two folder rows apply only to a skill that is installed and current, and are skipped during `setup`, `migrate`, and `migrate tools`, which create, complete, or move the folder themselves (next section).
+The two folder rows (the one for `aigamdocs/` and the one for no `gam-ai-memory/`) apply only to a skill that is installed and current (first version mark), and are skipped during `setup`, `migrate`, and `migrate tools`, which create, complete, or move the folder themselves (next section).
 
 ## In setup and migrate
 

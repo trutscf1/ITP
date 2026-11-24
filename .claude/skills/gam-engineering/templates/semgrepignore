@@ -1,0 +1,28 @@
+# Configuration of the gam-engineering static analysis (sast, semgrep; PP-F-56), copied to .semgrepignore in the project root.
+# A .semgrepignore replaces semgrep's built-in default list, so this file repeats that default list (A222) and states
+# node_modules/ and vendor/ explicitly; the results of a project do not change through the file. Add the project's own
+# paths at the end.
+:include .gitignore
+
+# Common large paths
+node_modules/
+vendor/
+build/
+dist/
+.env/
+.venv/
+.tox/
+*.min.js
+.npm/
+.yarn/
+_cargo/
+
+# Common test paths
+test/
+tests/
+*_test.go
+
+# Semgrep folders
+.semgrep/
+.semgrep_logs/
+.git/

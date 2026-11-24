@@ -1,0 +1,5 @@
+# Lines gam-engineering adds to .gitignore (setup, migrate tools); a line the file already covers is not added twice.
+# The VS Code workspace file worktree-setup.mjs writes into each linked worktree (P-WS-13).
+*.code-workspace
+# Personal settings that override the personal keys of .claude/settings.json (P-TEAM-2); never committed.
+.claude/settings.local.json

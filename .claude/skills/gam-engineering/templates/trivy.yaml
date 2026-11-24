@@ -1,0 +1,7 @@
+# Configuration of the gam-engineering Trivy checks (audit, config; PP-F-56), copied to trivy.yaml in the project root.
+# Trivy reads it there by default when the catalog's call runs in the project root. Installed dependency folders are not
+# scanned at any depth; lock files elsewhere stay in the scan. Add the project's own folders below.
+scan:
+  skip-dirs:
+    - "**/node_modules"
+    - "**/vendor"

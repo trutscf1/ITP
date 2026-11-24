@@ -11,7 +11,7 @@ Before the first step, apply the shared rules of the core once per session — s
 
 | Invocation | Procedure |
 | --- | --- |
-| `architecture review [<area>]` | Score the project by [references/score.md](references/score.md); the areas with their own rubric are [api.md](references/api.md), [database.md](references/database.md), and [stack-lenses.md](references/stack-lenses.md) |
+| `architecture review [<area>]` | Score the project by [references/score.md](references/score.md); the areas with their own rubric are [api.md](references/api.md), [database.md](references/database.md), [parallel-work.md](references/parallel-work.md), and [stack-lenses.md](references/stack-lenses.md) |
 | `architecture adr [<decision>]` | [references/adr.md](references/adr.md): write ADRs for decisions the code embodies and no ADR records |
 
 ## The report

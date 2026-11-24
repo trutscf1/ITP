@@ -7,8 +7,8 @@
       "upstream": {
         "repo": "https://github.com/mattpocock/skills",
         "path": "skills/productivity/grilling",
-        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-        "copied": "2026-11-03",
+        "commit": "5863806dd4e15c63174bee4e7515a4256792ecfa",
+        "copied": "2026-11-17",
         "identical": true
       }
     },
@@ -19,8 +19,8 @@
       "upstream": {
         "repo": "https://github.com/mattpocock/skills",
         "path": "skills/engineering/domain-modeling",
-        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-        "copied": "2026-11-03",
+        "commit": "5863806dd4e15c63174bee4e7515a4256792ecfa",
+        "copied": "2026-11-17",
         "identical": true
       }
     },
@@ -31,8 +31,8 @@
       "upstream": {
         "repo": "https://github.com/sickn33/antigravity-awesome-skills",
         "path": "skills/privacy-by-design",
-        "commit": "8ceacbb9d499e71cc1a8d364ab22685ef2463d5a",
-        "copied": "2026-11-03",
+        "commit": "6770698520a6cc08459c9f89791169dc0cdb3bce",
+        "copied": "2026-11-17",
         "identical": true
       }
     },
@@ -43,8 +43,8 @@
       "upstream": {
         "repo": "https://github.com/addyosmani/agent-skills",
         "path": "skills/doubt-driven-development",
-        "commit": "301b02b12bff98e4688e6984af6556802322bbde",
-        "copied": "2026-11-03",
+        "commit": "39b723ceebf81474d0557c1fecd01eddab585563",
+        "copied": "2026-11-17",
         "identical": true
       }
     },
@@ -55,8 +55,8 @@
       "upstream": {
         "repo": "https://github.com/mattpocock/skills",
         "path": "skills/engineering/tdd",
-        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-        "copied": "2026-11-03",
+        "commit": "5863806dd4e15c63174bee4e7515a4256792ecfa",
+        "copied": "2026-11-17",
         "identical": false
       }
     },
@@ -67,8 +67,8 @@
       "upstream": {
         "repo": "https://github.com/mattpocock/skills",
         "path": "skills/engineering/code-review",
-        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-        "copied": "2026-11-03",
+        "commit": "5863806dd4e15c63174bee4e7515a4256792ecfa",
+        "copied": "2026-11-17",
         "identical": true
       }
     },
@@ -79,8 +79,8 @@
       "upstream": {
         "repo": "https://github.com/obra/superpowers",
         "path": "skills/verification-before-completion",
-        "commit": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
-        "copied": "2026-11-03",
+        "commit": "22f0b463e7a5e579904dd6211a520321035526f7",
+        "copied": "2026-11-17",
         "identical": true
       }
     },
@@ -91,8 +91,8 @@
       "upstream": {
         "repo": "https://github.com/obra/superpowers",
         "path": "skills/receiving-code-review",
-        "commit": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
-        "copied": "2026-11-03",
+        "commit": "22f0b463e7a5e579904dd6211a520321035526f7",
+        "copied": "2026-11-17",
         "identical": true
       }
     },
@@ -103,8 +103,8 @@
       "upstream": {
         "repo": "https://github.com/sickn33/antigravity-awesome-skills",
         "path": "skills/pre-release-review",
-        "commit": "8ceacbb9d499e71cc1a8d364ab22685ef2463d5a",
-        "copied": "2026-11-03",
+        "commit": "6770698520a6cc08459c9f89791169dc0cdb3bce",
+        "copied": "2026-11-17",
         "identical": true
       }
     },
@@ -115,8 +115,8 @@
       "upstream": {
         "repo": "https://github.com/mattpocock/skills",
         "path": "skills/engineering/pr",
-        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-        "copied": "2026-11-03",
+        "commit": "5863806dd4e15c63174bee4e7515a4256792ecfa",
+        "copied": "2026-11-17",
         "identical": true
       }
     },
@@ -127,8 +127,8 @@
       "upstream": {
         "repo": "https://github.com/mattpocock/skills",
         "path": "skills/engineering/prototype",
-        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-        "copied": "2026-11-03",
+        "commit": "5863806dd4e15c63174bee4e7515a4256792ecfa",
+        "copied": "2026-11-17",
         "identical": true
       }
     },
@@ -139,8 +139,8 @@
       "upstream": {
         "repo": "https://github.com/mattpocock/skills",
         "path": "skills/engineering/research",
-        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-        "copied": "2026-11-03",
+        "commit": "5863806dd4e15c63174bee4e7515a4256792ecfa",
+        "copied": "2026-11-17",
         "identical": true
       }
     },
@@ -151,8 +151,8 @@
       "upstream": {
         "repo": "https://github.com/mattpocock/skills",
         "path": "skills/engineering/wizard",
-        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-        "copied": "2026-11-03",
+        "commit": "5863806dd4e15c63174bee4e7515a4256792ecfa",
+        "copied": "2026-11-17",
         "identical": true
       }
     },
@@ -163,8 +163,8 @@
       "upstream": {
         "repo": "https://github.com/mattpocock/skills",
         "path": "skills/engineering/diagnosing-bugs",
-        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-        "copied": "2026-11-03",
+        "commit": "5863806dd4e15c63174bee4e7515a4256792ecfa",
+        "copied": "2026-11-17",
         "identical": true
       }
     },
@@ -175,8 +175,8 @@
       "upstream": {
         "repo": "https://github.com/mattpocock/skills",
         "path": "skills/engineering/codebase-design",
-        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-        "copied": "2026-11-03",
+        "commit": "5863806dd4e15c63174bee4e7515a4256792ecfa",
+        "copied": "2026-11-17",
         "identical": true
       }
     },
@@ -187,8 +187,8 @@
       "upstream": {
         "repo": "https://github.com/sickn33/antigravity-awesome-skills",
         "path": "skills/skill-check",
-        "commit": "8ceacbb9d499e71cc1a8d364ab22685ef2463d5a",
-        "copied": "2026-11-03",
+        "commit": "6770698520a6cc08459c9f89791169dc0cdb3bce",
+        "copied": "2026-11-17",
         "identical": true
       }
     },
@@ -199,9 +199,212 @@
       "upstream": {
         "repo": "https://github.com/mattpocock/skills",
         "path": "skills/productivity/writing-for-agents",
-        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
-        "copied": "2026-11-03",
+        "commit": "5863806dd4e15c63174bee4e7515a4256792ecfa",
+        "copied": "2026-11-17",
         "identical": true
+      }
+    },
+    {
+      "name": "gam-v-impeccable",
+      "tier": "optional",
+      "used": "STACK.md §10 preset (implement, review)",
+      "upstream": {
+        "repo": "https://github.com/pbakaus/impeccable",
+        "path": "plugin/skills/impeccable",
+        "renameRefs": false,
+        "commit": "d41d9860b0094dcb68030657da63461212835aaa",
+        "copied": "2026-11-17",
+        "identical": true
+      }
+    },
+    {
+      "name": "gam-v-emil-design-eng",
+      "tier": "optional",
+      "used": "STACK.md §10 preset (implement)",
+      "upstream": {
+        "repo": "https://github.com/emilkowalski/skills",
+        "path": "skills/emil-design-eng",
+        "commit": "64eb3deb9a5fbfa041faf783e0bc3fd635872e9c",
+        "copied": "2026-11-17",
+        "identical": false
+      }
+    },
+    {
+      "name": "gam-v-break-ui",
+      "tier": "optional",
+      "used": "STACK.md §10 preset (review)",
+      "upstream": {
+        "repo": "https://github.com/emilkowalski/skills",
+        "path": "skills/break-ui",
+        "commit": "64eb3deb9a5fbfa041faf783e0bc3fd635872e9c",
+        "copied": "2026-11-17",
+        "identical": false
+      }
+    },
+    {
+      "name": "gam-v-animate",
+      "tier": "optional",
+      "used": "side skill (web motion)",
+      "upstream": {
+        "repo": "https://github.com/emilkowalski/skills",
+        "path": "skills/animate",
+        "commit": "64eb3deb9a5fbfa041faf783e0bc3fd635872e9c",
+        "copied": "2026-11-17",
+        "identical": false
+      }
+    },
+    {
+      "name": "gam-v-choreograph",
+      "tier": "optional",
+      "used": "side skill (web motion)",
+      "upstream": {
+        "repo": "https://github.com/emilkowalski/skills",
+        "path": "skills/choreograph",
+        "commit": "64eb3deb9a5fbfa041faf783e0bc3fd635872e9c",
+        "copied": "2026-11-17",
+        "identical": false
+      }
+    },
+    {
+      "name": "gam-v-animation-performance",
+      "tier": "optional",
+      "used": "side skill (web motion)",
+      "upstream": {
+        "repo": "https://github.com/emilkowalski/skills",
+        "path": "skills/animation-performance",
+        "commit": "64eb3deb9a5fbfa041faf783e0bc3fd635872e9c",
+        "copied": "2026-11-17",
+        "identical": false
+      }
+    },
+    {
+      "name": "gam-v-review-animations",
+      "tier": "optional",
+      "used": "side skill (web motion)",
+      "upstream": {
+        "repo": "https://github.com/emilkowalski/skills",
+        "path": "skills/review-animations",
+        "commit": "64eb3deb9a5fbfa041faf783e0bc3fd635872e9c",
+        "copied": "2026-11-17",
+        "identical": false,
+        "dropFrontmatter": [
+          "disable-model-invocation"
+        ]
+      }
+    },
+    {
+      "name": "gam-v-remove-animations",
+      "tier": "optional",
+      "used": "side skill (web motion)",
+      "upstream": {
+        "repo": "https://github.com/emilkowalski/skills",
+        "path": "skills/remove-animations",
+        "commit": "64eb3deb9a5fbfa041faf783e0bc3fd635872e9c",
+        "copied": "2026-11-17",
+        "identical": false
+      }
+    },
+    {
+      "name": "gam-v-find-animation-opportunities",
+      "tier": "optional",
+      "used": "side skill (web motion)",
+      "upstream": {
+        "repo": "https://github.com/emilkowalski/skills",
+        "path": "skills/find-animation-opportunities",
+        "commit": "64eb3deb9a5fbfa041faf783e0bc3fd635872e9c",
+        "copied": "2026-11-17",
+        "identical": false
+      }
+    },
+    {
+      "name": "gam-v-improve-animations",
+      "tier": "optional",
+      "used": "side skill (web motion)",
+      "upstream": {
+        "repo": "https://github.com/emilkowalski/skills",
+        "path": "skills/improve-animations",
+        "commit": "64eb3deb9a5fbfa041faf783e0bc3fd635872e9c",
+        "copied": "2026-11-17",
+        "identical": false
+      }
+    },
+    {
+      "name": "gam-v-gestures",
+      "tier": "optional",
+      "used": "side skill (web motion)",
+      "upstream": {
+        "repo": "https://github.com/emilkowalski/skills",
+        "path": "skills/gestures",
+        "commit": "64eb3deb9a5fbfa041faf783e0bc3fd635872e9c",
+        "copied": "2026-11-17",
+        "identical": false
+      }
+    },
+    {
+      "name": "gam-v-animation-vocabulary",
+      "tier": "optional",
+      "used": "side skill (web motion)",
+      "upstream": {
+        "repo": "https://github.com/emilkowalski/skills",
+        "path": "skills/animation-vocabulary",
+        "commit": "64eb3deb9a5fbfa041faf783e0bc3fd635872e9c",
+        "copied": "2026-11-17",
+        "identical": true
+      }
+    },
+    {
+      "name": "gam-v-apple-design",
+      "tier": "optional",
+      "used": "side skill (web motion)",
+      "upstream": {
+        "repo": "https://github.com/emilkowalski/skills",
+        "path": "skills/apple-design",
+        "commit": "64eb3deb9a5fbfa041faf783e0bc3fd635872e9c",
+        "copied": "2026-11-17",
+        "identical": false
+      }
+    },
+    {
+      "name": "gam-v-mobile-native",
+      "tier": "optional",
+      "used": "side skill (web UI quality)",
+      "upstream": {
+        "repo": "https://github.com/emilkowalski/skills",
+        "path": "skills/mobile-native",
+        "commit": "64eb3deb9a5fbfa041faf783e0bc3fd635872e9c",
+        "copied": "2026-11-17",
+        "identical": false
+      }
+    },
+    {
+      "name": "gam-v-pick-ui-library",
+      "tier": "optional",
+      "used": "side skill (web UI quality, typed by the developer)",
+      "upstream": {
+        "repo": "https://github.com/emilkowalski/skills",
+        "path": "skills/pick-ui-library",
+        "commit": "64eb3deb9a5fbfa041faf783e0bc3fd635872e9c",
+        "copied": "2026-11-17",
+        "identical": false,
+        "dropFrontmatter": [
+          "disable-model-invocation"
+        ]
+      }
+    },
+    {
+      "name": "gam-v-ui-prototype",
+      "tier": "optional",
+      "used": "side skill (UI variants, typed by the developer)",
+      "upstream": {
+        "repo": "https://github.com/emilkowalski/skills",
+        "path": "skills/prototype",
+        "name": "prototype",
+        "commit": "64eb3deb9a5fbfa041faf783e0bc3fd635872e9c",
+        "copied": "2026-11-17",
+        "identical": false,
+        "dropFrontmatter": [
+          "disable-model-invocation"
+        ]
       }
     }
   ]
