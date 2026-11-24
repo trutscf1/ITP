@@ -1,135 +1,110 @@
 # Known high and critical vulnerabilities in the third-party images of docker-compose.yml that
-# this repository cannot fix itself (SCF-AC-5.3). Every entry needs a reason and expires at the
-# end of Sprint 2; after that the container scan fails again until the image is replaced or the
-# entry is renewed with a new reason. SCF-US-2 slice 2 (#103, SCF-AC-2.5) moved every image to the
-# newest tag of its pinned version on 2026-10-27; the entries below are those no image fixes yet.
-# Found with Trivy 0.69.3 on 2026-10-13 and 2026-10-27, unfixed vulnerabilities are not reported
-# (--ignore-unfixed).
+# this repository cannot fix itself (SCF-AC-5.3, SCF-NF-6). Every entry needs a reason and expires
+# at the end of a sprint; after that the container scan fails again until the image is replaced or
+# the entry is renewed with a new reason.
+# Renewed on 2026-11-24 (#171) until the end of Sprint 3 (2027-01-11): every image was checked with
+# Trivy 0.69.3 (linux/amd64, --ignore-unfixed) against its newest tag; seaweedfs (4.55), Loki (3.7.10),
+# and the collector (0.165.0) were upgraded and are clean, the entries below are those no published
+# tag of the pinned version fixes (caddy:2.11-alpine of 2026-11-13, postgres:18-alpine of 2026-11-21,
+# mongo:8.0 of 2026-11-20, couchdb:3.5 of 2026-11-24, grafana/tempo:2.10.10 are the newest builds;
+# prometheus v3.16.0 and grafana 13.2.6 ship the same findings, node:24.22-alpine adds new ones).
 
-# gosu in postgres:18-alpine and mongo:8.0 is built with an old Go standard library (and
-# golang.org/x/net); gosu only drops root privileges at container start and opens no network
-# connection. Upstream must rebuild it.
-CVE-2025-61726 exp:2026-11-23
-CVE-2025-61729 exp:2026-11-23
-CVE-2025-68121 exp:2026-11-23
-CVE-2026-25679 exp:2026-11-23
-CVE-2026-27145 exp:2026-11-23
-CVE-2026-32280 exp:2026-11-23
-CVE-2026-32281 exp:2026-11-23
-CVE-2026-32283 exp:2026-11-23
-CVE-2026-33811 exp:2026-11-23
-CVE-2026-33814 exp:2026-11-23
-CVE-2026-33818 exp:2026-11-23
-CVE-2026-39820 exp:2026-11-23
-CVE-2026-39821 exp:2026-11-23
-CVE-2026-39822 exp:2026-11-23
-CVE-2026-39836 exp:2026-11-23
-CVE-2026-42499 exp:2026-11-23
-CVE-2026-42504 exp:2026-11-23
-CVE-2026-56853 exp:2026-11-23
-CVE-2026-56858 exp:2026-11-23
-CVE-2026-56859 exp:2026-11-23
-CVE-2026-56860 exp:2026-11-23
-CVE-2026-56862 exp:2026-11-23
-CVE-2026-78667 exp:2026-11-23
-CVE-2026-78669 exp:2026-11-23
-CVE-2026-97031 exp:2026-11-23
-# Added 2026-10-27 (Trivy DB of that day): gosu 1.19 is built with Go 1.24.6 (crypto/x509, fixed in
-# Go 1.26.10 / 1.27.3). gosu 1.20 (2026-10-25) is not yet in any official postgres:18 (trixie, bookworm,
-# alpine) or mongo:8.0 image, so no newer clean tag exists; gosu opens no TLS connection and verifies no certificate.
-CVE-2026-111943 exp:2026-11-23
+# gosu in postgres:18-alpine and mongo:8.0 is built with Go 1.24.6 (stdlib); gosu only drops root
+# privileges at container start and opens no network or TLS connection. gosu 1.20 is still in no
+# official postgres:18 or mongo:8.0 image of 2026-11-21. Upstream must rebuild the images.
+CVE-2025-61726 exp:2027-01-11
+CVE-2025-61729 exp:2027-01-11
+CVE-2025-68121 exp:2027-01-11
+CVE-2026-25679 exp:2027-01-11
+CVE-2026-27145 exp:2027-01-11
+CVE-2026-32280 exp:2027-01-11
+CVE-2026-32281 exp:2027-01-11
+CVE-2026-32283 exp:2027-01-11
+CVE-2026-33811 exp:2027-01-11
+CVE-2026-33814 exp:2027-01-11
+CVE-2026-33818 exp:2027-01-11
+CVE-2026-39820 exp:2027-01-11
+CVE-2026-39821 exp:2027-01-11
+CVE-2026-39822 exp:2027-01-11
+CVE-2026-39836 exp:2027-01-11
+CVE-2026-42499 exp:2027-01-11
+CVE-2026-42504 exp:2027-01-11
+CVE-2026-56853 exp:2027-01-11
+CVE-2026-56858 exp:2027-01-11
+CVE-2026-56859 exp:2027-01-11
+CVE-2026-56860 exp:2027-01-11
+CVE-2026-56862 exp:2027-01-11
+
+# Go standard library (crypto/x509, net/http, …) in gosu of postgres:18-alpine and mongo:8.0 and in
+# the bundled data-source plugins of grafana/grafana:13.2.5 (stdlib 1.26.7). gosu opens no network
+# connection; the dashboard tool listens only on 127.0.0.1 until TLS exists (R14) and the stack
+# configures only its Prometheus, Loki, and Tempo sources. Upstream must rebuild the images.
+CVE-2026-78667 exp:2027-01-11
+CVE-2026-78669 exp:2027-01-11
+CVE-2026-97031 exp:2027-01-11
+CVE-2026-111943 exp:2027-01-11
 
 # js-yaml in the Node.js tools bundled with mongo:8.0 (mongosh); the stack does not run mongosh.
 # Upstream must update it.
-CVE-2026-59869 exp:2026-11-23
-CVE-2026-84375 exp:2026-11-23
-GHSA-5p4m-2wfm-xmqj exp:2026-11-23
+CVE-2026-59869 exp:2027-01-11
+CVE-2026-84375 exp:2027-01-11
+GHSA-5p4m-2wfm-xmqj exp:2027-01-11
 
-# Go standard library (crypto/x509, certificate chains with untrusted intermediates) in gosu of
-# postgres:18-alpine and mongo:8.0 and in the caddy binary of caddy:2.11-alpine, the newest tags
-# on 2026-10-27; the fix needs a rebuild with Go 1.26.10. gosu opens no network connection, and
-# the local proxy serves plain HTTP and verifies no client or upstream certificate (TLS comes
-# with R14). Upstream must rebuild the images.
-CVE-2026-111943 exp:2026-11-23
+# Jackson, Jetty, and Guava in the Nouveau search server bundled with couchdb:3.5 (opt/couchdb/nouveau);
+# 3.5.3 (rebuilt 2026-11-24) still ships them. CouchDB does not start Nouveau (off by default, the
+# stack neither enables nor runs it), so the Java code is never executed. Upstream must update them.
+CVE-2026-68494 exp:2027-01-11
+CVE-2026-89407 exp:2027-01-11
+CVE-2026-89425 exp:2027-01-11
+CVE-2026-54512 exp:2027-01-11
+CVE-2026-54513 exp:2027-01-11
+CVE-2026-68497 exp:2027-01-11
+CVE-2026-91776 exp:2027-01-11
+CVE-2026-91777 exp:2027-01-11
+CVE-2026-2332 exp:2027-01-11
+CVE-2026-10050 exp:2027-01-11
+CVE-2026-102554 exp:2027-01-11
 
-# brotli decoder (brotli-libs, libbrotli1) and curl/libcurl (HTTP/2 upload) in postgres:18-alpine,
-# couchdb:3.5, and caddy:2.11-alpine: the fixed Alpine and Debian packages came out after the
-# newest tags were built (2026-10-21 to 2026-10-26). The libraries are only pulled in by curl;
-# the stack runs locally, its health checks use curl only against 127.0.0.1, and no service
-# uploads over HTTP/2 or decodes brotli data from outside. Upstream must rebuild the images.
-CVE-2026-111497 exp:2026-11-23
-CVE-2026-92392 exp:2026-11-23
+# go-jose v4.1.4/4.1.5 (denial of service when parsing JWKs with RSA keys, fixed in 4.1.6) in the
+# tempo binary of grafana/tempo:2.10.10 (newest release) and the grafana binary of grafana:13.2.5.
+# Both listen only on 127.0.0.1 or the internal network and parse no JWKs from outside.
+# Upstream must rebuild the images.
+CVE-2026-116587 exp:2027-01-11
 
-# Jackson and Jetty in the Nouveau search server bundled with couchdb:3.5 (opt/couchdb/nouveau);
-# 3.5.3 of 2026-10-21 is the newest release and still ships them. CouchDB does not start Nouveau
-# (it is off by default, and the stack neither enables nor runs it), so the Java code is never
-# executed. Upstream must update the bundled libraries.
-CVE-2026-68494 exp:2026-11-23
-CVE-2026-89407 exp:2026-11-23
-CVE-2026-89425 exp:2026-11-23
-CVE-2026-54512 exp:2026-11-23
-CVE-2026-54513 exp:2026-11-23
-CVE-2026-68497 exp:2026-11-23
-CVE-2026-91776 exp:2026-11-23
-CVE-2026-91777 exp:2026-11-23
-CVE-2026-2332 exp:2026-11-23
-CVE-2026-10050 exp:2026-11-23
-# Added 2026-10-28: Guava (denial of service) in the same Nouveau server; fixed in Guava 33.7.2.
-CVE-2026-102554 exp:2026-11-23
+# npm packages bundled in node:24.14-alpine (the configuration step of the observability stack) and
+# in grafana/grafana:13.2.5 (brace-expansion, minimatch, pacote, ip-address and others; the Tempo
+# library in the Tempo data source). The configuration step opens no network connection; the
+# dashboard tool listens only on 127.0.0.1 until TLS exists (R14). node:24.22-alpine would trade
+# them for new undici findings. Upstream must update the bundled packages.
+CVE-2026-102276 exp:2027-01-11
+CVE-2026-102278 exp:2027-01-11
+CVE-2026-13149 exp:2027-01-11
+CVE-2026-14257 exp:2027-01-11
+CVE-2026-21728 exp:2027-01-11
+CVE-2026-27903 exp:2027-01-11
+CVE-2026-27904 exp:2027-01-11
+CVE-2026-28377 exp:2027-01-11
+CVE-2026-29786 exp:2027-01-11
+CVE-2026-31802 exp:2027-01-11
+CVE-2026-33671 exp:2027-01-11
+CVE-2026-48815 exp:2027-01-11
+CVE-2026-59873 exp:2027-01-11
+CVE-2026-59874 exp:2027-01-11
+CVE-2026-69152 exp:2027-01-11
+CVE-2026-69192 exp:2027-01-11
+CVE-2026-73566 exp:2027-01-11
+CVE-2026-9496 exp:2027-01-11
 
-# go-jose v4.1.5 (denial of service when parsing JWKs with RSA keys) in the weed binary of
-# chrislusf/seaweedfs:4.51 and the caddy binary of caddy:2.11-alpine, found on 2026-10-28; fixed
-# in go-jose 4.1.6. Both services listen only on 127.0.0.1 in the local stack and parse no JWKs
-# from outside. Upstream must rebuild the images.
-CVE-2026-116587 exp:2026-11-23
+# golang.org/x/net/html (denial of service when parsing crafted HTML, fixed in x/net 0.62.0) in the
+# caddy binary of caddy:2.11-alpine (x/net 0.60, build of 2026-11-13), the MongoDB database tools of
+# mongo:8.0, grafana:13.2.5 and its plugins, prometheus v3.15.1 (v3.16.0 still ships 0.61), and
+# tempo 2.10.10. None of them parses HTML from outside: the local proxy forwards requests, the
+# stack never runs the database tools, and the observability services listen only on 127.0.0.1 or
+# the internal network. Upstream must rebuild the images.
+CVE-2026-78661 exp:2027-01-11
 
-# Added 2026-11-03 (observability profile, #82): OpenSSL (libcrypto3, libssl3) 3.5.6 in node:24.14-alpine
-# (Alpine 3.23.4), which only runs the configuration step of the observability stack. The fix is
-# OpenSSL 3.5.8-r0; no node image has it yet (checked: 24.14-alpine, 24.14-alpine3.23, 24.22-alpine on
-# 2026-11-03, the newer one has other findings in npm). The step opens no network connection and no
-# TLS connection. Upstream must rebuild the image.
-CVE-2026-14456 exp:2026-11-23
-CVE-2026-45447 exp:2026-11-23
-
-# Added 2026-11-03 (observability profile, #82): npm packages bundled in grafana/grafana:13.2.5
-# (brace-expansion, minimatch, pacote, ip-address and others), the newest 13.2 tag. The dashboard tool
-# listens only on 127.0.0.1 until TLS exists (R14). Upstream must update the bundled packages.
-CVE-2026-102276 exp:2026-11-23
-CVE-2026-102278 exp:2026-11-23
-CVE-2026-13149 exp:2026-11-23
-CVE-2026-14257 exp:2026-11-23
-CVE-2026-21728 exp:2026-11-23
-CVE-2026-27903 exp:2026-11-23
-CVE-2026-27904 exp:2026-11-23
-CVE-2026-28377 exp:2026-11-23
-CVE-2026-29786 exp:2026-11-23
-CVE-2026-31802 exp:2026-11-23
-CVE-2026-33671 exp:2026-11-23
-CVE-2026-48815 exp:2026-11-23
-CVE-2026-59873 exp:2026-11-23
-CVE-2026-59874 exp:2026-11-23
-CVE-2026-69152 exp:2026-11-23
-CVE-2026-69192 exp:2026-11-23
-CVE-2026-73566 exp:2026-11-23
-CVE-2026-9496 exp:2026-11-23
-
-# golang.org/x/net/html (denial of service when parsing crafted HTML, fixed in x/net 0.62.0) in
-# the caddy binary of caddy:2.11-alpine, the weed binary of chrislusf/seaweedfs:4.51, and the
-# MongoDB database tools of mongo:8.0 (bsondump, mongodump, …), found on 2026-11-10 (#160). No
-# published build fixes it yet: caddy:2.11-alpine of 2026-11-06 ships x/net 0.60, and moving
-# seaweedfs to 4.53 (2026-11-08) would not help, it still ships 0.61 (checked with Trivy 0.69.3).
-# The local proxy forwards requests without parsing HTML, weed listens on 127.0.0.1 only, and the stack never runs the database tools. Upstream must
-# rebuild the images.
-CVE-2026-78661 exp:2026-11-23
-
-# zlib (heap buffer overflow in gz_vacate() when writing gzip files) in couchdb:3.5 (zlib1g), found
-# on 2026-11-10 (#160); the fixed Debian package came out after couchdb:3.5 of 2026-11-05 was built.
-# CouchDB writes no gzip files from outside input in the local stack. Upstream must rebuild the image.
-CVE-2026-85091 exp:2026-11-23
-CVE-2026-76844 exp:2026-11-23
-
-# apt (code execution via hard link reuse during a package download) in mongo:8.0 (ubuntu 24.04),
-# found on 2026-11-10 (#160); the fixed package came out after mongo:8.0 of 2026-10-27 was built.
-# apt only runs when the image is built; the running container never downloads packages.
-# Upstream must rebuild the image.
-CVE-2026-109518 exp:2026-11-23
+# Added 2026-11-24 (#171): libxml2 2.13.9-r2 (information disclosure, SSRF, or denial of service)
+# in postgres:18-alpine of 2026-11-21; the fixed Alpine package 2.13.9-r3 came out after the image
+# was built. libxml2 is only reached through the XML functions of PostgreSQL, which no unit of the
+# stack calls, and the database listens only on 127.0.0.1. Upstream must rebuild the image.
+CVE-2026-86144 exp:2027-01-11

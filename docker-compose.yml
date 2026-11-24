@@ -91,7 +91,7 @@ services:
 
   # Object storage with an S3 interface. The master answers on 9333 once the server is up.
   seaweedfs:
-    image: chrislusf/seaweedfs:4.51
+    image: chrislusf/seaweedfs:4.55
     restart: unless-stopped
     command: ["server", "-dir=/data", "-filer", "-s3"]
     networks:

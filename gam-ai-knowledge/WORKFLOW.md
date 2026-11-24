@@ -58,7 +58,7 @@ Refs: #<issue>
 
 ## CI/CD
 
-GitLab CI (`.gitlab-ci.yml`) runs one pipeline per change: a merge request pipeline while an MR is open, otherwise a branch pipeline on every push to a feature branch, `dev`, or `main`; the jobs are defined by `gam-ai-knowledge/concepts/scaffolding.md` SCF-F-15, plus the documentation checks in `gam-engineering/ci/gitlab-docs.yml` (markdown lint and `gam-ai-knowledge/tools/doc-check.mjs`, including the rule `AC-TEST` for tests carrying the `AC` IDs). "Pipeline must succeed" is enabled as a merge check. Deployment on push to `main` follows with roadmap item R14.
+GitLab CI (`.gitlab-ci.yml`) runs a pipeline only for the release merge request `dev` → `main` and for a release tag; merge requests into `dev` and pushes to any branch start no pipeline (decided 2026-11-24 to save CI minutes; the checks before a merge into `dev` run locally through the pre-commit hooks and `pnpm run lint`, `pnpm test`); the jobs are defined by `gam-ai-knowledge/concepts/scaffolding.md` SCF-F-15, plus the documentation checks in `gam-engineering/ci/gitlab-docs.yml` (markdown lint and `gam-ai-knowledge/tools/doc-check.mjs`, including the rule `AC-TEST` for tests carrying the `AC` IDs). "Pipeline must succeed" is disabled (2026-11-24), because a merge request into `dev` has no pipeline and would stay blocked; the release MR `dev` → `main` is merged only when its pipeline is green. Deployment on push to `main` follows with roadmap item R14.
 
 ## Deviations from the profile
 
