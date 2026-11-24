@@ -111,12 +111,8 @@ function pipelineRuns(variables: CiVariables): boolean {
   return false;
 }
 
-function push(branch: string, openMergeRequest = false): CiVariables {
-  return {
-    CI_PIPELINE_SOURCE: "push",
-    CI_COMMIT_BRANCH: branch,
-    CI_OPEN_MERGE_REQUESTS: openMergeRequest ? "group/project!1" : undefined,
-  };
+function push(branch: string): CiVariables {
+  return { CI_PIPELINE_SOURCE: "push", CI_COMMIT_BRANCH: branch };
 }
 
 const checks = [
@@ -126,16 +122,30 @@ const checks = [
   ["build", "pnpm run build"],
 ] as const;
 
+function mergeRequest(source: string, target: string): CiVariables {
+  return {
+    CI_PIPELINE_SOURCE: "merge_request_event",
+    CI_MERGE_REQUEST_SOURCE_BRANCH_NAME: source,
+    CI_MERGE_REQUEST_TARGET_BRANCH_NAME: target,
+  };
+}
+
 describe("SCF-AC-5.1 Pipeline triggers", () => {
-  for (const branch of ["feature/42-ci-pipeline", "dev", "main"]) {
-    it(`SCF-AC-5.1 runs the pipeline on a push to ${branch}`, () => {
-      assert.equal(pipelineRuns(push(branch)), true);
+  it("SCF-AC-5.1 runs the pipeline for the release merge request dev -> main", () => {
+    assert.equal(pipelineRuns(mergeRequest("dev", "main")), true);
+  });
+
+  for (const source of ["feature/42-ci-pipeline", "fix/1-bug", "chore/x"]) {
+    it(`SCF-AC-5.1 runs no pipeline for a merge request ${source} -> dev`, () => {
+      assert.equal(pipelineRuns(mergeRequest(source, "dev")), false);
     });
   }
 
-  it("SCF-AC-5.1 runs one pipeline, not two, for a push to a branch with an open merge request", () => {
-    assert.equal(pipelineRuns(push("feature/42-ci-pipeline", true)), false);
-  });
+  for (const branch of ["feature/42-ci-pipeline", "dev", "main"]) {
+    it(`SCF-AC-5.1 runs no pipeline on a push to ${branch}`, () => {
+      assert.equal(pipelineRuns(push(branch)), false);
+    });
+  }
 
   for (const [name, command] of checks) {
     it(`SCF-AC-5.1 runs the job ${name} in every pipeline`, () => {
@@ -186,10 +196,7 @@ describe("SCF-AC-5.4 Run time", () => {
 
 describe("SCF-AC-5.5 Visible status", () => {
   it("SCF-AC-5.5 runs the checks as a merge request pipeline, whose status the merge request shows", () => {
-    assert.equal(
-      pipelineRuns({ CI_PIPELINE_SOURCE: "merge_request_event" }),
-      true,
-    );
+    assert.equal(pipelineRuns(mergeRequest("dev", "main")), true);
   });
 });
 
