@@ -11,6 +11,7 @@ New tasks and ideas for this developer land here first, before anyone plans them
 
 ## Open
 
+- [2026-11-24] From `schwaigc`, concept *Storage core* (R5, `concepts/storage-core.md` §13 Q448, §15, concept MR of #117): `folders` gets an `owner_id`, `team_id` becomes optional until R7, and the new tables `files` and `content_objects` are added; one root folder per member instead of per team. Please align `scaffolding.md` (table `folders`, seed) or answer on the MR.
 - [2026-11-17] From `schwaigc`, concept *Design system & accessibility modes* (R4, `concepts/design-system.md` §13 Q395, MR of #116): visitors now get light or dark by the system colour scheme, nothing stored ([DSA-F-21]). Please align A57 of `public-content.md` ("visitors see the default theme").
 - [2026-11-10] From `schwaigc` (MR of #71): `tools/doc-check.mjs` crashes with a TypeError in `conceptRow` when a concept document holds a table whose header starts `| Slice | Delivers |` (kind `slices`, meant for story files): `slices` is missing from the early return of `conceptRow`. `design-system.md` §16 works around it with the column name *Requirements*.
 

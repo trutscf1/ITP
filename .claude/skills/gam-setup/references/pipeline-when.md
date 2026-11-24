@@ -10,7 +10,7 @@ Without `gam-engineering/pipeline.json` there is no decision to change: say so a
 | --- | --- | --- |
 | **At every merge into dev** (default) | `dev` — also the value when the field is missing | `merge-request` — merge requests and the integration branch |
 | **Only at the merge into main** | `main` — due at the release merge `dev` → `main`, not at the merges into `dev` | `release-only` — merge requests into `main`, `main`, and tags |
-| **Only at the release** | `release` — due at `release` with `-Tier release` only | `release-tag` — release tags only, no merge request and no branch |
+| **Only at the release** | `release` — due at `release` with `--tier release` only | `release-tag` — release tags only, no merge request and no branch |
 
 In branch model `trunk` the merge into the integration branch is the merge into `main`: the first two answers are the same, so ask only *at every merge* and *only at the release*. `ci.trigger` `both` (merge requests, integration branch, `main`, tags) stays valid and is never offered anew.
 
@@ -29,7 +29,7 @@ A pipeline that is not due at a moment counts as green there (P-MR-3): the merge
 5. **Bring the files along**, as steps 9 and 10 of [pipeline.md](pipeline.md#steps) write them, limited to what the answer changes:
    - a new host or `both`: render the CI file with `render-ci <host> <integration branch> --write`, make `.gitlab-ci.yml` include it, and lint it (`glab ci lint` or `actionlint`); a changed trigger regenerates the file the same way ([Own changes kept](pipeline.md#own-changes-kept) applies);
    - a dropped host: remove the generated CI file and its `include` entry;
-   - a new `local` or `both`: copy `local-pipeline.ps1` when it is missing;
+   - a new `local` or `both`: copy `local-pipeline.mjs` when it is missing;
    - a dropped local: remove the copy only after [Own changes kept](pipeline.md#own-changes-kept).
 6. **Validate**: `node gam-engineering/tools/pipeline.mjs validate gam-engineering/pipeline.json` must print `[]`.
 7. **Ship it** like every change (P-GIT-2): the decision (its question round is in the chat export), and the changed files in one commit on a work branch; the MR description names the linter result when a CI file was written.

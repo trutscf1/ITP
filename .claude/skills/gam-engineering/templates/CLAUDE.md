@@ -18,7 +18,7 @@ Plans you write go to `gam-ai-memory/plans/` (`plansDirectory` in `.claude/setti
 
 The user's general engineering decisions — git flow, versioning, roadmap conventions, documentation quality bar, merge policy, working style — live in the **`gam-engineering`** skill (`PROFILE.md`, IDs `P-…`) and are binding here. Never re-ask a question it answers. Project-specific deviations are recorded as ADRs referencing the overridden ID.
 
-**Every grilling, planning, concept, or delivery session starts with `/gam-engineering`** (P-GRILL-5, P-WS-6). Its command table — setup, grill, check, triage, wayfind, sweep, tickets, implement, review, revise, merge, release, settings — is the single routing table for the engineering flow; it is not copied here. Every question to the developer is an `AskUserQuestion` pop-up, never a chat question (P-GRILL-1). Agents merge only through it, under the merge policy in `.claude/settings.json` (P-MR-4).
+**Every grilling, planning, concept, or delivery session starts with `/gam-engineering`** (P-GRILL-5, P-WS-6). Its command table — setup, grill, check, triage, wayfind, sweep, tickets, implement, review, revise, merge, release, settings — is the single routing table for the engineering flow; it is not copied here. Every question to the developer is a pop-up of the agent's question tool (`AskUserQuestion`, in Copilot `askQuestions` or `ask_user`), never a chat question (P-GRILL-1). Agents merge only through it, under the merge policy in `.claude/settings.json` (P-MR-4).
 
 ## AI chat export
 
@@ -28,11 +28,12 @@ Rules for every AI agent in this repo (P-TEAM-6). Setup and `migrate tools` copy
 2. **Log it yourself:** Whatever your tool's own storage does not hold (questions to the person, their answers, approvals, rejections), append verbatim at once to `docs/prompts/<handle>/manual/<YYYY-MM-DD>.md`.
 3. **Before handing in:** When the person says they are done or hand in, run `node gam-engineering/tools/prompt-export.mjs export --stage` and propose a commit of `docs/prompts/<handle>`. Say that anything discussed afterwards reaches the repo only with the next commit.
 4. **Web chats:** When the person mentions an AI chat in the browser (claude.ai, ChatGPT, Gemini, Copilot on the web), remind them of `docs/prompts/<handle>/manual/web-<YYYY-MM-DD>-<topic>.md` (tool, date, share link if any, their prompts verbatim) and offer to create it.
-5. **Do not touch exports:** Files under `docs/prompts/` outside `manual/` are written only by the script. Never change, shorten, or delete them, not even on request; to keep chats out of the repo, point to the mode `local` (`/gam-engineering settings prompts local`).
+5. **Do not touch exports:** Files under `docs/prompts/` outside `manual/` are written only by the script. Never change, shorten, or delete them, not even on request; to keep chats out of the repo, point to the mode `local` (`/gam-engineering settings prompts local`), which a student project (`env.GAM_ENGINEERING_PROJECT_KIND` = `student`) does not allow.
+6. **Questions as pop-ups:** Ask the person with your question tool — `AskUserQuestion` in Claude Code, `askQuestions` in GitHub Copilot in VS Code (agent mode, enabled in the tool picker), `ask_user` in the Copilot CLI — numbered `Q<n> - <title>: <question>?`, the recommended option first, its description starting with its basis — a rule or project value (`Regel P-…`, `Projektwert …`), a measured fact (`Gemessen: …`), or your judgment with the trade-off named (`Einschätzung: …`), also for a question of pure taste — *None of these* last. Without such a tool, ask in the chat in the same format, wait for the answer, log both by rule 2, and carry on; never stop work only because the pop-up is missing.
 
 ## Architecture rules for new code
 
-New code follows Clean Architecture as the profile's section *Architecture (P-ARCH)* defines it, with P-DES-1, P-DES-3, and P-DES-6: dependencies point inward along the layering chain in `gam-ai-knowledge/STACK.md`, modules stay within the limits of the architecture check, and TypeScript has no `any`. The rules are not restated here. `/gam-engineering architecture review` scores the code against them.
+New code follows Clean Architecture as the profile's section *Architecture (P-ARCH)* defines it, with P-DES-1, P-DES-3, and P-DES-6: dependencies point inward along the layering chain in `gam-ai-knowledge/STACK.md`, modules stay within the limits of the architecture check, TypeScript has no `any`, and the program is cut into parts that parallel sessions can change without meeting in the same file. The rules are not restated here. `/gam-engineering architecture review` scores the code against them.
 
 ## Other skills
 
@@ -48,7 +49,7 @@ Before each task, load the matching skill (P-WS-5). For situations outside the `
 | Steps only a human can perform (credentials, dashboards) | `/gam-v-wizard` |
 | About to call any task done | `/gam-v-verification-before-completion` |
 
-Vocabulary layers, model-invoked as needed: `/gam-v-domain-modeling` (glossary + ADRs), `/gam-v-codebase-design` (module/interface/seam/depth terms). Technology skills (UI design, framework conventions, UI audit, running-app checks) are bound in `gam-ai-knowledge/STACK.md` §10 (P-DES-7).
+Vocabulary layers, model-invoked as needed: `/gam-v-domain-modeling` (glossary + ADRs), `/gam-v-codebase-design` (module/interface/seam/depth terms). Technology skills (UI design, framework conventions, UI audit, running-app checks) are bound in `gam-ai-knowledge/STACK.md` §10 (P-DES-7). Every piece of interface work goes through `gam-frontend` (`/gam-engineering ui`) unless `env.GAM_ENGINEERING_FRONTEND` in `.claude/settings.json` is `off` or the developer names another skill for that part; no other UI, design, or motion skill is started directly (P-DES-13).
 
 **Generic skills not loaded here** (their rules contradict this project's profile; P-WS-5): `git-workflow-and-versioning` (P-GIT-4), `documentation-and-adrs` (P-DOC-2), `spec-driven-development` (P-DOC-1, P-DOC-7), `planning-and-task-breakdown` (P-TRK-2, P-DOC-7), `idea-refine` (`docs/ideas/`), `interview-me` (P-GRILL-1), and `using-agent-skills` (the routing above) — use `/gam-engineering`. Skills that duplicate a bound one are not started either: `test-driven-development` (use `/gam-v-tdd`), `code-review-and-quality` (use `/gam-v-code-review`), `debugging-and-error-recovery` (use `/gam-v-diagnosing-bugs`).
 

@@ -16,7 +16,7 @@ Loaded by `/gam-ai-knowledge init`, and by step 1 of [New project setup](../../g
    | `test-data/README.md` | `test-data/README.md` |
    | `gam-ai-knowledge/tools/doc-check.mjs` | `tools/doc-check.mjs` |
 
-   Create `adr/` with an empty `.gitkeep`. `TEAM.md` and `STATUS.md` are created only by `/gam-engineering team`.
+   Create `adr/` with an empty `.gitkeep`. `TEAM.md` and `STATUS.md` are created only by `/gam-engineering team`; `START.md` and `sources/` only by `/gam-engineering start` (setup step 0, P-GOAL-4), so `init` alone never creates them.
 4. **Record the round** of step 2: the AI chat export keeps it (P-GRILL-2); no Q&A file is created.
 5. **Point other agents at the folder.** Append this line to the root `AGENTS.md`, unless it already holds a link to `gam-ai-knowledge/`; never change its other lines. Without an `AGENTS.md`, create it with the heading `# AGENTS.md`, a blank line, and the line:
 

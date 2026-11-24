@@ -1,0 +1,6 @@
+{
+  "plansDirectory": "./gam-ai-memory/plans",
+  "env": {
+    "GAM_ENGINEERING_FLOW": "quick"
+  }
+}

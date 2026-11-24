@@ -1,0 +1,10 @@
+{
+  "scripts": [
+    {
+      "name": "gam worktree setup",
+      "command": "node gam-engineering/tools/worktree-setup.mjs",
+      "runOnWorktreeCreate": true,
+      "async": false
+    }
+  ]
+}

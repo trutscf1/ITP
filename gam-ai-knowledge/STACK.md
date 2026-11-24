@@ -27,7 +27,7 @@ Every capability of `concepts/scaffolding.md` §7, `concepts/public-content.md` 
 | SCF-C-1 | Workspace and task runner | section 1 | `trutscf1` |
 | SCF-C-2 | Schemas | section 2 | `schauby1` |
 | SCF-C-3 | Web application framework | section 4 | `schwaigc` |
-| SCF-C-4 | HTTP server framework | sections 2 and 3 (`identity`: Hono) | `schauby1`, `tschudea07` |
+| SCF-C-4 | HTTP server framework | sections 2 and 3 (`storage` and `identity`: Hono) | `schauby1`, `tschudea07` |
 | SCF-C-5 | Content management system | section 1 | `trutscf1` |
 | SCF-C-6 | Reverse proxy | section 1 | `trutscf1` |
 | SCF-C-7 | Container runtime | section 1 | `trutscf1` |
@@ -38,9 +38,9 @@ Every capability of `concepts/scaffolding.md` §7, `concepts/public-content.md` 
 | SCF-C-12 | Changelog draft generator | section 1 | `trutscf1` |
 | SCF-C-13 | Test runners | sections 1 and 4 | `trutscf1`, `schwaigc` |
 | SCF-C-14 | Key-value store | _open_ — Redis per the project proposal | `schauby1` |
-| SCF-C-15 | Document database | _open_ — MongoDB per the project proposal | `schauby1` |
+| SCF-C-15 | Document database | section 2 (row STO-C-2: MongoDB, official driver) | `schauby1` |
 | SCF-C-16 | Sync database | _open_ — CouchDB per the project proposal | `trutscf1` |
-| SCF-C-17 | Object storage | _open_ — SeaweedFS per the project proposal | `schauby1` |
+| SCF-C-17 | Object storage | section 2 (row STO-C-1: SeaweedFS, S3 client) | `schauby1` |
 | SCF-C-18 | Virus scanner | _open_ — ClamAV per `SCF-AC-2.1` | `schauby1` |
 | SCF-C-19 | Database access layer | section 3 (row "Database access layer") | `tschudea07` |
 | SCF-C-20 | Accessibility checker | section 3 (row "Accessibility check in CI") | `tschudea07` |
@@ -69,6 +69,16 @@ Every capability of `concepts/scaffolding.md` §7, `concepts/public-content.md` 
 | IDN-C-6 | Session store | section 3 | `tschudea07` |
 | IDN-C-7 | HTTP server framework (`identity`) | section 3 | `tschudea07` |
 | IDN-C-8 | E-mail delivery | section 3 | `tschudea07` |
+| STO-C-1 | Object store client | section 2 | `schauby1` |
+| STO-C-2 | Document database access | section 2 | `schauby1` |
+| STO-C-3 | Record store access | section 2 (uses SCF-C-19, section 3) | `schauby1` |
+| STO-C-4 | Resumable upload server | section 2 | `schauby1` |
+| STO-C-5 | ZIP streaming | section 2 | `schauby1` |
+| STO-C-6 | Scheduled job runtime | section 2 | `schauby1` |
+| STO-C-7 | Content type detection | section 2 (_open_) | `schauby1` |
+| STO-C-8 | Content hash | section 2 | `schauby1` |
+| STO-C-9 | Server push | section 2 | `schauby1` |
+| STO-C-10 | HTTP server framework (`storage`) | section 2 | `schauby1` |
 | DSA-C-1 | Design token mechanism | section 4 | `schwaigc` |
 | DSA-C-2 | Accessible component primitives | section 4 | `schwaigc` |
 | DSA-C-3 | Component catalogue | section 4 | `schwaigc` |
@@ -120,10 +130,30 @@ Build/run commands (root): `pnpm install`, `pnpm dev`, `pnpm run lint`, `pnpm ru
 | Capability | Technology | Version constraint | Notes |
 | --- | --- | --- | --- |
 | SCF-C-2 schemas & OpenAPI generation | Zod, `@asteasolutions/zod-to-openapi` | Zod 4.6.7, zod-to-openapi 8.5.0, both pinned exactly (the lockfile and `package.json` agree); OpenAPI 3.1 | Package `packages/contracts` (`@stash/contracts`; SCF-AC-3.1 still says `@nimbus/contracts`, a correction listed in `concepts/scaffolding.track-web.md`). One schema file per contract (`health.ts`, `errors.ts`), each exporting `<name>Schema` and its inferred type; every schema file imports `z` from `zod.ts`, which adds `.openapi()`. Source files import with `.ts` extensions, and `tsc` rewrites them for `dist/`. `pnpm --filter @stash/contracts openapi:generate [file]` writes the description, by default to `packages/contracts/dist/openapi.json` (not committed); `build` writes the same file, so it exists wherever the package is built. That default is the one `web` reads through `OPENAPI_FILE` (track Web, M6). Errors: `errorReplies` holds status and body per code of the concept §8, and `toErrorResponse(error)` maps a Zod failure to `validation-failed` and anything else to `internal-error`. Units import schemas from the package and do not depend on Zod themselves. Set by #40 (SCF-US-3). |
-| SCF-C-4 HTTP server framework (`storage`) | _open_ | | |
-| `worker` runtime | _open_ | | |
+| SCF-C-4 HTTP server framework (`storage`), STO-C-10 | Hono on Node.js, like `identity` | `hono` 4, newest version older than 7 days | Q422 of `concepts/storage-core.qa-log.md`. Request bodies are checked by the contracts of SCF-C-2; the streaming helpers of Hono serve the downloads. Set by: planned (R5 concept). |
+| STO-C-1 object store client; SCF-C-17 | `@aws-sdk/client-s3` against the S3 interface of SeaweedFS (the container of the local stack), path-style addressing | `@aws-sdk/client-s3` newest version older than 7 days; SeaweedFS as in `docker-compose.yml` | Q423. Streams of unknown length use multipart writes; reads use ranges. The object store is published on `127.0.0.1` for development only (STO-F-37). Used and total bytes (STO-F-46) are not part of the S3 interface: an adapter behind the object-store port reads them from the status interface of the SeaweedFS master on the internal network (port 9333, the one the health check of `docker-compose.yml` uses), address in `OBJECT_STORE_STATUS_URL` (Q454); which fields of its answer give used and total is settled in the slice that builds STO-F-46. Set by: planned (R5 concept). |
+| STO-C-2 document database access; SCF-C-15 | MongoDB through its official driver `mongodb`; the shape of a document is checked by a Zod contract of `packages/contracts` (module `storage`), no object-document mapper | `mongodb` newest version older than 7 days; MongoDB 8 as in `docker-compose.yml` | Q424. Collection `file_metadata`, key `_id` = the content object's ID (concept §8). Set by: planned (R5 concept). |
+| STO-C-3 record store access; SCF-C-19 | Prisma ORM 8 in `packages/db`, as the row "Database access layer" in section 3 | as the row "Database access layer" | A5. Row locks and the transactions of the storage core use the statements the access layer offers for them. The migration of the concept §15 follows the procedure of that row. Set by: planned (R5 concept). |
+| STO-C-4 resumable upload server | `@tus/server` with `@tus/s3-store`, mounted in the Hono server of `storage` | `@tus/server` and `@tus/s3-store` newest versions older than 7 days | Q433. The store writes into the object store through the client of STO-C-1; the upload ID is a random uuid made by `storage` and is the object key. The upload resources live in the object store next to the bytes. Set by: planned (R5 concept). |
+| STO-C-5 ZIP streaming | `archiver`, entries stored without compression (`store: true`), ZIP64 | `archiver` newest version older than 7 days | Q440. Each file is added as a stream, so the archive is never held in memory. Set by: planned (R5 concept). |
+| STO-C-6 scheduled job runtime; SCF-C-14 | BullMQ with repeatable jobs and one attempt per run (a failed run is not retried before the next interval), started in `apps/worker` on the key-value store (Redis) | `bullmq` newest version older than 7 days; Redis as in `docker-compose.yml` | Q435. The jobs `cleanup-uploads`, `cleanup-orphans`, and `purge-trash` call the storage core of `packages/storage-core`. The processors of R9 reuse the runtime. The row SCF-C-14 in the capability index stays open until `identity` and `worker` have set their Redis rows. Set by: planned (R5 concept). |
+| STO-C-7 content type detection | _open_ | | A library that detects a media type from leading bytes is chosen by the owner in slice 1 of STO-US-2 and written here with its version; the extension table is a data file of `packages/storage-core`. Not decided in the grill (Q430 fixes only the rule). |
+| STO-C-8 content hash | SHA-256 through `node:crypto` of Node.js | Node.js 24 | No package: the algorithm is from the platform (`G-1.N5`). Set by: planned (R5 concept). |
+| STO-C-9 server push | Server-sent events through the streaming helper of Hono | `hono` as above | Q431. Set by: planned (R5 concept). |
+| `worker` runtime | Node.js 24 as the other units; job runtime: row STO-C-6 | Node.js 24 | The processors of R9 are still open. |
 
 Type mapping (neutral type → concrete type) and error mapping (`E-x` → concrete representation): _open_.
+
+### Names
+
+Technology names the stack introduces, one row per track section, for the rebuild's stack-neutrality check (RB-F-31). _Names_ lists the technology names each section introduces, each in backticks and separated by commas; no concept document contains one of these names. Filled from the rows of the sections 1 to 4 (assumption A1 of the migration to skill version 1.6.0).
+
+| Section | Names |
+| --- | --- |
+| 1. Platform | `Node.js`, `TypeScript`, `pnpm`, `Turborepo`, `Biome`, `Docker`, `Docker Compose`, `Caddy`, `PostgreSQL`, `Prisma`, `OpenTelemetry Collector`, `Prometheus`, `Loki`, `Tempo`, `Grafana` |
+| 2. Contracts, storage & worker | `Zod`, `zod-to-openapi`, `OpenAPI` |
+| 3. Identity & CI | `Hono`, `Better Auth`, `Argon2id`, `nodemailer`, `Mailpit`, `Redis`, `Cloudflare Turnstile`, `GitLab CI`, `Gitleaks`, `Semgrep`, `Trivy`, `SonarQube`, `axe`, `commitlint`, `Vertabelo` |
+| 4. Web | `Next.js`, `React`, `Tailwind CSS`, `Radix UI`, `Storybook`, `Playwright`, `Geist`, `NVDA`, `VoiceOver` |
 
 ## 3. Identity & CI — `tschudea07`
 
@@ -183,6 +213,131 @@ Type mapping (neutral type → concrete type) and error mapping (`E-x` → concr
 | DSA-C-8 screen readers for manual tests | NVDA with Firefox or Chrome on Windows, VoiceOver with Safari on macOS; the protocol `gam-ai-knowledge/tests/screen-reader-protocol.md` (the row DSA-F-14 above) | NVDA, VoiceOver (current releases) | Set by: planned (R4 concept). |
 | Design-system tests | Node.js test runner on the token stylesheet, the theme and accessibility helpers, the components, and the package wiring (`tests/design-system.test.ts`, `tests/theme.test.ts`, `tests/accessibility-settings.test.ts`, `tests/accessibility-tokens.test.ts`, `tests/accessibility-components.test.ts`) | Node.js 24, TypeScript 5 | `tests/helpers/tokens-css.ts` parses the stylesheet and resolves the cascade of a visit (theme, contrast, colour vision, system contrast). Node.js does not run `.tsx`, so `tests/helpers/ui-build.ts` compiles `packages/ui` with `tsc` into a temporary folder in `packages/ui/node_modules/.cache` and renders the components with `react-dom/server`. Rendering in a browser is left to SCF-C-13. |
 
+### Path patterns
+
+Every file the project tracks is one of four kinds (RB-F-1, RB-F-2). Patterns are git pathspec globs: `*` matches within one path segment, `**` across any number of segments; `<module>` stands for the name a concept document gives a module in its §16. Filled from the tracked files (assumption A2); whether the `<module>` names equal the folder names is open (TODO Q1).
+
+| Kind | Pattern | Notes |
+| --- | --- | --- |
+| keep | `apps/web/public/**` | Static images of the web unit (`next.svg`, `vercel.svg`) |
+| keep | `apps/web/src/app/favicon.ico` | Binary icon |
+| keep | `docs/**` | The teacher's binding documents and the exported AI chats |
+| keep | `AGENTS.md`, `CHANGELOG.md`, `CLAUDE.local.md.example`, `apps/*/README.md` | Agent entry point, generated changelog, example of the personal file, unit readme |
+| keep | `apps/*/.gitignore`, `packages/*/.gitignore`, `packages/db/.gitattributes` | Git ignore and attribute lists of a unit or package |
+| keep | `pnpm-lock.yaml` | Written by pnpm, never by hand |
+| keep | `packages/db/migrations/**` | Applied Prisma migrations are never edited (§3) |
+| module | `apps/<module>/src/**` | Source of one unit |
+| module | `packages/<module>/src/**` | Source of one shared package |
+| module | `packages/ui/.storybook/*` | Storybook set-up of the `ui` package |
+| module | `scripts/*.ts` | Root scripts (`changelog`, `sonar`) |
+| test | `tests/**` | Acceptance and helper files at the repository root |
+| test | `apps/*/src/**/*.test.ts` | Unit tests of a unit |
+| test | `packages/*/src/**/*.test.ts` | Unit tests of a package |
+| stack | `**/package.json`, `pnpm-workspace.yaml`, `turbo.json`, `biome.json`, `**/tsconfig*.json`, `commitlint.config.ts`, `.tool-versions` | Package manifests and tool configuration |
+| stack | `docker-compose.yml`, `docker/**`, `packages/db/Dockerfile` | Container files and the configuration of the containers |
+| stack | `.pre-commit-config.yaml`, `.semgrep.yml`, `.trivyignore`, `.semgrepignore`, `sonar-project.properties`, `.env.example`, `.env.sonar.example` | Scanner and environment configuration |
+| stack | `apps/web/next.config.ts`, `apps/web/postcss.config.mjs`, `packages/db/prisma.config.ts` | Framework configuration |
+
+### Stack files
+
+One row per tracked stack file. Filled from the tracked files (assumption A3): JSON files carry their content minified; a row whose _Content_ is a TODO still needs the full content copied from the tracked file (open question Q2). The lock file `pnpm-lock.yaml` is no stack file.
+
+| Path | Purpose | Content |
+| --- | --- | --- |
+| `.env.example` | Documented environment variables (names, defaults) | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `.env.sonar.example` | Documented SonarQube variables | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `.pre-commit-config.yaml` | pre-commit hooks | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `.semgrep.yml` | Semgrep rules | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `.semgrepignore` | Paths Semgrep skips | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `.tool-versions` | Pinned Node.js version | `nodejs 24.14.0` |
+| `.trivyignore` | Trivy ignore list | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `apps/cms/package.json` | Package manifest of `@stash/cms` | `{"name":"@stash/cms","version":"0.1.0","private":true,"type":"module","main":"dist/index.js","types":"dist/index.d.ts","scripts":{"dev":"tsc -p tsconfig.build.json --watch --preserveWatchOutput","build":"tsc -p tsconfig.build.json","start":"node dist/main.js","lint":"biome check .","typecheck":"tsc --noEmit","test":"node --test \"src/**/*.test.ts\""},"dependencies":{"@stash/telemetry":"workspace:*"},"devDependencies":{"@stash/config":"workspace:*","@types/node":"^24"}}` |
+| `apps/cms/tsconfig.build.json` | TypeScript configuration | `{"extends":"./tsconfig.json","compilerOptions":{"noEmit":false},"exclude":["src/**/*.test.ts"]}` |
+| `apps/cms/tsconfig.json` | TypeScript configuration | `{"extends":"@stash/config/tsconfig.base.json","compilerOptions":{"outDir":"dist","rootDir":"src","types":["node"],"allowImportingTsExtensions":true,"rewriteRelativeImportExtensions":true,"noEmit":true},"include":["src"]}` |
+| `apps/identity/package.json` | Package manifest of `@stash/identity` | `{"name":"@stash/identity","version":"0.1.0","private":true,"type":"module","main":"dist/index.js","types":"dist/index.d.ts","scripts":{"dev":"tsc --watch --preserveWatchOutput","build":"tsc","lint":"biome check .","typecheck":"tsc --noEmit","test":"node --test"},"devDependencies":{"@stash/config":"workspace:*"}}` |
+| `apps/identity/tsconfig.json` | TypeScript configuration | `{"extends":"@stash/config/tsconfig.base.json","compilerOptions":{"outDir":"dist","rootDir":"src"},"include":["src"]}` |
+| `apps/storage/package.json` | Package manifest of `@stash/storage` | `{"name":"@stash/storage","version":"0.1.0","private":true,"type":"module","main":"dist/index.js","types":"dist/index.d.ts","scripts":{"dev":"tsc --watch --preserveWatchOutput","build":"tsc","lint":"biome check .","typecheck":"tsc --noEmit","test":"node --test"},"devDependencies":{"@stash/config":"workspace:*"}}` |
+| `apps/storage/tsconfig.json` | TypeScript configuration | `{"extends":"@stash/config/tsconfig.base.json","compilerOptions":{"outDir":"dist","rootDir":"src"},"include":["src"]}` |
+| `apps/web/next.config.ts` | Next.js configuration | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `apps/web/package.json` | Package manifest of `@stash/web` | `{"name":"@stash/web","type":"module","version":"0.1.0","private":true,"scripts":{"dev":"next dev","build":"next build","start":"next start","lint":"biome check .","format":"biome format --write","typecheck":"next typegen && tsc --noEmit","test":"node --test \"src/**/*.test.ts\""},"dependencies":{"@stash/contracts":"workspace:*","@stash/ui":"workspace:*","next":"16.4.2","react":"19.2.8","react-dom":"19.2.8"},"devDependencies":{"@stash/config":"workspace:*","@tailwindcss/postcss":"^4","@types/node":"^24","@types/react":"^19","@types/react-dom":"^19","tailwindcss":"^4"}}` |
+| `apps/web/postcss.config.mjs` | PostCSS configuration (Tailwind CSS) | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `apps/web/tsconfig.json` | TypeScript configuration | `{"extends":"@stash/config/tsconfig.base.json","compilerOptions":{"lib":["dom","dom.iterable","esnext"],"allowJs":true,"noEmit":true,"module":"preserve","moduleResolution":"bundler","resolveJsonModule":true,"isolatedModules":true,"jsx":"react-jsx","incremental":true,"plugins":[{"name":"next"}],"paths":{"@/*":["./src/*"]},"types":["node"],"declaration":false,"allowImportingTsExtensions":true,"erasableSyntaxOnly":true},"include":["next-env.d.ts","**/*.ts","**/*.tsx",".next/types/**/*.ts",".next/dev/types/**/*.ts","**/*.mts"],"exclude":["node_modules"]}` |
+| `apps/worker/package.json` | Package manifest of `@stash/worker` | `{"name":"@stash/worker","version":"0.1.0","private":true,"type":"module","main":"dist/index.js","types":"dist/index.d.ts","scripts":{"dev":"tsc --watch --preserveWatchOutput","build":"tsc","lint":"biome check .","typecheck":"tsc --noEmit","test":"node --test"},"devDependencies":{"@stash/config":"workspace:*"}}` |
+| `apps/worker/tsconfig.json` | TypeScript configuration | `{"extends":"@stash/config/tsconfig.base.json","compilerOptions":{"outDir":"dist","rootDir":"src"},"include":["src"]}` |
+| `biome.json` | Biome lint and format configuration | `{"$schema":"https://biomejs.dev/schemas/2.4.2/schema.json","vcs":{"enabled":true,"clientKind":"git","useIgnoreFile":true},"files":{"ignoreUnknown":true,"includes":["**","!node_modules","!.next","!dist","!build","!.claude","!gam-ai-knowledge/tools","!gam-engineering","!gam-ai-memory","!**/src/prisma/contract.d.ts","!**/src/prisma/contract.json","!**/migrations"]},"formatter":{"enabled":true,"indentStyle":"space","indentWidth":2,"lineEnding":"lf"},"css":{"parser":{"tailwindDirectives":true}},"linter":{"enabled":true,"rules":{"recommended":true,"suspicious":{"noExplicitAny":"error"}},"domains":{"next":"recommended","react":"recommended"}},"assist":{"actions":{"source":{"organizeImports":"on"}}}}` |
+| `commitlint.config.ts` | commitlint rules (Conventional Commits) | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `docker-compose.yml` | The local stack: all containers | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `docker/Caddyfile` | Reverse proxy configuration | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `docker/compose.offline-check.yml` | Observability stack configuration | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `docker/observability/alert-rules.template.yml` | Observability stack configuration | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `docker/observability/check-config.ts` | Check script of the observability configuration | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `docker/observability/collector.Dockerfile` | Container image definition | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `docker/observability/collector.yaml` | Observability stack configuration | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `docker/observability/grafana/dashboards/operations-overview.json` | Observability stack configuration | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `docker/observability/grafana/provisioning/dashboards/dashboards.yaml` | Observability stack configuration | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `docker/observability/grafana/provisioning/datasources/datasources.yaml` | Observability stack configuration | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `docker/observability/loki.Dockerfile` | Container image definition | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `docker/observability/loki.yaml` | Observability stack configuration | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `docker/observability/obs-config.Dockerfile` | Container image definition | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `docker/observability/prometheus.yml` | Observability stack configuration | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `docker/observability/tempo.Dockerfile` | Container image definition | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `docker/observability/tempo.template.yaml` | Observability stack configuration | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `docker/web.Dockerfile` | Container image definition | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `package.json` | Root package: workspace scripts through Turborepo | `{"name":"stash","private":true,"type":"module","packageManager":"pnpm@10.34.6","engines":{"node":">=24.14.0"},"scripts":{"dev":"turbo run dev","lint":"turbo run lint","typecheck":"turbo run typecheck","test":"turbo run test","build":"turbo run build","test:accessibility":"node tests/accessibility/axe-check.ts","changelog:draft":"node scripts/changelog.ts draft","sonar":"node scripts/sonar.ts","db:migrate":"pnpm --filter @stash/db run migrate","db:seed":"pnpm --filter @stash/db run seed"},"devDependencies":{"@axe-core/playwright":"^4.13.0","@biomejs/biome":"2.4.2","@commitlint/cli":"^21.2.3","@commitlint/config-conventional":"^21.2.3","@commitlint/lint":"^21.2.3","@commitlint/load":"^21.2.3","@commitlint/types":"^21.2.3","playwright":"1.63.0","turbo":"^2.11.7","typescript":"^5","yaml":"^2.9.1"}}` |
+| `packages/config/package.json` | Package manifest of `@stash/config` | `{"name":"@stash/config","version":"0.1.0","private":true,"type":"module","files":["tsconfig.base.json"],"scripts":{"dev":"node -e \"console.log('nothing to watch')\"","build":"node -e \"console.log('nothing to build')\"","lint":"biome check .","typecheck":"node -e \"console.log('nothing to check')\"","test":"node -e \"console.log('nothing to test')\""}}` |
+| `packages/config/tsconfig.base.json` | TypeScript configuration | `{"$schema":"https://json.schemastore.org/tsconfig","compilerOptions":{"target":"ES2023","module":"NodeNext","moduleResolution":"NodeNext","lib":["ES2023"],"strict":true,"declaration":true,"skipLibCheck":true,"esModuleInterop":true,"forceConsistentCasingInFileNames":true}}` |
+| `packages/contracts/package.json` | Package manifest of `@stash/contracts` | `{"name":"@stash/contracts","version":"0.1.0","private":true,"type":"module","main":"dist/index.js","types":"dist/index.d.ts","exports":{".":{"types":"./dist/index.d.ts","default":"./dist/index.js"},"./web":{"types":"./dist/web/config.d.ts","default":"./dist/web/config.js"}},"scripts":{"lint":"biome check .","typecheck":"tsc --noEmit","build":"tsc && node src/generate-openapi.ts","dev":"tsc --watch --preserveWatchOutput","test":"node --test","openapi:generate":"node src/generate-openapi.ts"},"dependencies":{"@asteasolutions/zod-to-openapi":"8.5.0","zod":"4.6.7"},"devDependencies":{"@stash/config":"workspace:*","@types/node":"^24"}}` |
+| `packages/contracts/tsconfig.json` | TypeScript configuration | `{"extends":"@stash/config/tsconfig.base.json","compilerOptions":{"outDir":"dist","rootDir":"src","types":["node"],"allowImportingTsExtensions":true,"rewriteRelativeImportExtensions":true},"include":["src"]}` |
+| `packages/db/Dockerfile` | Image that runs the database migrations | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `packages/db/package.json` | Package manifest of `@stash/db` | `{"name":"@stash/db","version":"0.1.0","private":true,"type":"module","exports":{".":"./src/prisma/db.ts","./seed":"./src/seed.ts","./seed-data":"./src/seed-data.ts"},"scripts":{"lint":"biome check .","typecheck":"tsc --noEmit","build":"node -e \"console.log('nothing to build')\"","dev":"node -e \"console.log('nothing to run')\"","test":"node --test \"src/**/*.test.ts\"","contract:emit":"prisma contract emit","migration:plan":"prisma migration plan --name","migrate":"prisma db migrate --show && prisma db migrate","seed":"node src/seed.ts"},"dependencies":{"@prisma/orm-postgres":"8.0.0-rc.20","dotenv":"^18.0.4","pg":"8.22.0"},"devDependencies":{"@prisma/cli-engine":"0.9.0","@stash/config":"workspace:*","@types/node":"^24","@types/pg":"8.20.4","prisma":"8.0.0-rc.27"}}` |
+| `packages/db/prisma.config.ts` | Prisma configuration | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `packages/db/tsconfig.json` | TypeScript configuration | `{"extends":"@stash/config/tsconfig.base.json","compilerOptions":{"noEmit":true,"declaration":false,"resolveJsonModule":true,"allowImportingTsExtensions":true,"rewriteRelativeImportExtensions":false,"types":["node"]},"include":["src","prisma.config.ts"]}` |
+| `packages/telemetry/package.json` | Package manifest of `@stash/telemetry` | `{"name":"@stash/telemetry","version":"0.1.0","private":true,"type":"module","main":"dist/index.js","types":"dist/index.d.ts","exports":{".":{"types":"./dist/index.d.ts","default":"./dist/index.js"}},"files":["dist"],"scripts":{"dev":"tsc -p tsconfig.build.json --watch --preserveWatchOutput","build":"tsc -p tsconfig.build.json","lint":"biome check .","typecheck":"tsc --noEmit","test":"node --test \"src/**/*.test.ts\""},"devDependencies":{"@stash/config":"workspace:*","@types/node":"^24"}}` |
+| `packages/telemetry/tsconfig.build.json` | TypeScript configuration | `{"extends":"./tsconfig.json","compilerOptions":{"noEmit":false},"exclude":["src/**/*.test.ts","src/test-support"]}` |
+| `packages/telemetry/tsconfig.json` | TypeScript configuration | `{"extends":"@stash/config/tsconfig.base.json","compilerOptions":{"outDir":"dist","rootDir":"src","types":["node"],"allowImportingTsExtensions":true,"rewriteRelativeImportExtensions":true,"noEmit":true},"include":["src"]}` |
+| `packages/ui/.storybook/main.ts` | Storybook configuration | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `packages/ui/.storybook/preview.ts` | Storybook configuration | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `packages/ui/.storybook/storybook.css` | Storybook configuration | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `packages/ui/package.json` | Package manifest of `@stash/ui` | `{"name":"@stash/ui","version":"0.1.0","private":true,"type":"module","main":"dist/index.js","types":"dist/index.d.ts","exports":{".":{"types":"./dist/index.d.ts","default":"./dist/index.js"},"./tokens.css":"./src/tokens.css"},"scripts":{"lint":"biome check .","typecheck":"tsc --noEmit","build":"tsc","dev":"tsc --watch --preserveWatchOutput","test":"node --test","storybook":"storybook dev -p 6006","build-storybook":"storybook build"},"dependencies":{"radix-ui":"1.6.7"},"peerDependencies":{"react":"^19.2.0","tailwindcss":"^4"},"devDependencies":{"@stash/config":"workspace:*","@storybook/react-vite":"10.6.1","@tailwindcss/vite":"4.3.3","@types/react":"^19","@types/react-dom":"^19.3.0","react":"19.2.8","react-dom":"19.2.8","storybook":"10.6.1","tailwindcss":"^4","vite":"8.3.3"}}` |
+| `packages/ui/tsconfig.json` | TypeScript configuration | `{"extends":"@stash/config/tsconfig.base.json","compilerOptions":{"outDir":"dist","rootDir":"src","jsx":"react-jsx","lib":["ES2023","DOM"]},"include":["src"]}` |
+| `pnpm-workspace.yaml` | pnpm workspace, supply-chain settings, and overrides | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `sonar-project.properties` | SonarQube scanner settings | TODO: full content (file is tracked; copy it into this cell or a fenced block below) |
+| `tests/package.json` | Package manifest of `@stash/tests` | `{"name":"@stash/tests","version":"0.1.0","private":true,"type":"module","scripts":{"dev":"node --test --watch \"**/*.test.ts\"","build":"node -e \"console.log('nothing to build')\"","lint":"biome check .","typecheck":"tsc --noEmit","test":"node --test \"**/*.test.ts\""},"devDependencies":{"@stash/config":"workspace:*","@stash/db":"workspace:*","@types/node":"^24","@types/pg":"8.20.4","pg":"8.22.0"}}` |
+| `tests/tsconfig.json` | TypeScript configuration | `{"extends":"@stash/config/tsconfig.base.json","compilerOptions":{"noEmit":true,"allowImportingTsExtensions":true,"types":["node"]},"include":["**/*.ts"]}` |
+| `turbo.json` | Turborepo tasks | `{"$schema":"https://turborepo.dev/schema.json","tasks":{"dev":{"cache":false,"persistent":true},"lint":{},"test":{"cache":false,"dependsOn":["^build"],"passThroughEnv":["TEST_DATABASE_URL"]},"typecheck":{"dependsOn":["^build"]},"build":{"dependsOn":["^build"],"outputs":["dist/**",".next/**","!.next/cache/**"]}},"agentGuidance":false}` |
+
 ## 5. Stack ADRs
 
 Technology choices with lock-in are recorded in `gam-ai-knowledge/adr/`.
+
+## 10. Technology Skills
+
+The installed skills that `/gam-engineering implement` and `review` load for this stack (P-DES-7). Keep one skill per situation; two skills covering the same framework rules stay out. _Loaded by_ is `implement`, `review`, or `gam-frontend (<situation>)`: the interface skills run through `gam-frontend`, which `implement` and `review` call for every change to an interface. The project has a web interface (Next.js, React, Radix UI, Tailwind CSS); the rows follow when `/gam-engineering frontend` has run.
+
+| Situation | Skill | Loaded by |
+| --- | --- | --- |
+| _open_ — filled by `/gam-engineering frontend` | _open_ | _open_ |
+
+## 11. Storage mapping & migration state
+
+How the records of the concepts are stored, and how far the migrations have run. Filled from `packages/db` (assumption A4): the record names are the model names of the contract `packages/db/src/prisma/contract.prisma`; the other stores of the project proposal (Redis, MongoDB, CouchDB, SeaweedFS) hold no tracked layout yet (TODO Q3).
+
+### Stored names
+
+| Record | Store | Physical name | Indexes |
+| --- | --- | --- | --- |
+| AuthUser | PostgreSQL | `auth_users` | — |
+| AuthSession | PostgreSQL | `auth_sessions` | `user_id` |
+| AuthAccount | PostgreSQL | `auth_accounts` | `user_id` |
+| AuthVerification | PostgreSQL | `auth_verifications` | `identifier` |
+| User | PostgreSQL | `users` | — |
+| Team | PostgreSQL | `teams` | — |
+| TeamMember | PostgreSQL | `team_members` | `user_id` |
+| Folder | PostgreSQL | `folders` | `team_id` |
+| FolderPermission | PostgreSQL | `folder_permissions` | — |
+
+### Migrations
+
+| Migration files | Heads procedure | Migration state |
+| --- | --- | --- |
+| `packages/db/migrations/app/*/migration.json`, `packages/db/migrations/app/*/migration.ts`, `packages/db/migrations/app/*/ops.json`, `packages/db/migrations/snapshots/*/contract.json`, `packages/db/migrations/snapshots/*/contract.d.ts` | List the folder names under `packages/db/migrations/app`; the last name in sort order is the head | `20261102T1544_create_relational_schema` |

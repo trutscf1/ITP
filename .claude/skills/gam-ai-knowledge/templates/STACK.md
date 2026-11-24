@@ -93,23 +93,31 @@ One row per tracked stack file, that is, per file a `stack` pattern matches. *Co
 
 ## 10. Technology Skills
 
-The installed skills that `/gam-engineering implement` and `review` load for this stack (P-DES-7). Keep one skill per situation; two skills covering the same framework rules stay out (e.g. one React skill, not two). Write `none` if the stack needs no technology skill.
+The installed skills that `/gam-engineering implement` and `review` load for this stack (P-DES-7). Keep one skill per situation; two skills covering the same framework rules stay out (e.g. one React skill, not two). Write `none` if the stack needs no technology skill. *Loaded by* is `implement`, `review`, or `gam-frontend (<situation>)`: the interface skills run through `gam-frontend`, which `implement` and `review` call for every change to an interface and which calls only the skills bound here.
 
 | Situation | Skill | Loaded by |
 | --- | --- | --- |
-| [e.g. building or changing a screen or component] | [skill name] | [implement / review / both] |
+| [e.g. building or changing a screen or component] | [skill name] | [implement / review / `gam-frontend (<situation>)`] |
 
-Preset for a web frontend, offered by setup (delete the rows that do not apply):
+Preset for a web frontend, offered by setup (delete the rows that do not apply; order and boundaries in [gam-frontend: Situations](../../gam-frontend/references/situations.md)):
 
 | Situation | Skill | Loaded by |
 | --- | --- | --- |
-| Building or changing a screen or component | `frontend-design` | implement |
-| Proving a story that changes the interface against the running app (P-DES-8) | `webapp-testing` | implement (*Finish*), review |
-| Auditing accessibility and UX of changed interface code | `web-design-guidelines` | review |
-| Writing React or Next.js code, if §1 names React | `react-best-practices` | implement, review |
-| Building components with shadcn/ui, if §1 or §2 names it | `shadcn` | implement |
-| Building animations, transitions, or overlays (modals, drawers, toasts), if the interface has or plans them | `emil-design-eng` | implement |
-| Fetching and caching server data, if §1 names React | `tanstack-query-expert` | implement, review |
+| Shaping a new screen (`shape`), building a screen or component against generic AI-looking interfaces with `DESIGN.md` (P-DES-12), and critiquing and auditing changed screens (`critique`, `audit`) | `gam-v-impeccable` | gam-frontend (plan, build, review) |
+| Building components with shadcn/ui, if §1 or §2 names it | `shadcn` | gam-frontend (build) |
+| Writing React or Next.js code, if §1 names React | `react-best-practices` | gam-frontend (build), review |
+| Fetching and caching server data, if §1 names React | `tanstack-query-expert` | gam-frontend (build), review |
+| Building animations, transitions, or overlays (modals, drawers, toasts), if the interface has or plans them | `gam-v-animate` | gam-frontend (motion) |
+| Several elements entering, leaving, or moving together, if the interface has motion | `gam-v-choreograph` | gam-frontend (motion) |
+| Drag, swipe, and sheets the finger moves, if the interface has them | `gam-v-gestures` | gam-frontend (motion) |
+| The native feel of gestures and sheets, if the interface has them | `gam-v-apple-design` | gam-frontend (motion) |
+| An animation that drops frames, if the interface has motion | `gam-v-animation-performance` | gam-frontend (motion) |
+| Reviewing motion code in the diff, if the interface has motion | `gam-v-review-animations` | gam-frontend (review) |
+| Stress-testing changed screens with worst-case data (long names, empty lists, huge counts) | `gam-v-break-ui` | gam-frontend (review) |
+| Proving a change to the interface against the running app (P-DES-8) | `webapp-testing` | gam-frontend (review), implement (*Finish*) |
+| Trying genuinely different versions of a UI piece | `gam-v-ui-prototype` | gam-frontend (vary) |
+| Choosing a library for a need without a row in the library table below | `gam-v-pick-ui-library` | gam-frontend (library) |
+| Making a web app feel native on a phone, if it targets phones | `gam-v-mobile-native` | gam-frontend (mobile) |
 
 Libraries for P-DES-11, offered by setup together with the preset (delete the rows that do not apply):
 
@@ -119,6 +127,8 @@ Libraries for P-DES-11, offered by setup together with the preset (delete the ro
 | Charts, if the interface shows any | Recharts | package manager |
 | Data tables with sorting, filtering, paging, if the interface shows any | TanStack Table | package manager |
 | Server-state fetching and caching | TanStack Query | package manager |
+
+A need without a row here goes to `gam-frontend (library)`, which proposes the result of `gam-v-pick-ui-library` as a new row.
 
 ## 11. Storage mapping & migration state
 

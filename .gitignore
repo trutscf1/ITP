@@ -18,3 +18,7 @@ dist/
 storybook-static/
 .trivy-cache/
 .scannerwork/
+
+# VS Code workspace file written by worktree-setup.mjs (P-WS-13)
+*.code-workspace
+gam-engineering/reports/
