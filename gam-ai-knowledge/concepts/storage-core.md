@@ -10,7 +10,7 @@ serves: "G-1"
 
 The specification of roadmap feature R5: how a member uploads, organizes, deletes, restores, and downloads files, and how those files are kept apart from everything else about them on the operator's own server. It is written for the feature's owner (schauby1), its reviewers, the owner of `web` who builds the pages of the feature, and the agents that implement it. Part H is the plain-language view; Part S is binding. Question log: [storage-core.qa-log.md](storage-core.qa-log.md).
 
-**Status of this version.** Grilled on 2026-11-24 (rounds 1 to 10, Q414 to Q445, A1 to A23); ready for review, not approved. The Phase 4 gate is the review of the merge request that carries this document.
+**Status of this version.** Grilled on 2026-11-24 (rounds 1 to 12, Q414 to Q455, A1 to A27); ready for review, not approved. The Phase 4 gate is the review of the merge request that carries this document.
 
 # Part H — For Human Readers
 
@@ -18,60 +18,105 @@ This part adds no rule. It summarizes Part S and cites its IDs; where the two di
 
 ## H1. In one sentence
 
-Members upload, organize, restore, and download files up to the size the operator allows, so that their data lives reliably on their own server. This serves `G-1` ("store, organize … on their own server"): every byte stays on the operator's installation, and nothing in this feature needs a service on the internet, so `G-1.S1` holds ([STO-NF-8]).
+Members upload, organize, restore, and download files up to the size the operator allows, so that their data lives reliably on their own server. This serves `G-1` ("store, organize … on their own server"): the server is the organisation's own, run by the operator. "Reliably" here means one thing: a file is saved completely or not at all, in all three places that hold it ([STO-F-35] (all or nothing), Q426), so no half-saved file ever shows up. It is no promise of backups or availability (`G-1.N4`). Through stash only the owner reaches an item ([STO-F-24] (owner only)), but stash stores files unencrypted ([STO-NF-7] (encryption at rest)), so whoever runs or has access to the server can read them. `G-1.S1` (start on one own server without internet) is a goal of the whole system; this feature needs no service on the internet and so does not endanger it ([STO-NF-8] (start without internet)).
 
 ## H2. Who benefits and how
 
-- **Member (`R-1`)**: uploads several files at once by file picker or drag and drop, sees the progress of each, continues an interrupted upload where it stopped, creates nested folders, renames, moves, and copies, restores a deleted item within 30 days, and downloads a file or a whole folder as one ZIP archive ([STO-US-2], [STO-US-3], [STO-US-5], [STO-US-6], [STO-US-7]). Only the member sees their own files ([STO-F-24] owner only).
-- **Operator (`R-2`)**: decides the largest file (default 5 GiB), the allowed file types, the chunk size, and how long the trash keeps items, all in the configuration ([STO-F-8], [STO-F-11], [STO-F-29]); saves space because identical files are stored once ([STO-US-4]); and is responsible for encrypting the disks ([STO-NF-7]).
-- **Owners of `web`, `identity`, and `worker`**: `web` builds the pages of the feature; `identity` tells `storage` to delete everything of a member whose account is deleted ([STO-F-44]); `worker` runs the clean-up jobs ([STO-US-3]).
+- **Member (`R-1`)**: uploads several files at once by file picker or drag and drop and sees the progress of each ([STO-US-2] (upload files)); continues an interrupted upload where it stopped ([STO-US-3] (chunked upload with resume)); creates nested folders and renames, moves, and copies files and folders ([STO-US-5] (manage folders and files)); restores a deleted item ([STO-US-6] (trash)); and downloads a file or a whole folder as one ZIP archive ([STO-US-7] (download files and folders)). Until the story STO-US-6 ships, deleting is final: there is no trash yet ([STO-F-26] (delete to trash), A7).
+- **Operator (`R-2`)**: sets the largest file (5 GiB by default), the allowed file types, the chunk size (8 MiB by default), and how long the trash keeps items (30 days by default) in the configuration ([STO-F-8] (size and type limits), [STO-F-29] (automatic purge)). Identical content is stored once, which saves space ([STO-US-4] (deduplication by file hash)). The operator is responsible for encrypting the disks and for backups ([STO-NF-7] (encryption at rest)).
+- **Link recipient (`R-3`), visitor (`R-4`), and content editor (`R-5`)**: nothing changes for them; sharing comes later, and the public pages hold no member files (§12).
 
 ## H3. How it works, step by step
 
-1. A member opens their files. The first time, stash creates their root folder ([STO-F-34]). Every request first asks `identity` whether the session is valid; without a valid session nothing is shown ([STO-F-4], A2).
-2. The member picks files or drops them on the folder. Each file is sent in chunks of 8 MiB over one resumable upload path, and each file shows its own progress ([STO-AC-2.1], [STO-F-11], [STO-F-42], [STO-U-1]).
-3. If the folder already holds a file of that name, the member chooses to replace it, keep both (the new file becomes `Name (2).ext`), or cancel ([STO-AC-2.4], [STO-F-9], [STO-F-38]).
-4. When the last chunk has arrived, `storage` reads the content once to compute its SHA-256 fingerprint. If another file already has the same content, the new copy of the bytes is thrown away and the new file points to the existing content; otherwise the bytes become a new content object ([STO-F-16], [STO-F-17]). The save is all or nothing across the three stores ([STO-F-35]).
-5. Every open folder view of the member, also on a second device, learns about the new file through a live event and updates without a reload ([STO-F-10]).
-6. If the connection drops or the page is reloaded, the upload continues where it stopped; the member can also pause and resume. An upload that nobody continues is removed after 24 hours ([STO-AC-3.2], [STO-AC-3.3], [STO-F-15]).
-7. The member creates folders to any depth and renames, moves, and copies files and folders. Names follow portable rules so a ZIP archive opens on every system ([STO-F-21], [STO-F-22], [STO-F-23]).
-8. Deleting an item moves it to the trash; a deleted folder is one entry with everything in it. A member restores an entry to its original place, or to the root folder if that place is gone, and deletes it for good only after confirming. After 30 days the trash removes it by itself ([STO-F-26], [STO-F-27], [STO-F-29], [STO-F-41], [STO-F-51]).
-9. A file is downloaded with its name and type; a browser can also ask for a part of it. A folder or a selection is streamed as a ZIP archive that is never held in memory as a whole; the ZIP of the root folder is a complete copy of the member's data ([STO-F-30] to [STO-F-32], [STO-F-49]).
-10. Content is removed from the server as soon as the last file that uses it is gone; a clean-up job catches whatever a crash left behind ([STO-F-5], [STO-F-18], [STO-F-36]).
+1. A member opens their files. The first time, stash creates their root folder ([STO-F-34] (root folder)). Every request first asks `identity` whether the session is valid; without a valid session nothing is shown ([STO-F-4] (protected endpoints), A2). Only the health endpoint and the internal deletion call of step 11 do not ask `identity`.
+2. The member picks files or drops them on the folder. Each file is sent in chunks (8 MiB by default) over one resumable upload path, and each file shows its own progress ([STO-AC-2.1] (several files), [STO-F-42] (one upload path), [STO-U-1] (progress per file)).
+3. If the folder already holds a file of that name, the member chooses to replace it, keep both (the new file becomes `Name (2).ext`), or cancel ([STO-F-9] (name conflict), [STO-F-38] (keep-both name)). Replace sends the old file through the normal deletion: into the trash, or final deletion before STO-US-6 ships. Replace is not offered when the existing item is a folder. If the name only becomes taken after the upload was created, keep-both is applied without asking ([STO-F-9]; the writing decisions on conflicts in §13).
+4. When the last chunk has arrived, `storage` reads the content once to compute its SHA-256 fingerprint ([STO-F-16] (hash on completion)). If a content object with the same fingerprint exists, the new copy of the bytes is thrown away and the new file refers to the existing content object; otherwise the bytes become a new content object ([STO-F-17] (reference instead of copy)). The save is all or nothing across the three stores ([STO-F-35]).
+5. Every open folder view of the member, also on a second device, learns about the change through a live event and updates without a reload ([STO-F-10] (live list)).
+6. If the connection drops or the page is reloaded, the upload continues where it stopped; after a reload it continues when the member selects the same file again. The member can also pause and resume ([STO-F-12] (resume), [STO-F-13] (pause), [STO-U-5] (pause and resume)). An upload that nobody continues is removed after 24 hours by default, configurable, plus up to one clean-up interval (60 minutes by default) ([STO-F-15] (clean-up of uploads), [STO-NF-10] (retention periods), [STO-E-13] (clean-up job failed)).
+7. The member creates folders (at least 1,000 levels deep) and renames, moves, and copies files and folders. Names follow portable rules so a ZIP archive opens on every system ([STO-F-21] (nested folders), [STO-F-22] (rename, move, copy), [STO-F-23] (name validation)).
+8. Once the story STO-US-6 (trash) ships, deleting an item moves it to the trash; a deleted folder is one trash entry with everything in it ([STO-F-26], [STO-F-41] (folder in the trash)). A member restores a trash entry to its original place, or to the root folder if that place is gone ([STO-F-27] (restore), [STO-F-50] (restore conflict)), or deletes it for good after confirming ([STO-F-51] (delete for good), [STO-U-7] (confirm final deletion)). After 30 days by default, configurable, plus up to one clean-up interval, the trash removes it by itself ([STO-F-29]).
+9. A file is downloaded with its name and type; a browser can also ask for a part of it ([STO-F-30] (single file), [STO-F-32] (range requests)). A folder or a selection is streamed as a ZIP archive that is never held in memory as a whole ([STO-F-31] (folder as ZIP)). The ZIP of the root folder contains every live file and folder of the member, below their names; it holds no trash entries and no file metadata ([STO-F-49] (download everything)).
+10. A content object is removed from the stores as soon as the last file that refers to it is deleted for good; while a file sits in the trash, it still holds its reference, up to the retention period ([STO-F-18] (reference counting), [STO-F-5] (final deletion)). A clean-up job catches what a crash or a failed removal left behind ([STO-F-36] (clean-up net), [STO-E-11] (removal failed after commit)). Nothing in this feature erases backups or replicas that the operator keeps.
+11. When an account is deleted, `identity` calls `storage`, which deletes at once everything of that member alone: files, folders, trash entries, and unfinished uploads ([STO-F-44] (account deletion), [STO-NF-6] (no remainder of a deleted account)). Content that another member's file also uses stays for that member, with nothing that points to the deleting member ([STO-NF-5] (shared content leaves no trace)). What stays: the shared content, IDs that logs and traces may still hold ([STO-NF-4] (no names or content in telemetry)), bytes whose removal failed until the next clean-up run, and the operator's backups. Whether this meets legal duties is an open question (L1, A22).
 
 ## H4. What it deliberately does not do
 
-- No sharing, teams, roles, or inherited permissions: only the owner sees an item until R7 ([teams-permissions.md](teams-permissions.md); Q420).
+- No sharing, teams, roles, or inherited permissions: only the owner reaches an item until R7 ([teams-permissions.md](teams-permissions.md); Q420). No quotas.
 - No thumbnails, virus scan, or text recognition; the file metadata of this feature holds only the detected type (R9, [background-processing.md](background-processing.md)).
-- No end-to-end encryption; encrypting the disks is the operator's job, and the documentation says so ([STO-NF-7], Q442).
-- No quotas, no version history, no pagination of long folders, and no preview (R7, R6; §12).
+- No end-to-end encryption and no encryption by stash; encrypting the disks is the operator's job ([STO-NF-7], Q442).
+- No backups and no availability guarantee (`G-1.N4`); no native sync clients (`G-1.N1`), because files are reached only through the web client and its installable offline app; no co-editing (`G-1.N2`); no payment or plans (`G-1.N3`); no cryptography of its own (`G-1.N5`).
+- Limits a member sees (§12): a single file cannot be restored from a deleted folder, only the whole trash entry (Q439); the member cannot sort a folder; long folders are not paginated; files have no preview or version history; there is a single instance of `storage`, so the live events work only through that one.
 - No legal decision: whether and on which basis an installation may keep members' files is an open question for the school management (L1 in §13).
 
 ## H5. How it is built, in plain words
 
-`storage` is a small HTTP server in its own container, reached under `/api/storage`. It keeps three kinds of data in three places: the bytes of files in an object store, the names, folders, owners, and fingerprints in the relational database, and facts derived from the content in a document database (§8, [STO-F-2]). The rules for files, folders, the trash, and counting how many files share a content object live in one deep module, the storage core, which reaches the three stores through three ports so it can be tested without them (§16, M3). The upload is a resumable protocol served by `storage`; finishing an upload runs the same module. `worker` runs the clean-up jobs on a schedule, using the same module. `web` gets the file browser and the upload dialog as slices of its own (Q432). Every story with an interface is cut into a slice for `storage` and a slice for `web` (A23).
+`storage` is a small HTTP server in its own container, reached under `/api/storage`. It keeps the data of a file in three places (§8, [STO-F-2] (separated data)): the object store holds the bytes; the record store holds names, folders, owners, sizes, trash markers, and the record of each content object (fingerprint, size, reference count); the metadata store holds the facts derived from the content, one document per content object. The rules for files, folders, the trash, and counting how many files share a content object live in one deep module, the storage core, which reaches the three stores through three ports so it can be tested without them (§16, M3). Unfinished uploads keep their folder, file name, owner, and last activity next to the bytes in the object store (§8).
+
+Two state machines (§16) summarize the life of the data. An upload is created, receives chunks (it can be paused and resumed), is finalized when the last chunk has arrived, and ends stored, failed, or expired after 24 hours without activity by default. An item is live; deleting makes it trashed (before STO-US-6, deleting makes it gone at once); restoring makes it live again; deleting for good, the purge after 30 days by default, or an account deletion makes it gone.
+
+Other units: `web` builds the file browser, the upload dialog, and the trash page as slices of its own (Q432); `worker` runs the clean-up jobs on a schedule and uses the same storage core ([STO-US-3] slice 3 brings the clean-up of uploads and orphans, [STO-US-6] slice 3 the purge of the trash); `identity` tells `storage` to delete the data of a deleted account, a call that is still a planned change awaiting its owner, like the note on encryption for `deployment.md` (§15, W10).
 
 ## H6. How we know it works
 
-Every acceptance criterion has at least one acceptance test in §17, run against `storage` with a real relational database, object store, and document database in the test stack, and a stub that plays the session check ([STO-T-1] to [STO-T-35]). One end-to-end test runs the whole path once with the real `identity` and the seeded member, in a browser ([STO-T-30]). The integration test of the old criterion "integration test" is now the behaviour "store, read, delete leaves nothing behind" ([STO-T-5]). The counting of references, the name rules, the range and archive rules, and the clean-up selection are unit tests with the values of §10 ([STO-T-36] to [STO-T-54]).
+The scenarios of §17 are of five kinds. The acceptance tests (at least one per acceptance criterion) run against `storage` over HTTP with the real record, object, and metadata stores of the test stack and a stub that plays the session check; the former test-only criterion became the integration test [STO-T-5] (store, read, delete leaves nothing behind) of the reworded criterion [STO-AC-1.5] (delete removes everything). The integration tests ([STO-T-31] account deletion, [STO-T-32] all or nothing, [STO-T-33] clean-up net, [STO-T-34] no names in telemetry, [STO-T-35] start without internet) cover what spans several parts. One browser end-to-end test ([STO-T-30] (the member's day)) runs with the real `identity` and the seeded member. The runs of 5 GiB ([STO-T-12], [STO-T-27]) are done by a person and recorded in a test protocol; they are never run in CI. The unit tests use the values of §10 (names, keep-both names, type check, reference counting, ranges, archives, moves, restore) and, for the clean-up, the ages in [STO-T-51].
+
+| Story | Scenarios |
+| --- | --- |
+| STO-US-1 (connect the storage backend to the object storage) | [STO-T-1] (bytes in the object store), [STO-T-2] (three stores, one fact each), [STO-T-3] (documented endpoints), [STO-T-4] (protected endpoints), [STO-T-5] |
+| STO-US-2 (upload files) | [STO-T-6] (size and type limits), [STO-T-7] (name conflict), [STO-T-8] (live list), [STO-T-9] (chunked protocol), [STO-T-14] (hash on completion), [STO-T-30] |
+| STO-US-3 (chunked upload with resume) | [STO-T-10] (resume), [STO-T-11] (pause on the server side), [STO-T-12] (large files), [STO-T-13] (clean-up of uploads), [STO-T-30] |
+| STO-US-4 (deduplication by file hash) | [STO-T-15] (reference instead of copy), [STO-T-16] (reference counting), [STO-T-17] (invisible to members), [STO-T-18] (counting is tested) |
+| STO-US-5 (manage folders and files) | [STO-T-19] (nested folders), [STO-T-20] (rename, move, copy), [STO-T-21] (name validation), [STO-T-22] (owner only), [STO-T-30] |
+| STO-US-6 (trash) | [STO-T-23] (delete to trash), [STO-T-24] (restore), [STO-T-25] (automatic purge), [STO-T-30] |
+| STO-US-7 (download files and folders) | [STO-T-26] (single file), [STO-T-27] (folder as ZIP), [STO-T-28] (range requests), [STO-T-29] (permission check per download) |
 
 ## H7. Key decisions
 
+One line per decision of §13 (Q numbers are those of the question log; Q446 and Q447 were used by other sessions).
+
 | Question | Decision | Reason |
 | --- | --- | --- |
-| Q417 Feature goal | "Up to the size the operator allows" instead of "any size" | The limit exists and is tested at 5 GiB |
-| Q418 Data apart | File (record store), content object (object store), file metadata (document store) | Deduplication needs bytes separate from names |
+| Q414 Deviations | None from the standing decisions | They apply unchanged |
+| Q415 Ownership of R5 | schwaigc took over only #56 and #117; schauby1 stays owner | Narrowest change |
+| Q416 Scope of the grill | The whole of R5, foundation first | One consistent concept |
+| Q417 Feature goal | "Up to the size the operator allows" instead of "of any size" | The limit is configurable and tested at 5 GiB |
+| Q418 Terms | File, content object, file metadata | Deduplication needs bytes apart from names |
+| Q419 STO-AC-1.5 | Reworded as behaviour; the test moved to §17 | A criterion describes what a person can observe |
 | Q420 Rights | Only the owner until R7 | Teams and roles are R7 |
-| Q421 Test user | Session check as a seam with a stub, plus one end-to-end test | Fast tests, one proof with the real login |
-| Q425 Object key | Random ID; fingerprint in the record store | A key never reveals content |
+| Q421 Test member | Session check as a seam with a stub, plus one end-to-end test | Fast tests, one real proof |
+| Q422 HTTP framework | The same as `identity` | One framework in both server units |
+| Q423 Object store client | An established client library | No own client code |
+| Q424 Metadata store access | The database's official driver | No second schema layer |
+| Q425 Object key | A random ID; the fingerprint in the record store | A key reveals nothing about content |
 | Q426 Failure | All or nothing across the three stores | No half-saved files |
-| Q427 Read path | Bytes stream through `storage` | The object store is not public and every download is checked |
-| Q428 Removal | Immediately, with a clean-up net | Members' deletions take effect at once |
-| Q429 Upload path | One resumable path for every upload | One code path to test |
-| Q434, Q436 Fingerprint | Computed after completion; a duplicate upload is deleted | Resumed uploads cannot be hashed on the fly |
-| Q435 Jobs | The clean-up runs in `worker` now | R9 reuses it later |
-| Q441 Account deletion | Everything is deleted at once | Right to erasure |
-| Q443 Speed | Three measurable targets | Falsifiable and tested in R13 |
+| Q427 Read path | Bytes stream through `storage` | The object store is not public; every download is checked |
+| Q428 Removing a content object | It is removed at once when its reference count reaches 0, with a clean-up net for failed removals | The bytes do not linger |
+| Q429 Upload path | One resumable path for every upload | One path to build and test |
+| Q430 Type check | Content and extension together | A renamed file does not slip through |
+| Q431 Live list | Server-sent events | One-way, simple, works through the proxy |
+| Q432 Interface | Built in R5 as web slices | A story is done when a member can use it |
+| Q433 Upload server | A library for the resumable protocol | No own protocol code |
+| Q434 Fingerprint | Computed after completion by reading once | A resumed upload cannot be hashed on the fly |
+| Q435 Clean-up jobs | `worker` runs them now | R9 reuses the runtime |
+| Q436 Deduplication hit | The new object is deleted, the file refers to the old one | One copy of the bytes |
+| Q437 Name rules | Portable rules | Archives open on every system |
+| Q438 Restore with a conflict | Asks like an upload | One behaviour for both |
+| Q439 Trash entry of a folder | Only the whole trash entry | No partial trees |
+| Q440 ZIP | A streaming library, stored without compression, for archives over 4 GiB | Archives are never held in memory |
+| Q441 Account deletion | Everything of that member alone is deleted at once; shared content stays for the other member; whether this meets legal duties is open (L1) | Members' data leaves the stores when the account goes |
+| Q442 Encryption at rest | The operator's matter, documented | stash adds no cryptography of its own |
+| Q443 Speed | Three measurable targets | Falsifiable; measured under load in R13 |
+| Q444 Adversarial check | An independent check of §1 and Part H before the review | Personal data and irreversible deletion |
+| Q445 Shared understanding | Confirmed | — |
+| Q448 Table `folders` | `owner_id` added, `team_id` optional until R7, new tables `files` and `content_objects` | Smallest change |
+| Q449 Account deletion call | An internal call with a shared secret, storage first | `identity` owns the account |
+| Q450 Shared package | `packages/storage-core` for `storage` and `worker`, without an ADR | Counting exists once |
+| Q451 Writing decisions | The details of W1 to W5, W8, W9, W12 stay | Accepted |
+| Q452 Fingerprint criterion | Moved into STO-US-2 | The first stored file needs it |
+| Q453 Protocol criterion | Moved into STO-US-2 | Q429 puts the path there |
+| Q454 Capacity | Read from the object store's status interface | The standard interface has no such call |
+| Q455 Cross-model check | Skipped | One independent check was enough |
 
 # Part S — Specification (normative)
 
@@ -79,7 +124,7 @@ Every acceptance criterion has at least one acceptance test in §17, run against
 
 ### Development Path
 
-Path A (frontloaded). The first draft of 2026-10-06 was grilled on 2026-11-24 by schwaigc (rounds 1 to 10, Q414 to Q445, A1 to A23). The concept was taken over from schauby1 on 2026-11-24 for the story issues #56 and #117; schauby1 stays owner of R5 (Q415). Phases 5 and 6 are in the same merge request; its approval by another team member is the Phase 4 gate.
+Path A (frontloaded). The first draft of 2026-10-06 was grilled on 2026-11-24 by schwaigc (rounds 1 to 12, Q414 to Q455, A1 to A27). The concept was taken over from schauby1 on 2026-11-24 for the story issues #56 and #117; schauby1 stays owner of R5 (Q415). Phases 5 and 6 are in the same merge request; its approval by another team member is the Phase 4 gate.
 
 ### Synthesis Dependencies
 
@@ -100,7 +145,17 @@ schauby1, per [ROADMAP.md](../ROADMAP.md) (Q415). The story issues #56 and #117 
 
 **Feature goal:** Members upload, organize, restore, and download files up to the size the operator allows, so that their data lives reliably on their own server.
 
-**Serves:** `G-1` in [GOAL.md](../GOAL.md), as stated in the *Serves* column of [ROADMAP.md](../ROADMAP.md) ("store and organize files"): files are kept on the operator's own installation and nobody else reaches them. It keeps `G-1.S1`: every store runs locally and no internet service is needed ([STO-NF-8]). No non-goal is touched: the content hash comes from the platform's standard cryptography (`G-1.N5`, [STO-C-8]), and nothing here syncs to native clients (`G-1.N1`).
+**Serves:** `G-1` in [GOAL.md](../GOAL.md), as stated in the *Serves* column of [ROADMAP.md](../ROADMAP.md) ("store and organize files"): files are kept on the organisation's own server, which its operator runs. Access through stash is owner-only ([STO-F-24]), but stash stores files unencrypted ([STO-NF-7]), so whoever runs or has access to the server can read them; "reliably" in the goal means the all-or-nothing save of Q426 ([STO-F-35]), not a backup or availability promise. `G-1.S1` is a goal of the whole system; this feature needs no service on the internet and so does not endanger it ([STO-NF-8]).
+
+Non-goals of `GOAL.md`, checked one by one:
+
+| Non-goal | Check |
+| --- | --- |
+| `G-1.N1` native sync clients | Not touched: files are reached only through the web client. |
+| `G-1.N2` real-time co-editing | Not touched: a file is stored and replaced as a whole. |
+| `G-1.N3` payment, billing, plans | Not touched: this feature has no quotas and nothing that is sold. |
+| `G-1.N4` production operation with an availability guarantee | Respected: the feature promises no backup and no availability; operators back up their own server. |
+| `G-1.N5` own cryptography | Respected: the fingerprint is SHA-256 from the platform ([STO-C-8]), and stash adds no encryption of its own ([STO-NF-7]). |
 
 ## 2. Ubiquitous Language & Context
 
@@ -501,7 +556,7 @@ With `ALLOWED_FILE_TYPES=*`: `a.txt` with plain text is accepted and stored as `
 
 ## 13. Resolved Questions & ADRs
 
-Verbatim rounds: [storage-core.qa-log.md](storage-core.qa-log.md). The questions are numbered by the project-wide counter; assumptions (A1 to A23) were stated before the questions of their round and accepted with Q445. No ADR is needed: the stack choices are rows of `STACK.md` §2, and the session check follows [ADR-0007](../adr/0007-session-check-through-identity.md).
+Verbatim rounds: [storage-core.qa-log.md](storage-core.qa-log.md). The questions are numbered by the project-wide counter; assumptions (A1 to A27) were stated before the questions of their round; A1 to A23 were accepted with Q445, A24 to A27 in round 11. No ADR is needed: the stack choices are rows of `STACK.md` §2, and the session check follows [ADR-0007](../adr/0007-session-check-through-identity.md).
 
 | Q | Title | Decision | Rationale |
 | --- | --- | --- | --- |
@@ -532,10 +587,10 @@ Verbatim rounds: [storage-core.qa-log.md](storage-core.qa-log.md). The questions
 | Q438 | Restore with a conflict | Asks like an upload ([STO-F-50], [STO-U-11]) | One behaviour for both |
 | Q439 | Trash entry of a folder | Only the whole entry ([STO-F-41]) | Simple, no partial trees |
 | Q440 | ZIP streaming | A streaming ZIP library, entries stored without compression, for archives over 4 GiB (`STACK.md` §2, [STO-C-5]) | Archives are never held in memory |
-| Q441 | Account deletion | Everything is deleted at once ([STO-F-44], [STO-NF-6]) | Right to erasure |
+| Q441 | Account deletion | Everything of that member alone is deleted at once; shared content stays for the other member ([STO-F-44], [STO-NF-6], [STO-NF-5]) | Members' data leaves the stores when the account goes; legal sufficiency is open (L1) |
 | Q442 | Encryption at rest | The operator's matter, documented ([STO-NF-7]) | stash adds no cryptography of its own (`G-1.N5`) |
 | Q443 | Performance | Three targets ([STO-NF-1] to [STO-NF-3]) | Measurable; tested in R13 |
-| Q444 | Adversarial check | An independent check of §1 and Part H before the review | Personal data and irreversible deletion |
+| Q444 | Adversarial check | An independent check of §1 and Part H before the review. It ran on 2026-11-24 (cycle 1): 22 findings, all fixed. The cross-model check was skipped (Q455) | Personal data and irreversible deletion |
 | Q445 | Shared understanding | Confirmed | — |
 | Q448 | Table `folders` | `owner_id` is added to `folders`, `team_id` becomes optional until R7, and the tables `files` and `content_objects` are new (§15, W6); the change of `scaffolding.md` §8 goes to `trutscf1` | Smallest change that makes folders member-owned |
 | Q449 | Account deletion through `identity` | An internal call with a shared secret, storage first, then the account ([STO-F-44], W10); an inbox item for `tschudea07` | `identity` owns the account; the order protects against orphaned content |
@@ -544,6 +599,7 @@ Verbatim rounds: [storage-core.qa-log.md](storage-core.qa-log.md). The questions
 | Q452 | Fingerprint from the first upload | STO-AC-4.1 moved to STO-US-2 as [STO-AC-2.6] (formerly STO-AC-4.1); STO-US-4 keeps STO-AC-4.2 to STO-AC-4.5 | The first stored file already needs its fingerprint |
 | Q453 | Overlap of STO-US-2 and STO-US-3 | STO-AC-3.1 moved to STO-US-2 as [STO-AC-2.7] (formerly STO-AC-3.1); STO-US-3 covers resume, pause, large files, and clean-up | Q429 puts the resumable path into STO-US-2 |
 | Q454 | Used and total storage | An adapter behind the object store port reads both from the status interface of the object store's master on the internal network (`STACK.md` §2, [STO-F-46]) | The S3 interface has no capacity call |
+| Q455 | Cross-model check | Skipped ("Überspringen (Recommended)") | One independent check was enough |
 
 | A | Assumption (accepted with Q445) | Where it applies |
 | --- | --- | --- |
@@ -569,7 +625,7 @@ Verbatim rounds: [storage-core.qa-log.md](storage-core.qa-log.md). The questions
 | A20 | The ZIP download of the root folder serves data portability | [STO-F-49] |
 | A21 | Shared content stays for the other owner; nothing that points to the deleting member remains | [STO-NF-5] |
 | A22 | Legal questions are not decided here | L1 below |
-| A23 | Every story with an interface is cut into an API slice and a web slice; the clean-up jobs are a worker slice of STO-US-3 | §16 |
+| A23 | Every story with an interface is cut into an API slice and a web slice; the clean-up jobs of STO-US-3 are a worker slice; the purge is STO-US-6 slice 3 (writing decision of the draft, not asked) | §16 |
 | A24 | STO-US-1 also depends on IDN-US-2 (the session check) | story file STO-US-1 |
 | A25 | After STO-US-6 only the deletion for good satisfies STO-AC-1.5; STO-T-5 stays | [STO-F-5], [STO-T-5] |
 | A26 | The weights of the stories are re-estimated at `tickets` | §16 |

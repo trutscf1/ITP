@@ -231,3 +231,11 @@ Answer: "AC-3.1 nach US-2 (Recommended)".
 **Q454 - Speicherbelegung (OBS-F-23):** Die S3-Schnittstelle liefert keine belegte und keine Gesamtgröße. Woher nimmt storage die beiden Werte?
 
 Answer: "SeaweedFS-Master-API (Recommended)".
+
+## Round 12 — 2026-11-24 — adversarial check (`schwaigc`)
+
+The independent check of §1 and Part H that Q444 asked for ran on 2026-11-24 (cycle 1) with 22 findings, all fixed in the concept.
+
+**Q455 - Cross-model-Prüfung:** Soll zusätzlich zur unabhängigen Prüfung eine Gegenprüfung durch ein anderes Modell laufen?
+
+Answer: "Überspringen (Recommended)".
