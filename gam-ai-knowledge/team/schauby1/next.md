@@ -11,6 +11,7 @@ New tasks and ideas for this developer land here first, before anyone plans them
 
 ## Open
 
+- [2026-11-24] From `schwaigc`: I took over #56 (STO-US-1 slice 1) and the concept issue #117 from you and grilled R5 on `concept/storage-core` (`concepts/storage-core.qa-log.md`, Q414–Q454); you stay owner of R5 and of the stories #57–#62 (Q415). Please review the concept MR, especially §13, the slices in §16, and the moved criteria STO-AC-2.6 (formerly 4.1) and STO-AC-2.7 (formerly 3.1). This covers point (2) of the entry below (OBS-F-21, OBS-F-23).
 - [2026-10-27] From `trutscf1`, concept *Observability baseline* (R2, `concepts/observability.md` §15, MR of #114): (1) the job envelope in the contracts core gets the optional field `traceContext` (§8, OBS-F-15), and `storage` and `worker` call the shared package `telemetry` — slices 6 (instrumentation) and 7 (trace through the job, after R5 and R9) of OBS-US-1, issues for you after `tickets` (changed on 2026-11-02, round 6 of the question log); (2) when you grill R5 and R9, add requirements that emit `upload.received`, `storage.capacity.used`, `storage.capacity.total` (R5) and `queue.jobs.waiting` (R9) exactly as in §8 (OBS-F-21 to OBS-F-23).
 - [2026-10-06] Add `Developer handle: schauby1` to your own gitignored `CLAUDE.local.md` and read `team/TEAM.md`.
 - [2026-10-06] Review the drafts that concern your features: the roles and success signals in `GOAL.md`, the *Serves* column in `ROADMAP.md`, and the concept drafts and work items of your features.

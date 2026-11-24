@@ -152,3 +152,43 @@ The at most four values a member chose in the appearance menu: theme, colour mod
 **Profile**:
 The member's own record in stash, at most one per member and separate from the account; today it holds the appearance preferences. The word names this record only, never the account.
 *Avoid*: account (for this record), settings
+
+**File**:
+What a member sees and works with: a name, its place in a folder, its owner, and its size. Its content is kept apart as a content object, and several files may share one content object without knowing it.
+*Avoid*: document, object, blob
+
+**Content object**:
+The stored bytes of a file's content, kept apart from everything else about the file. One content object can belong to several files with identical content; it is removed only when no file refers to it any more.
+*Avoid*: blob, file (for the bytes), chunk
+
+**File metadata**:
+The facts derived from a file's content after it is stored, such as its detected type, image details, recognized text, preview images, and the virus-scan result. A member never edits them.
+*Avoid*: metadata (for name, folder, or owner), properties
+
+**Owner**:
+The member who created a file or folder. Until teams and roles exist, only the owner can see or change it.
+*Avoid*: creator, uploader
+
+**Item**:
+A file or a folder. The word is used where a rule is the same for both, such as renaming, moving, copying, deleting, and restoring.
+*Avoid*: entry, node, object
+
+**Folder**:
+A named container in which a member keeps files and other folders. Folders nest to any depth and belong to one owner.
+*Avoid*: directory
+
+**Root folder**:
+The one folder of a member that has no parent. It is created when the member first uses their files, has no name of its own (the page calls it "My files"), and cannot be renamed, moved, copied, or deleted.
+*Avoid*: home folder, top folder, drive
+
+**Trash**:
+The place where an item a member deleted stays, restorable, until it is deleted for good by the member or automatically after 30 days (configurable).
+*Avoid*: recycle bin, bin
+
+**Trash entry**:
+An item a member deleted themselves, as the trash shows it. A deleted folder is one trash entry with everything in it; it is restored or deleted for good only as a whole.
+*Avoid*: deleted file, trash item
+
+**Upload**:
+The transfer of one file from a member's device to stash, in chunks, until its content is complete and stored as a file. An upload can be paused and continued after a dropped connection, and an unfinished one is removed after 24 hours (configurable).
+*Avoid*: import, transfer
