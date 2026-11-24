@@ -99,7 +99,7 @@ A person with a confirmed account of an installation of stash (role `R-1` in `GO
 
 **Account**:
 The record by which `identity` knows a member: display name, e-mail address, whether the address is confirmed, and the member's credentials. One account belongs to exactly one member.
-*Avoid*: profile, login
+*Avoid*: login; profile (for the account itself, see *Profile*)
 
 **Session**:
 The state of being logged in on one device, from a successful login until logout, expiry, or a password reset.
@@ -124,3 +124,31 @@ The check before registration and password reset that the request comes from a p
 **Operator role**:
 The right of an account to open the operations dashboards; given to accounts whose address the operator lists in the configuration.
 *Avoid*: admin, superuser
+
+**Theme**:
+One of exactly four looks of the interface: light, dark, sepia, night. A theme sets the colours of every page; high contrast, alternative colours, and reduced motion are not themes.
+*Avoid*: skin, mode, colour scheme (the colour scheme is the system's light or dark setting)
+
+**Colour mode**:
+The one choice that changes the colours of the interface for readability, next to the theme: standard, high contrast, alternative colours red-green, or alternative colours blue-yellow. Exactly one is active. Its labels describe the display, never the person.
+*Avoid*: accessibility mode, colour-blind mode, contrast mode
+
+**Font size**:
+One of three sizes of the text and spacing of the interface: small (87.5 %), normal (100 %), large (125 %) of the base size.
+*Avoid*: text size, zoom (zoom is the browser's own setting)
+
+**Reduced motion**:
+The state in which no animation and no transition runs on any page. It is on when the member switches it on or the system asks for it.
+*Avoid*: animations off, no-animation mode
+
+**Appearance menu**:
+The menu in the header of every page of the web client, shown to logged-in members and never to visitors, in which they choose theme, colour mode, font size, and reduced motion, reset each to the system, and see what is stored. It is the only place that changes these four values.
+*Avoid*: accessibility menu, accessibility settings, theme switcher (the theme switcher is its theme control)
+
+**Appearance preferences**:
+The at most four values a member chose in the appearance menu: theme, colour mode, font size, reduced motion. A kind the member did not choose, or reset to the system, is not stored. They are kept in the member's profile and, while a session exists, on the device; nothing else is derived from them.
+*Avoid*: accessibility settings, accessibility profile
+
+**Profile**:
+The member's own record in stash, at most one per member and separate from the account; today it holds the appearance preferences. The word names this record only, never the account.
+*Avoid*: account (for this record), settings
