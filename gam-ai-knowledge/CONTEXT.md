@@ -152,3 +152,19 @@ The at most four values a member chose in the appearance menu: theme, colour mod
 **Profile**:
 The member's own record in stash, at most one per member and separate from the account; today it holds the appearance preferences. The word names this record only, never the account.
 *Avoid*: account (for this record), settings
+
+**File**:
+What a member sees and works with: a name, its place in a folder, its owner, its size, and the fingerprint of its content. Several files may share one content object without knowing it.
+*Avoid*: document, object, blob
+
+**Content object**:
+The stored bytes of a file's content, kept apart from everything else about the file. One content object can belong to several files with identical content; it is removed only when no file refers to it any more.
+*Avoid*: blob, file (for the bytes), chunk
+
+**File metadata**:
+The facts derived from a file's content after it is stored, such as its detected type, image details, recognized text, preview images, and the virus-scan result. A member never edits them.
+*Avoid*: metadata (for name, folder, or owner), properties
+
+**Owner**:
+The member who created a file or folder. Until teams and roles exist, only the owner can see or change it.
+*Avoid*: creator, uploader
