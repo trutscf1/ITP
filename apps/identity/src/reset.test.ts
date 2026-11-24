@@ -331,3 +331,50 @@ describe(
     });
   },
 );
+
+describe(
+  "IDN-AC-1.7 IDN-F-30 reset with the registration closed",
+  { skip },
+  () => {
+    let stack: Stack;
+    before(async () => {
+      stack = await startStack();
+    });
+    after(async () => {
+      await stack?.stop();
+    });
+
+    it("IDN-AC-1.7 IDN-F-30 IDN-T-7 still sends a reset link and sets the new password while REGISTRATION_ENABLED=false", async () => {
+      const email = address();
+      const open = await startIdentity(stack);
+      await confirmedAccount(stack, open, email);
+      await open.close();
+
+      const closed = await startIdentity(stack, {
+        env: { REGISTRATION_ENABLED: "false" },
+      });
+      try {
+        const refused = await closed.post("/register", registration(address()));
+        assert.equal(refused.body?.code, "registration-closed");
+
+        const requested = await closed.post("/password-reset/request", {
+          email,
+        });
+        assert.equal(requested.status, 202);
+        const token = resetToken(stack.smtp.to(email).at(-1)?.text ?? "");
+        const done = await closed.post("/password-reset", {
+          token,
+          password: newPassword,
+        });
+        assert.equal(done.status, 204);
+        const login = await closed.post("/login", {
+          email,
+          password: newPassword,
+        });
+        assert.equal(login.status, 200);
+      } finally {
+        await closed.close();
+      }
+    });
+  },
+);

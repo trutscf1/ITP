@@ -4,10 +4,12 @@
 // of IDN-US-1 on top of it: accounts, confirmation links, and the removal of unconfirmed
 // accounts. Sessions are kept in the session store (sessions.ts), not by the library. The
 // `users` row is written only by the database trigger of SCF-F-24 (concept §14); nothing here
-// writes it, and `memberId` only reads it.
+// writes it, and `memberId` only reads it. The `pg` pool below belongs to the library; every
+// statement of our own goes through the access layer `@stash/db` (SCF-C-19).
 import { randomBytes } from "node:crypto";
 import { hash, verify } from "@node-rs/argon2";
 import { maxPasswordLength, minPasswordLength } from "@stash/contracts";
+import { createDb } from "@stash/db";
 import { betterAuth, type Where } from "better-auth";
 import pg from "pg";
 import type { Logger } from "./logger.ts";
@@ -134,7 +136,21 @@ export async function createAuthCore(
   pool.on("error", (error) => {
     options.logger.warn("database connection lost", { error });
   });
+  const db = createDb(options.databaseUrl);
+  try {
+    return await assemble(options, pool, db);
+  } catch (error) {
+    // A failed set-up leaves no open connections behind.
+    await Promise.allSettled([pool.end(), db.close()]);
+    throw error;
+  }
+}
 
+async function assemble(
+  options: AuthCoreOptions,
+  pool: pg.Pool,
+  db: ReturnType<typeof createDb>,
+): Promise<AuthCore> {
   const auth = betterAuth({
     baseURL: options.publicOrigin,
     secret: options.secret,
@@ -435,59 +451,40 @@ export async function createAuthCore(
       }),
 
     async memberId(accountId) {
-      const rows = await pool.query<{ id: string }>(
-        "SELECT id FROM users WHERE auth_user_id = $1",
-        [accountId],
-      );
-      return rows.rows[0]?.id;
+      const member = await db.orm.public.User.select("id").first({
+        authUserId: accountId,
+      });
+      return member?.id;
     },
 
-    removeUnconfirmed: (before) =>
-      adapter.transaction(async (db) => {
-        const stale: Where[] = [
-          { field: "emailVerified", value: false },
-          { field: "createdAt", operator: "lt", value: before },
-        ];
-        const candidates = (
-          await db.findMany<{ id: string }>({ model: "user", where: stale })
-        ).map(({ id }) => id);
-        if (candidates.length === 0) return 0;
-        // One conditional delete: an account confirmed or registered again since the read
-        // above no longer matches and stays. Credentials and `users` row go with the account
-        // (foreign keys with ON DELETE CASCADE).
-        const removed = await db.deleteMany({
-          model: "user",
-          where: [{ field: "id", operator: "in", value: candidates }, ...stale],
-        });
-        const kept = new Set(
-          (
-            await db.findMany<{ id: string }>({
-              model: "user",
-              where: [{ field: "id", operator: "in", value: candidates }],
-            })
-          ).map(({ id }) => id),
-        );
-        const gone = candidates.filter((id) => !kept.has(id));
-        if (gone.length > 0) {
-          await db.deleteMany({
-            model: "verification",
-            where: [
-              { field: "value", operator: "in", value: gone },
-              {
-                field: "identifier",
-                operator: "starts_with",
-                value: confirmationPrefix,
-              },
-            ],
-          });
-        }
-        return removed;
-      }),
+    async removeUnconfirmed(before) {
+      // One conditional delete, no read of candidates before it: an account confirmed or
+      // registered again meanwhile no longer matches and stays (IDN-F-31, Q346). Credentials
+      // and `users` row go with the account (foreign keys with ON DELETE CASCADE); every link
+      // of the accounts removed by this statement, whatever its kind, goes in the same
+      // statement, and the links of every other account stay.
+      const { affectedRows } = await db.execute(
+        db.raw.sql`
+          WITH removed AS (
+            DELETE FROM auth_users
+            WHERE email_verified = false AND created_at < ${before.toISOString()}::timestamptz
+            RETURNING id
+          ), links AS (
+            DELETE FROM auth_verifications WHERE value IN (SELECT id FROM removed)
+          )
+          SELECT id FROM removed`
+          .affectedCount()
+          .build(),
+      );
+      return affectedRows;
+    },
 
     async checkDatabase() {
-      await pool.query("SELECT 1");
+      await db.orm.public.User.select("id").limit(1).all();
     },
 
-    close: () => pool.end(),
+    async close() {
+      await Promise.all([pool.end(), db.close()]);
+    },
   };
 }

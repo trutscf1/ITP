@@ -640,14 +640,22 @@ describe(
     });
 
     it("IDN-T-7 IDN-AC-1.7 refuses even an invalid body with registration-closed and stores nothing", async () => {
+      const email = address();
+      const invalid = registration(email, { name: "", password: "x" });
+      // The control: with the registration open, the same body is invalid.
+      const open = await startIdentity(stack);
+      try {
+        const invalidWhenOpen = await open.post("/register", invalid);
+        assert.equal(invalidWhenOpen.status, 400);
+        assert.equal(invalidWhenOpen.body?.code, "validation-failed");
+      } finally {
+        await open.close();
+      }
+
       const closed = await startIdentity(stack, {
         env: { REGISTRATION_ENABLED: "false" },
       });
-      const email = address();
-      const refused = await closed.post(
-        "/register",
-        registration(email, { name: "", password: "x" }),
-      );
+      const refused = await closed.post("/register", invalid);
       assert.equal(refused.status, 403);
       assert.equal(refused.body?.code, "registration-closed");
       const stored = await stack.database.query(

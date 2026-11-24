@@ -1,6 +1,8 @@
 // IDN-T-25 (M7) and IDN-T-8 (IDN-AC-1.8): the hourly removal of unconfirmed accounts.
 import assert from "node:assert/strict";
 import { after, before, describe, it } from "node:test";
+import { setTimeout as sleep } from "node:timers/promises";
+import pg from "pg";
 import { skip } from "./test-support/database.ts";
 import {
   address,
@@ -99,6 +101,34 @@ describe("IDN-US-1 clean-up of unconfirmed accounts", { skip }, () => {
     assert.equal(links.length >= 1, true);
   });
 
+  it("IDN-T-25 IDN-AC-1.8 IDN-F-31 removes the reset link of a removed account too, and keeps the links of the accounts that stay", async () => {
+    const gone = address("link-gone");
+    const stays = address("link-stays");
+    await registerAged(gone, 8 * day);
+    await registerAged(stays, 6 * day);
+    for (const email of [gone, stays]) {
+      const reply = await running.post("/password-reset/request", { email });
+      assert.equal(reply.status, 202);
+    }
+    const goneId = await exists(gone);
+    const staysId = await exists(stays);
+    assert.ok(goneId);
+    assert.ok(staysId);
+    const links = (id: string) =>
+      stack.database.query<{ identifier: string }>(
+        "SELECT identifier FROM auth_verifications WHERE value = $1",
+        [id],
+      );
+    // A confirmation link and a reset link each.
+    assert.equal((await links(goneId)).length, 2);
+
+    await running.identity.runCleanup();
+
+    assert.equal(await exists(gone), undefined);
+    assert.equal((await links(goneId)).length, 0);
+    assert.equal((await links(staysId)).length, 2);
+  });
+
   it("IDN-T-8 IDN-AC-1.8 IDN-F-31 lets the address register again after the clean-up, as a fresh account", async () => {
     const email = address();
     await registerAged(email, 8 * day);
@@ -135,6 +165,60 @@ describe("IDN-US-1 clean-up of unconfirmed accounts", { skip }, () => {
     await running.identity.runCleanup();
     assert.ok(await exists(stays));
     assert.equal(await exists(goes), undefined);
+  });
+
+  it("IDN-T-25 IDN-AC-1.8 IDN-F-31 Q346 keeps an account that is registered again or confirmed while the clean-up is deleting, with its links", async () => {
+    // The clean-up is one conditional delete (no read of candidates before it): the row lock of
+    // the test holds the delete back, the change of the other request commits, and the delete
+    // finds the row no longer matching.
+    for (const change of [
+      "created_at = now()",
+      "email_verified = true",
+    ] as const) {
+      const email = address("races");
+      await registerAged(email, 8 * day);
+      const id = await exists(email);
+      assert.ok(id);
+      const other = new pg.Client({ connectionString: stack.database.url });
+      await other.connect();
+      try {
+        await other.query("BEGIN");
+        await other.query(
+          "SELECT id FROM auth_users WHERE id = $1 FOR UPDATE",
+          [id],
+        );
+        const cleanup = running.identity.runCleanup();
+        const deadline = Date.now() + 5000;
+        for (;;) {
+          const waiting = await stack.database.query(
+            "SELECT 1 FROM pg_stat_activity WHERE wait_event_type = 'Lock' AND datname = current_database() AND query LIKE '%DELETE FROM auth_users%' AND pid <> pg_backend_pid()",
+          );
+          if (waiting.length > 0) break;
+          assert.ok(
+            Date.now() < deadline,
+            "the clean-up never waited for the lock",
+          );
+          await sleep(20);
+        }
+        await other.query(`UPDATE auth_users SET ${change} WHERE id = $1`, [
+          id,
+        ]);
+        await other.query("COMMIT");
+        assert.equal(await cleanup, 0);
+      } finally {
+        await other.end();
+      }
+      assert.equal(await exists(email), id);
+      assert.equal(
+        (
+          await stack.database.query(
+            "SELECT 1 FROM auth_verifications WHERE value = $1",
+            [id],
+          )
+        ).length,
+        1,
+      );
+    }
   });
 
   it("IDN-F-31 never removes an account that was confirmed in the meantime, however old", async () => {

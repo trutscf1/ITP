@@ -16,6 +16,7 @@
     "@hono/node-server": "2.1.6",
     "@node-rs/argon2": "2.2.2",
     "@stash/contracts": "workspace:*",
+    "@stash/db": "workspace:*",
     "better-auth": "1.7.19",
     "hono": "4.13.17",
     "ioredis": "6.0.0",

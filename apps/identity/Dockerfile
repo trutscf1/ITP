@@ -20,7 +20,7 @@ WORKDIR /app
 
 COPY --chown=node:node . .
 
-# `run build` on `@stash/identity...` builds the workspace packages it uses first (the contracts).
+# `run build` on `@stash/identity...` builds the workspace packages it uses first (the contracts; `db` has nothing to build).
 RUN pnpm install --frozen-lockfile --filter @stash/identity... \
   && pnpm --filter @stash/identity... run build
 
