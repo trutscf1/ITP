@@ -1,5 +1,10 @@
 {
+  "model": "haiku",
   "plansDirectory": "./gam-ai-memory/plans",
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "env": {
     "GAM_ENGINEERING_BRANCHES": "dev",
     "GAM_ENGINEERING_FLOW": "full",
@@ -13,7 +18,17 @@
     "GAM_ENGINEERING_DELEGATE_MIN_FILES": "5",
     "GAM_ENGINEERING_DELEGATE_MIN_OUTPUT_LINES": "200",
     "GAM_ENGINEERING_PROJECT_KIND": "student",
-    "GAM_ENGINEERING_PROMPT_EXPORT": "commit"
+    "GAM_ENGINEERING_PROMPT_EXPORT": "commit",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet",
+    "GAM_ENGINEERING_LIMIT_GUARD": "on",
+    "GAM_ENGINEERING_LIMIT_WARN": "90",
+    "GAM_ENGINEERING_LIMIT_STOP": "95",
+    "GAM_ENGINEERING_LIMIT_ACTION": "auto",
+    "GAM_ENGINEERING_SESSION_MAX_HOURS": "4",
+    "GAM_ENGINEERING_RUNNER": "agent",
+    "GAM_ENGINEERING_FRONTEND_HOOK": "off",
+    "GAM_ENGINEERING_SKILL_TRIM": "on",
+    "GAM_ENGINEERING_SKILLS_KEEP": ""
   },
   "permissions": {
     "ask": [
@@ -25,7 +40,21 @@
       "PowerShell(gh pr merge *)"
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "node \"$CLAUDE_PROJECT_DIR/gam-engineering/tools/limit-statusline.mjs\""
+  },
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/gam-engineering/tools/skill-trim.mjs\""
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
@@ -36,6 +65,10 @@
           {
             "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/gam-engineering/tools/open-work-reminder.mjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/gam-engineering/tools/compact-hint.mjs\""
           }
         ]
       }
@@ -56,6 +89,33 @@
           {
             "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/gam-engineering/tools/format-on-write.mjs\""
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/gam-engineering/tools/frontend-hook.mjs\""
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/gam-engineering/tools/limit-guard.mjs\""
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/gam-engineering/tools/limit-guard.mjs\""
           }
         ]
       }

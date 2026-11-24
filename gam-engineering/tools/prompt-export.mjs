@@ -10,7 +10,8 @@
 //   node gam-engineering/tools/prompt-export.mjs check-growth [--base <ref>]
 //   node gam-engineering/tools/prompt-export.mjs next-q
 //
-// Mode: env.GAM_ENGINEERING_PROMPT_EXPORT in .claude/settings.json (or the environment): commit | local (default) | off.
+// Mode: env.GAM_ENGINEERING_PROMPT_EXPORT in .claude/settings.json (or the environment): commit | local (default) | off;
+// always commit when env.GAM_ENGINEERING_PROJECT_KIND there is student.
 // commit stages the export with --stage; local keeps it out of git through .gitignore; off exports nothing.
 // An export never shrinks and never disappears: no file is deleted, and a file whose new build has fewer rounds than
 // the existing one (the tool trimmed, compacted, or deleted the session) stays as it is.
@@ -53,10 +54,12 @@ export function normPath(path) {
   return value;
 }
 
+// roots.exclude (optional) holds the other live worktrees: a session there belongs to that worktree's export (Q474).
+const inside = (value, root) => value === root || value.startsWith(`${root}/`);
 const within = (roots, cwd) => {
   if (!cwd) return false;
   const value = normPath(cwd);
-  return roots.some((root) => value === root || value.startsWith(`${root}/`));
+  return roots.some((root) => inside(value, root)) && !(roots.exclude ?? []).some((root) => inside(value, root));
 };
 
 // The local path of a workspace folder URI. A remote one (vscode-remote://wsl+Ubuntu/home/…, ssh-remote+<host>,
@@ -71,7 +74,8 @@ const fileUriToPath = (uri) => {
   }
 };
 
-function walk(dir, accept, depth = 6) {
+// skip: folder names never entered (a database or dependency folder inside an app's data).
+function walk(dir, accept, depth = 6, skip = new Set()) {
   const found = [];
   if (depth < 0 || !existsSync(dir)) return found;
   let entries = [];
@@ -82,7 +86,9 @@ function walk(dir, accept, depth = 6) {
   }
   for (const entry of entries) {
     const path = join(dir, entry.name);
-    if (entry.isDirectory()) found.push(...walk(path, accept, depth - 1));
+    if (entry.isDirectory()) {
+      if (!skip.has(entry.name)) found.push(...walk(path, accept, depth - 1, skip));
+    }
     else if (accept(entry.name)) found.push(path);
   }
   return found;
@@ -106,6 +112,25 @@ const toIso = (value) => {
   const date = typeof value === "number" ? new Date(value < 1e12 ? value * 1000 : value) : new Date(value);
   return Number.isNaN(date.getTime()) ? "" : date.toISOString();
 };
+
+// The modification time of a source file as ISO time; "" when it cannot be read.
+const mtimeOf = (path) => {
+  try {
+    return statSync(path).mtime.toISOString();
+  } catch {
+    return "";
+  }
+};
+
+// The local day (YYYY-MM-DD) a session belongs to (export-session-date): its start, else its earliest message time,
+// else the modification time of its source file (mtime); only a session with none of them falls back to `now`. The day is
+// cut in the local time zone, so a session started just after local midnight is not filed under the previous day.
+export function sessionDay(session, now = new Date()) {
+  const times = [session.startedAt, ...(session.messages ?? []).map((item) => item.ts).filter(Boolean).sort(), session.mtime].map(toIso);
+  const first = times.find(Boolean);
+  const date = first ? new Date(first) : now;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
 
 // The name of an attached file, never its content.
 const attachmentName = (part) => basename(String(part.title ?? part.name ?? part.filename ?? part.fileData?.fileUri ?? part.source?.name ?? "file").replace(/\\/g, "/"));
@@ -150,9 +175,7 @@ const SECRET_PATTERNS = [
   /\bsk-(?:ant-|proj-)?[A-Za-z0-9_-]{20,}/g,
   /\bgh[pousr]_[A-Za-z0-9]{30,}/g,
   /\bgithub_pat_[A-Za-z0-9_]{20,}/g,
-  // A GitLab token of any type (personal, OAuth, trigger, deploy, runner, CI job, feed, …), with the part
-  // after ".01." of the current format, also when the chat shows only its start.
-  /(?<![A-Za-z0-9])gl(?:pat|oas|ptt|dt|rt|rtr|soat|cbt|ft|imt|agent|wt|ffct)-[A-Za-z0-9_.-]+/g,
+  /\bglpat-[A-Za-z0-9_-]{20,}/g,
   /\bxox[abprs]-[A-Za-z0-9-]{10,}/g,
   /\bAKIA[0-9A-Z]{16}\b/g,
   /\bAIza[0-9A-Za-z_-]{35}\b/g,
@@ -162,35 +185,19 @@ const SECRET_PATTERNS = [
 export function redact(text, home = homedir()) {
   let value = text;
   for (const pattern of SECRET_PATTERNS) value = value.replace(pattern, "[redacted]");
-  // A secret after its name; the name may end a longer one (CI_JOB_TOKEN, GITLAB_TOKEN, ?private_token). A value
-  // already redacted is skipped, so a second run changes nothing (the export run redacts existing exports again).
-  value = value.replace(/(?<![A-Za-z])((?:password|passwd|pwd|secret|private[_-]?token|token|api[_-]?key|client[_-]?secret)\s*[:=]\s*)(["']?)(?!\[redacted\])[^\s"'&]{4,}\2/gi, "$1[redacted]");
-  // A Bearer credential holds a digit, so prose such as "Bearer authentication" stays readable.
-  value = value.replace(/\b(Bearer\s+)(?=[A-Za-z._~+/=-]*[0-9])[A-Za-z0-9._~+/=-]{8,}/g, "$1[redacted]");
+  value = value.replace(/\b((?:password|passwd|pwd|secret|token|api[_-]?key|client[_-]?secret)\s*[:=]\s*)(["']?)[^\s"']{4,}\2/gi, "$1[redacted]");
   value = value.replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, "[email]");
   if (home) {
-    for (const form of homeForms(home)) {
-      const escaped = form.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      value = value.replace(new RegExp(`${escaped}(?![A-Za-z0-9])`, "g"), "~");
+    for (const form of new Set([home, home.replace(/\\/g, "/"), home.replace(/\//g, "\\")])) {
+      value = value.split(form).join("~");
     }
   }
   return value;
 }
 
-// Every form in which a chat shows the home folder: as written, with either slash, as Git Bash and WSL
-// write a Windows drive (/c/Users/<name>, /mnt/c/…), and as Claude Code encodes it into a folder name
-// (every character that is not a letter or digit becomes "-": -Users-<name>, C--Users-<name>).
-function homeForms(home) {
-  const forward = home.replace(/\\/g, "/");
-  const forms = [home, forward, home.replace(/\//g, "\\"), home.replace(/[^A-Za-z0-9]/g, "-")];
-  const drive = /^([A-Za-z]):\//.exec(forward);
-  if (drive) forms.push(`/${drive[1].toLowerCase()}${forward.slice(2)}`, `/${drive[1].toUpperCase()}${forward.slice(2)}`);
-  // Longest first, so a longer form is replaced before a shorter one inside it.
-  return [...new Set(forms)].sort((a, b) => b.length - a.length);
-}
-
 // ---------- adapters ----------
-// Each adapter: (ctx) → [{ tool, sessionId, startedAt, title, messages: [{ role: "user" | "assistant", text, ts }] }].
+// Each adapter: (ctx) → [{ tool, sessionId, startedAt, mtime?, title, messages: [{ role: "user" | "assistant", text, ts }] }].
+// mtime (the source file's modification time) only dates a session that has no start and no message time (sessionDay).
 // ctx: { roots (normalized repo and worktree paths), home, appData, env }.
 
 const message = (role, text, ts) => ({ role, text: clean(textOf(text)), ts: toIso(ts) });
@@ -272,17 +279,21 @@ function claudeAdapter(ctx) {
       }
       const messages = keep(main.flatMap((line) => [message(line.message.role ?? line.type, line.message.content, line.timestamp), ...claudeInteractions(line, toolUses)]));
       const model = models(main.filter((line) => line.type === "assistant").map((line) => line.message.model));
-      sessions.push({ tool: "claude", sessionId: basename(file, ".jsonl"), startedAt: messages[0]?.ts ?? "", model, messages });
+      sessions.push({ tool: "claude", sessionId: basename(file, ".jsonl"), startedAt: messages[0]?.ts ?? "", mtime: mtimeOf(join(base, dir, file)), model, messages });
     }
   }
   return sessions;
 }
 
-// Codex CLI: ~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl; new format wraps items in { type, payload }.
+// Codex CLI: ~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl; new format wraps items in { type, payload }. Paperclip runs
+// Codex with a CODEX_HOME of its own per agent under ~/.paperclip/instances/, so those rollout files are searched there
+// too; the cwd check below keeps only the sessions of this repo. (Orca runs agents in registered git worktrees, which
+// ctx.roots already holds.)
 function codexAdapter(ctx) {
   const base = join(ctx.env.CODEX_HOME && !ctx.fixedHome ? ctx.env.CODEX_HOME : join(ctx.home, ".codex"), "sessions");
+  const paperclip = walk(join(ctx.home, ".paperclip", "instances"), (name) => /^rollout-.*\.jsonl$/.test(name), 12, new Set(["db", "node_modules", ".git", "worktrees", "isolated-workspaces"]));
   const sessions = [];
-  for (const file of walk(base, (name) => name.endsWith(".jsonl"))) {
+  for (const file of [...walk(base, (name) => name.endsWith(".jsonl")), ...paperclip]) {
     const lines = jsonLines(file);
     const meta = lines.find((line) => line.type === "session_meta")?.payload ?? lines[0] ?? {};
     let cwd = meta.cwd;
@@ -298,7 +309,7 @@ function codexAdapter(ctx) {
         .map(({ item, ts }) => message(item.role, item.content, ts)),
     );
     const model = models(lines.filter((line) => line.type === "turn_context").map((line) => line.payload?.model));
-    sessions.push({ tool: "codex", sessionId: meta.id ?? basename(file, ".jsonl"), startedAt: toIso(meta.timestamp) || messages[0]?.ts || "", model, messages });
+    sessions.push({ tool: "codex", sessionId: meta.id ?? basename(file, ".jsonl"), startedAt: toIso(meta.timestamp) || messages[0]?.ts || "", mtime: mtimeOf(file), model, messages });
   }
   return sessions;
 }
@@ -325,7 +336,7 @@ function geminiCliAdapter(ctx) {
         (data.messages ?? []).filter((item) => ["user", "gemini", "model", "assistant"].includes(item.type ?? item.role)).map((item) => message((item.type ?? item.role) === "user" ? "user" : "assistant", item.content ?? item.parts, item.timestamp)),
       );
       const model = models((data.messages ?? []).map((item) => item.model));
-      sessions.push({ tool: "gemini-cli", sessionId: data.sessionId ?? basename(file, ".json"), startedAt: toIso(data.startTime) || messages[0]?.ts || "", model, messages });
+      sessions.push({ tool: "gemini-cli", sessionId: data.sessionId ?? basename(file, ".json"), startedAt: toIso(data.startTime) || messages[0]?.ts || "", mtime: mtimeOf(file), model, messages });
     }
     const logs = join(folder, "logs.json");
     if (existsSync(logs) && !existsSync(join(folder, "chats"))) {
@@ -490,7 +501,7 @@ function copilotVscodeAdapter(ctx) {
           ]),
         );
         const model = models((session.requests ?? []).map((request) => request.modelId));
-        sessions.push({ tool: "copilot-vscode", sessionId: session.sessionId ?? basename(file).replace(/\.jsonl?$/, ""), startedAt: toIso(session.creationDate) || messages[0]?.ts || "", title: session.customTitle, model, messages });
+        sessions.push({ tool: "copilot-vscode", sessionId: session.sessionId ?? basename(file).replace(/\.jsonl?$/, ""), startedAt: toIso(session.creationDate) || messages[0]?.ts || "", mtime: mtimeOf(path), title: session.customTitle, model, messages });
       }
     }
   }
@@ -536,7 +547,7 @@ function copilotCliAdapter(ctx) {
       items
         .filter((item) => roleOf(item)).map((item) => message(roleOf(item), item.data?.content ?? item.content ?? item.text, item.timestamp ?? item.data?.timestamp)),
     );
-    sessions.push({ tool: "copilot-cli", sessionId, startedAt: messages[0]?.ts ?? "", messages });
+    sessions.push({ tool: "copilot-cli", sessionId, startedAt: messages[0]?.ts ?? "", mtime: mtimeOf(file), messages });
   }
   return sessions;
 }
@@ -748,15 +759,19 @@ export const ADAPTERS = {
 
 // ---------- core ----------
 
+// The committed project kind decides first: a student project always commits its chats (P-TEAM-6, Q533). Otherwise the
+// committed mode wins over the environment, so a value from .claude/settings.local.json (which Claude Code puts into the
+// environment) cannot change a project key; the environment counts only where the committed file has no valid mode.
+// The settings are read here, not through project-settings.mjs, so the pre-commit hook runs even without that file.
 export function readMode(repo, env = process.env) {
-  let value = env.GAM_ENGINEERING_PROMPT_EXPORT;
-  if (!value) {
-    try {
-      value = readJson(join(repo, ".claude", "settings.json")).env?.GAM_ENGINEERING_PROMPT_EXPORT;
-    } catch {
-      value = undefined;
-    }
+  let committed = {};
+  try {
+    committed = readJson(join(repo, ".claude", "settings.json")).env ?? {};
+  } catch {
+    committed = {};
   }
+  if (String(committed.GAM_ENGINEERING_PROJECT_KIND ?? "").trim().toLowerCase() === "student") return "commit";
+  const value = MODES.includes(committed.GAM_ENGINEERING_PROMPT_EXPORT) ? committed.GAM_ENGINEERING_PROMPT_EXPORT : env.GAM_ENGINEERING_PROMPT_EXPORT;
   return MODES.includes(value) ? value : "local";
 }
 
@@ -779,36 +794,114 @@ function fenced(text) {
 // The number of rounds (prompts) of an export file: its "Runden" line, or for an older file its prompt headings.
 export function roundsOf(text) {
   const line = /^- Runden: (\d+)$/m.exec(text);
-  return line ? Number(line[1]) : (text.match(/^## \d+\. Prompt\b/gm) ?? []).length;
+  return line ? Number(line[1]) : (text.match(/^#{2,3} \d+\. Prompt\b/gm) ?? []).length;
 }
 
-// meta: { author, username: { platform, name } } for the file head.
-export function toMarkdown(session, home, meta = {}) {
+// One session as a section of its day file (Q437): "## <title>", its own head (model, session, start, rounds), then
+// every prompt as "### <n>. Prompt" with its answers, questions, and interactions as "#### <n>. …".
+export function toMarkdown(session, home) {
   const first = session.messages.find((item) => item.role === "user")?.text ?? "";
   const title = redact((session.title || first).replace(/\s+/g, " ").trim().slice(0, 80), home).replace(/[#`*_<>[\]]/g, "").replace(/\s+/g, " ").trim() || session.sessionId;
-  const lines = [`# ${title}`, "", `- Tool: ${session.tool}`];
+  const lines = [`## ${title}`, ""];
   if (session.model) lines.push(`- Model: ${session.model}`);
   lines.push(`- Session: ${session.sessionId}`);
   if (session.startedAt) lines.push(`- Started: ${session.startedAt}`);
-  if (meta.author) lines.push(`- Author: ${meta.author}`);
-  if (meta.username?.name) lines.push(`- Username: ${meta.username.platform ? `${meta.username.platform}: ` : ""}${meta.username.name}`);
   lines.push(`- Runden: ${session.messages.filter((item) => item.role === "user").length}`);
   let turn = 0;
   for (const item of session.messages) {
     if (item.role === "user") turn += 1;
-    const heading = { user: `## ${turn}. Prompt`, question: `### ${turn}. Questions`, interaction: `### ${turn}. Interaction` }[item.role] ?? `### ${turn}. Answer`;
+    const heading = { user: `### ${turn}. Prompt`, question: `#### ${turn}. Questions`, interaction: `#### ${turn}. Interaction` }[item.role] ?? `#### ${turn}. Answer`;
     lines.push("", item.ts ? `${heading} (${item.ts})` : heading, "", fenced(redact(item.text, home)));
   }
   return `${lines.join("\n")}\n`;
 }
 
-const repoRoots = (repo) => {
-  const raw = [repo];
-  for (const line of git(["worktree", "list", "--porcelain"], repo).split("\n")) {
-    if (line.startsWith("worktree ")) raw.push(line.slice(9));
+// The session sections of a day file, keyed by session id. A "## " line starts a section only outside a fence, so chat
+// content that contains such a line stays in its section. A fence still open at the end (a hand-edited or cut file)
+// returns null: the caller then leaves the file as it is rather than lose the sections after the fence.
+export function sectionsOf(text) {
+  const sections = [];
+  let current = null;
+  let fence = null;
+  for (const line of text.replace(/\r\n/g, "\n").split("\n")) {
+    if (fence) {
+      if (line === fence) fence = null;
+    } else if (/^`{3,}text$/.test(line)) fence = line.slice(0, -4);
+    else if (line.startsWith("## ")) {
+      current = [];
+      sections.push(current);
+    }
+    if (current) current.push(line);
   }
-  const unique = [...new Set(raw.map((path) => resolve(path)))];
-  return { rawRoots: unique, roots: [...new Set(unique.map(normPath))] };
+  if (fence) return null;
+  const byId = new Map();
+  for (const lines of sections) {
+    const section = `${lines.join("\n").replace(/\n+$/, "")}\n`;
+    const id = /^- Session: (.+)$/m.exec(section)?.[1];
+    if (id) byId.set(id, section);
+  }
+  return byId;
+}
+
+const startedOf = (section) => /^- Started: (.+)$/m.exec(section)?.[1] ?? "\uffff"; // a section without a start sorts last
+
+// The day file of one tool (Q437): a head naming date, tool, author, user name, and the number of sessions, then every
+// session section in order of start. meta: { author, username: { platform, name } }.
+export function dayMarkdown(date, tool, sections, meta = {}) {
+  const ordered = [...sections].sort(([a, left], [b, right]) => startedOf(left).localeCompare(startedOf(right)) || a.localeCompare(b));
+  const lines = [`# ${date} ${tool}`, "", `- Tool: ${tool}`];
+  if (meta.author) lines.push(`- Author: ${meta.author}`);
+  if (meta.username?.name) lines.push(`- Username: ${meta.username.platform ? `${meta.username.platform}: ` : ""}${meta.username.name}`);
+  lines.push(`- Sessions: ${ordered.length}`);
+  return `${[lines.join("\n"), ...ordered.map(([, section]) => section.replace(/\n$/, ""))].join("\n\n")}\n`;
+}
+
+// The common git folder all worktrees share (absolute), or "" outside git.
+const commonGitDir = (repo) => {
+  const dir = git(["rev-parse", "--git-common-dir"], repo);
+  return dir ? resolve(repo, dir) : "";
+};
+
+// The folders whose chat sessions this checkout exports (Q474, P-WS-13): its own worktree only, so parallel branches never
+// write the same day files. The main folder also takes the sessions of worktrees that no longer exist; every export
+// remembers the live worktrees in <common git dir>/gam-worktree-history.json to know them later. Sessions in another live
+// worktree, even one nested inside this folder (.claude/worktrees/…), are left to that worktree's own export.
+export const repoRoots = (repo) => {
+  const own = resolve(repo);
+  const live = [];
+  for (const line of git(["worktree", "list", "--porcelain"], repo).split("\n")) {
+    if (line.startsWith("worktree ")) live.push(resolve(line.slice(9)));
+  }
+  const isMain = live.length === 0 || normPath(live[0]) === normPath(own);
+  let gone = [];
+  const common = commonGitDir(repo);
+  if (common) {
+    // The history has its own file: gam-worktrees.json holds the worktree numbers of worktree-setup.mjs (path -> number,
+    // an object), and it is the older home of this list when it is an array.
+    const historyFile = join(common, "gam-worktree-history.json");
+    const readList = (file) => {
+      try {
+        const parsed = JSON.parse(readFileSync(file, "utf8"));
+        return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string") : [];
+      } catch {
+        return [];
+      }
+    };
+    const known = readList(historyFile);
+    const all = [...new Set([...known, ...readList(join(common, "gam-worktrees.json")), ...live])];
+    if (all.length !== known.length) {
+      try {
+        writeFileSync(historyFile, `${JSON.stringify(all, null, 2)}\n`);
+      } catch {
+        // a history that cannot be written only loses removed worktrees' sessions
+      }
+    }
+    gone = all.filter((path) => !live.some((tree) => normPath(tree) === normPath(path)));
+  }
+  const rawRoots = [...new Set([own, ...(isMain ? gone : [])])];
+  const roots = [...new Set(rawRoots.map(normPath))];
+  roots.exclude = live.map(normPath).filter((path) => path !== normPath(own));
+  return { rawRoots, roots };
 };
 
 function ensureIgnored(repo) {
@@ -872,27 +965,6 @@ function writeOwner(info) {
   writeFileSync(info.ownerFile, text);
 }
 
-// An export the run did not rebuild (its session is gone or was trimmed) keeps the redaction of the day it was
-// written; apply the current one in place, so a better redaction also reaches it. Only the tool folders of the
-// developer's own folder: manual/ is written by hand, and other folders belong to other developers.
-function redactExisting(folder, home, skip) {
-  const changed = [];
-  if (!existsSync(folder)) return changed;
-  for (const entry of readdirSync(folder, { withFileTypes: true })) {
-    if (!entry.isDirectory() || entry.name === "manual") continue;
-    for (const name of readdirSync(join(folder, entry.name))) {
-      const file = join(folder, entry.name, name);
-      if (!name.endsWith(".md") || skip.includes(file)) continue;
-      const current = readFileSync(file, "utf8");
-      const text = redact(current, home);
-      if (text === current) continue;
-      writeFileSync(file, text);
-      changed.push(file);
-    }
-  }
-  return changed;
-}
-
 export async function exportPrompts({ repo, home, appData, out = OUT, stage = false, env = process.env, fixedHome = false }) {
   const mode = readMode(repo, env);
   if (mode === "off") return { mode, written: [], sessions: 0 };
@@ -901,6 +973,7 @@ export async function exportPrompts({ repo, home, appData, out = OUT, stage = fa
   const ctx = { ...repoRoots(repo), home, appData, env, fixedHome };
   const written = [];
   let count = 0;
+  const days = new Map(); // day file → Map(session id → section)
   for (const [name, adapter] of Object.entries(ADAPTERS)) {
     let sessions = [];
     try {
@@ -912,20 +985,36 @@ export async function exportPrompts({ repo, home, appData, out = OUT, stage = fa
     for (const session of sessions) {
       if (!session.messages.some((item) => item.role === "user")) continue;
       count += 1;
-      const date = (session.startedAt || new Date().toISOString()).slice(0, 10);
-      const file = join(resolve(repo, out), user, session.tool, `${date}-${slug(session.sessionId).slice(0, 36)}.md`);
-      const text = toMarkdown(session, home, { author: info.author, username: info.username });
-      if (existsSync(file)) {
-        const current = readFileSync(file, "utf8");
-        // Never shrink: a tool that trimmed, compacted, or deleted the session leaves the fuller export in place.
-        if (current === text || roundsOf(text) < roundsOf(current)) continue;
-      }
-      mkdirSync(dirname(file), { recursive: true });
-      writeFileSync(file, text);
-      written.push(file);
+      const date = sessionDay(session);
+      // An older per-session file <date>-<session>.md stays untouched (Q438); its session, if still running, continues in
+      // full in the day file (Q439).
+      const file = join(resolve(repo, out), user, session.tool, `${date}.md`);
+      if (!days.has(file)) days.set(file, { date, tool: session.tool, sections: new Map() });
+      const sections = days.get(file).sections;
+      const section = toMarkdown(session, home);
+      // The same session found twice in one run (e.g. ~/.codex and a Paperclip CODEX_HOME): the fuller one wins.
+      if (!sections.has(session.sessionId) || roundsOf(section) >= roundsOf(sections.get(session.sessionId))) sections.set(session.sessionId, section);
     }
   }
-  written.push(...redactExisting(join(resolve(repo, out), user), home, written));
+  for (const [file, day] of days) {
+    const current = existsSync(file) ? readFileSync(file, "utf8") : "";
+    const merged = sectionsOf(current);
+    if (!merged) {
+      warn(`${relative(resolve(repo), file)} has an unclosed code fence; left unchanged`);
+      continue;
+    }
+    for (const [id, section] of day.sections) {
+      // Never shrink: a tool that trimmed or compacted a session leaves the fuller section in place; a session the tool
+      // no longer holds keeps its section.
+      if (merged.has(id) && roundsOf(section) < roundsOf(merged.get(id))) continue;
+      merged.set(id, section);
+    }
+    const text = dayMarkdown(day.date, day.tool, merged, { author: info.author, username: info.username });
+    if (text === current.replace(/\r\n/g, "\n")) continue;
+    mkdirSync(dirname(file), { recursive: true });
+    writeFileSync(file, text);
+    written.push(file);
+  }
   if (count) writeOwner(info);
   if (mode === "local") ensureIgnored(repo);
   if (mode === "commit" && stage && existsSync(join(resolve(repo, out), user))) git(["add", "--", `${out}/${user}`], repo);
@@ -967,12 +1056,15 @@ function ensureExecutable(repo, file) {
 
 export function installHook(repo) {
   let hooksPath = git(["config", "core.hooksPath"], repo);
-  const gitDir = git(["rev-parse", "--git-dir"], repo);
+  // The common git folder: in a linked worktree the per-worktree folder has no hooks/ of its own.
+  const gitDir = git(["rev-parse", "--git-common-dir"], repo);
   if (!gitDir) throw new Error("not a git repository");
-  const legacy = join(resolve(repo, gitDir), "hooks", "pre-commit");
+  const legacyDir = join(resolve(repo, gitDir), "hooks");
+  // An active hook is any file that is not a *.sample; setting core.hooksPath would make git ignore it (git-lfs, for example).
+  const hasActiveHook = existsSync(legacyDir) && readdirSync(legacyDir).some((name) => !name.endsWith(".sample"));
   let changed = false;
   if (!hooksPath) {
-    if (existsSync(legacy)) hooksPath = join(resolve(repo, gitDir), "hooks");
+    if (hasActiveHook) hooksPath = legacyDir;
     else {
       hooksPath = ".githooks";
       git(["config", "core.hooksPath", hooksPath], repo);
@@ -1115,21 +1207,92 @@ export function checkGrowth(repo, named) {
 
 // ---------- next-q ----------
 
-// The next free question number: one counter for every round of the project (P-GRILL-2), from the archived Q&A logs
-// (gam-ai-knowledge/qa-log.md, concepts/*.qa-log.md, a root qa-log.md) and the exported question rounds.
-export function nextQuestion(repo, out = OUT) {
-  const archives = ["gam-ai-knowledge", join("gam-ai-knowledge", "concepts"), "."].flatMap((dir) => {
-    const path = join(repo, dir);
-    return existsSync(path) ? readdirSync(path).filter((name) => name === "qa-log.md" || name.endsWith(".qa-log.md")).map((name) => join(path, name)) : [];
-  });
-  const exports = walk(resolve(repo, out), (name) => name.endsWith(".md"), 4);
+// Question numbers carry the letter of the checkout and four digits, one counter per letter (Q586–Q588): QA0001 in the
+// main folder, QB0007 in a linked worktree. The legacy numbers without a letter (Q1 … Q588) stay in the archive.
+
+// The letter of a checkout index: 0 → A (the main folder), 1 → B, …, 25 → Z, 26 → AA, 27 → AB.
+export function letterOf(index) {
+  let rest = index + 1;
+  let letters = "";
+  while (rest > 0) {
+    rest -= 1;
+    letters = String.fromCharCode(65 + (rest % 26)) + letters;
+    rest = Math.floor(rest / 26);
+  }
+  return letters;
+}
+
+// The letter of this checkout: A for the main folder; a linked worktree takes the letter of its worktree number in
+// <common git dir>/gam-worktrees.json (worktree-number.mjs, shared with worktree-setup.mjs: the lowest free number from 1, reserved while the worktree
+// exists, Q588). Without that tool the position in `git worktree list` decides.
+export async function worktreeLetter(repo) {
+  const same = (a, b) => (isWin ? resolve(a).toLowerCase() === resolve(b).toLowerCase() : resolve(a) === resolve(b));
+  const trees = git(["worktree", "list", "--porcelain"], repo)
+    .split("\n")
+    .filter((line) => line.startsWith("worktree "))
+    .map((line) => line.slice("worktree ".length).trim());
+  const common = commonGitDir(repo);
+  if (!trees.length || !common || same(trees[0], repo)) return "A";
+  try {
+    const { numberFor } = await import("./worktree-number.mjs");
+    return letterOf(numberFor(common, repo, trees[0], trees).number);
+  } catch {
+    return letterOf(Math.max(1, trees.findIndex((tree) => same(tree, repo))));
+  }
+}
+
+// The project's own copy of the export (`gam-engineering/tools/prompt-export.mjs`, or a project's `scripts/` copy).
+export const hasOwnExport = (repo) => ["gam-engineering/tools/prompt-export.mjs", "scripts/prompt-export.mjs"].some((path) => existsSync(join(repo, path)));
+
+// The next number of a letter after the exported question rounds (`❓ QB0007 - …`).
+export function nextQuestion(repo, letter = "A", out = OUT) {
+  const pattern = new RegExp(`^❓ Q${letter}(\\d{4,})\\b`, "gm");
   let highest = 0;
-  for (const file of [...archives, ...exports]) {
-    const text = readFileSync(file, "utf8");
-    const rounds = exports.includes(file) ? [...text.matchAll(/^❓ Q(\d+)\b/gm)] : [...text.matchAll(/\bQ(\d+)\b/g)];
-    for (const match of rounds) highest = Math.max(highest, Number(match[1]));
+  for (const file of walk(resolve(repo, out), (name) => name.endsWith(".md"), 4)) {
+    for (const match of readFileSync(file, "utf8").matchAll(pattern)) highest = Math.max(highest, Number(match[1]));
   }
   return highest + 1;
+}
+
+export const formatQuestion = (letter, number) => `Q${letter}${String(number).padStart(4, "0")}`;
+
+// Reserves the number for this session, so two sessions never get the same one (Q474): a high-water mark per letter in
+// <common git dir>/gam-q-reserve.json under a short lock file, without expiry, so the unexported numbers of a removed
+// worktree are not handed out again when its letter comes back. Returns the number to use.
+export function reserveQuestion(repo, letter, next) {
+  const common = commonGitDir(repo);
+  if (!common) return next;
+  const file = join(common, "gam-q-reserve.json");
+  const lock = `${file}.lock`;
+  let locked = false;
+  for (let attempt = 0; attempt < 50 && !locked; attempt += 1) {
+    try {
+      writeFileSync(lock, String(process.pid), { flag: "wx" });
+      locked = true;
+    } catch {
+      try {
+        if (Date.now() - statSync(lock).mtimeMs > 10_000) rmSync(lock, { force: true });
+      } catch {
+        // the lock went away meanwhile
+      }
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
+    }
+  }
+  if (!locked) return next;
+  try {
+    let letters = {};
+    try {
+      letters = JSON.parse(readFileSync(file, "utf8")).letters ?? {};
+    } catch {
+      // no reservations yet
+    }
+    const number = Math.max(next, (letters[letter] ?? 0) + 1);
+    letters[letter] = number;
+    writeFileSync(file, `${JSON.stringify({ letters }, null, 2)}\n`);
+    return number;
+  } finally {
+    rmSync(lock, { force: true });
+  }
 }
 
 // ---------- CLI ----------
@@ -1151,13 +1314,17 @@ async function main(argv) {
     return 0;
   }
   if (command === "next-q") {
-    // Export first (never staging), so the rounds of the running session count too.
-    try {
-      await exportPrompts({ repo, home, appData, out, stage: false, fixedHome });
-    } catch (error) {
-      warn(`export before counting failed: ${error.message}`);
+    // Export first (never staging), so the rounds of the running session count too — but only in a project with its own
+    // export; run from an installed copy elsewhere, next-q only counts and writes nothing in the working tree (QC0001).
+    if (hasOwnExport(repo)) {
+      try {
+        await exportPrompts({ repo, home, appData, out, stage: false, fixedHome });
+      } catch (error) {
+        warn(`export before counting failed: ${error.message}`);
+      }
     }
-    process.stdout.write(`Q${nextQuestion(repo, out)}\n`);
+    const letter = await worktreeLetter(repo);
+    process.stdout.write(`${formatQuestion(letter, reserveQuestion(repo, letter, nextQuestion(repo, letter, out)))}\n`);
     return 0;
   }
   if (command === "install-hook") {
