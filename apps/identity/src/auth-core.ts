@@ -4,10 +4,12 @@
 // of IDN-US-1 on top of it: accounts, confirmation links, and the removal of unconfirmed
 // accounts. Sessions are kept in the session store (sessions.ts), not by the library. The
 // `users` row is written only by the database trigger of SCF-F-24 (concept §14); nothing here
-// writes it, and `memberId` only reads it.
+// writes it, and `memberId` only reads it. The `pg` pool below belongs to the library; every
+// statement of our own goes through the access layer `@stash/db` (SCF-C-19).
 import { randomBytes } from "node:crypto";
 import { hash, verify } from "@node-rs/argon2";
 import { maxPasswordLength, minPasswordLength } from "@stash/contracts";
+import { createDb } from "@stash/db";
 import { betterAuth, type Where } from "better-auth";
 import pg from "pg";
 import type { Logger } from "./logger.ts";
@@ -134,6 +136,8 @@ export async function createAuthCore(
   pool.on("error", (error) => {
     options.logger.warn("database connection lost", { error });
   });
+
+  const db = createDb(options.databaseUrl);
 
   const auth = betterAuth({
     baseURL: options.publicOrigin,
@@ -435,11 +439,10 @@ export async function createAuthCore(
       }),
 
     async memberId(accountId) {
-      const rows = await pool.query<{ id: string }>(
-        "SELECT id FROM users WHERE auth_user_id = $1",
-        [accountId],
-      );
-      return rows.rows[0]?.id;
+      const member = await db.orm.public.User.select("id").first({
+        authUserId: accountId,
+      });
+      return member?.id;
     },
 
     removeUnconfirmed: (before) =>
@@ -485,9 +488,11 @@ export async function createAuthCore(
       }),
 
     async checkDatabase() {
-      await pool.query("SELECT 1");
+      await db.orm.public.User.select("id").limit(1).all();
     },
 
-    close: () => pool.end(),
+    async close() {
+      await Promise.all([pool.end(), db.close()]);
+    },
   };
 }

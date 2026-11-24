@@ -87,9 +87,7 @@ Presented at the final presentation (`docs/anforderungen_software_projekte.md`, 
 
 Temporary; each row names the issue that ends it, and the row is removed with that issue.
 
-| DoD item | Where | Rule until then | Ends with |
-| --- | --- | --- | --- |
-| 17 (database access through `@stash/db`, SCF-C-19) | `apps/identity/src/auth-core.ts` (lookup of the `users` row) and the database probe of the health report of `identity` | They use the `pg` pool that the authentication library needs anyway (`STACK.md` IDN-C-1, ADR-0009) and only read; no other code of `identity` writes SQL. Recorded in the review of !62 (`trutscf1`, `schwaigc`). | #167 |
+None at present. The deviation from item 17 (database access of `identity` through its own `pg` pool) ended with #167: the lookup of the `users` row and the database probe go through `@stash/db`; only the authentication library keeps its `pg` pool (`STACK.md` IDN-C-1).
 
 ## Tracker (P-TRK-1…4)
 
