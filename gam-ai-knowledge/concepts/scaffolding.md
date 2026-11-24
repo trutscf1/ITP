@@ -134,6 +134,7 @@ The user stories and their acceptance criteria are the work items in [work-items
 | SCF-F-26 | Migrations at start | When the local stack starts, a one-shot container MUST apply all pending migrations once the relational database is healthy, list them first, and exit; every container that uses the relational database MUST start only after it completed successfully (Q25, [SCF-E-7], failed migration). | SCF-AC-4.5 (Migrations at start) |
 | SCF-F-27 | Release tag | Every release MUST be an annotated tag `v<MAJOR>.<MINOR>.<PATCH>` on `main` and a release on the git host that holds the changelog section of that version. | SCF-AC-6.3 (Release tags) |
 | SCF-F-28 | Project documentation | The README MUST contain: an architecture overview with a diagram of the four areas and all databases; a setup guide for the start with and without internet access; notes on operation and deployment; a link to the Definition of Done in `gam-ai-knowledge/WORKFLOW.md`, named as binding; and licence notes for all used content and dependencies. | SCF-AC-7.1 (Architecture overview), SCF-AC-7.2 (Setup guide), SCF-AC-7.3 (Definition of Done), SCF-AC-7.5 (Licence notes) |
+| SCF-F-29 | Folder stays in its team | A child folder MUST belong to the same team as its parent folder. The database MUST reject a folder row whose `parent_id` names a folder of another team, and a change of `team_id` on a folder that has children (`qa-log.md` A67, review of !27). It is enforced by a composite foreign key from `(parent_id, team_id)` to `folders(id, team_id)`, so that no application code has to check it. | SCF-AC-4.6 (Folder stays in its team) |
 
 ## 5. User Interaction Requirements
 
@@ -340,7 +341,7 @@ Rules the diagram cannot show:
 | `auth_users`, `auth_sessions`, `auth_accounts`, `auth_verifications` | The four core tables of the authentication library, under plural names (Q22). The library writes them; its own model and field names are mapped onto these names by its configuration in the identity unit. Its identifiers are text that the library generates. |
 | `users` | The own users table of [SCF-F-24]: exactly one row per `auth_users` row, created by the database when the `auth_users` row is inserted and deleted with it (Q23). The features add their own columns here, never to `auth_users`. |
 | `team_members` | `role` is one of `owner`, `admin`, `editor`, `viewer` (the roles of the teams concept, R7). |
-| `folders` | One tree per team. The root folder has no parent, and a team has at most one root folder. Names are unique among the children of one folder. `inherits_permissions` is `true` unless the folder overrides the inheritance of its parent's permissions. Deleting a folder deletes its subtree. |
+| `folders` | One tree per team. The root folder has no parent, and a team has at most one root folder. A child folder has the same `team_id` as its parent ([SCF-F-29]). Names are unique among the children of one folder. `inherits_permissions` is `true` unless the folder overrides the inheritance of its parent's permissions. Deleting a folder deletes its subtree. |
 | `folder_permissions` | Granted either to one member (`user_id`) or to a team role (`role`), never both and never neither; `level` is one of `read`, `write`, `manage`. At most one permission per folder and member, and one per folder and role. |
 | all | Every foreign key deletes with its parent row. Own identifiers are UUIDs the database generates; time stamps are stored with time zone and default to the time of the insert. |
 
@@ -584,7 +585,7 @@ Each owner writes the "Plan" section of their plan file (module specification in
 
 Written per track in the plan files named in the table above, so that every owner specifies their own modules (Q13). One exception: the package `db` of [SCF-US-4] is specified here, because its implementer is not the owner of its track (A21).
 
-**Package `db`** — traces to [SCF-F-22] to [SCF-F-26], [SCF-E-7]; requires the relational database [SCF-C-8] and the access layer [SCF-C-19].
+**Package `db`** — traces to [SCF-F-22] to [SCF-F-26], [SCF-F-29], [SCF-E-7]; requires the relational database [SCF-C-8] and the access layer [SCF-C-19].
 
 ```text
 schema definition      tables, columns, keys, and checks of §8 ("Relational data model")
@@ -671,7 +672,7 @@ The seams at which the acceptance tests of §17 run (P-DES-2):
 | SCF-US-1 | SCF-F-1, F-12, F-18, F-19; SCF-NF-5, NF-9; SCF-C-1 | Platform & cms | SCF-T-1 to T-5 |
 | SCF-US-2 | SCF-F-1, F-2, F-3, F-11, F-14, F-17, F-20; SCF-NF-1, NF-2, NF-6, NF-8; SCF-E-1, E-6; SCF-C-5, C-7, C-8, C-14 to C-18 | Platform & cms | SCF-T-6 to T-12 |
 | SCF-US-3 | SCF-F-9, F-10, F-21; SCF-NF-4, NF-7; SCF-C-2, C-4 | Contracts, storage & worker | SCF-T-13 to T-17 |
-| SCF-US-4 | SCF-F-22 to F-26; SCF-E-7; SCF-C-19, C-21 | Identity & CI | SCF-T-18 to T-22 |
+| SCF-US-4 | SCF-F-22 to F-26, F-29; SCF-E-7; SCF-C-19, C-21 | Identity & CI | SCF-T-18 to T-22, T-41 |
 | SCF-US-5 | SCF-F-15; SCF-NF-6, NF-10; SCF-E-5; SCF-C-9, C-10, C-13, C-20 | Identity & CI | SCF-T-23 to T-27 |
 | SCF-US-6 | SCF-F-13, F-16, F-27; SCF-E-4; SCF-C-11, C-12 | Identity & CI | SCF-T-28 to T-30 |
 | SCF-US-7 | SCF-F-22, F-28 | shared | SCF-T-31 to T-35 |
@@ -729,6 +730,7 @@ One test per acceptance criterion; test names in code carry the `AC` ID. On `dev
 | SCF-T-38 | Timed-out dependency reports down | SCF-AC-8.3, SCF-F-6, SCF-F-7, SCF-NF-3, SCF-E-2 | `identity` whose database stub does not answer within 1000 ms | its health endpoint is requested | the response arrives within 2000 ms and is the report of §10, example 2 |
 | SCF-T-39 | Status page shows every unit | SCF-AC-8.4, SCF-F-8, SCF-U-1, SCF-U-3, SCF-E-3 | the health endpoints stubbed as in §10, example 7 | the status page is loaded, and loaded again after `storage` answers `ok` | the first page shows the five rows of the example; the second shows `storage` as `ok` |
 | SCF-T-40 | Status page is accessible | SCF-AC-8.5, SCF-U-1, SCF-U-2 | the status page with one unit `down` | it is checked with the accessibility checker and read as a table | the checker reports 0 violations, every cell has a header cell, and the status of every row is text |
+| SCF-T-41 | Folder stays in its team | SCF-AC-4.6, SCF-F-29 | an empty database with the migrations applied; two teams and a root folder of team A | a child folder of the root is inserted for team B, then one for team A, then the root folder is moved to team B | the first insert is rejected by `folders_parent_id_team_id_fkey`, the second is accepted, and the move is rejected while the root has a child |
 
 ### Integration Tests
 

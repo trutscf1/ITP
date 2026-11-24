@@ -1,0 +1,247 @@
+[
+  {
+    "id": "dropConstraint.folders.folders_parent_id_fkey",
+    "label": "Drop constraint \"folders_parent_id_fkey\" on \"folders\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "folders_parent_id_fkey",
+        "table": "folders"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"folders_parent_id_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "folders_parent_id_fkey",
+          "public",
+          "\"public\".\"folders\""
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "constraint \"folders_parent_id_fkey\" on \"folders\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop constraint \"folders_parent_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"folders\" DROP CONSTRAINT \"folders_parent_id_fkey\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"folders_parent_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "folders_parent_id_fkey",
+          "public",
+          "\"public\".\"folders\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"folders_parent_id_fkey\" on \"folders\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "dropIndex.folders.folders_parent_id_idx_ab33b399",
+    "label": "Drop index \"folders_parent_id_idx_ab33b399\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "folders_parent_id_idx_ab33b399",
+        "table": "folders"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"folders_parent_id_idx_ab33b399\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"folders_parent_id_idx_ab33b399\""
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "index \"folders_parent_id_idx_ab33b399\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop index \"folders_parent_id_idx_ab33b399\"",
+        "sql": "DROP INDEX \"public\".\"folders_parent_id_idx_ab33b399\"",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"folders_parent_id_idx_ab33b399\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"folders_parent_id_idx_ab33b399\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"folders_parent_id_idx_ab33b399\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "unique.folders.folders_id_team_id_key",
+    "label": "Add unique constraint on \"folders\" (id, team_id)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "folders_id_team_id_key",
+        "table": "folders"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"folders_id_team_id_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "folders_id_team_id_key",
+          "public",
+          "\"public\".\"folders\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"folders_id_team_id_key\" on \"folders\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"folders_id_team_id_key\"",
+        "sql": "ALTER TABLE \"public\".\"folders\" ADD CONSTRAINT \"folders_id_team_id_key\" UNIQUE (\"id\", \"team_id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"folders_id_team_id_key\" exists on (id, team_id)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "folders_id_team_id_key",
+          "public",
+          "\"public\".\"folders\"",
+          "u",
+          "[\"id\",\"team_id\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.folders.folders_parent_id_team_id_idx_18cc5ccc",
+    "label": "Create index \"folders_parent_id_team_id_idx_18cc5ccc\" on \"folders\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "folders_parent_id_team_id_idx_18cc5ccc",
+        "table": "folders"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"folders_parent_id_team_id_idx_18cc5ccc\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"folders_parent_id_team_id_idx_18cc5ccc\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"folders_parent_id_team_id_idx_18cc5ccc\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"folders_parent_id_team_id_idx_18cc5ccc\"",
+        "sql": "CREATE INDEX \"folders_parent_id_team_id_idx_18cc5ccc\" ON \"public\".\"folders\" (\"parent_id\", \"team_id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"folders_parent_id_team_id_idx_18cc5ccc\" exists on \"folders\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"folders_parent_id_team_id_idx_18cc5ccc\"",
+          "i",
+          "I",
+          "\"public\".\"folders\"",
+          "btree",
+          "[\"parent_id\",\"team_id\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.folders.folders_parent_id_team_id_fkey",
+    "label": "Add foreign key \"folders_parent_id_team_id_fkey\" on \"folders\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "folders_parent_id_team_id_fkey",
+        "table": "folders"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"folders_parent_id_team_id_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "folders_parent_id_team_id_fkey",
+          "public",
+          "\"public\".\"folders\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"folders_parent_id_team_id_fkey\" on \"folders\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"folders_parent_id_team_id_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"folders\"\nADD CONSTRAINT \"folders_parent_id_team_id_fkey\"\nFOREIGN KEY (\"parent_id\", \"team_id\")\nREFERENCES \"public\".\"folders\" (\"id\", \"team_id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"folders_parent_id_team_id_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "folders_parent_id_team_id_fkey",
+          "public",
+          "\"public\".\"folders\"",
+          "f",
+          "[\"parent_id\",\"team_id\"]",
+          "\"public\".\"folders\"",
+          "[\"id\",\"team_id\"]",
+          "c",
+          "a"
+        ]
+      }
+    ]
+  }
+]

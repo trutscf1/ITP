@@ -178,12 +178,12 @@ The repository is public, so all content must be licence-free. Licences of what 
 | MongoDB 8.0 (Docker image) | SSPL | metadata database, runs as a container; not part of the delivered source |
 | Redis 8.8 (Docker image) | RSALv2, SSPLv1, or AGPLv3, at the user's choice | sessions and cache, runs as a container |
 | CouchDB 3.5 (Docker image) | Apache-2.0 | offline sync database, runs as a container |
-| SeaweedFS 4.51 (Docker image) | Apache-2.0 | object storage, runs as a container |
+| SeaweedFS 4.55 (Docker image) | Apache-2.0 | object storage, runs as a container |
 | ClamAV 1.5 (Docker image) | GPL-2.0 | virus scanner, runs as a container; not part of the delivered source |
 | Mailpit 1.32 (Docker image) | MIT | catches all outgoing e-mail of the local stack |
 | Caddy 2.11 (Docker image) | Apache-2.0 | reverse proxy of the local stack |
 | Node.js 24 (Docker image) | MIT | runs the configuration step of the observability profile as a container |
-| OpenTelemetry Collector 0.164 (Docker image) | Apache-2.0 | receives, cleans, and routes telemetry; runs as a container of the observability profile |
+| OpenTelemetry Collector 0.165 (Docker image) | Apache-2.0 | receives, cleans, and routes telemetry; runs as a container of the observability profile |
 | Prometheus 3.15 (Docker image) | Apache-2.0 | metric store of the observability profile, runs as a container |
 | Loki 3.7 (Docker image) | AGPL-3.0 | log store of the observability profile, runs as a container; not part of the delivered source |
 | Tempo 2.10 (Docker image) | AGPL-3.0 | trace store of the observability profile, runs as a container; not part of the delivered source |
