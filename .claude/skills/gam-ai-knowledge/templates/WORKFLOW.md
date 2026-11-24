@@ -79,7 +79,7 @@ One milestone per sprint, numbered in order: `Sprint <n>`, in `goal` mode `Sprin
 - Title: plain-language summary with the story ID, e.g. `QE-US-3 Reuse questions: copy with duplicate check`.
 - Description (MR template): `Closes #<issue>`, what changes for the user, summary of the implementation, tested functions, consistency-check result — IDs always with their titles.
 - Reviewer: a person other than the author checks the acceptance criteria and the DoD and leaves a content comment (P-MR-2); under merge policy `auto` (solo mode only) the recorded clean `/gam-engineering review` takes this place.
-- Merging: the author never merges on their own authority; an agent merges only via `/gam-engineering merge` under the merge policy (P-MR-4). To merge by hand — after *I merge myself*, or without an agent — follow `gam-engineering/tools/MERGING.md` or run `gam-engineering/tools/merge.ps1`.
+- Merging: the author never merges on their own authority; an agent merges only via `/gam-engineering merge` under the merge policy (P-MR-4). To merge by hand — after *I merge myself*, or without an agent — follow `gam-engineering/tools/MERGING.md` or run `node gam-engineering/tools/merge.mjs`.
 - Merge method: merge commit (no squash).
 
 ## Definition of Done
@@ -103,7 +103,7 @@ In a project without git (*Version control: none*), "MR" means the `## Changes` 
 
 ## Releases (P-VER-1…4)
 
-Run `/gam-engineering release [<version>]`, or by hand `gam-engineering/tools/merge.ps1 -Release <version> -Via Host` (steps in `gam-engineering/tools/MERGING.md`):
+Run `/gam-engineering release [<version>]`, or by hand `node gam-engineering/tools/merge.mjs --release <version> --via Host` (steps in `gam-engineering/tools/MERGING.md`):
 
 1. Set every version file that carries a version field (`package.json`, `pyproject.toml`, `*.csproj`, …) to `<version>` and commit it as `release: v<version>` on the integration branch; without a version file, skip this step (P-VER-4).
 2. Merge `dev` → `main` via a release MR, as the release merge key allows (P-MR-5). [trunk: delete this step; the release key governs step 3.]

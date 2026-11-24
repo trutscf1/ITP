@@ -9,6 +9,7 @@ workflow:
 
 include:
   - local: gam-engineering/ci/gitlab-docs.yml
+  - local: gam-engineering/ci/gitlab-pipeline.yml
 
 stages:
   - test
@@ -85,6 +86,39 @@ build:
   stage: test
   script:
     - pnpm run build
+
+# The alert rule "High error rate" filled with the default thresholds by the configuration step
+# of the observability stack, as the input of `rule-test` (OBS-AC-2.3, OBS-F-28).
+alert-rules:
+  stage: test
+  image: node:24.14.0-alpine
+  variables:
+    OBS_TEMPLATE_DIR: docker/observability
+    OBS_GENERATED_DIR: generated
+  script:
+    - node docker/observability/check-config.ts
+  artifacts:
+    paths:
+      - generated/alert-rules.yml
+    expire_in: 1 day
+
+# The rule test of the alert rule "High error rate": `promtool test rules` on the image of the
+# metric store (the tag of docker-compose.yml; a test keeps them equal) against the five rows of
+# example 5 (OBS-AC-2.3, OBS-T-33, OBS-C-3). The job `test` has neither promtool nor Docker and
+# skips this test with a written reason; a state that differs from the example fails this job.
+# `rule-test` is therefore the proof of OBS-T-33 in the pipeline.
+rule-test:
+  stage: test
+  image:
+    name: prom/prometheus:v3.15.1
+    entrypoint: [""]
+  needs:
+    - job: alert-rules
+      artifacts: true
+  script:
+    - cp generated/alert-rules.yml tests/data/observability/alert-rules.yml
+    - cd tests/data/observability
+    - promtool test rules alert-error-rate.test.yml
 
 # Accessibility check with axe on the built web client; fails on a critical violation
 # (SCF-AC-5.2, SCF-AC-5.3). The image tag equals the Playwright version in package.json.

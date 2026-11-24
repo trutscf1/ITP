@@ -58,7 +58,9 @@ Refs: #<issue>
 
 ## CI/CD
 
-GitLab CI (`.gitlab-ci.yml`) runs a pipeline only for the release merge request `dev` → `main` and for a release tag; merge requests into `dev` and pushes to any branch start no pipeline (decided 2026-11-24 to save CI minutes; the checks before a merge into `dev` run locally through the pre-commit hooks and `pnpm run lint`, `pnpm test`); the jobs are defined by `gam-ai-knowledge/concepts/scaffolding.md` SCF-F-15, plus the documentation checks in `gam-engineering/ci/gitlab-docs.yml` (markdown lint and `gam-ai-knowledge/tools/doc-check.mjs`, including the rule `AC-TEST` for tests carrying the `AC` IDs). "Pipeline must succeed" is disabled (2026-11-24), because a merge request into `dev` has no pipeline and would stay blocked; the release MR `dev` → `main` is merged only when its pipeline is green. Deployment on push to `main` follows with roadmap item R14.
+GitLab CI (`.gitlab-ci.yml`) runs a pipeline only for the release merge request `dev` → `main` and for a release tag; merge requests into `dev` and pushes to any branch start no pipeline (decided 2026-11-24 to save CI minutes; the checks before a merge into `dev` run locally through the pre-commit hooks and `pnpm run lint`, `pnpm test`); the jobs are defined by `gam-ai-knowledge/concepts/scaffolding.md` SCF-F-15, plus the markdown lint in `gam-engineering/ci/gitlab-docs.yml` and the gam checks of `gam-engineering/pipeline.json` in the generated `gam-engineering/ci/gitlab-pipeline.yml` (`gam-docs` runs `gam-ai-knowledge/tools/doc-check.mjs --status`, including the rule `AC-TEST` for tests carrying the `AC` IDs; `gam-limits`, `gam-guard`, `gam-eol`, `gam-architecture-node`). "Pipeline must succeed" is disabled (2026-11-24), because a merge request into `dev` has no pipeline and would stay blocked; the release MR `dev` → `main` is merged only when its pipeline is green. Deployment on push to `main` follows with roadmap item R14.
+
+The project keeps its own pipeline (ADR-0008); merged into `gam-engineering/pipeline.json` on 2026-11-24 (Q360, *gam checks only*): the decision records only the gam checks the project's pipeline lacks, and both pipelines are the gate. The same checks run locally with `node gam-engineering/local-pipeline.mjs` (location `both`, Q361).
 
 ## Deviations from the profile
 
@@ -68,7 +70,7 @@ Where `docs/` and a profile decision disagree, `docs/` wins.
 | --- | --- | --- |
 | P-GIT-2 (work branches are deleted after merge) | Feature, fix, concept, and chore branches are **never deleted** after merge. | School requirement (`docs/anforderungen_software_projekte.md` §2, §5): the per-branch history is graded. |
 | P-GIT-2 (`concept/…` branches need no issue) | Every `concept/…` branch has a `type::concept` issue. | School requirement: every change starts with an issue (§3). |
-| P-GIT-8 (no AI attribution by default) | Commits carry the `Co-Authored-By` trailer and MR descriptions the *Generated with Claude Code* line; `.claude/settings.json` has no `attribution` key, so Claude Code adds them. | Developer decision on 2026-11-10 (Q11, migration MR !52): the project has credited the AI in its commits from the start, and the AI share of the work stays visible. |
+| P-GIT-8 (no AI attribution by default) | Commits carry the `Co-Authored-By` trailer; MR descriptions carry no *Generated with Claude Code* line. `.claude/settings.json` sets only `attribution.pr` to `""`, so Claude Code keeps its default commit trailer. | Developer decision on 2026-11-10 (Q11, migration MR !52): the project has credited the AI in its commits from the start, and the AI share of the work stays visible. Narrowed to commits on 2026-11-24 (Q359, `migrate tools`): the git history keeps the AI share, MR descriptions stay lean. |
 | P-TIME-1 (AI agents never book time) | An agent may post a time entry (`/spend`) for a developer, but only after that developer has confirmed the entry. At the end of each issue the agent proposes duration and activity; the developer answers yes or names another duration; only then does the agent post it. The time is the developer's own working time, never the agent's, and the agent never books on its own initiative. | The school only requires that time is recorded (`docs/anforderungen_software_projekte.md` §6) and does not say who posts it, so `docs/` does not override P-TIME-1; this is a project decision. The developer stays responsible for the entry, and each entry is at most 50 minutes. |
 | P-TRK-4 (Premium: the epic is a group epic) | The epics #88 to #100 are issues labelled `type::epic`; their stories link to them by `Part of` and a task list. | The agent's token has no membership in the group, and promoting an issue to a group epic needs one (inbox). They become group epics as soon as someone with group rights promotes them. Decision of 2026-11-10. |
 | Issue format of `gam-delivery` `tickets` (weight only, no time estimate) | A story also gets a time estimate (`/estimate`); 1 weight point is 0.75 h (`ROADMAP.md`, "Capacity"). Time is booked per work session (P-TIME-1). | `docs/git_workflow_commands.md` (`/estimate`) and the hours per person that the final presentation must show; `docs/` wins. Decision of 2026-11-10. |
@@ -168,7 +170,7 @@ Every sprint runs the same five steps; the exit criteria of each milestone are i
 - Title: plain-language summary with the story ID, e.g. `SCF-US-3 Status page: one row per unit`.
 - Description (MR template): `Closes #<issue>`, what changes for the user, summary of the implementation, tested functions, consistency-check result, and the Definition of Done check — IDs always with their titles.
 - Reviewer: a person other than the author checks the acceptance criteria and the DoD explicitly and leaves a short, content-related comment (§10, P-MR-2).
-- Merging: the author never merges their own MR (§11); an agent merges only via `/gam-engineering merge` under the merge policy (P-MR-4). To merge by hand — after *I merge myself*, or without an agent — follow `gam-engineering/tools/MERGING.md` or run `gam-engineering/tools/merge.ps1`.
+- Merging: the author never merges their own MR (§11); an agent merges only via `/gam-engineering merge` under the merge policy (P-MR-4). To merge by hand — after *I merge myself*, or without an agent — follow `gam-engineering/tools/MERGING.md` or run `node gam-engineering/tools/merge.mjs`.
 - Every review thread is resolved and the pipeline is green before merging.
 - Merge method: merge commit (no squash, P-GIT-3).
 
@@ -181,7 +183,7 @@ Record time on the issue or MR with `/spend` (§9): one entry per work session, 
 An issue is done, and its MR may be merged, only when every item holds:
 
 1. All acceptance criteria `AC-n.m` of the issue are met and demonstrated by a passing acceptance test carrying the AC ID. `gam-ai-knowledge/tools/doc-check.mjs` rule `AC-TEST` checks that a test name carries the ID; in the MR pipeline it fails for every criterion the MR's slice delivers that has none (`MANIFEST.md`, "What the script checks").
-2. All tests pass in CI; no test is skipped without a written reason in the MR.
+2. The pipeline is green at every location recorded in `gam-engineering/pipeline.json` (P-PIPE-2), and the project's own CI pipeline (`.gitlab-ci.yml`) is green. No test is skipped without a written reason in the MR.
 3. Every commit follows "Commit messages" above; every commit touching production code names a requirement ID (P-GIT-4).
 4. The owning concept document (and Part H, if affected) is updated in the same MR (P-GIT-5, P-HUM-3).
 5. The consistency check (goal → story → requirement) shows no new orphan or contradiction if documentation changed.
@@ -206,7 +208,7 @@ Items 15 and 16 apply from the day the sprint plan is merged into `dev`, to work
 
 ## Releases (P-VER-1…3)
 
-Run `/gam-engineering release [<version>]`, or by hand `gam-engineering/tools/merge.ps1 -Release <version> -Via Host` (steps in `gam-engineering/tools/MERGING.md`):
+Run `/gam-engineering release [<version>]`, or by hand `node gam-engineering/tools/merge.mjs --release <version> --via Host` (steps in `gam-engineering/tools/MERGING.md`):
 
 1. Merge `dev` → `main` via a release MR (§15.1) that includes the curated `CHANGELOG.md` section, as the release merge key allows (P-MR-5).
 2. Create the annotated tag `v<version>` on `main` (§15.2).

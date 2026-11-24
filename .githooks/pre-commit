@@ -1,2 +1,3 @@
 #!/bin/sh
 node --no-warnings gam-engineering/tools/prompt-export.mjs export --stage || true  # gam-engineering prompt-export
+[ -f gam-ai-memory/tools/agent-memory.mjs ] && node gam-ai-memory/tools/agent-memory.mjs hook || true  # agent-memory:hook

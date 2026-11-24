@@ -55,3 +55,5 @@ Carried over from `ROADMAP-DETAILS.md` at the switch to team mode on 2026-10-06;
 | --- | --- | --- |
 | Public content Q12–Q14: operator named in the team's legal pages, lawful basis for editor accounts, review of the legal templates ([question log](../../concepts/public-content.qa-log.md)) | school management, asked by `trutscf1` | 2026-10-06 |
 | Observability Q33–Q34: telemetry and personal data, lawful basis for operator accounts ([question log](../../concepts/observability.qa-log.md)) | school management, to be asked by `trutscf1` | 2026-10-27 |
+
+Fix #164 (2026-11-17): branch `feature/164-alert-rule-test-in-pipeline`, MR pending; after its merge the pipeline runs the rule test of the alert rule (`rule-test`, `OBS-T-33`).

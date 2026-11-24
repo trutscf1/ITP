@@ -17,14 +17,16 @@ Which file answers which question. Rules for agents: [CLAUDE.md](CLAUDE.md).
 | Where does the project stand overall? | [PROJECT_STATE.md](PROJECT_STATE.md) |
 | What happened in earlier sessions? | [SESSION_LOG.md](SESSION_LOG.md) |
 | What is known to be broken? | [KNOWN_ISSUES.md](KNOWN_ISSUES.md) |
-| How do I start, hand over, or review? | [prompts/](prompts/) |
+| How do I start, sync at a merge, hand over, or review? | [prompts/](prompts/) |
 | Earlier review and check results | [reports/](reports/) |
+| What do the agents already remember about this project? | `tools/agent-memory.mjs` (`read`, `detect`, `compare`) |
 
 ## The long-term knowledge (`gam-ai-knowledge/`)
 
 | Question | File |
 | --- | --- |
 | What is the project for? | [GOAL.md](../gam-ai-knowledge/GOAL.md) |
+| Where did the project start from? | [START.md](../gam-ai-knowledge/START.md), when the project has one |
 | Which features come next, and where does each stand? | [ROADMAP.md](../gam-ai-knowledge/ROADMAP.md), [ROADMAP-DETAILS.md](../gam-ai-knowledge/ROADMAP-DETAILS.md) |
 | What small tasks and ideas are waiting? | [next.md](../gam-ai-knowledge/next.md) |
 | What was decided, and why? | [adr/](../gam-ai-knowledge/adr/) |

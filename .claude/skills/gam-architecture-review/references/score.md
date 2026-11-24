@@ -6,7 +6,7 @@ Loaded by `architecture review`. The score is the sum of the area scores, each a
 
 | # | Area | Weight | Looks at |
 | --- | --- | --- | --- |
-| 1 | Layering and dependency rule | 15 | Layers of the project's chain (P-DES-3), imports point inward only, no cycles, interfaces at layer borders (P-ARCH) |
+| 1 | Layering and dependency rule | 10 | Layers of the project's chain (P-DES-3), imports point inward only, no cycles, interfaces at layer borders (P-ARCH) |
 | 2 | Domain model | 10 | Entities and value objects carry the rules; names match `CONTEXT.md`; no logic in controllers or UI |
 | 3 | SOLID and module design | 10 | Single responsibility per module, small interfaces, dependencies injected, size limits of P-ARCH |
 | 4 | Security and authentication | 15 | Input validation at the border, authorization on every route, secrets out of code, the auth library used as documented |
@@ -17,6 +17,7 @@ Loaded by `architecture review`. The score is the sum of the area scores, each a
 | 9 | Production readiness | 5 | Errors handled and logged, health check, config per environment, no hardcoded tunables (P-DES-6) |
 | 10 | Configuration and delivery | 5 | Pipeline green and recorded, reproducible build, dependencies audited |
 | 11 | Documentation and decisions | 5 | Concepts, `STACK.md`, and ADRs match the code; decisions that shaped the code have an ADR |
+| 12 | Parallel work | 5 | [parallel-work.md](parallel-work.md) |
 
 The weights add up to 100.
 

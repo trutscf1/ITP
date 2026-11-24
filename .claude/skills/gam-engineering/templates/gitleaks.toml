@@ -5,8 +5,10 @@
 useDefault = true
 
 [allowlist]
-description = "Git-ignored files the gam checks write on purpose"
+description = "Git-ignored files the gam checks write on purpose, and installed dependency folders (PP-F-56)"
 paths = [
   '''(^|/)\.env\.sonar$''',
   '''(^|/)\.scannerwork/''',
+  '''(^|/)node_modules/''',
+  '''(^|/)vendor/''',
 ]
