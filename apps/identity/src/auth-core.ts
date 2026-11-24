@@ -21,6 +21,9 @@ const argon2 = { memoryCost: 19_456, timeCost: 2, parallelism: 1 } as const;
 const confirmationPrefix = "confirm:";
 const resetPrefix = "reset:";
 
+/** Thrown inside a transaction to undo it when its link was used or replaced meanwhile. */
+const linkGone = new Error("the link is gone");
+
 /** The open links of one kind of one account (concept §8, "Confirmation and reset tokens"). */
 function linksOf(id: string, prefix: string): Where[] {
   return [
@@ -378,19 +381,48 @@ async function assemble(
       }),
 
     async confirm(token, now) {
-      const link = await internalAdapter.consumeVerificationValue(
-        `${confirmationPrefix}${hashToken(token)}`,
-      );
-      if (!link || link.expiresAt.getTime() <= now.getTime()) return false;
-      const user = await internalAdapter.findUserById(link.value);
-      if (!user) return false;
-      if (!user.emailVerified) {
-        await internalAdapter.updateUser(user.id, {
-          emailVerified: true,
-          updatedAt: now,
+      const identifier = `${confirmationPrefix}${hashToken(token)}`;
+      try {
+        return await adapter.transaction(async (db) => {
+          const link = await db.findOne<{ value: string; expiresAt: Date }>({
+            model: "verification",
+            where: [{ field: "identifier", value: identifier }],
+          });
+          if (!link) return false;
+          const valid = new Date(link.expiresAt).getTime() > now.getTime();
+          // The account row is changed before the link is taken: a registration again holds
+          // that row while it replaces the links (IDN-F-6), so the confirmation waits for it.
+          const confirmed = valid
+            ? await db.updateMany({
+                model: "user",
+                where: [
+                  { field: "id", value: link.value },
+                  { field: "emailVerified", value: false },
+                ],
+                update: { emailVerified: true, updatedAt: now },
+              })
+            : 0;
+          // Only the request that deletes the link uses it (IDN-F-4, IDN-NF-5); a link that a
+          // registration again deleted in the meantime confirms nothing.
+          const used = await db.deleteMany({
+            model: "verification",
+            where: [{ field: "identifier", value: identifier }],
+          });
+          if (used !== 1) throw linkGone;
+          if (!valid) return false;
+          if (confirmed === 1) return true;
+          // Already confirmed: the link is used up, and the answer stays the same.
+          return (
+            (await db.findOne({
+              model: "user",
+              where: [{ field: "id", value: link.value }],
+            })) !== null
+          );
         });
+      } catch (error) {
+        if (error === linkGone) return false;
+        throw error;
       }
-      return true;
     },
 
     replaceResetLink: (id, now, validityMinutes) =>
