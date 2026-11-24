@@ -20,14 +20,14 @@ Every row traces to the capability IDs (`SCF-C-x`, later other prefixes) that de
 
 ## Capability index
 
-Every capability of `concepts/scaffolding.md` §7, `concepts/public-content.md` §7, `concepts/observability.md` §7, `concepts/identity.md` §7, and `concepts/design-system.md` §7 and where its technology stands. The index only points to the track sections; it holds no technology of its own, except the capabilities added on 2026-10-13 that no section maps yet. Their owner moves the row into the own section when the technology is chosen.
+Every capability of `concepts/scaffolding.md` §7, `concepts/public-content.md` §7, `concepts/observability.md` §7, `concepts/identity.md` §7, `concepts/design-system.md` §7, and `concepts/storage-core.md` §7 and where its technology stands. The index only points to the track sections; it holds no technology of its own, except the capabilities added on 2026-10-13 that no section maps yet. Their owner moves the row into the own section when the technology is chosen.
 
 | ID | Capability | Technology | Owner |
 | --- | --- | --- | --- |
 | SCF-C-1 | Workspace and task runner | section 1 | `trutscf1` |
 | SCF-C-2 | Schemas | section 2 | `schauby1` |
 | SCF-C-3 | Web application framework | section 4 | `schwaigc` |
-| SCF-C-4 | HTTP server framework | sections 2 and 3 (`identity`: Hono) | `schauby1`, `tschudea07` |
+| SCF-C-4 | HTTP server framework | sections 2 and 3 (`storage` and `identity`: Hono) | `schauby1`, `tschudea07` |
 | SCF-C-5 | Content management system | section 1 | `trutscf1` |
 | SCF-C-6 | Reverse proxy | section 1 | `trutscf1` |
 | SCF-C-7 | Container runtime | section 1 | `trutscf1` |
@@ -38,9 +38,9 @@ Every capability of `concepts/scaffolding.md` §7, `concepts/public-content.md` 
 | SCF-C-12 | Changelog draft generator | section 1 | `trutscf1` |
 | SCF-C-13 | Test runners | sections 1 and 4 | `trutscf1`, `schwaigc` |
 | SCF-C-14 | Key-value store | _open_ — Redis per the project proposal | `schauby1` |
-| SCF-C-15 | Document database | _open_ — MongoDB per the project proposal | `schauby1` |
+| SCF-C-15 | Document database | section 2 (row STO-C-2: MongoDB, official driver) | `schauby1` |
 | SCF-C-16 | Sync database | _open_ — CouchDB per the project proposal | `trutscf1` |
-| SCF-C-17 | Object storage | _open_ — SeaweedFS per the project proposal | `schauby1` |
+| SCF-C-17 | Object storage | section 2 (row STO-C-1: SeaweedFS, S3 client) | `schauby1` |
 | SCF-C-18 | Virus scanner | _open_ — ClamAV per `SCF-AC-2.1` | `schauby1` |
 | SCF-C-19 | Database access layer | section 3 (row "Database access layer") | `tschudea07` |
 | SCF-C-20 | Accessibility checker | section 3 (row "Accessibility check in CI") | `tschudea07` |
@@ -64,6 +64,16 @@ Every capability of `concepts/scaffolding.md` §7, `concepts/public-content.md` 
 | IDN-C-6 | Session store | section 3 | `tschudea07` |
 | IDN-C-7 | HTTP server framework (`identity`) | section 3 | `tschudea07` |
 | IDN-C-8 | E-mail delivery | section 3 | `tschudea07` |
+| STO-C-1 | Object store client | section 2 | `schauby1` |
+| STO-C-2 | Document database access | section 2 | `schauby1` |
+| STO-C-3 | Record store access | section 2 (uses SCF-C-19, section 3) | `schauby1` |
+| STO-C-4 | Resumable upload server | section 2 | `schauby1` |
+| STO-C-5 | ZIP streaming | section 2 | `schauby1` |
+| STO-C-6 | Scheduled job runtime | section 2 | `schauby1` |
+| STO-C-7 | Content type detection | section 2 (_open_) | `schauby1` |
+| STO-C-8 | Content hash | section 2 | `schauby1` |
+| STO-C-9 | Server push | section 2 | `schauby1` |
+| STO-C-10 | HTTP server framework (`storage`) | section 2 | `schauby1` |
 | DSA-C-1 | Design token mechanism | section 4 | `schwaigc` |
 | DSA-C-2 | Accessible component primitives | section 4 | `schwaigc` |
 | DSA-C-3 | Component catalogue | section 4 | `schwaigc` |
@@ -110,8 +120,17 @@ Build/run commands (root): `pnpm install`, `pnpm dev`, `pnpm run lint`, `pnpm ru
 | Capability | Technology | Version constraint | Notes |
 | --- | --- | --- | --- |
 | SCF-C-2 schemas & OpenAPI generation | Zod, `@asteasolutions/zod-to-openapi` | Zod 4.6.7, zod-to-openapi 8.5.0, both pinned exactly (the lockfile and `package.json` agree); OpenAPI 3.1 | Package `packages/contracts` (`@stash/contracts`; SCF-AC-3.1 still says `@nimbus/contracts`, a correction listed in `concepts/scaffolding.track-web.md`). One schema file per contract (`health.ts`, `errors.ts`), each exporting `<name>Schema` and its inferred type; every schema file imports `z` from `zod.ts`, which adds `.openapi()`. Source files import with `.ts` extensions, and `tsc` rewrites them for `dist/`. `pnpm --filter @stash/contracts openapi:generate [file]` writes the description, by default to `packages/contracts/dist/openapi.json` (not committed); `build` writes the same file, so it exists wherever the package is built. That default is the one `web` reads through `OPENAPI_FILE` (track Web, M6). Errors: `errorReplies` holds status and body per code of the concept §8, and `toErrorResponse(error)` maps a Zod failure to `validation-failed` and anything else to `internal-error`. Units import schemas from the package and do not depend on Zod themselves. Set by #40 (SCF-US-3). |
-| SCF-C-4 HTTP server framework (`storage`) | _open_ | | |
-| `worker` runtime | _open_ | | |
+| SCF-C-4 HTTP server framework (`storage`), STO-C-10 | Hono on Node.js, like `identity` | `hono` 4, newest version older than 7 days | Q422 of `concepts/storage-core.qa-log.md`. Request bodies are checked by the contracts of SCF-C-2; the streaming helpers of Hono serve the downloads. Set by: planned (R5 concept). |
+| STO-C-1 object store client; SCF-C-17 | `@aws-sdk/client-s3` against the S3 interface of SeaweedFS (the container of the local stack), path-style addressing | `@aws-sdk/client-s3` newest version older than 7 days; SeaweedFS as in `docker-compose.yml` | Q423. Streams of unknown length use multipart writes; reads use ranges. The object store is published on `127.0.0.1` for development only (STO-F-37). Used and total bytes (STO-F-46) are not part of the S3 interface: an adapter behind the object-store port reads them from the status interface of the SeaweedFS master on the internal network (port 9333, the one the health check of `docker-compose.yml` uses), address in `OBJECT_STORE_STATUS_URL` (Q454); which fields of its answer give used and total is settled in the slice that builds STO-F-46. Set by: planned (R5 concept). |
+| STO-C-2 document database access; SCF-C-15 | MongoDB through its official driver `mongodb`; the shape of a document is checked by a Zod contract of `packages/contracts` (module `storage`), no object-document mapper | `mongodb` newest version older than 7 days; MongoDB 8 as in `docker-compose.yml` | Q424. Collection `file_metadata`, key `_id` = the content object's ID (concept §8). Set by: planned (R5 concept). |
+| STO-C-3 record store access; SCF-C-19 | Prisma ORM 8 in `packages/db`, as the row "Database access layer" in section 3 | as the row "Database access layer" | A5. Row locks and the transactions of the storage core use the statements the access layer offers for them. The migration of the concept §15 follows the procedure of that row. Set by: planned (R5 concept). |
+| STO-C-4 resumable upload server | `@tus/server` with `@tus/s3-store`, mounted in the Hono server of `storage` | `@tus/server` and `@tus/s3-store` newest versions older than 7 days | Q433. The store writes into the object store through the client of STO-C-1; the upload ID is a random uuid made by `storage` and is the object key. The upload resources live in the object store next to the bytes. Set by: planned (R5 concept). |
+| STO-C-5 ZIP streaming | `archiver`, entries stored without compression (`store: true`), ZIP64 | `archiver` newest version older than 7 days | Q440. Each file is added as a stream, so the archive is never held in memory. Set by: planned (R5 concept). |
+| STO-C-6 scheduled job runtime; SCF-C-14 | BullMQ with repeatable jobs and one attempt per run (a failed run is not retried before the next interval), started in `apps/worker` on the key-value store (Redis) | `bullmq` newest version older than 7 days; Redis as in `docker-compose.yml` | Q435. The jobs `cleanup-uploads`, `cleanup-orphans`, and `purge-trash` call the storage core of `packages/storage-core`. The processors of R9 reuse the runtime. The row SCF-C-14 in the capability index stays open until `identity` and `worker` have set their Redis rows. Set by: planned (R5 concept). |
+| STO-C-7 content type detection | _open_ | | A library that detects a media type from leading bytes is chosen by the owner in slice 1 of STO-US-2 and written here with its version; the extension table is a data file of `packages/storage-core`. Not decided in the grill (Q430 fixes only the rule). |
+| STO-C-8 content hash | SHA-256 through `node:crypto` of Node.js | Node.js 24 | No package: the algorithm is from the platform (`G-1.N5`). Set by: planned (R5 concept). |
+| STO-C-9 server push | Server-sent events through the streaming helper of Hono | `hono` as above | Q431. Set by: planned (R5 concept). |
+| `worker` runtime | Node.js 24 as the other units; job runtime: row STO-C-6 | Node.js 24 | The processors of R9 are still open. |
 
 Type mapping (neutral type → concrete type) and error mapping (`E-x` → concrete representation): _open_.
 

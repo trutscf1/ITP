@@ -24,3 +24,7 @@ b94e6887a9d1ad1f7124a0fe0dbfa81f85f207c6:apps/identity/src/main.test.ts:generic-
 
 # Synthetic secret of the set-up failure test of the AuthCore (#167, IDN-C-1), not a credential.
 a3cdf61eec4fd9f73a6c547114456420eefc1ca7:apps/identity/src/auth-core.test.ts:generic-api-key:16
+
+# Example password of the identity concept (IDN-T-47, "Drei-blaue-Wolken-7") in the test output
+# that a chat export of schwaigc quotes, not a credential (R5 grill, !78).
+2d535968197a75274a54c7db6fc3e5383e8f3ed4:docs/prompts/schwaigc/claude/2026-11-24-215b68bb-dafe-4123-b464-6fceea677d3f.md:generic-api-key:488
