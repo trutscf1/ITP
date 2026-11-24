@@ -102,7 +102,7 @@ WebConfig {
   OPENAPI_FILE: path, 1..512 chars,   default "../../packages/contracts/dist/openapi.json"   // relative to the working directory apps/web (A3)
   REGISTRATION_ENABLED: true|false,   default true                     // identity.md §8, #168
   CAPTCHA_ENABLED: true|false,        default false                    // identity.md §8, #168
-  CAPTCHA_SITE_KEY: string, 0..512 chars, default ""                  // required when CAPTCHA_ENABLED (problem "required when CAPTCHA_ENABLED is true")
+  CAPTCHA_SITE_KEY: string, 1..512 chars, unset by default            // required when CAPTCHA_ENABLED (problem "required when CAPTCHA_ENABLED is true")
 }
 
 ConfigProblem { name: string, reason: string }        // never the value

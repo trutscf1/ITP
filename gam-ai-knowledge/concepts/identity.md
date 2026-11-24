@@ -584,7 +584,7 @@ stateDiagram-v2
 
 | Story | Requirements | Modules | Tests |
 | --- | --- | --- | --- |
-| IDN-US-1 | IDN-F-1 to F-6, F-30 to F-32, F-35, F-38; IDN-U-1 to U-3, U-6 to U-8; IDN-NF-1, NF-4 to NF-6; IDN-E-1 to E-3, E-7, E-8, E-11; IDN-C-2 to C-5, C-7, C-8 | M1 to M3, M5 to M8 | IDN-T-1 to T-9, T-21 to T-26, T-46 to T-51 |
+| IDN-US-1 | IDN-F-1 to F-6, F-30 to F-32, F-35, F-38; IDN-U-1 to U-3, U-6 to U-8; IDN-NF-1, NF-4 to NF-6; IDN-E-1 to E-3, E-7, E-8, E-11; IDN-C-2 to C-5, C-7, C-8 | M1 to M3, M5 to M8 | IDN-T-1 to T-9, T-21 to T-26, T-46 to T-52 |
 | IDN-US-2 | IDN-F-7 to F-11, F-34, F-36, F-37; IDN-U-4; IDN-NF-2, NF-3, NF-7; IDN-E-4 to E-6, E-9, E-10; IDN-C-1, C-6 | M1, M2, M4, M8, M9 | IDN-T-10 to T-15, T-27, T-28 |
 | IDN-US-6 | IDN-F-25 to F-29, F-33; IDN-U-3, U-5, U-7; IDN-E-1 to E-3, E-7 | M1, M2, M4 to M6, M8 | IDN-T-16 to T-20 |
 
@@ -652,6 +652,7 @@ One test per acceptance criterion; test names in code carry the `AC` ID.
 | IDN-T-49 | Bot check only when switched on | IDN-AC-1.5, IDN-F-5 | `CAPTCHA_ENABLED=false`, then `true` with a site key | `/register` is drawn and a registration is sent | off: no widget and no script of the provider, and the body has no `botToken`; on: the widget with the site key, and its token is sent as `botToken` |
 | IDN-T-50 | Same message for every answer 202 | IDN-AC-1.6, IDN-U-3 | the registration form of `web` | `identity` answers 202 `{ "status": "check-mailbox" }` | the form is replaced by the text of IDN-U-3 |
 | IDN-T-51 | Registration page closed | IDN-AC-1.7, IDN-F-30, IDN-U-6 | `REGISTRATION_ENABLED=false` | `/register` is drawn | the page shows the text of IDN-U-6 and no form |
+| IDN-T-52 | Language of the pages | IDN-F-38, IDN-U-1 (A19) | the pages of M8 | `Accept-Language` is `en-GB,de;q=0.5`, `de-AT,en;q=0.8`, `fr-FR,en;q=0.7,de;q=0.9`, `fr`, and missing | English, German, German, German, German; the content carries that `lang` |
 
 ### Synthetic Test Data Strategy
 

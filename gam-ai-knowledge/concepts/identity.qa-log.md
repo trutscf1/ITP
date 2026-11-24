@@ -190,7 +190,7 @@ Answer: Link to /login (Recommended). [IDN-U-7] names the link to `/login`; regi
 
 **Q410 - Page tests:** §16/§17 named the end-to-end job of the Web track for the page tests of slices 2, which does not exist yet (WEB-US-4). How are the criteria of #168 tested?
 
-Answer: node --test + SSR (Recommended). §16 *Design for Testability* names the unit test runner of `web`; §17 gets [IDN-T-46] to [IDN-T-51]; the browser journeys stay with WEB-US-4.
+Answer: node --test + SSR (Recommended). §16 *Design for Testability* names the unit test runner of `web`; §17 gets [IDN-T-46] to [IDN-T-51], and [IDN-T-52] for the language of the pages (review of #168); the browser journeys stay with WEB-US-4.
 
 Assumptions stated with the implementation, not rejected:
 
