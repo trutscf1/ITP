@@ -66,7 +66,11 @@ describe("PUB-AC-1.1 CMS container: Strapi runs as a container with its own Post
     const test = cmsDb?.healthcheck?.test;
     const command = Array.isArray(test) ? test.join(" ") : String(test);
     assert.match(command, /pg_isready/);
-    assert.doesNotMatch(command, /(^|[^$])\$\{POSTGRES_/, "a single dollar is replaced on the host, use two");
+    assert.doesNotMatch(
+      command,
+      /(^|[^$])\$\{POSTGRES_/,
+      "a single dollar is replaced on the host, use two",
+    );
     assert.match(command, /\$\$\{?POSTGRES_USER/);
   });
 
