@@ -160,3 +160,19 @@ Answer: "Nur ganzer Eintrag (Recommended)".
 **Q440 - ZIP-Streaming (STO-AC-7.2):** Mit welcher Bibliothek baut storage das ZIP-Archiv als Stream (auch über 4 GB, also ZIP64)?
 
 Answer: "archiver (Recommended)".
+
+## Round 8 — 2026-11-24 — personal data (`schwaigc`)
+
+- **A18**: R5 builds the storage metrics the observability concept requires: OBS-F-23 (capacity) with STO-US-1, OBS-F-21 (upload throughput) with the tus upload.
+- **A19**: File names and content never reach logs, traces, or metrics; these carry only IDs, sizes, and route patterns.
+- **A20**: The ZIP download of the root folder (STO-US-7) serves the right to data portability.
+- **A21**: When two members share a content object and one deletes their file, the object stays for the other, whose file it is as well; nothing that points to the deleting member remains.
+- **A22**: Legal questions are not decided here: the controller role and the lawful basis for processing members' files go as open question L1 in §13 to the school management (data-protection contact).
+
+**Q441 - Account löschen (IDN-US-8, Entwurf in identity):** Was passiert mit den Files, Ordnern und dem Papierkorb eines Members, dessen Account gelöscht wird?
+
+Answer: "Sofort alles löschen (Recommended)".
+
+**Q442 - Verschlüsselung im Ruhezustand:** Content objects, Datenbanken und Metadata liegen unverschlüsselt auf dem Server; Ende-zu-Ende-Verschlüsselung ist die optionale Erweiterung O1. Was verlangt R5?
+
+Answer: "Betreiber-Sache, dokumentiert (Recommended)".
