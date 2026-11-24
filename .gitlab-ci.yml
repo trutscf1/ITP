@@ -101,6 +101,7 @@ alert-rules:
 # metric store (the tag of docker-compose.yml; a test keeps them equal) against the five rows of
 # example 5 (OBS-AC-2.3, OBS-T-33, OBS-C-3). The job `test` has neither promtool nor Docker and
 # skips this test with a written reason; a state that differs from the example fails this job.
+# `rule-test` is therefore the proof of OBS-T-33 in the pipeline.
 rule-test:
   stage: test
   image:
