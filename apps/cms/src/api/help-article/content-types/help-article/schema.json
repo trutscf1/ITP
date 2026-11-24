@@ -1,0 +1,46 @@
+{
+  "kind": "collectionType",
+  "collectionName": "help_articles",
+  "info": {
+    "singularName": "help-article",
+    "pluralName": "help-articles",
+    "displayName": "Help article",
+    "description": "An article of the help center (concept public-content.md §8)"
+  },
+  "options": { "draftAndPublish": true },
+  "pluginOptions": { "i18n": { "localized": true } },
+  "attributes": {
+    "category": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::help-category.help-category",
+      "required": true,
+      "pluginOptions": { "i18n": { "localized": false } }
+    },
+    "helpContext": {
+      "type": "string",
+      "unique": true,
+      "regex": "^[a-z0-9-]{1,64}$",
+      "pluginOptions": { "i18n": { "localized": false } }
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "maxLength": 120,
+      "pluginOptions": { "i18n": { "localized": true } }
+    },
+    "body": {
+      "type": "text",
+      "required": true,
+      "minLength": 1,
+      "maxLength": 20000,
+      "pluginOptions": { "i18n": { "localized": true } }
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 160,
+      "pluginOptions": { "i18n": { "localized": true } }
+    }
+  }
+}

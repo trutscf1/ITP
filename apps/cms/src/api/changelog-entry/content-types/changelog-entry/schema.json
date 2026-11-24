@@ -1,0 +1,40 @@
+{
+  "kind": "collectionType",
+  "collectionName": "changelog_entries",
+  "info": {
+    "singularName": "changelog-entry",
+    "pluralName": "changelog-entries",
+    "displayName": "Changelog entry",
+    "description": "One entry of the public changelog, one per release (concept public-content.md §8)"
+  },
+  "options": { "draftAndPublish": true },
+  "pluginOptions": { "i18n": { "localized": true } },
+  "attributes": {
+    "version": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "regex": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "pluginOptions": { "i18n": { "localized": false } }
+    },
+    "releaseDate": {
+      "type": "date",
+      "required": true,
+      "pluginOptions": { "i18n": { "localized": false } }
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "maxLength": 120,
+      "pluginOptions": { "i18n": { "localized": true } }
+    },
+    "body": {
+      "type": "text",
+      "required": true,
+      "minLength": 1,
+      "maxLength": 5000,
+      "pluginOptions": { "i18n": { "localized": true } }
+    }
+  }
+}

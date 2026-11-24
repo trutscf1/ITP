@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_shared_localized_names",
+  "info": {
+    "displayName": "Localized name",
+    "description": "A name in both content languages; both are required (PUB-F-2, PUB-E-11)"
+  },
+  "options": {},
+  "attributes": {
+    "de": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "maxLength": 60
+    },
+    "en": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "maxLength": 60
+    }
+  }
+}

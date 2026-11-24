@@ -1,0 +1,45 @@
+{
+  "kind": "collectionType",
+  "collectionName": "landing_sections",
+  "info": {
+    "singularName": "landing-section",
+    "pluralName": "landing-sections",
+    "displayName": "Landing section",
+    "description": "One section of the landing page (concept public-content.md §8)"
+  },
+  "options": { "draftAndPublish": true },
+  "pluginOptions": { "i18n": { "localized": true } },
+  "attributes": {
+    "kind": {
+      "type": "enumeration",
+      "enum": ["hero", "feature", "text-with-image", "call-to-action"],
+      "required": true,
+      "pluginOptions": { "i18n": { "localized": false } }
+    },
+    "position": {
+      "type": "integer",
+      "min": 1,
+      "required": true,
+      "unique": true,
+      "pluginOptions": { "i18n": { "localized": false } }
+    },
+    "heading": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "maxLength": 120,
+      "pluginOptions": { "i18n": { "localized": true } }
+    },
+    "body": {
+      "type": "text",
+      "maxLength": 2000,
+      "pluginOptions": { "i18n": { "localized": true } }
+    },
+    "image": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::image.image",
+      "pluginOptions": { "i18n": { "localized": false } }
+    }
+  }
+}

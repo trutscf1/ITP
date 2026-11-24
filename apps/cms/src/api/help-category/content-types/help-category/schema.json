@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "help_categories",
+  "info": {
+    "singularName": "help-category",
+    "pluralName": "help-categories",
+    "displayName": "Help category",
+    "description": "A category of the help center; the name exists in both languages (concept public-content.md §8)"
+  },
+  "options": { "draftAndPublish": false },
+  "attributes": {
+    "position": {
+      "type": "integer",
+      "min": 1,
+      "required": true,
+      "unique": true
+    },
+    "name": {
+      "type": "component",
+      "component": "shared.localized-name",
+      "repeatable": false,
+      "required": true
+    }
+  }
+}

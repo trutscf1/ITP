@@ -1,0 +1,35 @@
+{
+  "kind": "collectionType",
+  "collectionName": "legal_pages",
+  "info": {
+    "singularName": "legal-page",
+    "pluralName": "legal-pages",
+    "displayName": "Legal page",
+    "description": "Imprint, terms, or privacy policy; exactly one page of each kind (concept public-content.md §8)"
+  },
+  "options": { "draftAndPublish": true },
+  "pluginOptions": { "i18n": { "localized": true } },
+  "attributes": {
+    "kind": {
+      "type": "enumeration",
+      "enum": ["imprint", "terms", "privacy"],
+      "required": true,
+      "unique": true,
+      "pluginOptions": { "i18n": { "localized": false } }
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "minLength": 1,
+      "maxLength": 120,
+      "pluginOptions": { "i18n": { "localized": true } }
+    },
+    "body": {
+      "type": "text",
+      "required": true,
+      "minLength": 1,
+      "maxLength": 50000,
+      "pluginOptions": { "i18n": { "localized": true } }
+    }
+  }
+}
