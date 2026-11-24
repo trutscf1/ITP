@@ -8,6 +8,12 @@ export interface WebConfig {
   WORKER_HEALTH_URL: string;
   CMS_HEALTH_URL: string;
   OPENAPI_FILE: string;
+  /** `/register` shows the form only while true (IDN-F-30, `concepts/identity.md` §8). */
+  REGISTRATION_ENABLED: boolean;
+  /** `/register` loads the bot-check widget only while true (IDN-F-5). */
+  CAPTCHA_ENABLED: boolean;
+  /** The public site key of the bot-check widget; required while `CAPTCHA_ENABLED` is true. */
+  CAPTCHA_SITE_KEY: string;
 }
 
 /** One invalid variable; it names the variable and the reason, never the value (SCF-NF-4). */
@@ -39,6 +45,13 @@ function integer(min: number, max: number): Parse<number> {
 function text(min: number, max: number): Parse<string> {
   return (value) =>
     value.length >= min && value.length <= max ? value : undefined;
+}
+
+const flag: Parse<boolean> = (value) =>
+  value === "true" ? true : value === "false" ? false : undefined;
+
+function boolean(fallback: boolean): Rule<boolean> {
+  return { fallback, parse: flag, reason: "expected true or false" };
 }
 
 const httpUrl: Parse<string> = (value) => {
@@ -79,6 +92,13 @@ const rules: { [K in keyof WebConfig]: Rule<WebConfig[K]> } = {
     parse: text(1, 512),
     reason: "expected 1 to 512 characters",
   },
+  REGISTRATION_ENABLED: boolean(true),
+  CAPTCHA_ENABLED: boolean(false),
+  CAPTCHA_SITE_KEY: {
+    fallback: "",
+    parse: text(1, 512),
+    reason: "expected 1 to 512 characters",
+  },
 };
 
 export type WebConfigValueResult<K extends keyof WebConfig> =
@@ -104,6 +124,22 @@ export function loadWebConfigValue<K extends keyof WebConfig>(
 }
 
 /**
+ * The bot-check widget cannot be drawn without its site key (`concepts/identity.md` §8): the one
+ * rule that spans two variables, shared by the whole check and by the registration page.
+ */
+export function siteKeyProblem(
+  captchaEnabled: boolean,
+  siteKey: string,
+): ConfigProblem | null {
+  return captchaEnabled && siteKey === ""
+    ? {
+        name: "CAPTCHA_SITE_KEY",
+        reason: "required when CAPTCHA_ENABLED is true",
+      }
+    : null;
+}
+
+/**
  * Reads the configuration of `web` from the environment (SCF-F-11, SCF-F-17). A variable that
  * is missing or empty takes its default. Local stand-in for the configuration helper of the
  * contracts core, with the same signature; it is replaced when that helper is merged.
@@ -118,6 +154,11 @@ export function loadWebConfig(
     if (result.ok) config[name] = result.value;
     else problems.push(result.problem);
   }
+  const siteKey = siteKeyProblem(
+    config.CAPTCHA_ENABLED === true,
+    typeof config.CAPTCHA_SITE_KEY === "string" ? config.CAPTCHA_SITE_KEY : "",
+  );
+  if (siteKey !== null) problems.push(siteKey);
   return problems.length > 0
     ? { ok: false, problems }
     : { ok: true, config: config as WebConfig };
