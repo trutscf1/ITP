@@ -644,10 +644,13 @@ describe(
       const invalid = registration(email, { name: "", password: "x" });
       // The control: with the registration open, the same body is invalid.
       const open = await startIdentity(stack);
-      const invalidWhenOpen = await open.post("/register", invalid);
-      assert.equal(invalidWhenOpen.status, 400);
-      assert.equal(invalidWhenOpen.body?.code, "validation-failed");
-      await open.close();
+      try {
+        const invalidWhenOpen = await open.post("/register", invalid);
+        assert.equal(invalidWhenOpen.status, 400);
+        assert.equal(invalidWhenOpen.body?.code, "validation-failed");
+      } finally {
+        await open.close();
+      }
 
       const closed = await startIdentity(stack, {
         env: { REGISTRATION_ENABLED: "false" },
