@@ -101,6 +101,34 @@ describe("IDN-US-1 clean-up of unconfirmed accounts", { skip }, () => {
     assert.equal(links.length >= 1, true);
   });
 
+  it("IDN-T-25 IDN-AC-1.8 IDN-F-31 removes the reset link of a removed account too, and keeps the links of the accounts that stay", async () => {
+    const gone = address("link-gone");
+    const stays = address("link-stays");
+    await registerAged(gone, 8 * day);
+    await registerAged(stays, 6 * day);
+    for (const email of [gone, stays]) {
+      const reply = await running.post("/password-reset/request", { email });
+      assert.equal(reply.status, 202);
+    }
+    const goneId = await exists(gone);
+    const staysId = await exists(stays);
+    assert.ok(goneId);
+    assert.ok(staysId);
+    const links = (id: string) =>
+      stack.database.query<{ identifier: string }>(
+        "SELECT identifier FROM auth_verifications WHERE value = $1",
+        [id],
+      );
+    // A confirmation link and a reset link each.
+    assert.equal((await links(goneId)).length, 2);
+
+    await running.identity.runCleanup();
+
+    assert.equal(await exists(gone), undefined);
+    assert.equal((await links(goneId)).length, 0);
+    assert.equal((await links(staysId)).length, 2);
+  });
+
   it("IDN-T-8 IDN-AC-1.8 IDN-F-31 lets the address register again after the clean-up, as a fresh account", async () => {
     const email = address();
     await registerAged(email, 8 * day);
@@ -139,7 +167,7 @@ describe("IDN-US-1 clean-up of unconfirmed accounts", { skip }, () => {
     assert.equal(await exists(goes), undefined);
   });
 
-  it("IDN-F-31 Q346 keeps an account that is registered again or confirmed while the clean-up is deleting, with its links", async () => {
+  it("IDN-T-25 IDN-AC-1.8 IDN-F-31 Q346 keeps an account that is registered again or confirmed while the clean-up is deleting, with its links", async () => {
     // The clean-up is one conditional delete (no read of candidates before it): the row lock of
     // the test holds the delete back, the change of the other request commits, and the delete
     // finds the row no longer matching.
@@ -163,7 +191,7 @@ describe("IDN-US-1 clean-up of unconfirmed accounts", { skip }, () => {
         const deadline = Date.now() + 5000;
         for (;;) {
           const waiting = await stack.database.query(
-            "SELECT 1 FROM pg_stat_activity WHERE wait_event_type = 'Lock' AND datname = current_database()",
+            "SELECT 1 FROM pg_stat_activity WHERE wait_event_type = 'Lock' AND datname = current_database() AND query LIKE '%DELETE FROM auth_users%' AND pid <> pg_backend_pid()",
           );
           if (waiting.length > 0) break;
           assert.ok(

@@ -445,26 +445,27 @@ export async function createAuthCore(
       return member?.id;
     },
 
-    removeUnconfirmed: (before) =>
-      db.transaction(async (tx) => {
-        // One conditional delete, no read of candidates before it: an account confirmed or
-        // registered again meanwhile no longer matches and stays (IDN-F-31, Q346). Credentials
-        // and `users` row go with the account (foreign keys with ON DELETE CASCADE).
-        const { affectedRows } = await tx.execute(
-          tx.raw
-            .sql`DELETE FROM auth_users WHERE email_verified = false AND created_at < ${before.toISOString()}`
-            .affectedCount()
-            .build(),
-        );
-        // The confirmation links of the accounts that are gone.
-        await tx.execute(
-          tx.raw
-            .sql`DELETE FROM auth_verifications v WHERE v.identifier LIKE ${`${confirmationPrefix}%`} AND NOT EXISTS (SELECT 1 FROM auth_users u WHERE u.id = v.value)`
-            .affectedCount()
-            .build(),
-        );
-        return affectedRows;
-      }),
+    async removeUnconfirmed(before) {
+      // One conditional delete, no read of candidates before it: an account confirmed or
+      // registered again meanwhile no longer matches and stays (IDN-F-31, Q346). Credentials
+      // and `users` row go with the account (foreign keys with ON DELETE CASCADE); every link
+      // of the accounts removed by this statement, whatever its kind, goes in the same
+      // statement, and the links of every other account stay.
+      const { affectedRows } = await db.execute(
+        db.raw.sql`
+          WITH removed AS (
+            DELETE FROM auth_users
+            WHERE email_verified = false AND created_at < ${before.toISOString()}::timestamptz
+            RETURNING id
+          ), links AS (
+            DELETE FROM auth_verifications WHERE value IN (SELECT id FROM removed)
+          )
+          SELECT id FROM removed`
+          .affectedCount()
+          .build(),
+      );
+      return affectedRows;
+    },
 
     async checkDatabase() {
       await db.orm.public.User.select("id").limit(1).all();
