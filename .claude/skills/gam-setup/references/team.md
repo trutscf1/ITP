@@ -2,7 +2,7 @@
 
 Loaded by `/gam-engineering team` (skill `gam-setup`).
 
-The procedure behind `/gam-engineering team` (the resulting layout is described in the manifest's Team Mode chapter). Team mode needs git: in a folder without it, say so and stop (P-GIT-7).
+The procedure behind `/gam-engineering team` (the resulting layout is described in the manifest's Team Mode chapter). Team mode needs git: in a folder without it, say so and stop (P-GIT-7). Team mode also needs the documents in git: under footprint `minimal` (`env.GAM_ENGINEERING_FOOTPRINT`, read on disk) say that a team cannot share ignored documents and stop; the project first returns to `tracked` by the steps in the README, *Footprint* (A4).
 
 1. Copy this skill folder to `.claude/skills/gam-engineering/` in the repo and commit it.
 2. Create `gam-ai-knowledge/team/TEAM.md` from [templates/TEAM.md](../../gam-ai-knowledge/templates/TEAM.md), one row per developer handle.

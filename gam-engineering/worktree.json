@@ -1,0 +1,4 @@
+{
+  "ports": { "WEB_PORT": 3000, "POSTGRES_PORT": 5432 },
+  "suffix": ["DATABASE_URL"]
+}

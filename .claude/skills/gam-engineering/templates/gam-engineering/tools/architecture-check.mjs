@@ -3,7 +3,7 @@
 // Usage: node gam-engineering/tools/architecture-check.mjs layers   (dependency-cruiser: cycles and inward layer rules)
 //        node gam-engineering/tools/architecture-check.mjs limits   (file size and function length)
 // Run from the repo root; no dependencies of its own. dependency-cruiser runs through npx at the version the catalog
-// pins. The recorded check in gam-engineering/pipeline.json may carry settings ({ maxFileLines, maxFunctionLines })
+// pins, with the TypeScript compiler the catalog pins next to it. The recorded check in gam-engineering/pipeline.json may carry settings ({ maxFileLines, maxFunctionLines })
 // and exclude (a list of path prefixes) for limits.
 import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, extname, join, relative } from "node:path";
@@ -71,10 +71,36 @@ function layers() {
   if (chain.length === 0) console.log("layering chain missing in STACK.md (P-DES-3); only the cycle rule runs");
   mkdirSync(dirname(CONFIG), { recursive: true });
   writeFileSync(CONFIG, `${JSON.stringify(buildConfig(chain), null, 2)}\n`);
-  const args = ["--yes", `dependency-cruiser@${catalogEntry("architecture").version}`, "--config", CONFIG, "--output-type", "err", "."];
-  const run = spawnSync("npx", args, { stdio: "inherit", shell: process.platform === "win32" });
+  const run = spawnSync("npx", cruiseArgs(catalogEntry("architecture"), CONFIG), { encoding: "utf8", stdio: ["inherit", "pipe", "inherit"], shell: process.platform === "win32" });
   if (run.error) console.error(`architecture-check: cannot run npx (${run.error.message})`);
+  process.stdout.write(run.stdout ?? "");
+  if (run.status === 0 && cruisedModules(run.stdout ?? "") === 0 && hasCruisableFile(".")) {
+    console.error("architecture-check: dependency-cruiser checked no file although the folder holds code it can read (PP-F-57)");
+    return 1;
+  }
   return run.status === 0 ? 0 : 1;
+}
+
+// The npx call: dependency-cruiser and the TypeScript compiler as two packages of one run, both at the versions the
+// catalog pins. dependency-cruiser finds a compiler only next to itself, not in the project's node_modules; without one
+// it skips every .ts file and reports green (PP-F-57).
+export function cruiseArgs(entry, config) {
+  return ["--yes", "-p", `dependency-cruiser@${entry.version}`, "-p", `typescript@${entry.typescript}`, "depcruise", "--config", config, "--output-type", "err", "."];
+}
+
+// Output of dependency-cruiser (reporter err) → the number of modules it cruised, or null when the output names none.
+export function cruisedModules(output) {
+  const match = /(\d+) modules, \d+ dependencies cruised/.exec(output);
+  return match ? Number(match[1]) : null;
+}
+
+const CRUISABLE = new Set([".js", ".cjs", ".mjs", ".jsx", ".ts", ".tsx", ".cts", ".mts"]);
+
+function hasCruisableFile(folder) {
+  for (const item of readdirSync(folder, { withFileTypes: true })) {
+    if (item.isDirectory() ? !SKIPPED_FOLDERS.has(item.name) && hasCruisableFile(join(folder, item.name)) : CRUISABLE.has(extname(item.name).toLowerCase())) return true;
+  }
+  return false;
 }
 
 // Declaration line → function name, or null. One pattern per family; comments and strings are stripped first.

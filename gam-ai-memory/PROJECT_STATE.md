@@ -33,3 +33,11 @@ See [GOAL.md](../gam-ai-knowledge/GOAL.md).
 
 - **Default branch:** `dev` (releases are tagged on `main`)
 - **Last release:** v0.1.0
+
+<!-- agent-memory:auto -->
+- **Updated:** 2026-11-24
+- **Branch:** concept/storage-core
+- **Builds on:** afbfc58f3 fix(repo): exempt the example password quoted in a chat export from the secret scan [SCF-F-15]
+- **Commits since the reference point:** n/a (no reference point)
+- **Agent memory files:** none found
+<!-- /agent-memory:auto -->

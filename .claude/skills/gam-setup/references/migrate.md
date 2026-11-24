@@ -10,13 +10,13 @@ First read `gam-engineering/version.json` and take every entry of [migrations.md
 
 Check every row; several states may apply at once. The entry point limits the rows:
 
-- `migrate` checks all eight;
+- `migrate` checks all nine;
 - `migrate tools` only rows 2, 5, and 7;
 - the first change to an unnumbered work-item tree (P-DOC-5) only row 4.
 
 | # | State | Signs | Part |
 | --- | --- | --- | --- |
-| 1 | Predecessor skill `engineering-profile` | `CLAUDE.md` or `MANIFEST.md` naming `engineering-profile`; a `MANIFEST.md` in the documentation folder without a `GOAL.md` next to it; concept documents whose §3 is *Functional Requirements*. A project without any `MANIFEST.md` is a fresh repo: stop and run setup instead. | [migrate-engineering-profile.md](migrate-engineering-profile.md) |
+| 1 | Predecessor skill `engineering-profile` | `CLAUDE.md` or `MANIFEST.md` naming `engineering-profile`; a `MANIFEST.md` in the documentation folder without a `GOAL.md` next to it; concept documents whose §3 is *Functional Requirements*. A project without any `MANIFEST.md` is a fresh repo: stop and run setup instead; with the signs of row 9, setup preselects the basis *existing project* and adopts it ([start.md](start.md)). | [migrate-engineering-profile.md](migrate-engineering-profile.md) |
 | 2 | Layout before 2026-10-14 | A top-level `documentation/` and neither `gam-ai-knowledge/`, `gam-engineering/documentation/`, nor `humanengineering/documentation/`; or a tooling file of the skill at an old path | [migrate-tools.md](migrate-tools.md), *Old locations* |
 | 3 | Former names `humanengineering`, `engineering-human` | The signs listed in the part | [migrate-rename.md](migrate-rename.md) |
 | 4 | Unnumbered work items | A `work-items/<feature>/feature.md` (`doc-check` warning `WI`) | [migrate-epics.md](migrate-epics.md) |
@@ -24,12 +24,13 @@ Check every row; several states may apply at once. The entry point limits the ro
 | 6 | Knowledge folder | The documents outside `gam-ai-knowledge/` — in `gam-engineering/documentation/`, `humanengineering/documentation/`, or a top-level `documentation/` — or a folder `aigamdocs/`; checked first, since it can stop the run | [migrate-knowledge.md](migrate-knowledge.md) |
 | 7 | Memory folder missing or incomplete | gam-ai-memory installed and current, no `aigamdocs/`, and `init` would add something (`gam-ai-memory/`, its `plans/`, a template file, or the `AGENTS.md` link missing) | [memory.md](memory.md#in-setup-and-migrate) |
 | 8 | Plans or agent files at the old place | A root `plans/` (or `plansDirectory` other than `./gam-ai-memory/plans`) while `gam-ai-memory/` exists, or `docs/agents/` | [migrate-plans.md](migrate-plans.md) |
+| 9 | Foreign project | `gam-ai-knowledge/GOAL.md` exists, and a documentation folder, speckit or BMAD files, agent instruction files without a gam reference, or requirements in the `README.md` remain outside it ([detect.md](../../gam-engineering/references/detect.md)) | [migrate-foreign.md](migrate-foreign.md) |
 
 If no row applies, say so, write the version file (step 5) as its own commit, and stop.
 
 ## Step 2 — Inventory and one confirmation
 
-Report one table *part — item — current state — action* over every detected part; each part names its rows (for example the rename's *file — occurrence — replacement*). Show a short diff for every *customised* tooling item. Confirm the whole table as one `Q<n>` ([Asking the developer](../../gam-engineering/SKILL.md#asking-the-developer)) with the options **All proposed** (recommended), **Choose parts**, and **No**. On *Choose parts*, a second `Q<n>` with `multiSelect` names the detected parts. *Customised* items stay as they are unless the answer names them. Change nothing before the confirmation.
+Report one table *part — item — current state — action* over every detected part; each part names its rows (for example the rename's *file — occurrence — replacement*). Show a short diff for every *customised* tooling item. Confirm the whole table as one `Q<n>` ([Asking the developer](../../gam-engineering/SKILL.md#asking-the-developer)) with the options **All proposed** (recommended), **Choose parts**, and **No**. On *Choose parts*, a second `Q<n>` with `multiSelect` names the detected parts. *Customised* items stay as they are unless the answer names them. A *blocked* row, for example *Line endings LF* while an open branch changed a file the renormalize would rewrite (`eol-branches.mjs`), has the action *postponed*: it is listed with the lines of its check, *All proposed* does not apply it, and step 5 keeps the number below its entry. Change nothing before the confirmation.
 
 The questions a part prescribes come after the confirmation and before any change, as the next rounds: the goal wording of part 1 first (P-GOAL-1), then the rest of the frontier — merge keys, sprint mode, attribution, solo or team.
 
@@ -37,16 +38,17 @@ The questions a part prescribes come after the confirmation and before any chang
 
 All confirmed parts go into one change on the branch `chore/migrate-gam-engineering` from the integration branch, with one MR (P-GIT-2); without git, in place (P-GIT-7), and the parts' git-only rows are skipped. Apply the parts in this order, so that each later part works on the final paths and names:
 
-1. part 6 — move the documents straight to `gam-ai-knowledge/` and `aigamdocs/` to `gam-ai-memory/`;
-2. part 2 — move the old tooling paths to `gam-engineering/`; its `documentation/` row is part 6's;
-3. part 3 — rename the former names; its *Project folder* row moves only the tooling left in `humanengineering/`;
-4. part 1 — the project-level files of `engineering-profile`;
-5. part 4 — number the epics;
-6. part 5 — the tooling;
-7. part 7 — `/gam-ai-memory init`, which creates or completes `gam-ai-memory/`, so the memory links the knowledge folder at its final place;
-8. part 8 — the plans and agent files, last, since `gam-ai-memory/` exists only after part 6 or 7.
+1. part 9 — adopt the foreign files first, so the gam parts below never treat a foreign `documentation/` or `docs/` folder as an old gam layout;
+2. part 6 — move the documents straight to `gam-ai-knowledge/` and `aigamdocs/` to `gam-ai-memory/`;
+3. part 2 — move the old tooling paths to `gam-engineering/`; its `documentation/` row is part 6's;
+4. part 3 — rename the former names; its *Project folder* row moves only the tooling left in `humanengineering/`;
+5. part 1 — the project-level files of `engineering-profile`;
+6. part 4 — number the epics;
+7. part 5 — the tooling;
+8. part 7 — `/gam-ai-memory init`, which creates or completes `gam-ai-memory/`, so the memory links the knowledge folder at its final place;
+9. part 8 — the plans and agent files, last, since `gam-ai-memory/` exists only after part 6 or 7.
 
-The MR description lists every part with its items, every *customised* item kept with its diff summary, and the result of step 4. Part 1 writes the one ADR this migration needs (mandatory when adopting the skill); the other parts decide nothing for the project and need none.
+The MR description lists every part with its items, every *customised* item kept with its diff summary, and the result of step 4. Part 1 or part 9 writes the one ADR this migration needs (mandatory when adopting the skill); the other parts decide nothing for the project and need none.
 
 ## Step 4 — Check
 

@@ -1,13 +1,18 @@
 // PostToolUse hook of the gam-engineering skill (P-ROAD-3, short names of inbox entries).
-// After a Read of an inbox file (next.md), every entry under ## Urgent or ## Open without a `- **Kurzname:**` line gets
+// After a Read of the project's own inbox, every entry under ## Urgent or ## Open without a `- **Kurzname:**` line gets
 // one: a short, unique, lowercase kebab-case name derived from its title. Names already written by hand are kept. The
 // file is rewritten only when a name was added, keeps its line endings, and the hook stays silent otherwise.
+// The project's own inbox is gam-ai-knowledge/next.md and the developer's own team/<handle>/next.md there (QC0013). A
+// next.md in another folder or repository, and every inbox in a linked worktree (P-WS-13, QC0014), is left alone.
+import { spawnSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
-import { basename } from "node:path";
+import path from "node:path";
 import { pathToFileURL } from "node:url";
 
 const UMLAUTS = { ä: "ae", ö: "oe", ü: "ue", ß: "ss" };
 const NAME_LINE = /^\s*-\s*\*\*Kurzname:\*\*\s*(\S.*)$/;
+// The folders that hold the inbox: the knowledge folder and its former names of the transition period (P-DOC-10, P-DOC-11).
+const INBOX_FOLDERS = ["gam-ai-knowledge", "gam-engineering/documentation", "humanengineering/documentation"];
 
 // Lowercase ASCII words of a title, without the priority prefix ("P1 — ") and parenthetical notes; at most `max` words.
 export function slugify(title, max = 3) {
@@ -55,6 +60,35 @@ export function addShortNames(text) {
   return { text: lines.join(eol), added };
 }
 
+// True when `file` is the project's own inbox under `root`: next.md in an inbox folder, or with a handle the developer's
+// own team/<handle>/next.md there (P-TEAM-3). On Windows the case of the path does not matter. `pathApi` is node:path;
+// the tests pass path.win32 or path.posix.
+export function isProjectInbox(file, root, handle, pathApi = path) {
+  const fold = (text) => (pathApi.sep === "\\" ? text.toLowerCase() : text);
+  const relative = fold(pathApi.relative(pathApi.resolve(root), pathApi.resolve(file)).split(pathApi.sep).join("/"));
+  const inboxes = INBOX_FOLDERS.flatMap((folder) => [`${folder}/next.md`, ...(handle ? [`${folder}/team/${handle}/next.md`] : [])]);
+  return inboxes.some((inbox) => fold(inbox) === relative);
+}
+
+// The handle of `Developer handle: <handle>` in CLAUDE.local.md (P-TEAM-2), read as prompt-export.mjs reads it.
+function readHandle(root) {
+  try {
+    return /Developer handle:\s*`?([^`\s]+)/.exec(readFileSync(path.join(root, "CLAUDE.local.md"), "utf8"))?.[1];
+  } catch {
+    return undefined;
+  }
+}
+
+// True in a linked worktree, whose git folder differs from the common one: a session on a work branch there leaves the
+// inbox to the merge (P-WS-13). Without git, or outside a repository, the checkout counts as the main folder. Git may
+// print one folder absolute and the other relative, so both are resolved, and compared without case on Windows.
+function isLinkedWorktree(root) {
+  const run = spawnSync("git", ["rev-parse", "--git-dir", "--git-common-dir"], { cwd: root, encoding: "utf8" });
+  const [gitDir, commonDir] = run.status === 0 ? run.stdout.split(/\r?\n/) : [];
+  const full = (dir) => (path.sep === "\\" ? path.resolve(root, dir).toLowerCase() : path.resolve(root, dir));
+  return Boolean(gitDir && commonDir) && full(gitDir) !== full(commonDir);
+}
+
 function readInput() {
   try {
     return JSON.parse(readFileSync(0, "utf8") || "{}");
@@ -66,13 +100,22 @@ function readInput() {
 // Run as a hook: the Read input names the file. Run by hand: node inbox-names.mjs <next.md>. Importing the module
 // (the tests do) runs nothing and reads no stdin.
 function runHook() {
-  const path = process.argv[2] || readInput().tool_input?.file_path || "";
-  if (basename(path) !== "next.md") return;
+  const byHand = process.argv[2];
+  let file = byHand;
+  if (byHand) {
+    if (path.basename(byHand) !== "next.md") return;
+  } else {
+    const input = readInput();
+    const root = process.env.CLAUDE_PROJECT_DIR || input.cwd || process.cwd();
+    file = path.resolve(input.cwd || root, input.tool_input?.file_path || "");
+    // Cheapest check first, since every Read runs this hook; git is asked only for the project's own inbox.
+    if (path.basename(file).toLowerCase() !== "next.md" || !isProjectInbox(file, root, readHandle(root)) || isLinkedWorktree(root)) return;
+  }
   try {
-    const original = readFileSync(path, "utf8");
+    const original = readFileSync(file, "utf8");
     const { text, added } = addShortNames(original);
     if (added.length > 0) {
-      writeFileSync(path, text);
+      writeFileSync(file, text);
       process.stdout.write(
         JSON.stringify({
           hookSpecificOutput: {
