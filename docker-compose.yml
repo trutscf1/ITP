@@ -1,8 +1,9 @@
 # Local stack (SCF-US-2, slice 1): the data services, the reverse proxy, and `web`, started by
 # one `docker compose up`. Every setting comes from `.env` (SCF-AC-2.2); `.env.example` lists
 # every variable. Every service has a health check, and a service starts only after the
-# services it depends on are healthy (SCF-AC-2.4). The units `identity`, `storage`, `worker`,
-# join when their code runs; `cms` and `cms-db` are here (PUB-US-1) (gam-ai-knowledge/concepts/scaffolding.md, SCF-F-1).
+# services it depends on are healthy (SCF-AC-2.4). The units `identity`, `storage`, and `worker`
+# join when their code runs; `cms` and `cms-db` are here (PUB-US-1). Units and their order:
+# gam-ai-knowledge/concepts/scaffolding.md (SCF-F-1).
 services:
   # Relational database (SCF-C-8).
   postgres:
