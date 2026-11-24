@@ -18,7 +18,7 @@ The model is read in every session from `env.GAM_ENGINEERING_BRANCHES` in the co
 | Release pop-up under `ask`: **Merge now**, **No**, **Later**, **I merge myself** | **Release now**, **No**, **Later**, **I release myself** |
 | Merge guard (P-MR-6): `git merge`, `glab mr merge`, `gh pr merge` | The same, plus `git tag`, `glab release create`, `gh release create` |
 | Status hook watches `dev` and `origin/dev` | Watches `main` and `origin/main` (it reads the key itself) |
-| `merge.ps1 -Release` merges `dev` into `main`, then tags | `merge.ps1 -Release` only tags `main` (it reads the key itself) |
+| `merge.mjs --release` merges `dev` into `main`, then tags | `merge.mjs --release` only tags `main` (it reads the key itself) |
 | `git init` without git: first commit on `main`, then `dev` from it | First commit on `main`, no `dev` |
 
 `doc-check.mjs` reads the key itself: in branch model `trunk` the stage `in dev` is an error `STAGE-MODE`, in branch model `dev` the stage `merged` is.

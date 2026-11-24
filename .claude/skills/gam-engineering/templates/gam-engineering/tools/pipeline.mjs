@@ -14,6 +14,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, posix } from "node:path";
 import { pathToFileURL } from "node:url";
+import { LOCK_FILES, NODE_INSTALL, findLockFile } from "./install-detect.mjs";
 
 // HostAnswers → RunnerProbe. An empty answer means the host did not answer or denied access (PP-E-1).
 export function probeFromAnswers({ host, project, runners, permissions }) {
@@ -328,16 +329,10 @@ const CI_FILES = {
 export const DOC_CHECK_PATHS = ["gam-ai-knowledge/tools/doc-check.mjs", "gam-engineering/tools/doc-check.mjs", "humanengineering/tools/doc-check.mjs"];
 export const findDocCheck = (repoRoot) => DOC_CHECK_PATHS.find((path) => existsSync(join(repoRoot, path))) ?? DOC_CHECK_PATHS[0];
 
-// The install line of a Node job by the lock file in its folder: the catalog's `npm ci` stands for it, because npm ci
-// fails without package-lock.json (schoolquiz 0.26.0). A folder without a lock file gets no install step. One line each,
-// so it runs in the check's folder as a whole.
-export const NODE_INSTALL = {
-  "package-lock.json": "npm ci",
-  "pnpm-lock.yaml": "corepack enable && pnpm install --frozen-lockfile",
-  "yarn.lock": "corepack enable && yarn install --immutable",
-};
-export const LOCK_FILES = Object.keys(NODE_INSTALL);
-export const findLockFile = (repoRoot) => (cwd) => LOCK_FILES.find((name) => existsSync(join(repoRoot, cwd || "", name))) ?? "";
+// The install line of a Node job by the lock file in its folder (NODE_INSTALL, LOCK_FILES, findLockFile): the catalog's
+// `npm ci` stands for it, because npm ci fails without package-lock.json (schoolquiz 0.26.0). The detection lives in
+// install-detect.mjs, shared with worktree-setup.mjs (plan 2026-11-14-worktree-isolation, A247).
+export { LOCK_FILES, NODE_INSTALL, findLockFile };
 
 // lockOf(cwd) names the lock file of a check's folder; without it every Node job keeps npm ci.
 export function renderCi(decision, host, integrationBranch, catalog, docCheck = DOC_CHECK_PATHS[0], lockOf = () => "package-lock.json") {
@@ -552,25 +547,25 @@ const readCatalog = () => JSON.parse(readFileSync(new URL("./pipeline-catalog.js
 const RUNNER_FEATURES = [
   {
     feature: "tier",
-    marker: /\$Tier\b/,
+    marker: /\$Tier\b|\boptions\.tier\b/,
     needed: (checks, catalog) => checks.filter((check) => checkTier(check, catalog) === "release"),
     consequence: (names) => `runs the release-tier checks ${names} on every merge`,
   },
   {
     feature: "not-run",
-    marker: /'not run'/,
+    marker: /['"]not run['"]/,
     needed: (checks, catalog) => checks.filter((check) => catalogEntry(check, catalog)?.skipExit !== undefined),
     consequence: (names) => `counts the skip exit code of ${names} as red instead of not run`,
   },
   {
     feature: "skip",
-    marker: /\$Skip\b/,
+    marker: /\$Skip\b|\boptions\.skip\b/,
     needed: (checks) => checks.filter((check) => check.kind === "quality"),
     consequence: (names) => `does not know -Skip, which leaves out ${names} when gam-sonar is missing`,
   },
   {
     feature: "live-report",
-    marker: /New-RunFolder/,
+    marker: /New-RunFolder|\bnewRunFolder\b/,
     needed: (checks) => checks,
     consequence: () => "writes the report only when the whole run ends, so a hanging check shows nothing",
   },
@@ -584,6 +579,14 @@ function catalogEntry(check, catalog) {
 function checkTier(check, catalog) {
   if (check.tier === "merge" || check.tier === "release") return check.tier;
   return catalogEntry(check, catalog)?.tier ?? "merge";
+}
+
+// The text the gaps are read from: the script itself, or, for a thin wrapper that only starts local-pipeline.mjs, the .mjs
+// beside it (a project whose pipeline.json still names the old .ps1 keeps working through the wrapper).
+function runnerText(script) {
+  const text = readFileSync(script, "utf8");
+  const sibling = script.replace(/\.ps1$/i, ".mjs");
+  return sibling !== script && /local-pipeline\.mjs/.test(text) && existsSync(sibling) ? readFileSync(sibling, "utf8") : text;
 }
 
 export function runnerGaps(scriptText, decision, catalog) {
@@ -651,9 +654,9 @@ const COMMANDS = {
   "runner-gaps": {
     read: "decision",
     run: (decision) => {
-      const script = decision.localScript || "gam-engineering/local-pipeline.ps1";
+      const script = decision.localScript || "gam-engineering/local-pipeline.mjs";
       if (!existsSync(script)) return [[], 0];
-      const gaps = runnerGaps(readFileSync(script, "utf8"), decision, readCatalog());
+      const gaps = runnerGaps(runnerText(script), decision, readCatalog());
       return [gaps, gaps.length ? 1 : 0];
     },
   },

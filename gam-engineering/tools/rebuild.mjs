@@ -398,7 +398,7 @@ function globToRegExp(pattern) {
 // The fixed keep list of RB-F-1; the patterns of STACK.md §4 and §11 and the submodules are added by `readStack`.
 const KEEP_PATTERNS = [
   "gam-ai-knowledge/**", "gam-engineering/**", "gam-ai-memory/**", ".claude/**", ".git*", ".git*/**", "CLAUDE.md",
-  "CONTEXT-MAP.md", "README.md", "LICENSE*", ".markdownlint.jsonc", ".deployignore", ".npmignore", ".dockerignore", "MANIFEST.in",
+  "CONTEXT-MAP.md", "README.md", "LICENSE*", ".markdownlint.jsonc", ".markdownlint-cli2.jsonc", ".deployignore", ".npmignore", ".dockerignore", "MANIFEST.in",
 ];
 
 // The lock files each package manager writes (RB-F-22); a lock file is no file without a place, at any depth.

@@ -6,7 +6,7 @@ audience: [developer, agent]
 ---
 # Session log
 
-One entry per session, newest first, from [templates/SESSION_TEMPLATE.md](templates/SESSION_TEMPLATE.md). Entries are never edited afterwards.
+One entry per session, newest first, from [templates/SESSION_TEMPLATE.md](templates/SESSION_TEMPLATE.md). Entries are never edited afterwards, except that a session adds lines to its own open entry ([prompts/sync.md](prompts/sync.md), [prompts/handover.md](prompts/handover.md)).
 
 ## Entries
 

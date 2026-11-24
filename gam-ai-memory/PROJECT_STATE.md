@@ -33,3 +33,12 @@ See [GOAL.md](../gam-ai-knowledge/GOAL.md).
 
 - **Default branch:** `dev` (releases are tagged on `main`)
 - **Last release:** v0.1.0
+
+<!-- agent-memory:auto -->
+- **Updated:** 2026-11-24
+- **Branch:** chore/migrate-gam-engineering
+- **Builds on:** e75591d5f ci(repo): merge the own pipeline with the gam checks [no-req]
+- **Commits since the reference point:** 22 (2026-11-10)
+- **Agent memory files:**
+  - Claude Code: feedback-mr-reviewers.md (2026-11-03)
+<!-- /agent-memory:auto -->

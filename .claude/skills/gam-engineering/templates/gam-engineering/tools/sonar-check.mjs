@@ -4,7 +4,7 @@
 // version) and scripts/export-report.ps1 (the report, written into this project's run folder). Dependency-free; run by the local pipeline as
 // `node ... sonar-check.mjs scan`, with --version=<version> from the check's version (PP-F-41); without it, the next MINOR after the newest
 // release tag, because SonarQube counts everything since the previous version as new code.
-// The scripts are read from ~/.claude/skills/gam-sonar (env GAM_SONAR_DIR overrides it, used by the tests).
+// The scripts are read from <config>/skills/gam-sonar, <config> being CLAUDE_CONFIG_DIR or else ~/.claude (env GAM_SONAR_DIR overrides it, used by the tests).
 // Exit 0: the quality gate passed and the report is written. Exit 1: the scan, the gate, or the report failed.
 // Exit 3: the check could not run (reason on stdout).
 import { existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
@@ -63,7 +63,8 @@ export function reportsToRemove(names, keep = REPORTS_KEPT) {
 }
 
 // The scripts of the installed gam-sonar skill; the version is pinned there, not here.
-export const gamSonarDir = () => process.env.GAM_SONAR_DIR || join(homedir(), ".claude", "skills", "gam-sonar");
+export const gamSonarDir = (env = process.env) =>
+  env.GAM_SONAR_DIR || join(env.CLAUDE_CONFIG_DIR || join(homedir(), ".claude"), "skills", "gam-sonar");
 
 export async function scan(cwd = process.cwd(), version = releaseVersion(), sonarDir = gamSonarDir()) {
   const scanScript = join(sonarDir, "scripts", "scan.ps1");

@@ -1,0 +1,9 @@
+// markdownlint-cli2 options (gam-engineering): which files the run skips.
+// The rules stay in .markdownlint.jsonc next to this file.
+{
+  "ignores": [
+    // AI chat exports: written only by gam-engineering/tools/prompt-export.mjs
+    // and never edited (P-TEAM-6). The hand-written manual/ logs stay linted.
+    "docs/prompts/*/!(manual)/**"
+  ]
+}
