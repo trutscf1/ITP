@@ -62,6 +62,14 @@ describe("PUB-AC-1.1 CMS container: Strapi runs as a container with its own Post
     assert.notEqual(cmsDb, compose.services.postgres);
   });
 
+  it("PUB-AC-1.1 SCF-AC-2.4 asks the health check of cms-db for its own user and database inside the container", () => {
+    const test = cmsDb?.healthcheck?.test;
+    const command = Array.isArray(test) ? test.join(" ") : String(test);
+    assert.match(command, /pg_isready/);
+    assert.doesNotMatch(command, /(^|[^$])\$\{POSTGRES_/, "a single dollar is replaced on the host, use two");
+    assert.match(command, /\$\$\{?POSTGRES_USER/);
+  });
+
   it("PUB-AC-1.1 PUB-F-1 lets cms start only after its content store is healthy", () => {
     assert.equal(cms?.depends_on?.["cms-db"]?.condition, "service_healthy");
     assert.ok(cmsDb?.healthcheck?.test, "cms-db has no health check");
