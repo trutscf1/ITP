@@ -2,5 +2,5 @@
 # (OBS-F-5, SCF-F-20) cannot run in it. This file adds one static tool, busybox, and nothing else.
 # Both base images are pinned and scanned by the job container-scan (SCF-AC-5.2).
 FROM busybox:1.38.0-musl AS tools
-FROM otel/opentelemetry-collector-contrib:0.164.0
+FROM otel/opentelemetry-collector-contrib:0.165.0
 COPY --from=tools --chmod=0755 /bin/busybox /busybox
