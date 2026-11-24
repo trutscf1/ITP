@@ -11,6 +11,8 @@ New tasks and ideas for this developer land here first, before anyone plans them
 
 ## Open
 
+- [2026-11-17] From `schwaigc`, concept *Design system & accessibility modes* (R4, `concepts/design-system.md` §11, §13 Q382/Q394, MR of #116): `identity.md` should state that the appearance-preferences record (1:1 to `users`) is deleted with the account (IDN-US-8, [DSA-NF-13]), and that sign-out lets the web client delete the device values ([DSA-F-23]).
+
 - [2026-11-17] From the code review of #45 (IDN-US-1, Q344), for #46 (IDN-US-2): (1) `/login` has no throttle yet, and every attempt costs one Argon2id run of 19 MiB — the locks of IDN-F-9 must also bound the cost before the throttle answers; (2) `identity` trusts the last `X-Forwarded-For` entry from every peer on the network `frontend`, so another container can choose the counted address — accept it only from the reverse proxy (own network, or a trusted-proxy setting); (3) move the login logic out of `apps/identity/src/app.ts` into its own module, as registration has one; (4) `sendReset` and its template already exist for IDN-US-6 (#50).
 
 - [2026-10-27] From `trutscf1`, concept *Observability baseline* (R2, `concepts/observability.md` §15 and §16, MR of #114, you are its reviewer): `identity` includes `TelemetryConfig` in its configuration contract, calls `startTelemetry` and writes the start log entry before it accepts requests (OBS-F-1, OBS-F-25) — slice 5 of OBS-US-1, an issue for you after `tickets`. Log attributes holding passwords, tokens, or TOTP codes are redacted by key (OBS-F-14); nothing about a person goes into telemetry (OBS-NF-2).

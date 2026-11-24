@@ -11,6 +11,7 @@ New tasks and ideas for this developer land here first, before anyone plans them
 
 ## Open
 
+- [2026-11-17] From `schwaigc`, concept *Design system & accessibility modes* (R4, `concepts/design-system.md` §13 Q395, MR of #116): visitors now get light or dark by the system colour scheme, nothing stored ([DSA-F-21]). Please align A57 of `public-content.md` ("visitors see the default theme").
 - [2026-11-10] From `schwaigc` (MR of #71): `tools/doc-check.mjs` crashes with a TypeError in `conceptRow` when a concept document holds a table whose header starts `| Slice | Delivers |` (kind `slices`, meant for story files): `slices` is missing from the early return of `conceptRow`. `design-system.md` §16 works around it with the column name *Requirements*.
 
 - [2026-11-03] From `tschudea07`, concept *Identity* (R3, `concepts/identity.md` §15): (1) add the error codes `bot-check-failed`, `too-many-requests`, `invalid-credentials`, `address-not-confirmed`, `registration-closed`, `link-invalid`, `no-session` with their statuses and messages (identity §8) to `ErrorResponse` in `scaffolding.md` §8 — needed before slice 1 of IDN-US-1 (#45) is merged; (2) add `botToken`, `confirmationToken`, `resetToken` to the secret key list of `observability.md` §8 ([IDN-NF-4]); (3) name the periods of [IDN-F-31], [IDN-NF-2], [IDN-NF-3] in the privacy template paragraphs of [PUB-F-22]. The bot check runs as a visible widget, so [PUB-F-23] shows no notice (A16); `SESSION_CHECK_TIMEOUT_MS` defaults to 1000 ms.
