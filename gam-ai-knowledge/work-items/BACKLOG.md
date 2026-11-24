@@ -16,7 +16,6 @@ The story files are the source: their `status` and `sprint` fields decide what s
 | 2 | [SCF-US-8 Units reachable and visible](E01-scaffolding/SCF-US-8-units-reachable-and-visible.md) | E01 Scaffolding & shared contracts | backlog | — | — | — |
 | 3 | [OBS-US-1 Telemetry of every unit](E02-observability/OBS-US-1-telemetry-of-every-unit.md) | E02 Observability baseline | review | 2 | 8 | #82 |
 | 4 | [OBS-US-2 Operations dashboards and alerts](E02-observability/OBS-US-2-operations-dashboards-and-alerts.md) | E02 Observability baseline | review | 2 | 5 | #83 |
-| 5 | [IDN-US-1 Register by e-mail](E03-identity/IDN-US-1-register-by-e-mail.md) | E03 Identity: accounts, external login, MFA | in-progress | 2 | 5 | #45 |
 | 6 | [IDN-US-2 Log in and log out with rate limiting](E03-identity/IDN-US-2-log-in-and-log-out-with-rate-limiting.md) | E03 Identity: accounts, external login, MFA | in-progress | 2 | 3 | #46 |
 | 7 | [IDN-US-3 Log in with OAuth2 (GitHub, Google, Microsoft)](E03-identity/IDN-US-3-log-in-with-oauth2-github-google-microsoft.md) | E03 Identity: accounts, external login, MFA | backlog | 3 | 3 | #47 |
 | 8 | [IDN-US-4 Two-factor authentication with TOTP](E03-identity/IDN-US-4-two-factor-authentication-with-totp.md) | E03 Identity: accounts, external login, MFA | backlog | 3 | 3 | #48 |

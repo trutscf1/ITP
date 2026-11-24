@@ -159,6 +159,9 @@ services:
       # External services are switched off by default; e-mail goes to mailpit (SCF-AC-2.3).
       OAUTH_ENABLED: ${OAUTH_ENABLED:?set OAUTH_ENABLED in .env}
       CAPTCHA_ENABLED: ${CAPTCHA_ENABLED:?set CAPTCHA_ENABLED in .env}
+      # The registration page shows the form and the bot-check widget with the same values as identity (#168).
+      REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:?set REGISTRATION_ENABLED in .env}
+      CAPTCHA_SITE_KEY: ${CAPTCHA_SITE_KEY:-}
       SMTP_HOST: mailpit
       SMTP_PORT: "1025"
     depends_on:

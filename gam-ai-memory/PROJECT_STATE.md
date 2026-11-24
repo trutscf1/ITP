@@ -36,8 +36,11 @@ See [GOAL.md](../gam-ai-knowledge/GOAL.md).
 
 <!-- agent-memory:auto -->
 - **Updated:** 2026-11-24
-- **Branch:** concept/storage-core
-- **Builds on:** afbfc58f3 fix(repo): exempt the example password quoted in a chat export from the secret scan [SCF-F-15]
+- **Branch:** feature/45-register-by-e-mail
+- **Builds on:** 1aa09e96b chore(repo): merge dev into feature/45-register-by-e-mail [no-req]
 - **Commits since the reference point:** n/a (no reference point)
-- **Agent memory files:** none found
+- **Agent memory files:**
+  - Codex: MEMORY.md (2026-06-22)
+  - Codex: memory_summary.md (2026-06-22)
+  - Codex: raw_memories.md (2026-06-22)
 <!-- /agent-memory:auto -->
