@@ -69,11 +69,15 @@ test:
   services:
     - name: postgres:18-alpine
       alias: postgres
+    # The session store and the request counters of `identity` (IDN-C-6, concepts/identity.md §17).
+    - name: redis:8.8-alpine
+      alias: redis
   variables:
     POSTGRES_DB: stash
     POSTGRES_USER: stash
     POSTGRES_PASSWORD: change-me
     TEST_DATABASE_URL: postgresql://stash:change-me@postgres:5432/stash
+    TEST_REDIS_URL: redis://redis:6379
   script:
     - pnpm test
 

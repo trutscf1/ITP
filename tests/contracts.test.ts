@@ -202,6 +202,13 @@ describe("SCF-AC-3.4 Uniform error format", () => {
       "not-found": 404,
       "method-not-allowed": 405,
       "internal-error": 500,
+      "bot-check-failed": 400,
+      "too-many-requests": 429,
+      "invalid-credentials": 401,
+      "address-not-confirmed": 403,
+      "registration-closed": 403,
+      "link-invalid": 400,
+      "no-session": 401,
     });
     for (const code of errorCodes) {
       const { body } = errorReplies[code];
