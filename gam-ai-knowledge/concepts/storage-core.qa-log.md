@@ -176,3 +176,15 @@ Answer: "Sofort alles löschen (Recommended)".
 **Q442 - Verschlüsselung im Ruhezustand:** Content objects, Datenbanken und Metadata liegen unverschlüsselt auf dem Server; Ende-zu-Ende-Verschlüsselung ist die optionale Erweiterung O1. Was verlangt R5?
 
 Answer: "Betreiber-Sache, dokumentiert (Recommended)".
+
+## Round 9 — 2026-11-24 — performance and adversarial check (`schwaigc`)
+
+- **A23**: Every story with an interface is cut into an API slice (`storage`) and a web slice (Q432); STO-US-1 keeps its two slices (#56, #105); the cleanup jobs are a worker slice of STO-US-3 (Q435). The INVEST check runs while writing; its findings are asked one by one.
+
+**Q443 - Leistungsziele (NF):** Welche messbaren Ziele soll R5 haben (gemessen im lokalen Stack, später unter Last in R13)?
+
+Answer: "Drei Ziele (Recommended)" — list a folder of 1 000 items in ≤ 300 ms (p95); first byte of a download in ≤ 500 ms (p95); a 5 GiB upload or download without `storage` using more than 256 MB of memory.
+
+**Q444 - Gegenprüfung vor dem Phase-4-Gate:** R5 verarbeitet personenbezogene Daten und löscht endgültig (irreversible Wirkung). Soll vor dem Review ein unabhängiger Prüfer (gam-v-doubt-driven-development) die Ziel-Kette (§1) und Part H angreifen?
+
+Answer: "Ja, Gegenprüfung (Recommended)".
