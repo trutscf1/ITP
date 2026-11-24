@@ -236,6 +236,20 @@ Answer: "SeaweedFS-Master-API (Recommended)".
 
 The independent check of §1 and Part H that Q444 asked for ran on 2026-11-24 (cycle 1) with 22 findings, all fixed in the concept.
 
-**Q455 - Cross-model-Prüfung:** Soll zusätzlich zur unabhängigen Prüfung eine Gegenprüfung durch ein anderes Modell laufen?
+**Q455 - Zweitmeinung anderes Modell:** Die Gegenprüfung von §1 und Part H (storage-core) durch einen unabhängigen opus-Reviewer ist fertig (22 Befunde, u. a. überzogene Lösch- und Vertraulichkeitsversprechen). Soll zusätzlich ein anderes Modell prüfen?
 
 Answer: "Überspringen (Recommended)".
+
+## Round 13 — 2026-11-24 — adversarial check, cycle 2 (`schwaigc`)
+
+The second cycle of the independent check found 18 more issues, several of them in the specification; all were fixed in the concept.
+
+- **A28**: The internal deletion call `DELETE /internal/members/{userId}` is not routed by the proxy; it is reachable only on the internal Docker network. STO-F-4 exempts it, with the health endpoint, from the session check, and it is protected by the shared secret.
+- **A29**: "Replace" replaces only the file that held the name when the upload was created (its ID is recorded at creation); if at completion a different item, file or folder, holds the name, keep-both applies; before STO-US-6 the conflict dialog says that replacing deletes the old file for good.
+- **A30**: Account deletion first blocks new writes of the member (uploads, creates, moves), then deletes; the call is idempotent and safe to repeat, `identity` repeats it until 204, and a partial failure leaves a state the next call finishes.
+- **A31**: Telemetry carries no member IDs (glossary *Telemetry*, OBS-NF-2).
+- **A32**: The glossary entry *File* drops "the fingerprint of its content"; the state machine of the item gets trashed → gone on account deletion; the state machine of the upload gets receiving → failed on a refusal (type or size) and a transition for the member's cancel.
+
+**Q456 - „reliably“ im Feature-Ziel:** Das Ziel aus Q417 lautet „… so that their data lives reliably on their own server.“ Der Reviewer zeigt, dass „reliably“ als Haltbarkeits- bzw. Verfügbarkeitsversprechen gelesen wird, das R5 nicht gibt (keine Backups, G-1.N4). Soll das Ziel geändert werden?
+
+Answer: "„stays under their control“ (Recommended)" — new feature goal: "Members upload, organize, restore, and download files up to the size the operator allows, so that their data stays on their own server under their control."

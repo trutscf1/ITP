@@ -154,7 +154,7 @@ The member's own record in stash, at most one per member and separate from the a
 *Avoid*: account (for this record), settings
 
 **File**:
-What a member sees and works with: a name, its place in a folder, its owner, its size, and the fingerprint of its content. Several files may share one content object without knowing it.
+What a member sees and works with: a name, its place in a folder, its owner, and its size. Its content is kept apart as a content object, and several files may share one content object without knowing it.
 *Avoid*: document, object, blob
 
 **Content object**:
