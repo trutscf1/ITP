@@ -21,3 +21,6 @@ b94e6887a9d1ad1f7124a0fe0dbfa81f85f207c6:apps/identity/src/main.test.ts:generic-
 # review of !62 (IDN-F-6), not credentials.
 730f61b6f23e1e966a551ffa052b03b61aa32df2:apps/identity/src/registration-race.test.ts:generic-api-key:31
 730f61b6f23e1e966a551ffa052b03b61aa32df2:apps/identity/src/registration-race.test.ts:generic-api-key:73
+
+# Synthetic secret of the set-up failure test of the AuthCore (#167, IDN-C-1), not a credential.
+a3cdf61eec4fd9f73a6c547114456420eefc1ca7:apps/identity/src/auth-core.test.ts:generic-api-key:16
