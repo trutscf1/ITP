@@ -253,3 +253,25 @@ The second cycle of the independent check found 18 more issues, several of them 
 **Q456 - „reliably“ im Feature-Ziel:** Das Ziel aus Q417 lautet „… so that their data lives reliably on their own server.“ Der Reviewer zeigt, dass „reliably“ als Haltbarkeits- bzw. Verfügbarkeitsversprechen gelesen wird, das R5 nicht gibt (keine Backups, G-1.N4). Soll das Ziel geändert werden?
 
 Answer: "„stays under their control“ (Recommended)" — new feature goal: "Members upload, organize, restore, and download files up to the size the operator allows, so that their data stays on their own server under their control."
+
+## Round 14 — 2026-11-24 — adversarial check, cycle 3 (`schwaigc`)
+
+The third and last cycle of the independent check found 20 more issues. Most of the serious ones hang on the specification of account deletion; the developer decided to move that out as a draft (Q457) and to work in the rest (Q458).
+
+- **A33**: "Their" in the feature goal means the members' organisation, as in G-1; §1 says so.
+
+**Q457 - Account löschen in R5:** Die meisten schweren Befunde aus Zyklus 3 hängen an STO-F-44 (Löschen aller Daten bei Account-Löschung), das von der Entwurfs-Story IDN-US-8 abhängt. Wie gehen wir damit um?
+
+Answer: "Als Entwurf auslagern (Recommended)".
+
+**Q458 - Weiter nach drei Zyklen:** Die übrigen Befunde (Ersetzen durch identischen Inhalt, interner Port, Upload-Datensatz nach Abschluss, 0-Byte-Dateien, Ordner-Konflikt im Dialog, Fristen ohne Obergrenze, Doppel-Unique über files/folders, kleine Part-H-Fehler) sind konkret. Wie weiter?
+
+Answer: "Einarbeiten, dann MR (Recommended)".
+
+**Q459 - Kopie unter vergebenem Namen (W11):** Wird eine Datei in einen Ordner kopiert, in dem der Name schon vergeben ist, bekommt die Kopie den „Beide behalten“-Namen („Name (2).ext“). Bestätigst du das?
+
+Answer: "Ja, Beide-behalten-Name (Recommended)".
+
+**Q460 - Backups:** Part H sagt „stash macht keine Backups, das ist Sache des Operators“, aber keine Entscheidung deckt das. Was gilt?
+
+Answer: "Operator, dokumentiert (Recommended)".

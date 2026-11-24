@@ -10,7 +10,7 @@ serves: "G-1"
 
 The specification of roadmap feature R5: how a member uploads, organizes, deletes, restores, and downloads files, and how those files are kept apart from everything else about them on the operator's own server. It is written for the feature's owner (schauby1), its reviewers, the owner of `web` who builds the pages of the feature, and the agents that implement it. Part H is the plain-language view; Part S is binding. Question log: [storage-core.qa-log.md](storage-core.qa-log.md).
 
-**Status of this version.** Grilled on 2026-11-24 (rounds 1 to 13, Q414 to Q456, A1 to A32); ready for review, not approved. The Phase 4 gate is the review of the merge request that carries this document.
+**Status of this version.** Grilled on 2026-11-24 (rounds 1 to 14, Q414 to Q460, A1 to A33); ready for review, not approved. The Phase 4 gate is the review of the merge request that carries this document.
 
 # Part H — For Human Readers
 
@@ -18,62 +18,63 @@ This part adds no rule. It summarizes Part S and cites its IDs; where the two di
 
 ## H1. In one sentence
 
-Members upload, organize, restore, and download files up to the size the operator allows, so that their data stays on their own server under their control. This serves `G-1` ("store, organize … on their own server"): the server is the organisation's own, run by the operator. Until R7, only the owner reaches an item through stash ([STO-F-24] (owner only)), but stash stores files unencrypted ([STO-NF-7] (encryption at rest)), so whoever runs or has access to the server can read them. The feature promises no backups (stash makes none; that is the operator's job, Q442) and no availability (`G-1.N4`). `G-1.S1` (start on one own server without internet) is a goal of the whole system; this feature needs no service on the internet and so does not endanger it ([STO-NF-8] (start without internet)).
+Members upload, organize, restore, and download files up to the size the operator allows, so that their data stays on their own server under their control; "their" means the organisation of the members, as in `G-1` (A33). This serves `G-1` ("store, organize … on their own server"): the server is the organisation's own, run by the operator. Until R7, only the owner reaches an item through stash ([STO-F-24] (owner only)), but stash stores files unencrypted ([STO-NF-7] (encryption at rest)), so whoever runs or has access to the server can read them. The feature promises no backups (stash makes none; that is the operator's job, Q442) and no availability (`G-1.N4`). `G-1.S1` (start on one own server without internet) is a goal of the whole system; this feature needs no service on the internet and so does not endanger it ([STO-NF-8] (start without internet)).
 
 ## H2. Who benefits and how
 
 - **Member (`R-1`)**: uploads several files at once by file picker or drag and drop and sees the progress of each ([STO-US-2] (upload files)); continues an interrupted upload where it stopped ([STO-US-3] (chunked upload with resume)); creates nested folders and renames, moves, and copies files and folders ([STO-US-5] (manage folders and files)); restores a deleted item ([STO-US-6] (trash)); and downloads a file or a whole folder as one ZIP archive ([STO-US-7] (download files and folders)). Until the story STO-US-6 ships, deleting is final: there is no trash yet ([STO-F-26] (delete to trash), A7).
-- **Operator (`R-2`)**: sets in the configuration the largest file (5 GiB by default), the allowed file types, the chunk size (8 MiB by default), how long an unfinished upload is kept (24 hours by default), and how long the trash keeps items (30 days by default) ([STO-F-8] (size and type limits), [STO-F-11] (resumable protocol), [STO-F-15] (clean-up of uploads), [STO-F-29] (automatic purge)). Identical content is stored once, which saves space ([STO-US-4] (deduplication by file hash)). The operator is responsible for encrypting the disks and for backups ([STO-NF-7]).
+- **Operator (`R-2`)**: sets in the configuration the largest file (5 GiB by default), the allowed file types, the chunk size (8 MiB by default), how long an unfinished upload is kept (24 hours by default), and how long the trash keeps items (30 days by default) ([STO-F-8] (size and type limits), [STO-F-11] (resumable protocol), [STO-F-15] (clean-up of uploads), [STO-F-29] (automatic purge)). Identical content is stored once, which saves space ([STO-US-4] (deduplication by file hash)). The operator is responsible for encrypting the disks; stash makes no backups, and the documentation of the installation names the volumes to back up ([STO-NF-7], [STO-NF-12] (no backups by stash), Q460).
 - **Link recipient (`R-3`), visitor (`R-4`), and content editor (`R-5`)**: nothing changes for them in this feature; it has no sharing and no public files.
 
 ## H3. How it works, step by step
 
-1. A member opens their files. The first time, stash creates their root folder ([STO-F-34] (root folder)). Every request first asks `identity` whether the session is valid; without a valid session nothing is shown ([STO-F-4] (protected endpoints), A2). Only the health endpoint and the internal deletion call of step 11 skip that question; the internal call is reachable only on the internal network and needs a shared secret (A28).
+1. A member opens their files. The first time, stash creates their root folder ([STO-F-34] (root folder)). Every request first asks `identity` whether the session is valid; without a valid session nothing is shown ([STO-F-4] (protected endpoints), A2). Only the health endpoint skips that question.
 2. The member picks files or drops them on the folder. Each file is sent in chunks over one resumable upload path, and each file shows its own progress ([STO-AC-2.1] (several files), [STO-F-42] (one upload path), [STO-U-1] (progress per file)).
-3. If the folder already holds a file of that name, the member chooses to replace it, keep both (the new file becomes `Name (2).ext`), or cancel ([STO-F-9] (name conflict), [STO-F-38] (keep-both name)). Replace removes only the file that held the name when the upload was created, through the normal deletion: into the trash, or final deletion before STO-US-6 ships, which the dialog then says. Replace is not offered when the existing item is a folder. If at the end a different item holds the name, or the name only became taken after the upload was created, keep-both is applied without asking (A29).
+3. If the folder already holds a file of that name, the member chooses to replace it, keep both (the new file becomes `Name (2).ext`), or cancel ([STO-F-9] (name conflict), [STO-F-38] (keep-both name)). Replace removes only the file that held the name when the upload was created, through the normal deletion: into the trash, or final deletion before STO-US-6 ships, which the dialog then says. The answer to a conflict says whether the existing item is a file or a folder; a folder offers only keep both and cancel, because replace would delete a whole subtree. If at the end a different item holds the name, or the name only became taken after the upload was created, keep-both is applied without asking (A29).
 4. When the last chunk has arrived, `storage` reads the content once to compute its SHA-256 fingerprint ([STO-F-16] (hash on completion)). If a content object with the same fingerprint exists, the new file refers to it and the new copy of the bytes is removed after the commit; until the clean-up job runs it may still linger if that removal fails ([STO-F-17] (reference instead of copy), [STO-E-11] (removal failed after commit)). Otherwise the bytes become a new content object. The member never sees a half-saved file: if a step fails, what the request wrote is undone, and the clean-up net removes any leftovers ([STO-F-35] (all or nothing), [STO-F-36] (clean-up net)).
 5. Every open folder view of the member, also on a second device, learns about the change through a live event and updates without a reload ([STO-F-10] (live list)).
-6. If the connection drops or the page is reloaded, the upload continues where it stopped; after a reload it continues when the member selects the same file again. The member can also pause and resume ([STO-F-12] (resume), [STO-F-13] (pause), [STO-U-5] (pause and resume)). An upload that nobody continues is removed after 24 hours by default (configurable), normally within one clean-up interval (60 minutes by default) after that; a failed run is repeated at the next interval ([STO-NF-10] (retention periods), [STO-E-13] (clean-up job failed)).
-7. The member creates folders (at least 1,000 levels deep) and renames, moves, and copies files and folders. Names follow portable rules so a ZIP archive opens on every system ([STO-F-21] (nested folders), [STO-F-22] (rename, move, copy), [STO-F-23] (name validation)). A copy into a folder where the name is taken is proposed to get a keep-both name instead of being refused; this is a writing decision (W11) that is still open for the review.
-8. Once the story STO-US-6 (trash) ships, deleting an item moves it to the trash; a deleted folder is one trash entry with everything in it ([STO-F-41] (folder in the trash)). A member restores a trash entry to its original place, or to the root folder if that place no longer exists or it or one of its ancestors is in the trash ([STO-F-27] (restore), [STO-F-50] (restore conflict)), or deletes it for good after confirming ([STO-F-51] (delete for good), [STO-U-7] (confirm final deletion)). After 30 days by default (configurable), normally within one clean-up interval after that, the trash removes it by itself.
+6. If the connection drops or the page is reloaded, the upload continues where it stopped; after a reload it continues when the member selects the same file again. The member can also pause and resume ([STO-F-12] (resume), [STO-F-13] (pause), [STO-U-5] (pause and resume)). An upload that nobody continues is removed by the first successful clean-up run after 24 hours without activity (the default, configurable; the job runs every 60 minutes by default); a failed run is not retried before the next interval, and the documentation states the period "and until the next successful clean-up run" ([STO-NF-10] (retention periods), [STO-E-13] (clean-up job failed)). An empty file needs no chunk and is stored at creation ([STO-F-53] (empty files)).
+7. The member creates folders (at least 1,000 levels deep) and renames, moves, and copies files and folders. Names follow portable rules so a ZIP archive opens on every system ([STO-F-21] (nested folders), [STO-F-22] (rename, move, copy), [STO-F-23] (name validation)). A copy into a folder where the name is taken gets a keep-both name instead of being refused (Q459). A name is unique among the files and folders of a folder together.
+8. Once the story STO-US-6 (trash) ships, deleting an item moves it to the trash; a deleted folder is one trash entry with everything in it ([STO-F-41] (folder in the trash)). A member restores a trash entry to its original place, or to the root folder if that place no longer exists or it or one of its ancestors is in the trash ([STO-F-27] (restore), [STO-F-50] (restore conflict)), or deletes it for good after confirming ([STO-F-51] (delete for good), [STO-U-7] (confirm final deletion)). After 30 days by default (configurable), the first successful clean-up run after that removes it by itself.
 9. A file is downloaded with its name and type; a browser can also ask for a part of it ([STO-F-30] (single file), [STO-F-32] (range requests)). A folder or a selection is streamed as a ZIP archive that is never held in memory as a whole ([STO-F-31] (folder as ZIP)). The ZIP of the root folder contains every live file and folder of the member, below their names; it holds no trash entries and no file metadata ([STO-F-49] (download everything)).
-10. A content object is removed from the stores as soon as the last file that refers to it is deleted for good; while a file sits in the trash, it still holds its reference, up to the retention period ([STO-F-18] (reference counting), [STO-F-5] (final deletion)). A failed removal is caught by the clean-up net. Deleting is logical in the stores: they reclaim space and remnants such as database logs later, and the operator's backups and replicas are untouched; this feature promises no physical erasure.
-11. This is the planned flow for account deletion, awaiting the draft story IDN-US-8 and the owner of `identity`; [IDN-F-42] (files of a deleted account) there still names the opposite order. `identity` calls `storage` first. `storage` blocks every further write of that member, then deletes at once everything of that member alone: files, folders, trash entries, and unfinished uploads ([STO-F-44] (account deletion), [STO-NF-6] (no remainder of a deleted account)). The call is safe to repeat, and `identity` repeats it until it gets the answer 204, so a failure part-way is finished by the next call. Content that another member's file also uses stays for that member, with nothing that points to the deleting member ([STO-NF-5] (shared content leaves no trace)). What stays: that shared content, bytes whose removal failed until the clean-up net runs, remnants the stores reclaim later, the operator's backups, and a marker with only the member's ID until the clean-up net removes it. Telemetry carries no member IDs ([STO-NF-4] (no names or content in telemetry), A31). Whether this meets legal duties is an open question (L1, A22).
+10. A content object is removed from the stores as soon as the last file that refers to it is deleted for good; while a file sits in the trash, it still holds its reference, up to the retention period ([STO-F-18] (reference counting), [STO-F-5] (final deletion)). Two deletions of the same trash entry at the same time subtract the count only once. Nothing points to the member who deleted a shared file in the content object, its metadata, or its object key ([STO-NF-5] (shared content leaves no trace)). A failed removal is caught by the clean-up net ([STO-F-36] (clean-up net)). Deleting is logical in the stores: they reclaim space and remnants such as database logs later. What stays after a final deletion: the operator's backups and replicas, logs and telemetry that name items by ID, logs of the reverse proxy, entries in the job queue, and copies on members' devices; this feature promises no physical erasure.
+11. Account deletion is planned, not yet specified. Its goal is fixed (Q441): everything of the member alone is deleted at once, and content that another member's file also uses stays for that member. How `identity` and `storage` do it, in which order, and what happens on failure is grilled together with the draft story IDN-US-8 by the owner of `identity` (Q457); the draft rows in §4 only hold the direction. Whether this meets legal duties is an open question (L1, A22).
 
 ## H4. What it deliberately does not do
 
 - No sharing, teams, roles, or inherited permissions: only the owner reaches an item until R7 ([teams-permissions.md](teams-permissions.md); Q420). No quotas.
 - No thumbnails, virus scan, or text recognition; the file metadata of this feature holds only the detected type (R9, [background-processing.md](background-processing.md)).
-- No end-to-end encryption and no encryption by stash; encrypting the disks is the operator's job ([STO-NF-7], Q442). No backups either: stash makes none (Q442).
+- No end-to-end encryption and no encryption by stash; encrypting the disks is the operator's job ([STO-NF-7], Q442). No backups either: stash makes none, and the documentation names the volumes to back up (Q442, Q460, [STO-NF-12]).
 - No availability guarantee for external users (`G-1.N4`); no native sync clients (`G-1.N1`), because files are reached only through the web client, which can be installed for offline use; no co-editing (`G-1.N2`); no payment or plans (`G-1.N3`); no cryptography of its own (`G-1.N5`).
 - Limits a member sees (§12): a single file cannot be restored from a deleted folder, only the whole trash entry (Q439); the member cannot sort a folder; long folders are not paginated; files have no preview or version history; there is a single instance of `storage`, so the live events work only through that one.
+- Account deletion is planned but not yet specified (Q457).
 - No legal decision: whether and on which basis an installation may keep members' files is an open question for the school management (L1 in §13).
 
 ## H5. How it is built, in plain words
 
 `storage` is a small HTTP server in its own container, reached under `/api/storage`. It keeps the data of a file in three places (§8, [STO-F-2] (separated data)): the object store holds the bytes; the record store holds names, folders, owners, sizes, trash markers, and the record of each content object (fingerprint, size, reference count); the metadata store holds the facts derived from the content, one document per content object. The rules for files, folders, the trash, and counting how many files share a content object live in one deep module, the storage core, which reaches the three stores through three ports so it can be tested without them (§16, M3). Unfinished uploads keep their folder, file name, owner, replace target, and last activity next to the bytes in the object store (§8). The shapes of requests and answers are shared contracts that `web` and `storage` both use.
 
-Two state machines (§16) summarize the life of the data. An upload is created, receives chunks (it can be paused and resumed), is finalized when the last chunk has arrived, and ends stored; it ends failed when the type or size is refused or a store fails, cancelled when the member cancels, or expired after 24 hours without activity by default. An item is live; deleting makes it trashed (before STO-US-6, deleting makes it gone at once); restoring makes it live again; deleting for good, the purge after 30 days by default, or an account deletion makes it gone, whether it was live or in the trash.
+Two state machines (§16) summarize the life of the data. An upload is created (an empty file is stored at once), receives chunks (it can be paused and resumed), is finalized when the last chunk has arrived, and ends stored; it ends failed when the type or size is refused, the folder is gone, or a store fails, cancelled when the member cancels, or expired after 24 hours without activity by default. At every end the upload resource is removed, and a later request for it answers not found. An item is live; deleting makes it trashed (before STO-US-6, deleting makes it gone at once); restoring makes it live again; deleting for good, the purge after 30 days by default, or an account deletion makes it gone, whether it was live or in the trash (account deletion is draft).
 
-Other units: `web` builds the file browser, the upload dialog, and the trash page as slices of its own (Q432); `worker` runs the clean-up jobs on a schedule and uses the same storage core ([STO-US-3] slice 3 brings the clean-up of uploads and orphans, [STO-US-6] slice 3 the purge of the trash); `identity` tells `storage` to delete the data of a deleted account, a call that is still a planned change awaiting its owner, like the note on encryption for `deployment.md` (§15, W10).
+Other units: `web` builds the file browser, the upload dialog, and the trash page as slices of its own (Q432); `worker` runs the clean-up jobs on a schedule and uses the same storage core ([STO-US-3] slice 3 brings the clean-up of uploads and orphans, [STO-US-6] slice 3 the purge of the trash); `identity` will tell `storage` to delete the data of a deleted account; that part is draft and grilled with IDN-US-8 (Q457, W10). The notes on encryption and backups for `deployment.md` are planned changes awaiting their owner (§15).
 
 ## H6. How we know it works
 
-The scenarios of §17 are of five kinds. The acceptance tests (at least one per acceptance criterion) run against `storage` over HTTP with the real record, object, and metadata stores of the test stack and a stub that plays the session check, unless a row says otherwise. Four criteria are proven only in a browser with the real `identity`, through [STO-T-30] (the member's day): [STO-AC-2.1] (several files), [STO-AC-2.2] (drag and drop or button), [STO-AC-5.5] (breadcrumb), and [STO-AC-6.3] (confirm final deletion). The former test-only criterion became [STO-T-5] (store, read, delete leaves nothing behind), which §17 lists among the acceptance tests and describes as an integration test with real stores, for the reworded criterion [STO-AC-1.5] (delete removes everything). The integration tests cover what spans several parts: [STO-T-31] (account deletion), [STO-T-55] (account deletion is safe to repeat), [STO-T-56] (writes blocked during deletion), [STO-T-32] (all or nothing), [STO-T-33] (clean-up net), [STO-T-34] (no names in telemetry), and [STO-T-35] (start without internet). The runs of 5 GiB ([STO-T-12] (large files), [STO-T-27] (folder as ZIP)) are done by a person and recorded in a test protocol; they are never run in continuous integration (CI). The unit tests use the values of §10 (names, keep-both names, type check, reference counting, ranges, archives, moves, restore) and, for the clean-up, the ages in [STO-T-51] (clean-up selection).
+The scenarios of §17 are of five kinds. The acceptance tests (at least one per acceptance criterion) run against `storage` over HTTP with the real record, object, and metadata stores of the test stack and a stub that plays the session check, unless a row says otherwise. Four criteria are proven only in a browser with the real `identity`, through [STO-T-30] (the member's day): [STO-AC-2.1] (several files), [STO-AC-2.2] (drag and drop or button), [STO-AC-5.5] (breadcrumb), and [STO-AC-6.3] (confirm final deletion). The former test-only criterion became [STO-T-5] (store, read, delete leaves nothing behind), which §17 lists among the acceptance tests and describes as an integration test with real stores, for the reworded criterion [STO-AC-1.5] (delete removes everything). The integration tests cover what spans several parts: [STO-T-32] (all or nothing), [STO-T-33] (clean-up net), [STO-T-34] (no names in telemetry), [STO-T-35] (start without internet), [STO-T-59] (empty file), and [STO-T-60] (names across files and folders). Three further tests belong to the draft account deletion and are not part of the gate: [STO-T-31] (account deletion), [STO-T-55] (account deletion is safe to repeat), and [STO-T-56] (writes blocked during deletion). The runs of 5 GiB ([STO-T-12] (large files), [STO-T-27] (folder as ZIP)) are done by a person and recorded in a test protocol; they are never run in continuous integration (CI). The unit tests use the values of §10 (names, keep-both names, type check, reference counting, ranges, archives, moves, restore) and, for the clean-up, the ages in [STO-T-51] (clean-up selection).
 
 | Story | Scenarios |
 | --- | --- |
 | STO-US-1 (connect the storage backend to the object storage) | [STO-T-1] (bytes in the object store), [STO-T-2] (three stores, one fact each), [STO-T-3] (documented endpoints), [STO-T-4] (protected endpoints), [STO-T-5] |
-| STO-US-2 (upload files) | [STO-T-6] (size and type limits), [STO-T-7] (name conflict), [STO-T-8] (live list), [STO-T-9] (chunked protocol), [STO-T-14] (hash on completion), [STO-T-30] |
+| STO-US-2 (upload files) | [STO-T-6] (size and type limits), [STO-T-7] (name conflict), [STO-T-8] (live list), [STO-T-9] (chunked protocol), [STO-T-14] (hash on completion), [STO-T-30], [STO-T-59], [STO-T-60] |
 | STO-US-3 (chunked upload with resume) | [STO-T-10] (resume), [STO-T-11] (pause on the server side), [STO-T-12], [STO-T-13] (clean-up of uploads), [STO-T-30] |
-| STO-US-4 (deduplication by file hash) | [STO-T-15] (reference instead of copy), [STO-T-16] (reference counting), [STO-T-17] (invisible to members), [STO-T-18] (counting is tested) |
-| STO-US-5 (manage folders and files) | [STO-T-19] (nested folders), [STO-T-20] (rename, move, copy), [STO-T-21] (name validation), [STO-T-22] (owner only), [STO-T-30] |
+| STO-US-4 (deduplication by file hash) | [STO-T-15] (reference instead of copy), [STO-T-16] (reference counting), [STO-T-17] (invisible to members), [STO-T-18] (counting is tested), unit tests of concurrent deletion and of replacing with identical content |
+| STO-US-5 (manage folders and files) | [STO-T-19] (nested folders), [STO-T-20] (rename, move, copy), [STO-T-21] (name validation), [STO-T-22] (owner only), [STO-T-30], [STO-T-60] |
 | STO-US-6 (trash) | [STO-T-23] (delete to trash), [STO-T-24] (restore), [STO-T-25] (automatic purge), [STO-T-30] |
 | STO-US-7 (download files and folders) | [STO-T-26] (single file), [STO-T-27], [STO-T-28] (range requests), [STO-T-29] (permission check per download) |
 
 ## H7. Key decisions
 
-One line per decision of §13 (Q numbers are those of the question log; Q446 and Q447 were used by other sessions). The writing decisions W1 to W12 are in §13; W11 (a copy into a taken name gets a keep-both name) is still open for the review.
+One line per decision of §13 (Q numbers are those of the question log; Q446 and Q447 were used by other sessions). The writing decisions W1 to W12 are in §13; W11 (a copy into a taken name gets a keep-both name) was confirmed by Q459.
 
 | Question | Decision | Reason |
 | --- | --- | --- |
@@ -104,10 +105,10 @@ One line per decision of §13 (Q numbers are those of the question log; Q446 and
 | Q438 Restore with a conflict | Asks like an upload | One behaviour for both |
 | Q439 Trash entry of a folder | Only the whole trash entry | No partial trees |
 | Q440 ZIP | A streaming library, stored without compression, for archives over 4 GiB | Archives are never held in memory |
-| Q441 Account deletion | Everything of that member alone is deleted at once; shared content stays for the other member. The planned flow: `storage` blocks the member's writes, deletes, is safe to repeat, and `identity` repeats until 204. Whether this meets legal duties is open (L1) | Members' data leaves the stores when the account goes |
+| Q441 Account deletion | The goal: everything of that member alone is deleted at once; shared content stays for the other member. The specification is draft and grilled with IDN-US-8. Whether this meets legal duties is open (L1) | Members' data leaves the stores when the account goes |
 | Q442 Encryption at rest | The operator's matter, documented; stash makes no backups | stash adds no cryptography of its own |
 | Q443 Speed | Three measurable targets | Falsifiable; measured under load in R13 |
-| Q444 Adversarial check | An independent check of §1 and Part H before the review | Personal data and irreversible deletion |
+| Q444 Adversarial check | An independent check of §1 and Part H before the review; it ran in three cycles (22, 18, and 20 findings) | Personal data and irreversible deletion |
 | Q445 Shared understanding | Confirmed | — |
 | Q448 Table `folders` | `owner_id` added, `team_id` optional until R7, new tables `files` and `content_objects` | Smallest change |
 | Q449 Account deletion call | An internal call with a shared secret, storage first | `identity` owns the account |
@@ -118,6 +119,10 @@ One line per decision of §13 (Q numbers are those of the question log; Q446 and
 | Q454 Capacity | Read from the object store's status interface | The standard interface has no such call |
 | Q455 Cross-model check | Skipped | One independent check was enough |
 | Q456 Feature goal | "… stays on their own server under their control" replaces "lives reliably" | "Reliably" read as a durability or availability promise that R5 does not give |
+| Q457 Account deletion in R5 | Specified only as a draft, grilled with IDN-US-8; the goal of Q441 stays | The serious findings hang on it and on a draft story of `identity` |
+| Q458 After three cycles | The remaining findings are worked in, then the merge request | They are concrete and fixable |
+| Q459 Copy into a taken name | The copy gets the keep-both name | One behaviour for upload and copy |
+| Q460 Backups | stash makes none; the documentation names the volumes to back up | Backups are the operator's job |
 
 # Part S — Specification (normative)
 
@@ -125,7 +130,7 @@ One line per decision of §13 (Q numbers are those of the question log; Q446 and
 
 ### Development Path
 
-Path A (frontloaded). The first draft of 2026-10-06 was grilled on 2026-11-24 by schwaigc (rounds 1 to 13, Q414 to Q456, A1 to A32). The concept was taken over from schauby1 on 2026-11-24 for the story issues #56 and #117; schauby1 stays owner of R5 (Q415). Phases 5 and 6 are in the same merge request; its approval by another team member is the Phase 4 gate.
+Path A (frontloaded). The first draft of 2026-10-06 was grilled on 2026-11-24 by schwaigc (rounds 1 to 14, Q414 to Q460, A1 to A33). The concept was taken over from schauby1 on 2026-11-24 for the story issues #56 and #117; schauby1 stays owner of R5 (Q415). Account deletion ([STO-F-44], [STO-NF-6], [STO-E-14], the marker, the internal listener, example 13, and tests [STO-T-31], [STO-T-55], [STO-T-56]) is *draft*: it is grilled together with IDN-US-8 by its owner, tschudea07, and is not part of the Phase 4 gate; the goal of Q441 stays (Q457). Phases 5 and 6 are in the same merge request; its approval by another team member is the Phase 4 gate.
 
 ### Synthesis Dependencies
 
@@ -146,7 +151,7 @@ schauby1, per [ROADMAP.md](../ROADMAP.md) (Q415). The story issues #56 and #117 
 
 **Feature goal:** Members upload, organize, restore, and download files up to the size the operator allows, so that their data stays on their own server under their control.
 
-**Serves:** `G-1` in [GOAL.md](../GOAL.md), as stated in the *Serves* column of [ROADMAP.md](../ROADMAP.md) ("store and organize files"): files stay on the organisation's own server, which its operator runs, under the control of that organisation. Until R7, access through stash is owner-only ([STO-F-24]), but stash stores files unencrypted ([STO-NF-7]), so whoever runs or has access to the server can read them. The feature promises neither backups (stash makes none; that is the operator's job, Q442) nor availability (`G-1.N4`); its all-or-nothing save ([STO-F-35], Q426) only means that no half-saved file is visible. `G-1.S1` is a goal of the whole system; this feature needs no service on the internet and so does not endanger it ([STO-NF-8]).
+**Serves:** `G-1` in [GOAL.md](../GOAL.md), as stated in the *Serves* column of [ROADMAP.md](../ROADMAP.md) ("store and organize files"): files stay on the organisation's own server, which its operator runs, under the control of that organisation; "their" in the goal means the organisation of the members, as in `G-1` (A33). Until R7, access through stash is owner-only ([STO-F-24]), but stash stores files unencrypted ([STO-NF-7]), so whoever runs or has access to the server can read them. The feature promises neither backups (stash makes none; that is the operator's job, Q442) nor availability (`G-1.N4`); its all-or-nothing save ([STO-F-35], Q426) only means that no half-saved file is visible. `G-1.S1` is a goal of the whole system; this feature needs no service on the internet and so does not endanger it ([STO-NF-8]).
 
 Non-goals of `GOAL.md`, checked one by one:
 
@@ -186,24 +191,24 @@ The IDs STO-F-1 to STO-F-33 of the first draft keep their meaning, with three ex
 | --- | --- | --- | --- |
 | STO-F-1 | Object store | `storage` MUST write the bytes of every file to the object store, under a key that is a random uuid (Q425), and MUST read them from there; no file content MUST be written to the disk of the `storage` container beyond the object store's own transfer buffers. | STO-AC-1.1 (Object storage) |
 | STO-F-2 | Separated data | When a file is saved, its bytes MUST go to the object store, the facts derived from the content to the metadata store (one document per content object), and names, folders, owners, sizes, content objects, and the trash marker to the record store. Each fact MUST live in exactly one of the three. | STO-AC-1.2 (Separated data) |
-| STO-F-3 | Documented endpoints | The machine-readable interface description generated from the contracts MUST list every endpoint of §8, each with its request shape, its response shape, and its error codes. A test MUST compare the list of the description with the list of the routes of the server. | STO-AC-1.3 (Documented endpoints) |
-| STO-F-4 | Protected endpoints | Every endpoint of §8 except the health endpoint and the internal member-deletion call MUST first ask the session gate for the session cookie and answer [STO-E-2] without a valid session. It MUST then check that the file, folder, trash entry, or upload belongs to the member of the session and MUST answer [STO-E-3] otherwise. In production the session gate MUST ask `identity` ([IDN-F-37], A2). The internal call is not left unprotected: it is served only on the internal port, which the reverse proxy does not route, and it requires the shared secret ([STO-F-44], A28). | STO-AC-1.4 (Protected endpoints) |
+| STO-F-3 | Documented endpoints | The machine-readable interface description generated from the contracts MUST list every endpoint of §8 (the health endpoint and the upload protocol included), each with its request shape, its response shape, and its error codes. A test MUST compare the list of the description with the list of the routes of the server. | STO-AC-1.3 (Documented endpoints) |
+| STO-F-4 | Protected endpoints | Every endpoint of §8 except the health endpoint MUST first ask the session gate for the session cookie and answer [STO-E-2] without a valid session. It MUST then check that the file, folder, trash entry, or upload belongs to the member of the session and MUST answer [STO-E-3] otherwise. In production the session gate MUST ask `identity` ([IDN-F-37], A2). The planned internal member-deletion call of [STO-F-44] (*draft*) is the other exception. | STO-AC-1.4 (Protected endpoints) |
 | STO-F-5 | Final deletion | After the final deletion of a file by its owner, the file record MUST be gone, and when no other file refers to its content object, that content object's record, its bytes in the object store, and its document in the metadata store MUST be gone as well. Once the story STO-US-6 is delivered, only the deletion for good of [STO-F-51] satisfies this; a deletion into the trash does not (A25). | STO-AC-1.5 (Final deletion) |
 | STO-F-8 | Size and type limits | `storage` MUST refuse an upload whose declared size exceeds `MAX_FILE_BYTES` with [STO-E-5], at creation and again when more bytes arrive than were declared. It MUST decide the file type from the content and the extension together (Q430): the type detected from the first received 4,096 bytes (or the whole file, if smaller) MUST be in `ALLOWED_FILE_TYPES`, and the extension MUST be one of the extensions of that type; otherwise the upload MUST be refused with [STO-E-6] and removed. With `ALLOWED_FILE_TYPES=*` every type is allowed (W2). | STO-AC-2.3 (Size and type limits) |
 | STO-F-9 | Name conflict | When an upload is created for a folder that already holds a live item with the same name key, `storage` MUST refuse the creation with [STO-E-4] unless it names `onConflict` as `replace` or `keep-both`. `replace` MUST NOT be accepted when that item is a folder. With `replace`, `storage` MUST record the ID of the file that held the name in the upload (the replace target, A29). When the upload completes: if the replace target is still live in the folder and still holds the name key, it MUST be removed through [STO-F-26] and the new file gets the name; if the name key is held by another item (a file or a folder), the new file MUST get the keep-both name of [STO-F-38] without asking; if the name is free, the new file gets the name and nothing is removed. This rule also covers a name that became taken after the creation without a choice (W3, W4). | STO-AC-2.4 (Name conflict) |
 | STO-F-10 | Live list | `storage` MUST send, for every change of the direct children of a folder of the member (create, upload finished, rename, move, copy, delete, restore), one event `folder-changed` with the folder's ID to every open event stream of that member for that folder. An event stream MUST send a comment line every 25 seconds and MUST check the session every 60 seconds and end when it is no longer valid. A member MUST NOT receive an event of another member's folder. | STO-AC-2.5 (Live list) |
-| STO-F-11 | Resumable protocol | Every upload MUST use the resumable upload protocol of [STO-C-4]: creation, then chunks of exactly `UPLOAD_CHUNK_BYTES` bytes (the last may be shorter), then completion. `storage` MUST accept a chunk of up to `UPLOAD_CHUNK_BYTES` bytes and MUST refuse a larger one. | STO-AC-2.7 (Chunked protocol) |
+| STO-F-11 | Resumable protocol | Every upload MUST use the resumable upload protocol of [STO-C-4]: creation, then chunks of exactly `UPLOAD_CHUNK_BYTES` bytes (the last may be shorter), then completion. `storage` MUST accept a chunk of up to `UPLOAD_CHUNK_BYTES` bytes and MUST refuse a larger one with [STO-E-1], leaving the upload unchanged. | STO-AC-2.7 (Chunked protocol) |
 | STO-F-12 | Resume | `storage` MUST report the number of bytes it holds for an upload on request, so that a client continues from there after a dropped connection or a reloaded page, without sending bytes the server already holds. An upload MUST stay resumable until its last activity is `UPLOAD_ORPHAN_HOURS` hours old. | STO-AC-3.2 (Resume) |
 | STO-F-13 | Pause | A paused upload MUST continue from the number of bytes the server holds when the member resumes it, also after a pause of up to `UPLOAD_ORPHAN_HOURS` hours. | STO-AC-3.3 (Pause) |
 | STO-F-14 | Large files | An upload of a file of `MAX_FILE_BYTES` bytes (5 GiB by default) MUST complete with identical stored bytes, also when the connection is interrupted once in the middle. The run of this test with the default limits MUST be documented in a test protocol with its result table. | STO-AC-3.4 (Large files) |
 | STO-F-15 | Clean-up of uploads | The job `cleanup-uploads` MUST remove, every `CLEANUP_INTERVAL_MINUTES` minutes, every upload whose last activity is older than `UPLOAD_ORPHAN_HOURS` hours, with its bytes in the object store and its upload resource. | STO-AC-3.5 (Cleanup) |
 | STO-F-16 | Hash on completion | When an upload is complete, `storage` MUST read its content once from the object store and compute its SHA-256 fingerprint as 64 lower-case hexadecimal characters; it MUST NOT compute or announce a fingerprint before the upload is complete (Q434, A10). | STO-AC-2.6 (Hash on upload) |
 | STO-F-17 | Reference instead of copy | When the fingerprint of a completed upload equals that of an existing content object, `storage` MUST create the file with a reference to the existing content object, MUST raise its reference count by 1, and MUST remove the just uploaded object from the object store (Q436); otherwise the uploaded object MUST become a new content object whose ID is the upload's ID and whose reference count is 1. | STO-AC-4.2 (Reference instead of copy) |
-| STO-F-18 | Reference counting | Every creation of a file (upload, copy) MUST raise the reference count of its content object by 1 and every final deletion of a file MUST lower it by 1, in the same transaction as the file record. A content object MUST be removed exactly when its reference count reaches 0 (F-5), also when a creation and a final deletion run at the same time. | STO-AC-4.3 (Reference counting) |
+| STO-F-18 | Reference counting | Every creation of a file (upload, copy) MUST raise the reference count of its content object by 1 and every final deletion of a file MUST lower it by 1, in the same transaction as the file record. A content object MUST be removed exactly when its reference count reaches 0 (F-5), also when a creation and a final deletion run at the same time. A final deletion MUST collect and delete the files inside one record transaction with row locks, and the number it subtracts MUST be the number of file rows it actually deleted, so that two deletions at the same time (for example the job `purge-trash` and a member's delete for good of the same trash entry) never subtract twice. A replacement of a file by a file of the same content MUST raise the count by 1 before it lowers it by 1, in one transaction, so that the content object is never removed in between. | STO-AC-4.3 (Reference counting) |
 | STO-F-19 | Invisible to members | No response, event, or message to a member MUST contain a content object ID, a fingerprint, a reference count, or any hint that another file has the same content. Every file MUST keep its own owner, name, folder, and trash state; an action on one file MUST NOT change another file (A10, A21). | STO-AC-4.4 (Invisible to members) |
 | STO-F-20 | Tested counting | The unit tests of §17 MUST cover the reference counting with these cases: reuse raises the count, a copy raises the count, a deletion with other references keeps the object, the deletion of the last reference removes it, and a creation concurrent with the last deletion never leaves a file without bytes. | STO-AC-4.5 (Tested counting) |
 | STO-F-21 | Nested folders | A member MUST be able to create a folder in any of their folders, nested to a depth of at least 1,000 levels. | STO-AC-5.1 (Nested folders) |
-| STO-F-22 | Rename, move, copy | A member MUST be able to rename a file or folder, move it into another folder of theirs, and copy it into a folder of theirs. A rename or move onto a name key already used by a live item in the target MUST be refused with [STO-E-4]; a copy MUST take the name of [STO-F-38] when the name is taken. A rename, move, copy, or deletion of the root folder MUST be refused with [STO-E-1]. | STO-AC-5.2 (Rename, move, copy) |
+| STO-F-22 | Rename, move, copy | A member MUST be able to rename a file or folder, move it into another folder of theirs, and copy it into a folder of theirs. A rename or move onto a name key already used by a live item in the target MUST be refused with [STO-E-4]; the name key MUST be unique among all live children of a folder, files and folders together, and every operation that adds, renames, or restores a child MUST lock the folder's row and check both kinds (§8); a copy MUST take the name of [STO-F-38] when the name is taken. A rename, move, copy, or deletion of the root folder MUST be refused with [STO-E-1]. | STO-AC-5.2 (Rename, move, copy) |
 | STO-F-23 | Name validation | The shared contract `ItemName` of §8 MUST reject, in `web` before sending and in `storage`, a name that is empty after trimming, longer than 255 characters, contains a slash, backslash, colon, asterisk, question mark, double quote, less-than sign, greater-than sign, vertical bar, or a control character, ends with a dot, is `.` or `..`, or equals a reserved device name (W1). `storage` MUST answer a rejection with [STO-E-1]. Names are stored in Unicode normalization form C and compared by name key. | STO-AC-5.3 (Name validation) |
 | STO-F-24 | Owner only | Until R7, only the owner of a file, folder, or trash entry MUST be able to see or change it. Any request of another member for it MUST be answered as if it did not exist ([STO-E-3]); a folder of one member MUST NOT accept a new item from another (Q420, A6). | STO-AC-5.4 (Permissions respected) |
 | STO-F-25 | Path of a folder | The answer for a folder MUST contain its path as the list of its ancestors from the root folder to the folder itself, each with ID and name. | STO-AC-5.5 (Breadcrumb) |
@@ -216,7 +221,7 @@ The IDs STO-F-1 to STO-F-33 of the first draft keep their meaning, with three ex
 | STO-F-33 | Permission check | Every download MUST pass the checks of [STO-F-4] for the file, the folder, and each item of a selection, before the first byte is sent; one item the member may not see MUST fail the whole download with [STO-E-3]. | STO-AC-7.4 (Permission check) |
 | STO-F-34 | Root folder | Every member MUST have exactly one root folder, which `storage` creates on the member's first request for it or first upload; it has no parent and the empty name. | STO-AC-2.2 (Drag and drop or button), STO-AC-6.2 (Restore) |
 | STO-F-35 | All or nothing | Saving a file touches the object store, the metadata store, and the record store. If any step fails, `storage` MUST undo what the same request already wrote (the metadata document and the uploaded object, in reverse order), answer [STO-E-8], and leave no file, content object, or metadata document that the member could see (Q426). | STO-AC-1.2 (Separated data) |
-| STO-F-36 | Clean-up net | The job `cleanup-orphans` MUST remove, every `CLEANUP_INTERVAL_MINUTES` minutes, every object in the object store without a content object record, every metadata document without a content object record, and every content object record with reference count 0, and every deletion marker of [STO-F-44] whose account no longer exists, each only when older than `CLEANUP_GRACE_MINUTES` minutes and not part of a running upload. After a final deletion, `storage` MUST remove the object and the document immediately and MUST NOT wait for the job (Q428). | STO-AC-1.5 (Final deletion), STO-AC-3.5 (Cleanup) |
+| STO-F-36 | Clean-up net | The job `cleanup-orphans` MUST remove, every `CLEANUP_INTERVAL_MINUTES` minutes, every object in the object store without a content object record, every metadata document without a content object record, and every content object record with reference count 0, each only when older than `CLEANUP_GRACE_MINUTES` minutes and not part of a running upload. After a final deletion, `storage` MUST remove the object and the document immediately and MUST NOT wait for the job (Q428). | STO-AC-1.5 (Final deletion), STO-AC-3.5 (Cleanup) |
 | STO-F-37 | Streamed through storage | The object store MUST NOT be reachable from outside the local stack. Every download MUST pass through `storage`, which streams the bytes after the checks of [STO-F-33] (Q427). | STO-AC-7.4 (Permission check) |
 | STO-F-38 | Keep-both name | The new name MUST be the name with a space and the number in parentheses, for example (2), inserted before the last extension, for the smallest `n` of 2 or more whose name key is free in the folder; an extension is the part after the last dot unless that dot is the first character or the last (A9, §10 example 2). | STO-AC-2.4 (Name conflict) |
 | STO-F-39 | Copy shares content | A copy of a file MUST be a new file that refers to the same content object; a copy of a folder MUST copy its live subtree the same way and MUST NOT copy the content (A13). | STO-AC-5.2 (Rename, move, copy) |
@@ -224,14 +229,16 @@ The IDs STO-F-1 to STO-F-33 of the first draft keep their meaning, with three ex
 | STO-F-41 | Folder in the trash | Deleting a folder MUST create one trash entry for it; everything in it MUST stay unchanged and be unreachable until the entry is restored or deleted for good. A trash entry of a folder MUST be restored or deleted only as a whole (A17, Q439). | STO-AC-6.1 (Delete to trash), STO-AC-6.2 (Restore) |
 | STO-F-42 | One upload path | Every upload, also of a file smaller than one chunk, MUST use the resumable protocol (Q429); `storage` MUST offer no other way to put a file into a folder. | STO-AC-2.7 (Chunked protocol) |
 | STO-F-43 | Detected type stored | When a content object is created, `storage` MUST store the type detected from the content in its metadata document; with no signature, the type of the extension table of [STO-C-7] for a content without a zero byte; otherwise `application/octet-stream`. | STO-AC-2.3 (Size and type limits), STO-AC-7.1 (Single file) |
-| STO-F-44 | Account deletion | `storage` MUST offer `identity` the internal call of §8, served only on the internal port that the reverse proxy does not route (A28), that finally deletes, at once, every file, folder, trash entry, and unfinished upload of one member. The call MUST first set a deletion marker for the member, from which on every write of that member is refused with [STO-E-14], and then delete. It MUST answer 204 only when everything is deleted and [STO-E-8] when a store fails, leaving the marker and the rest for the next call. It MUST be safe to repeat: a repeat finishes what is left and answers 204, also when nothing is left (A30). It MUST require the secret `INTERNAL_API_SECRET` and MUST answer [STO-E-3] without it. `identity` is to repeat the call until it receives 204 (Q441, W10). | IDN-AC-8.2 (Files deleted) |
+| STO-F-44 | Account deletion (*draft*) | Draft, grilled together with IDN-US-8 by the owner of `identity`; Q441 fixes only the goal: everything of the member alone is deleted at once, shared content stays for the other member. Planned: `storage` offers `identity` an internal call, served on an internal listener that the reverse proxy does not route and that is not published on the host (A28), which sets a deletion marker (from then on every write of that member is refused with [STO-E-14]), deletes, answers 204 only when everything is deleted, is safe to repeat, and requires the secret `INTERNAL_API_SECRET`; `identity` repeats it until 204 (A30, W10). | IDN-AC-8.2 (Files deleted) |
 | STO-F-45 | Upload throughput metric | `storage` MUST add the size in bytes of every completely received chunk to the metric `upload.received` ([OBS-F-21], A18). | STO-AC-2.7 (Chunked protocol) |
 | STO-F-46 | Capacity metrics | `storage` MUST set `storage.capacity.used` and `storage.capacity.total` every 60 seconds to the used and total bytes of the object store, read from its status interface on the internal network ([OBS-F-23], A18, Q454). | STO-AC-1.1 (Object storage) |
 | STO-F-47 | Dependency checks | The health report of `storage` MUST contain the essential dependency checks `relational-database`, `object-storage`, and `document-database` ([SCF-F-7]). | STO-AC-1.2 (Separated data) |
 | STO-F-48 | Limits endpoint | `storage` MUST tell a logged-in client the effective `maxFileBytes`, `chunkBytes`, and `allowedFileTypes` of the configuration, so that `web` can check a file before sending it. | STO-AC-2.3 (Size and type limits), STO-AC-2.7 (Chunked protocol) |
 | STO-F-49 | Download everything | The ZIP download of the root folder MUST contain every live file and folder of the member, below their names, and nothing else; it is the member's copy of their data (A20). | STO-AC-7.2 (Folder as ZIP) |
-| STO-F-50 | Restore conflict | When the place a trash entry returns to already holds a live item with the same name key, `storage` MUST refuse the restore with [STO-E-4] unless the request names `onConflict` as `replace` or `keep-both`, which act as in [STO-F-9] (for `replace`, the file that holds the name at that moment is removed); for a folder only `keep-both` is accepted (Q438, W5). | STO-AC-6.2 (Restore) |
+| STO-F-50 | Restore conflict | When the place a trash entry returns to already holds a live item with the same name key, `storage` MUST refuse the restore with [STO-E-4] unless the request names `onConflict` as `replace` or `keep-both`, which act as in [STO-F-9] (for `replace`, the file that holds the name at that moment is removed); `replace` is accepted only when the restored item and the existing item are both files (Q438, W5). | STO-AC-6.2 (Restore) |
 | STO-F-51 | Delete for good | Deleting a trash entry for good MUST be the final deletion of [STO-F-5] for the item, and for a folder for everything in it; `storage` MUST NOT ask for a confirmation, because the page asks ([STO-U-7]). | STO-AC-6.3 (Confirm final deletion) |
+| STO-F-52 | Upload resource lifetime | The upload resource MUST be removed when its upload is stored, ends as a duplicate of an existing content object, fails, or is cancelled by `DELETE /uploads/{id}`; any later request for it MUST be answered with [STO-E-3] (404). | STO-AC-3.2 (Resume), STO-AC-2.7 (Chunked protocol) |
+| STO-F-53 | Empty files | An upload that declares the size 0 MUST complete at creation: `storage` MUST finalize it as in [STO-F-16] and [STO-F-17] without a chunk, and the answer to the creation MUST carry the header `Stash-File-Id`. The fingerprint of an empty content is `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. | STO-AC-2.7 (Chunked protocol) |
 
 ## 5. User Interaction Requirements
 
@@ -241,7 +248,7 @@ The pages are built in `web` (Q432, A15). Texts are given in English; the German
 | --- | --- | --- | --- |
 | STO-U-1 | Progress per file | The upload dialog MUST list every file with its name, its status (`waiting`, `uploading`, `paused`, `done`, `failed`), and, while uploading, its percentage as text and as a progress bar with its value readable by screen readers. | STO-AC-2.1 (Several files) |
 | STO-U-2 | Drag and drop or button | A member MUST be able to start an upload by dropping files onto the folder view or by the button "Upload files", which opens the file picker and works with the keyboard alone; the dialog MUST announce the start and the end of each upload as a status message. | STO-AC-2.2 (Drag and drop or button) |
-| STO-U-3 | Conflict choice | When [STO-E-4] answers an upload, the page MUST show the dialog "A file named "{name}" already exists in this folder." with the buttons `Replace`, `Keep both`, and `Cancel`; focus MUST start on `Keep both`, and `Cancel` MUST leave everything unchanged. Until the story STO-US-6 ships, the dialog MUST add "Replacing deletes the old file for good." | STO-AC-2.4 (Name conflict) |
+| STO-U-3 | Conflict choice | When [STO-E-4] answers an upload, the page MUST read `existingKind` of the answer: for an existing file it MUST show the dialog "A file named "{name}" already exists in this folder." with the buttons `Replace`, `Keep both`, and `Cancel`, for an existing folder the dialog "A folder named "{name}" already exists in this folder." with only `Keep both` and `Cancel`; focus MUST start on `Keep both`, and `Cancel` MUST leave everything unchanged. Until the story STO-US-6 ships, the dialog MUST add "Replacing deletes the old file for good." | STO-AC-2.4 (Name conflict) |
 | STO-U-4 | List updates | On [STO-F-10] the page MUST reload the listing and keep keyboard focus and scroll position; the addition of an item MUST be announced as a status message. | STO-AC-2.5 (Live list) |
 | STO-U-5 | Pause and resume | Each running upload MUST have a button `Pause`, and each paused upload a button `Resume`; a reload MUST offer to continue an unfinished upload when the member selects the same file again. | STO-AC-3.3 (Pause), STO-AC-3.2 (Resume) |
 | STO-U-6 | Breadcrumb | The folder view MUST show the path of [STO-F-25] as a navigation landmark labelled "Folder path"; every ancestor is a link, the current folder is plain text marked as the current page, and the root folder is named "My files". | STO-AC-5.5 (Breadcrumb) |
@@ -249,7 +256,7 @@ The pages are built in `web` (Q432, A15). Texts are given in English; the German
 | STO-U-8 | Move without dragging | Every move possible by drag and drop MUST also be possible by the action "Move to…" that lists the member's folders, operable by keyboard. | STO-AC-5.2 (Rename, move, copy) |
 | STO-U-9 | Name errors | Rename and create-folder forms MUST show each violation of [STO-F-23] next to the field before sending, as text linked to the field for screen readers, and MUST keep the entered name. | STO-AC-5.3 (Name validation) |
 | STO-U-10 | Upload messages | A file refused by [STO-E-5], [STO-E-6], or [STO-E-8] MUST show its status `failed` with the matching message of §8; the page MUST check size and type with the limits of [STO-F-48] before sending and show the same message. | STO-AC-2.3 (Size and type limits) |
-| STO-U-11 | Restore conflict | When [STO-E-4] answers a restore, the page MUST show the dialog of [STO-U-3] with the text "An item named "{name}" already exists in the place it returns to." and, for a folder, without `Replace`. | STO-AC-6.2 (Restore) |
+| STO-U-11 | Restore conflict | When [STO-E-4] answers a restore, the page MUST show the dialog of [STO-U-3] with the text "An item named "{name}" already exists in the place it returns to." and without `Replace` when the restored item or the existing item is a folder. | STO-AC-6.2 (Restore) |
 | STO-U-12 | Download actions | A file MUST have the action "Download", and a folder or a selection the action "Download as ZIP"; both start a download by a link to the endpoints of §8, so the browser streams it. | STO-AC-7.1 (Single file), STO-AC-7.2 (Folder as ZIP) |
 | STO-U-13 | Trash page | The trash page MUST list every trash entry with its name, the date it was deleted, and the days left until the purge, and offer `Restore` and `Delete for good` per entry. | STO-AC-6.1 (Delete to trash), STO-AC-6.4 (Automatic purge) |
 
@@ -262,12 +269,13 @@ The pages are built in `web` (Q432, A15). Texts are given in English; the German
 | STO-NF-3 | Memory | An upload or a download of 5 GiB MUST NOT make the process of `storage` use more than 256 MB of memory (Q443). | STO-AC-3.4 (Large files), STO-AC-7.2 (Folder as ZIP) |
 | STO-NF-4 | No names or content in telemetry | Log entries, traces, and metrics of `storage` and `worker` MUST NOT contain a file name, folder name, file content, fingerprint, e-mail address, or the ID of a member or owner (A19, A31, [OBS-NF-2]); they MAY contain IDs of files, folders, content objects, and uploads, sizes, counts, and route patterns. | STO-US-2 (Upload files) |
 | STO-NF-5 | Shared content leaves no trace | A content object and its metadata document MUST NOT hold any reference to a member. After a member's final deletion of a shared file, nothing that points to that member MUST remain in the content object, its metadata, or the object key (A21). | STO-AC-4.4 (Invisible to members), STO-AC-4.3 (Reference counting) |
-| STO-NF-6 | No remainder of a deleted account | After [STO-F-44] has answered 204, no file record, folder record, trash marker, unfinished upload, or content object of that member alone MUST remain in any of the three stores (Q441), except the deletion marker, which holds only the member's ID until the clean-up net removes it after the account is gone ([STO-F-36]). The deletion is logical in the stores: they reclaim space and remnants such as database logs later, and stash promises no physical erasure and does not touch the operator's backups. | IDN-AC-8.2 (Files deleted) |
+| STO-NF-6 | No remainder of a deleted account (*draft*) | Draft with [STO-F-44]. Planned: after the deletion has answered 204, nothing of that member alone remains in the three stores, except a marker with only the member's ID that is removed once the account is gone; the deletion is logical, and stash promises no physical erasure and does not touch the operator's backups (Q441). | IDN-AC-8.2 (Files deleted) |
 | STO-NF-7 | Encryption at rest | `storage` MUST NOT encrypt content, records, or metadata itself; the documentation of the installation MUST state that they are stored unencrypted, that disk or volume encryption is the operator's responsibility, and that end-to-end encryption is the optional extension O1 (Q442). | STO-US-1 (Connect the storage backend to the object storage) |
 | STO-NF-8 | Start without internet | With the stores of the local stack, upload, organize, trash, and download MUST work without any service on the internet. | G-1.S1 |
 | STO-NF-9 | Minimal stored data | A file record MUST hold only owner, folder, name, name key, size, content object, time stamps, and trash marker; a content object only its fingerprint, size, reference count, and creation time; a metadata document only facts derived from the content. No IP address, browser string, or e-mail address MUST be stored. | STO-US-2 (Upload files) |
-| STO-NF-10 | Retention periods | An unfinished upload MUST be removed, normally within one clean-up interval after it passes `UPLOAD_ORPHAN_HOURS` hours (24 by default) without activity, and a trash entry normally within one clean-up interval after it passes `TRASH_RETENTION_DAYS` days (30 by default); a failed run is repeated at the next interval ([STO-E-13]). The privacy template names both ([PUB-F-22]). | STO-AC-3.5 (Cleanup), STO-AC-6.4 (Automatic purge) |
+| STO-NF-10 | Retention periods | An unfinished upload MUST be removed by the first successful clean-up run after it passes `UPLOAD_ORPHAN_HOURS` hours (24 by default) without activity, and a trash entry by the first successful clean-up run after it passes `TRASH_RETENTION_DAYS` days (30 by default); a failed run is not retried before the next interval ([STO-E-13]). The operator documentation and the privacy template ([PUB-F-22]) MUST state each period "and until the next successful clean-up run". | STO-AC-3.5 (Cleanup), STO-AC-6.4 (Automatic purge) |
 | STO-NF-11 | Accessible pages | Every page of the slices of `web` MUST pass the automated accessibility check with 0 violations, in all themes and colour modes the check covers ([design-system.md](design-system.md)). | G-1.S2 |
+| STO-NF-12 | No backups by stash | stash MUST NOT make backups of content, records, or metadata; the documentation of the installation MUST name the volumes that the operator has to back up (the volumes of the object store, the record store, and the metadata store) (Q460). | STO-US-1 (Connect the storage backend to the object storage) |
 
 ## 7. Capability Requirements
 
@@ -280,7 +288,7 @@ Mapped to technology in `STACK.md` §2 (track Contracts, storage & worker).
 | STO-C-3 | Record store access | Access to the relational database of [SCF-C-8] through the access layer of [SCF-C-19], with transactions and row locks. | STO-AC-1.2 (Separated data) |
 | STO-C-4 | Resumable upload server | A server component for an open resumable upload protocol with creation, chunks, offset query, termination, and metadata, that writes straight into the object store and runs inside the HTTP server. | STO-AC-2.7 (Chunked protocol) |
 | STO-C-5 | ZIP streaming | A library that writes a ZIP archive as a stream, with entries stored without compression, in the format for archives over 4 GiB. | STO-AC-7.2 (Folder as ZIP) |
-| STO-C-6 | Scheduled job runtime | A job queue with repeatable scheduled jobs and retries, on the key-value store of [SCF-C-14], running in `worker`. | STO-AC-3.5 (Cleanup), STO-AC-6.4 (Automatic purge) |
+| STO-C-6 | Scheduled job runtime | A job queue with repeatable scheduled jobs, where a failed run is not retried before the next interval, on the key-value store of [SCF-C-14], running in `worker`. | STO-AC-3.5 (Cleanup), STO-AC-6.4 (Automatic purge) |
 | STO-C-7 | Content type detection | Detection of a media type from the leading bytes of a content, and a fixed table that maps each detected type to its extensions and each text extension to a text type. | STO-AC-2.3 (Size and type limits) |
 | STO-C-8 | Content hash | SHA-256 of a stream, from the platform's standard cryptography library. | STO-AC-2.6 (Hash on upload) |
 | STO-C-9 | Server push | One-way events from the server to the browser over HTTP, with heartbeats. | STO-AC-2.5 (Live list) |
@@ -292,11 +300,11 @@ Mapped to technology in `STACK.md` §2 (track Contracts, storage & worker).
 
 | Store | Holds | Key |
 | --- | --- | --- |
-| Record store | `folders` (extended, §15), `files`, `content_objects`, `member_deletions` | uuid per row |
+| Record store | `folders` (extended, §15), `files`, `content_objects`, and (*draft*, [STO-F-44]) `member_deletions` | uuid per row |
 | Object store | the bytes of every content object | the content object's ID; an unfinished upload under its upload ID |
 | Metadata store | collection `file_metadata`, one document per content object | the content object's ID |
 
-An item is *live* when it has no trash marker and neither does any ancestor; it is *in the trash* otherwise; a trash entry is an item with its own trash marker. The upload resources (offset, folder, file name, choice, replace target, owner, last activity) are kept by the resumable upload server next to the bytes in the object store, not in the record store.
+An item is *live* when it has no trash marker and neither does any ancestor; it is *in the trash* otherwise; a trash entry is an item with its own trash marker. The upload resources (offset, folder, file name, choice, replace target, owner, last activity) are kept by the resumable upload server next to the bytes in the object store, not in the record store; a resource is removed after completion, a duplicate match, a failure, or a cancel ([STO-F-52]).
 
 ### Persisted layout
 
@@ -323,13 +331,13 @@ An item is *live* when it has no trash marker and neither does any ancestor; it 
 | ContentObject | `content_objects` | sizeBytes | `size_bytes` | integer | 64 bit | no | no | none | — | — | — |
 | ContentObject | `content_objects` | referenceCount | `reference_count` | integer | at least 0 | no | no | none | — | 0 | — |
 | ContentObject | `content_objects` | createdAt | `created_at` | timestamp | UTC, with time zone | no | no | none | — | time of insert | — |
-| MemberDeletion | `member_deletions` | ownerId | `owner_id` | uuid | no foreign key, so that it survives the account | no | yes | primary | — | — | — |
-| MemberDeletion | `member_deletions` | startedAt | `started_at` | timestamp | UTC, with time zone | no | no | none | — | time of insert | — |
+| MemberDeletion (*draft*) | `member_deletions` | ownerId | `owner_id` | uuid | no foreign key, so that it survives the account | no | yes | primary | — | — | — |
+| MemberDeletion (*draft*) | `member_deletions` | startedAt | `started_at` | timestamp | UTC, with time zone | no | no | none | — | time of insert | — |
 | FileMetadata | `file_metadata` (document) | contentObjectId | `_id` | uuid | text | no | yes | primary | `content_objects.id` (no constraint across stores) | — | — |
 | FileMetadata | `file_metadata` (document) | detectedType | `detectedType` | string | media type in lower case | no | no | none | — | — | — |
 | FileMetadata | `file_metadata` (document) | createdAt | `createdAt` | timestamp | UTC | no | no | none | — | time of insert | — |
 
-Constraints beyond these columns are requirements: the root folder (no parent, empty name, one per owner) is [STO-F-34]; the name key is unique among live children of a folder ([STO-F-22]); `files.folder_id` and `files.content_object_id` are `restrict`, so that only the application deletes files and can count references ([STO-F-18]); `files.owner_id` is `restrict`, so that an account is deleted only after [STO-F-44].
+Constraints beyond these columns are requirements: the root folder (no parent, empty name, one per owner) is [STO-F-34]; the name key is unique among all live children of a folder, files and folders together: each table has a unique index on the folder and the name key among live rows, and an operation that adds, renames, or restores a child first locks the folder's row and checks the other table ([STO-F-22]); `files.folder_id` and `files.content_object_id` are `restrict`, so that only the application deletes files and can count references ([STO-F-18]); `files.owner_id` is `restrict`, so that an account is deleted only after [STO-F-44].
 
 ### Seed records
 
@@ -364,29 +372,29 @@ FolderChanged     { folderId: uuid }                                  // data of
 | --- | --- | --- | --- |
 | `GET /health` | — | 200 `HealthReport` ([STO-F-47]) | — |
 | `GET /limits` | — | 200 `Limits` | E-2 |
-| `GET /folders/root` | — | 200 `FolderListing` of the root folder, created on first use | E-2 |
+| `GET /folders/root` | — | 200 `FolderListing` of the root folder, created on first use | E-2, E-8 |
 | `GET /folders/{id}` | — | 200 `FolderListing` | E-2, E-3 |
-| `POST /folders` | `CreateFolderInput` | 201 `FolderInfo` | E-1, E-2, E-3, E-4 |
-| `PATCH /folders/{id}`, `PATCH /files/{id}` | `UpdateItemInput` | 200 `ItemInfo` | E-1, E-2, E-3, E-4, E-7 |
+| `POST /folders` | `CreateFolderInput` | 201 `FolderInfo` | E-1, E-2, E-3, E-4, E-8 |
+| `PATCH /folders/{id}`, `PATCH /files/{id}` | `UpdateItemInput` | 200 `ItemInfo` | E-1, E-2, E-3, E-4, E-7, E-8 |
 | `POST /folders/{id}/copy`, `POST /files/{id}/copy` | `CopyInput` | 201 `ItemInfo` | E-1, E-2, E-3, E-7, E-8 |
 | `DELETE /folders/{id}`, `DELETE /files/{id}` | — | 204 (trash; final deletion until STO-US-6) | E-2, E-3, E-8 |
 | `GET /trash` | — | 200 `list<TrashEntryInfo>`, newest first | E-2 |
 | `POST /trash/{id}/restore` | `RestoreInput` | 200 `ItemInfo` | E-1, E-2, E-3, E-4, E-8 |
 | `DELETE /trash/{id}` | — | 204 (final deletion) | E-2, E-3, E-8 |
-| `POST /uploads` | resumable protocol creation; metadata `folderId`, `filename`, optional `onConflict` | 201 with the upload's URL `/uploads/{id}` | E-1, E-2, E-3, E-4, E-5, E-6 |
-| `HEAD /uploads/{id}`, `PATCH /uploads/{id}`, `DELETE /uploads/{id}`, `OPTIONS /uploads` | per the protocol; the last `PATCH` finishes the file | 204; the last `PATCH` adds the header `Stash-File-Id` | E-2, E-3, E-5, E-6, E-8 |
+| `POST /uploads` | resumable protocol creation; metadata `folderId`, `filename`, optional `onConflict`; size 0 completes at creation ([STO-F-53]) | 201 with the upload's URL `/uploads/{id}` (and `Stash-File-Id` for size 0) | E-1, E-2, E-3, E-4, E-5, E-6, E-8 |
+| `HEAD /uploads/{id}`, `PATCH /uploads/{id}`, `DELETE /uploads/{id}`, `OPTIONS /uploads` | per the protocol; the last `PATCH` finishes the file; a removed upload answers 404 ([STO-F-52]) | 204; the last `PATCH` adds the header `Stash-File-Id` | E-1, E-2, E-3, E-5, E-6, E-8 |
 | `GET /files/{id}/content` | optional `Range` | 200 or 206 bytes with the headers below | E-2, E-3, E-10, E-12 |
 | `GET /archive?items=<id>,<id>…` | `ArchiveQuery` | 200 ZIP stream | E-1, E-2, E-3, E-12 |
-| `GET /events?folderId=<uuid>` | — | 200 event stream with `folder-changed` | E-2, E-3 |
-| `DELETE /internal/members/{userId}` (internal port only) | header `Authorization: Bearer <INTERNAL_API_SECRET>` | 204, also when repeated | E-3, E-8 |
+| `GET /events?folderId=<uuid>` | — | 200 event stream with `folder-changed` | E-1, E-2, E-3 |
+| *draft* `DELETE /internal/members/{userId}` (internal listener only, no session check) | header `Authorization: Bearer <INTERNAL_API_SECRET>` | 204, also when repeated | E-3, E-8 |
 
-Download headers: `Content-Type` is the stored detected type; `Content-Length` is the size (for a range, the length of the range); `Accept-Ranges: bytes`; `Content-Range: bytes <first>-<last>/<size>` for 206; `Content-Disposition: attachment; filename="<ASCII fallback>"; filename*=UTF-8''<percent-encoded name>`. The ASCII fallback replaces every character outside printable ASCII, the quote, and the backslash by `_`. The archive is named `<folder name>.zip` for one folder, else `stash-download.zip`; its entries use `/` as separator, folders have an entry ending in `/`, and a name used twice in one folder of the archive is changed by [STO-F-38].
+Download headers: `Content-Type` is the stored detected type; `Content-Length` is the size (for a range, the length of the range); `Accept-Ranges: bytes`; `Content-Range: bytes <first>-<last>/<size>` for 206; `Content-Disposition: attachment; filename="<ASCII fallback>"; filename*=UTF-8''<percent-encoded name>`. The ASCII fallback replaces every character outside printable ASCII, the quote, and the backslash by `_`. The archive is named `<folder name>.zip` for one folder that is not the root folder, else `stash-download.zip`; its entries use `/` as separator, folders have an entry ending in `/`, and a name used twice in one folder of the archive is changed by [STO-F-38].
 
 Event stream: `event: folder-changed` and `data: {"folderId":"<uuid>"}`, then an empty line; heartbeat `: keep-alive`.
 
 The call `DELETE /internal/members/{userId}` is not for browsers: `storage` serves it only on a second listener, `INTERNAL_PORT`, which the reverse proxy neither routes nor publishes, so it is reachable only on the internal network of the local stack; the secret protects it as well ([STO-F-44], A28). Every write endpoint above answers [STO-E-14] for a member whose deletion has begun.
 
-**Error codes** added to the `ErrorResponse` table of `scaffolding.md` §8 (§15); `no-session`, `validation-failed`, and `not-found` exist already:
+**Error codes** added to the `ErrorResponse` table of `scaffolding.md` §8 (§15); `no-session`, `validation-failed`, and `not-found` exist already. The answer `name-taken` also carries `existingKind: enum(file|folder)` (an extension of `ErrorResponse` for this code, §15). Every endpoint except `/health` can answer `no-session` (E-2) and the draft internal call; the Errors column lists the other conditions that apply:
 
 | Code | HTTP status | Message |
 | --- | --- | --- |
@@ -404,7 +412,7 @@ The call `DELETE /internal/members/{userId}` is not for browsers: `storage` serv
 | `OBJECT_STORE_ENDPOINT` | absolute URL | — (required) |
 | `OBJECT_STORE_BUCKET` | 3..63 characters | `stash` |
 | `OBJECT_STORE_ACCESS_KEY`, `OBJECT_STORE_SECRET_KEY` | non-empty | — (required) |
-| `INTERNAL_PORT` | 1024..65535, not the port of the public listener | `3012` |
+| *draft* `INTERNAL_PORT` | 1024..65535, not the port of the public listener; the internal listener MUST NOT be published on the host | `3012` |
 | `OBJECT_STORE_STATUS_URL` | absolute URL of the object store's status interface inside the local stack, used for [STO-F-46] (Q454) | — (required) |
 | `METADATA_STORE_URL` | absolute URL | — (required) |
 | `IDENTITY_URL` | absolute URL of `identity` inside the local stack | `http://identity:3001` |
@@ -425,10 +433,10 @@ The call `DELETE /internal/members/{userId}` is not for browsers: `storage` serv
 
 | ID | Title | Trigger | Required behavior | Fallback | Derives from |
 | --- | --- | --- | --- | --- | --- |
-| STO-E-1 | Invalid input | A body, query, or upload metadata does not match its contract of §8, a name breaks [STO-F-23], or a change names the root folder. | 400 `validation-failed` ([SCF-F-21]); nothing is stored. | None. | STO-AC-5.3 (Name validation) |
+| STO-E-1 | Invalid input | A body, query, or upload metadata does not match its contract of §8, a name breaks [STO-F-23], a chunk is larger than `UPLOAD_CHUNK_BYTES`, or a change names the root folder. | 400 `validation-failed` ([SCF-F-21]); nothing is stored. | None. | STO-AC-5.3 (Name validation) |
 | STO-E-2 | No session | No cookie, an invalid or expired session, or no answer of `identity` within `SESSION_CHECK_TIMEOUT_MS` ([ADR-0007](../adr/0007-session-check-through-identity.md)). | 401 `no-session`; nothing else is checked or changed. | None: never treat a missing answer as a valid session. | STO-AC-1.4 (Protected endpoints) |
-| STO-E-3 | Not found | The ID names no file, folder, trash entry, or upload, or one of another member, or the internal call carries no or a wrong secret. | 404 `not-found`; the answer MUST NOT tell the two cases apart. | None. | STO-AC-5.4 (Permissions respected), STO-AC-7.4 (Permission check) |
-| STO-E-4 | Name taken | A creation, rename, move, upload, or restore meets a live item with the same name key, and no choice of [STO-F-9] or [STO-F-50] was given. | 409 `name-taken`; nothing is changed. | The page shows [STO-U-3] or [STO-U-11]. | STO-AC-2.4 (Name conflict), STO-AC-5.2 (Rename, move, copy) |
+| STO-E-3 | Not found | The ID names no file, folder, trash entry, or upload, or one of another member, or the upload resource was already removed ([STO-F-52]). | 404 `not-found`; the answer MUST NOT tell the two cases apart. | None. | STO-AC-5.4 (Permissions respected), STO-AC-7.4 (Permission check) |
+| STO-E-4 | Name taken | A creation, rename, move, upload, or restore meets a live item with the same name key, and no choice of [STO-F-9] or [STO-F-50] was given. | 409 `name-taken` with `existingKind` (`file` or `folder`) of the item that holds the name; nothing is changed. | The page shows [STO-U-3] or [STO-U-11]. | STO-AC-2.4 (Name conflict), STO-AC-5.2 (Rename, move, copy) |
 | STO-E-5 | File too large | The declared size or the received bytes exceed `MAX_FILE_BYTES`. | 413 `file-too-large`; the upload is terminated and its bytes removed. | None. | STO-AC-2.3 (Size and type limits) |
 | STO-E-6 | Type not allowed | The detected type is not in `ALLOWED_FILE_TYPES`, or the extension does not belong to it. | 415 `file-type-not-allowed`; the upload is terminated and its bytes removed. | None. | STO-AC-2.3 (Size and type limits) |
 | STO-E-7 | Invalid move | A folder is moved into itself or one of its subfolders. | 409 `invalid-move`; nothing is changed. | None. | STO-AC-5.2 (Rename, move, copy) |
@@ -438,7 +446,7 @@ The call `DELETE /internal/members/{userId}` is not for browsers: `storage` serv
 | STO-E-11 | Removal failed after commit | The object or document of a removed content object cannot be removed after the record store committed. | The request still succeeds; the failure is logged at level `error` with the content object's ID only. | `cleanup-orphans` removes it ([STO-F-36]). | STO-AC-1.5 (Final deletion) |
 | STO-E-12 | Content missing | The record store names a content object whose object is missing, or the object store fails while a download streams. | Before the first byte: 500 `internal-error`; after it: the connection is closed without finishing the body, so the client sees an incomplete download; both are logged at level `error` with IDs only. | None; the operator restores the object store. | STO-AC-7.1 (Single file), STO-AC-7.2 (Folder as ZIP) |
 | STO-E-13 | Clean-up job failed | A job of `worker` throws or the stores do not answer. | The failure is logged at level `error`; the job runs again at its next interval; items it did not reach stay as they are. | The next run. | STO-AC-3.5 (Cleanup), STO-AC-6.4 (Automatic purge) |
-| STO-E-14 | Account being deleted | A write request (upload creation or chunk, creating a folder or the root folder, rename, move, copy, delete, restore) of a member for whom the deletion marker of [STO-F-44] is set. | 401 `no-session`; nothing is written. Reads are answered as usual. | None. | IDN-AC-8.2 (Files deleted) |
+| STO-E-14 | Account being deleted (*draft*) | A write request (upload creation or chunk, creating a folder or the root folder, rename, move, copy, delete, restore) of a member for whom the deletion marker of [STO-F-44] is set. | 401 `no-session`; nothing is written. Reads are answered as usual. | None. | IDN-AC-8.2 (Files deleted) |
 
 ## 10. Worked Examples
 
@@ -490,7 +498,8 @@ With `ALLOWED_FILE_TYPES=*`: `a.txt` with plain text is accepted and stored as `
 | 4 | as step 3, but before the last chunk the member renames R1 to `old.pdf` | the name is free: the new file is `report.pdf`, and `old.pdf` stays |
 | 5 | as step 3, but before the last chunk R1 is deleted and a folder `report.pdf` is created | the name is held by another item: the new file is `report (2).pdf`, and nothing is removed |
 | 6 | create upload without `onConflict` for `scan.pdf`; meanwhile another tab uploads `scan.pdf` | at the last chunk the new file becomes `scan (2).pdf` |
-| 7 | create upload with `onConflict=replace` for the name of a folder | 409 `name-taken` — replace is not accepted for a folder |
+| 7 | create upload with `onConflict=replace` for the name of a folder | 409 `name-taken` with `existingKind=folder` — replace is not accepted for a folder |
+| 8 | as step 3, with bytes identical to R1's, before STO-US-6 | the count of the content goes 1 → 2 → 1; the new file has a new ID; the object is never removed |
 
 **Example 5 — reference counting ([STO-F-17], [STO-F-18], [STO-F-5]).** Ada and Ben are members; content X has fingerprint `9f86d0…0a08` (invented).
 
@@ -513,6 +522,7 @@ With `ALLOWED_FILE_TYPES=*`: `a.txt` with plain text is accepted and stored as `
 | `Projekte` holds a new live folder `Fotos`, no choice | 409 `name-taken` |
 | the same, `onConflict=keep-both` | the restored folder is `Fotos (2)` |
 | the same, `onConflict=replace` | 409 `name-taken` — replace is not accepted for a folder |
+| a file `a.txt` is restored where a folder `a.txt` exists, `onConflict=replace` | 409 `name-taken` — replace needs two files |
 | `a.jpg` alone is restored from the entry `Fotos` | 404 `not-found` — only the whole entry can be restored (Q439) |
 
 **Example 7 — moves ([STO-F-40]).** Folders `A` contains `B` contains `C`. Moving `A` into `C`: 409 `invalid-move`. Moving `A` into `A`: 409 `invalid-move`. Moving `C` into the root folder: 200. Moving, renaming, or deleting the root folder: 400 `validation-failed`.
@@ -531,13 +541,13 @@ With `ALLOWED_FILE_TYPES=*`: `a.txt` with plain text is accepted and stored as `
 
 **Example 9 — download header ([STO-F-30]).** The file `Übersicht Q3.pdf` of detected type `application/pdf`: `Content-Type: application/pdf`; `Content-Disposition: attachment; filename="_bersicht Q3.pdf"; filename*=UTF-8''%C3%9Cbersicht%20Q3.pdf`.
 
-**Example 10 — chunks ([STO-F-11]).** With the defaults, a file of 5 GiB is sent as 640 chunks of 8 MiB. A file of 10 MiB with `UPLOAD_CHUNK_BYTES=5242880` is sent as 2 chunks of 5 MiB; a file of 12 MiB as 2 chunks of 5 MiB and one of 2 MiB.
+**Example 10 — chunks ([STO-F-11]).** With the defaults, a file of 5 GiB is sent as 640 chunks of 8 MiB. A file of 10 MiB with `UPLOAD_CHUNK_BYTES=5242880` is sent as 2 chunks of 5 MiB; a file of 12 MiB as 2 chunks of 5 MiB and one of 2 MiB; a file of 0 bytes needs no chunk and is stored at creation ([STO-F-53]); a chunk of 5 MiB + 1 byte is refused with 400 `validation-failed`.
 
 **Example 11 — failure while saving ([STO-F-35], [STO-E-8]).** The last chunk of a new file has arrived and the fingerprint is computed, but the metadata store does not answer. The request answers 503 `storage-unavailable`; no `files` or `content_objects` row exists; the object under the upload ID is removed; no document exists. The member sees `failed` and may upload again.
 
 **Example 12 — archive ([STO-F-31], [STO-F-49]).** A member selects the folder `Fotos` (with `a.jpg` and an empty subfolder `Leer`) and the file `notiz.txt`: the archive is `stash-download.zip` with the entries `Fotos/`, `Fotos/a.jpg`, `Fotos/Leer/`, `notiz.txt`. Selecting only `Fotos` gives `Fotos.zip` with the first three entries. Selecting the root folder gives `stash-download.zip` with every live item at the top level, below its own name.
 
-**Example 13 — account deletion ([STO-F-44], [STO-NF-6], A30).** Ada has two files, a trash entry, and an unfinished upload; one of her contents is shared with Ben.
+**Example 13 — account deletion (*draft*, [STO-F-44], [STO-NF-6], A30).** Ada has two files, a trash entry, and an unfinished upload; one of her contents is shared with Ben.
 
 | Step | Event | Result |
 | --- | --- | --- |
@@ -554,7 +564,7 @@ With `ALLOWED_FILE_TYPES=*`: `a.txt` with plain text is accepted and stored as `
 | --- | --- | --- | --- |
 | Pages and upload | browser → `web` → `storage` | The contracts and endpoints of §8, the resumable upload, the event stream | [STO-U-1] to [STO-U-13], §8; slice 2 of each story (Q432) |
 | Session check | `storage` → `identity` | Session cookie → `SessionInfo` or 401 | [STO-F-4], [IDN-F-37], [ADR-0007](../adr/0007-session-check-through-identity.md) |
-| Account deletion | `identity` → `storage` (internal port only) | `DELETE /internal/members/{userId}` with the shared secret, repeated until 204 | [STO-F-44], [IDN-F-42] |
+| Account deletion (*draft*) | `identity` → `storage` (internal listener only) | `DELETE /internal/members/{userId}` with the shared secret, repeated until 204 | [STO-F-44], [IDN-F-42] |
 | Object store | `storage`, `worker` → object store | Bytes by key, range reads, listing; used and total bytes from its status interface | [STO-C-1], §8 |
 | Record store | `storage`, `worker` → relational database | `folders`, `files`, `content_objects` | [STO-C-3], §8 |
 | Metadata store | `storage`, `worker` → document database | `file_metadata` documents | [STO-C-2], §8 |
@@ -575,7 +585,7 @@ With `ALLOWED_FILE_TYPES=*`: `a.txt` with plain text is accepted and stored as `
 
 ## 13. Resolved Questions & ADRs
 
-Verbatim rounds: [storage-core.qa-log.md](storage-core.qa-log.md). The questions are numbered by the project-wide counter; assumptions (A1 to A32) were stated before the questions of their round; A1 to A23 were accepted with Q445, A24 to A27 in round 11, A28 to A32 in round 13. No ADR is needed: the stack choices are rows of `STACK.md` §2, and the session check follows [ADR-0007](../adr/0007-session-check-through-identity.md).
+Verbatim rounds: [storage-core.qa-log.md](storage-core.qa-log.md). The questions are numbered by the project-wide counter; assumptions (A1 to A33) were stated before the questions of their round; A1 to A23 were accepted with Q445, A24 to A27 in round 11, A28 to A32 in round 13, A33 in round 14. No ADR is needed: the stack choices are rows of `STACK.md` §2, and the session check follows [ADR-0007](../adr/0007-session-check-through-identity.md).
 
 | Q | Title | Decision | Rationale |
 | --- | --- | --- | --- |
@@ -606,10 +616,10 @@ Verbatim rounds: [storage-core.qa-log.md](storage-core.qa-log.md). The questions
 | Q438 | Restore with a conflict | Asks like an upload ([STO-F-50], [STO-U-11]) | One behaviour for both |
 | Q439 | Trash entry of a folder | Only the whole entry ([STO-F-41]) | Simple, no partial trees |
 | Q440 | ZIP streaming | A streaming ZIP library, entries stored without compression, for archives over 4 GiB (`STACK.md` §2, [STO-C-5]) | Archives are never held in memory |
-| Q441 | Account deletion | Everything of that member alone is deleted at once; shared content stays for the other member; planned flow: `storage` blocks the member's writes, then deletes, safely repeatable, and `identity` repeats until 204 ([STO-F-44], [STO-NF-6], [STO-NF-5], A28, A30) | Members' data leaves the stores when the account goes; legal sufficiency is open (L1) |
+| Q441 | Account deletion | The goal: everything of that member alone is deleted at once, shared content stays for the other member. Its specification (STO-F-44, STO-NF-6, STO-E-14) is *draft* and is grilled together with IDN-US-8 by the owner of `identity` (Q457) | Members' data leaves the stores when the account goes; legal sufficiency is open (L1) |
 | Q442 | Encryption at rest | The operator's matter, documented ([STO-NF-7]) | stash adds no cryptography of its own (`G-1.N5`) |
 | Q443 | Performance | Three targets ([STO-NF-1] to [STO-NF-3]) | Measurable; tested in R13 |
-| Q444 | Adversarial check | An independent check of §1 and Part H before the review. It ran on 2026-11-24 in two cycles: 22 findings in cycle 1 and 18 in cycle 2, all fixed. The cross-model check was skipped (Q455) | Personal data and irreversible deletion |
+| Q444 | Adversarial check | An independent check of §1 and Part H before the review. It ran on 2026-11-24 in three cycles: 22, 18, and 20 findings. The findings of cycle 3 are fixed, except those that depend on account deletion, which are deferred with Q457 (§14). The cross-model check was skipped (Q455) | Personal data and irreversible deletion |
 | Q445 | Shared understanding | Confirmed | — |
 | Q448 | Table `folders` | `owner_id` is added to `folders`, `team_id` becomes optional until R7, and the tables `files` and `content_objects` are new (§15, W6); the change of `scaffolding.md` §8 goes to `trutscf1` | Smallest change that makes folders member-owned |
 | Q449 | Account deletion through `identity` | An internal call with a shared secret, storage first, then the account ([STO-F-44], W10); an inbox item for `tschudea07` | `identity` owns the account; the order protects against orphaned content |
@@ -620,8 +630,12 @@ Verbatim rounds: [storage-core.qa-log.md](storage-core.qa-log.md). The questions
 | Q454 | Used and total storage | An adapter behind the object store port reads both from the status interface of the object store's master on the internal network (`STACK.md` §2, [STO-F-46]) | The S3 interface has no capacity call |
 | Q455 | Cross-model check | Skipped ("Überspringen (Recommended)") | One independent check was enough |
 | Q456 | "Reliably" in the feature goal | The goal reads "… so that their data stays on their own server under their control." (replaces "lives reliably", which read as a durability or availability promise; §1) | R5 makes no backups and no availability promise (Q442, `G-1.N4`) |
+| Q457 | Account deletion in R5 | The specification of account deletion is moved out as a draft and grilled with IDN-US-8; Q441's goal stays | Most serious findings of cycle 3 hang on it, and it depends on the draft story of `identity` |
+| Q458 | Continue after three cycles | The remaining concrete findings are worked in, then the merge request is opened | They are specific and fixable now |
+| Q459 | Copy into a taken name (W11) | The copy gets the keep-both name (`Name (2).ext`) ([STO-F-22], [STO-F-38]) | One behaviour for upload and copy; never a refusal |
+| Q460 | Backups | stash makes no backups; the operator's documentation names the volumes to back up ([STO-NF-12]) | Backups are the operator's job, and the documentation says what to back up |
 
-| A | Assumption (accepted with Q445, round 11, or round 13) | Where it applies |
+| A | Assumption (accepted with Q445 or in rounds 11, 13, 14) | Where it applies |
 | --- | --- | --- |
 | A1 | The branch of the worktree is `concept/storage-core`; #56 gets its `feature/` branch after this concept is merged | process |
 | A2 | `storage` checks every session by asking `identity` ([IDN-F-37]) | [STO-F-4] |
@@ -650,11 +664,12 @@ Verbatim rounds: [storage-core.qa-log.md](storage-core.qa-log.md). The questions
 | A25 | After STO-US-6 only the deletion for good satisfies STO-AC-1.5; STO-T-5 stays | [STO-F-5], [STO-T-5] |
 | A26 | The weights of the stories are re-estimated at `tickets` | §16 |
 | A27 | STO-AC-4.5 stays a test criterion with named cases | [STO-F-20] |
-| A28 | The internal deletion call is not routed by the proxy; it is served on an internal port reachable only on the internal network, exempt from the session check, and protected by the shared secret | [STO-F-4], [STO-F-44], [STO-E-3] |
+| A28 | (*draft*, Q457) The internal deletion call is not routed by the proxy; it is served on an internal listener reachable only on the internal network and not published on the host, has no session check, and is protected by the shared secret | [STO-F-44] |
 | A29 | Replace replaces only the file that held the name when the upload was created; if another item holds the name at completion, keep-both applies; before STO-US-6 the dialog says replacing deletes the old file for good | [STO-F-9], [STO-U-3] |
-| A30 | Account deletion first blocks the member's writes, then deletes; the call is safe to repeat and `identity` repeats it until 204 | [STO-F-44], [STO-NF-6], [STO-E-14] |
+| A30 | (*draft*, Q457) Account deletion first blocks the member's writes, then deletes; the call is safe to repeat and `identity` repeats it until 204 | [STO-F-44] |
 | A31 | Telemetry carries no member IDs | [STO-NF-4] |
 | A32 | The glossary entry *File* no longer names the fingerprint; the state machines of §16 show account deletion and the refusal and cancel of an upload | CONTEXT.md, §16 |
+| A33 | "Their" in the feature goal means the members' organisation, as in `G-1` | §1, H1 |
 
 **Decisions of the writing.** The first grill rounds fixed the choices above but not the details below; the author took them to make the document complete. Round 11 confirmed most of them (column *Confirmed*); the review confirms or changes the rest.
 
@@ -669,8 +684,8 @@ Verbatim rounds: [storage-core.qa-log.md](storage-core.qa-log.md). The questions
 | W7 | Clean-up code | The jobs call the storage core, shared by `storage` and `worker` in the package `storage-core`, so that reference counting exists once ([STO-F-36]) | Q450 |
 | W8 | Events | One event kind for every change of a folder's children; the session is checked every 60 seconds ([STO-F-10]) | Q451 |
 | W9 | Completion | The last chunk's response waits for the save (hash, deduplication, records) and carries the file ID or the error ([STO-F-16], [STO-F-35]) | Q451 |
-| W10 | Account deletion call | An internal call on a separate internal port with a shared secret, safe to repeat; its form and the order are confirmed with the owner of `identity` when IDN-US-8 is grilled ([STO-F-44], A28, A30) | Q449 |
-| W11 | Copy name | A copy in a folder where the name is taken is renamed by keep-both instead of refused ([STO-F-22]) | open, for the review |
+| W10 | Account deletion call (*draft*) | An internal call on a separate internal listener with a shared secret, safe to repeat; its form and the order are grilled with IDN-US-8 ([STO-F-44], A28, A30) | Q449, draft by Q457 |
+| W11 | Copy name | A copy in a folder where the name is taken is renamed by keep-both instead of refused ([STO-F-22], [STO-F-38]) | Q459 |
 | W12 | Listing and archive limits | A listing returns every live item; an archive takes 1 to 100 items ([STO-F-31], §12) | Q451 |
 
 **Open questions for the school management** (legal; not decided by the team or an agent):
@@ -684,9 +699,9 @@ Verbatim rounds: [storage-core.qa-log.md](storage-core.qa-log.md). The questions
 | Artifact | Interaction | Interference | Resolved by |
 | --- | --- | --- | --- |
 | Data model ([SCF-F-23], `packages/db`) | `folders`, `users`. | `folders` is bound to a team (`team_id` required, one root per team, names unique among all children); R5 needs member-owned folders, a trash marker, and unique names only among live items. | §15; [STO-F-34], [STO-F-22] |
-| Account deletion ([IDN-F-42], IDN-US-8) | `identity` deletes the account; the database would delete `users` and cascade. | `files.owner_id` and `folders.owner_id` are `restrict`: `identity` MUST call [STO-F-44] before it deletes the account, and repeat it until it gets 204, or the deletion fails; [IDN-F-42] still names the opposite order. | §15; [STO-NF-6] |
+| Account deletion (*draft*, [IDN-F-42], IDN-US-8) | `identity` deletes the account; the database would delete `users` and cascade. | `files.owner_id` and `folders.owner_id` are `restrict`: `identity` MUST call [STO-F-44] before it deletes the account, and repeat it until it gets 204, or the deletion fails; [IDN-F-42] still names the opposite order. | §15; [STO-NF-6] |
 | Error response ([SCF-F-21]) | Six new codes; `no-session` is added by `identity`. | The code table says "a new code is added to this table first". | §15 |
-| Routing ([SCF-F-4]) | `/api/storage` is proxied to `storage`; the proxy strips the prefix. | An internal endpoint on the same listener would be reachable through the proxy. | A28: the call of [STO-F-44] is served on a second internal port, which the proxy neither routes nor publishes; the secret protects it as well |
+| Routing ([SCF-F-4]) | `/api/storage` is proxied to `storage`. | An internal endpoint on the same listener could be reachable through the proxy. | A28 (*draft*): the call of [STO-F-44] is served on a second internal listener, which the proxy neither routes nor publishes on the host; the secret protects it as well |
 | Example configuration ([SCF-F-17], `.env.example`) | New variables of §8. | `tests/docker-compose.test.ts` requires every variable of `.env.example` to be used in `docker-compose.yml`. | The services `storage` and `worker` take them (slice 1 of STO-US-1) |
 | Local stack (`docker-compose.yml`) | The object store, the document database, and the key-value store exist. | `storage` and `worker` are not services yet; the object store is published on the host only for development. | Slice 1 of STO-US-1 adds `storage`; slice 3 of STO-US-3 adds `worker`; [STO-F-37] forbids a public object store |
 | Telemetry ([OBS-F-14], [OBS-F-21], [OBS-F-23]) | Two metrics; logs of the units. | The redactor catches secrets, e-mail addresses, and IP addresses, but not file names. | [STO-NF-4]: `storage` and `worker` never put names into attributes |
@@ -696,7 +711,19 @@ Verbatim rounds: [storage-core.qa-log.md](storage-core.qa-log.md). The questions
 | Teams and permissions ([teams-permissions.md](teams-permissions.md), R7) | R7 adds roles and inherited permissions to folders. | Owner-only rules of R5 become permission checks; `files` has no permission rows. | R7 replaces [STO-F-24] by its checks and migrates `owner_id` |
 | Background processing ([background-processing.md](background-processing.md), R9) | R9 adds thumbnails, scan, and text recognition as jobs. | R9 needs the job runtime and the metadata documents of R5. | [STO-C-6] and `file_metadata` are the shared base |
 | Public pages ([PUB-F-22]) | The privacy template must name stored files and their retention. | It does not yet. | §15 |
+| Privacy template and operator documentation ([PUB-F-22], [deployment.md](deployment.md)) | Retention periods ([STO-NF-10]), unencrypted storage ([STO-NF-7]), and the volumes to back up ([STO-NF-12]). | The documents do not state them yet; the change is pending with their owners. | §15 |
 | Web track (`apps/web`, schwaigc) | File browser, upload dialog, trash page. | Other track (WORKFLOW "Tracks"). | Slice 2 of each story (Q432) |
+
+**Open points for the account-deletion grill (Q457).** Account deletion is *draft* and is grilled together with IDN-US-8 by the owner of `identity`. These points go with it: the order of the calls and what happens when `identity` deletes the account before `storage` has finished; the lifecycle of the deletion marker and the member ID it leaves; whether reads and the creation of the root folder are blocked; sessions of the member during the deletion; the exposure of the internal listener and the handling of the shared secret; deletions at the same time as uploads in flight and the purge; what telemetry, proxy logs, and job queues still hold. The deferred findings of cycle 3 of the adversarial check, in short:
+
+1. The call can answer 204 while bytes or metadata remain, because removals after the commit only log a failure ([STO-E-11]); this contradicts [STO-NF-6].
+2. A repeated call from `identity` after a timeout, the purge, and a final deletion by the member can run on the same items at once; deletion of all data of a member needs serialisation.
+3. Writes already past their marker check (an upload in finalizing, a move, a copy, a restore) are not stopped; the marker check and the writes need one order.
+4. If `identity` stops or abandons the account deletion after `storage` has answered, the member keeps the account but no files, and the marker blocks every write for good; nothing clears it, and `storage` does not check that the account is really being deleted, so a leaked secret deletes any member's data.
+5. Once the marker is gone, nothing records which member's data was deleted, when, and by which call (audit); the raw path with the member ID must stay out of traces and access logs.
+6. Reads during the deletion: the first read of the root folder creates it, and a refused write answers `401 no-session` to a member whose session is still valid.
+7. The marker also holds `started_at`, and "whose account no longer exists" couples `worker` to the account tables of `identity` (which of the two user tables is not said).
+8. [IDN-F-42] and [IDN-AC-8.2] still say "after deleting an account", the opposite order, which fails on the `restrict` foreign keys.
 
 ## 15. Schema Extensions
 
@@ -708,11 +735,11 @@ Verbatim rounds: [storage-core.qa-log.md](storage-core.qa-log.md). The questions
 
 | Document | Change | Reason | Carried out by |
 | --- | --- | --- | --- |
-| [scaffolding.md](scaffolding.md) §8, `ErrorResponse` and relational model | Add the six codes of §8; change `folders` as above; add `files` and `content_objects`. | [SCF-F-21], [SCF-F-22] | `trutscf1`, inbox; before slice 1 of STO-US-1 is merged |
-| [identity.md](identity.md) [IDN-F-42] | Name the call `DELETE /internal/members/{userId}` of [STO-F-44] on the internal port of `storage` (a variable for its address and the shared secret), the order (storage first, then the account), and the repeat until 204. A planned change awaiting its owner. | [STO-NF-6] | `tschudea07`, inbox; when IDN-US-8 is grilled |
+| [scaffolding.md](scaffolding.md) §8, `ErrorResponse` and relational model | Add the six codes of §8; allow `name-taken` the extra field `existingKind`; change `folders` as above; add `files` and `content_objects`. | [SCF-F-21], [SCF-F-22] | `trutscf1`, inbox; before slice 1 of STO-US-1 is merged |
+| [identity.md](identity.md) [IDN-F-42] | Name the call `DELETE /internal/members/{userId}` of [STO-F-44] on the internal listener of `storage` (a variable for its address and the shared secret), the order (storage first, then the account), and the repeat until 204. A planned change awaiting its owner. | [STO-NF-6] | `tschudea07`, inbox; when IDN-US-8 is grilled |
 | [observability.md](observability.md) | Nothing; the metrics of [OBS-F-21] and [OBS-F-23] are built here. | [STO-F-45], [STO-F-46] | — |
-| [public-content.md](public-content.md) [PUB-F-22] | Name stored files, their retention periods ([STO-NF-10]), and that they are stored unencrypted ([STO-NF-7]). | Privacy, L1 | `trutscf1`, inbox |
-| [deployment.md](deployment.md) | State that content, records, and metadata are stored unencrypted and that disk encryption is the operator's responsibility. | [STO-NF-7] | `tschudea07`, inbox |
+| [public-content.md](public-content.md) [PUB-F-22] | Name stored files, their retention periods each "and until the next successful clean-up run" ([STO-NF-10]), and that they are stored unencrypted ([STO-NF-7]). | Privacy, L1 | `trutscf1`, inbox |
+| [deployment.md](deployment.md) | State that content, records, and metadata are stored unencrypted, that disk encryption is the operator's responsibility, that stash makes no backups, and which volumes to back up. | [STO-NF-7], [STO-NF-12] | `tschudea07`, inbox |
 | CI `test` job (`STACK.md` §3) | Add the object store and the document database as service containers; the key-value store for `worker` tests. | [STO-T-1] to [STO-T-35] | `tschudea07`, inbox; before slice 1 of STO-US-1 |
 | `web` (schwaigc) | Slices 2 of STO-US-2, -3, -5, -6, -7: the pages. | Q432 | `schwaigc`, issues cut with `tickets` |
 
@@ -730,7 +757,7 @@ packages/storage-core         track Contracts, storage & worker (used by storage
 ├── P3 MetadataStore          port: put, get, delete, list of file_metadata documents
 └── A1 A2 A3                  adapters of the ports for the stores of the local stack
 apps/storage                  track Contracts, storage & worker
-├── M1 Server                 routes of §8, error responses, health report, the internal listener for the deletion call
+├── M1 Server                 routes of §8, error responses, health report, the internal listener of the draft deletion call
 ├── M2 SessionGate            seam: cookie -> SessionInfo or no session (asks identity)
 ├── M4 UploadService          resumable upload: creation checks, chunks, completion through M3
 ├── M5 Downloads              file content with ranges, archive stream
@@ -771,28 +798,30 @@ The weights of the stories are re-estimated at `tickets` (A26), because the slic
 ```text
 function finalizeUpload(upload) -> FileInfo
   input: upload { id: uuid, ownerId: uuid, folderId: uuid, fileName: string, replaceTargetId: optional<uuid> };
-         the bytes are complete in the object store under the key upload.id
-  1. folder = live folder upload.folderId owned by ownerId, else remove the object and raise E-3;
-     a member with a deletion marker raises E-14
-  2. type check of STO-F-8 on the stored bytes; on failure remove the object and raise E-6
+         the bytes are complete in the object store under the key upload.id (an empty upload has no bytes, STO-F-53)
+  1. folder = live folder upload.folderId owned by ownerId, else remove the object and the upload resource and raise E-3
+  2. type check of STO-F-8 on the stored bytes; on failure remove the object and the resource and raise E-6
   3. hash = SHA-256 of the object, read once as a stream            // STO-F-16
   4. detectedType = type of the content (STO-F-43)
   5. in one record transaction:
-       a. content = content object with sha256 = hash, row locked
-       b. if content exists: reuse = true
+       a. lock the row of folder (names are unique among files and folders together, STO-F-22)
+       b. content = content object with sha256 = hash, row locked
+       c. if content exists: reuse = true
           else: insert content object { id: upload.id, sha256: hash, sizeBytes, referenceCount: 0 }; reuse = false
-       c. target = live file upload.replaceTargetId in the folder, if set and still holding the name key of fileName
-          if target exists: trash it (finally delete it before STO-US-6); name = fileName
-          else if the name key is free: name = fileName
+       d. content.referenceCount = content.referenceCount + 1       // first, so a replace with identical content never reaches 0
+       e. target = live file upload.replaceTargetId in the folder, if set and still holding the name key of fileName
+          if target exists: trash it; before STO-US-6 finally delete it with releaseContent(target.contentObjectId, 1)
+                            in this transaction; name = fileName
+          else if the name key is free among the live children (files and folders): name = fileName
           else: name = keepBothName(folder, fileName)                           // STO-F-9, STO-F-38, A29
-       e. insert file { ownerId, folderId, name, nameKey, sizeBytes, contentObjectId: content.id }
-       f. content.referenceCount = content.referenceCount + 1
+       f. insert file { ownerId, folderId, name, nameKey, sizeBytes, contentObjectId: content.id }
        g. if not reuse: put the metadata document { contentObjectId: upload.id, detectedType }   // before the commit
        h. commit
-  6. if reuse: delete the object upload.id                                      // STO-F-17; failure: E-11
-  7. publish folder-changed(ownerId, folderId); return the file
+  6. after the commit: afterCommitRemove for every content object that reached 0 in step e;
+     if reuse: delete the object upload.id                                      // STO-F-17; failure: E-11
+  7. remove the upload resource (STO-F-52); publish folder-changed(ownerId, folderId); return the file
   on any failure in 1 to 5: roll back, delete the metadata document of this call, delete the object upload.id,
-       raise E-8 (or the specific error)                                         // STO-F-35
+       remove the upload resource, raise E-8 (or the specific error)             // STO-F-35
 
 function releaseContent(contentObjectId, count) -> removeNeeded
   1. in the caller's record transaction: lock the content object row; referenceCount = referenceCount - count
@@ -800,10 +829,11 @@ function releaseContent(contentObjectId, count) -> removeNeeded
 function afterCommitRemove(contentObjectId)
   1. delete the metadata document, then delete the object; a failure is E-11 and is only logged
 
-function deleteForGood(ownerId, itemId)                                         // STO-F-5, STO-F-51
-  1. collect the item, or the whole subtree of a folder, with every file and trashed file in it
-  2. in one record transaction: delete the files, then the folders from the leaves up; per content object
-     of the deleted files call releaseContent with the number of deleted files that refer to it
+function deleteForGood(ownerId, itemId)                                         // STO-F-5, STO-F-18, STO-F-51
+  1. in one record transaction, with row locks: collect the item, or the whole subtree of a folder with every file in it,
+     trashed ones included; if the item is already gone, stop (E-3 for a member, nothing for a job)
+  2. delete the files, then the folders from the leaves up; per content object call releaseContent with the number of
+     file rows this transaction actually deleted that refer to it
   3. after the commit: afterCommitRemove for every content object that reached 0
 function moveItem(ownerId, itemId, targetFolderId)
   1. target and item are owned and live, else E-3; the root folder cannot be moved
@@ -819,12 +849,10 @@ function restore(ownerId, itemId, onConflict) -> ItemInfo                       
   2. if a live item in place has the same name key: no choice -> E-4; replace for a folder -> E-4;
      keep-both -> keepBothName; replace -> trash that file
   3. set parent = place, trashedAt = empty
-function deleteAllOfMember(ownerId)                       // STO-F-44, A30; safe to repeat
+function deleteAllOfMember(ownerId)      // STO-F-44, draft: grilled with IDN-US-8, shape not binding
   1. set the deletion marker of ownerId if it is absent; from now on writes of the member raise E-14
-  2. remove every upload of ownerId
-  3. deleteForGood for every item of the member (the tree of the root folder, every trash entry), in batches
-  4. delete the root folder; answer 204, also when nothing was left
-  a failure in step 2 or 3 raises E-8 and leaves the marker and the rest; the next call continues
+  2. remove every upload of ownerId; deleteForGood for every item of the member, in batches
+  3. delete the root folder; answer 204, also when nothing was left; a failure raises E-8 and the next call continues
 function keepBothName(folder, name) -> string                                   // STO-F-38
   1. split name at the last dot unless it is the first or the last character: base, ext
   2. for n = 2, 3, ...: candidate = base + " (" + n + ")" + ext; return the first whose name key is free,
@@ -836,11 +864,12 @@ function keepBothName(folder, name) -> string                                   
 ```text
 on create(request): session gate; metadata folderId, filename (validated as ItemName), onConflict;
    folder must be live and owned (E-3); declared size <= MAX_FILE_BYTES (E-5); extension allowed (E-6);
-   a live item with the name key exists and no onConflict: raise E-4; onConflict=replace with a folder: raise E-4;
-   with replace on a file: store its ID in the upload as the replace target; the upload ID is a random uuid
-on chunk(request): session gate and ownership of the upload; at most UPLOAD_CHUNK_BYTES; after the first
-   4,096 bytes run the type check (E-6); add the received bytes to upload.received; at the declared size
-   call StorageCore.finalizeUpload and answer 204 with Stash-File-Id
+   a live item (file or folder) with the name key exists and no onConflict: raise E-4 with its existingKind;
+   onConflict=replace and the item is a folder: raise E-4; replace on a file: store its ID in the upload as the replace
+   target; the upload ID is a random uuid; a declared size of 0 calls StorageCore.finalizeUpload at once (STO-F-53)
+on chunk(request): session gate and ownership of the upload; a chunk above UPLOAD_CHUNK_BYTES raises E-1 and changes
+   nothing; after the first 4,096 bytes run the type check (E-6); add the received bytes to upload.received; at the
+   declared size call StorageCore.finalizeUpload and answer 204 with Stash-File-Id
 on offset(request) and on terminate(request): session gate and ownership
 ```
 
@@ -850,10 +879,9 @@ on offset(request) and on terminate(request): session gate and ownership
 every CLEANUP_INTERVAL_MINUTES minutes, three repeatable jobs:
   cleanup-uploads: for every upload whose last activity is older than UPLOAD_ORPHAN_HOURS: remove bytes and resource
   cleanup-orphans: remove objects, metadata documents, and content object records with reference count 0
-                   that have no counterpart, each older than CLEANUP_GRACE_MINUTES and not in a running upload;
-                   remove every deletion marker whose account no longer exists
+                   that have no counterpart, each older than CLEANUP_GRACE_MINUTES and not in a running upload
   purge-trash:     for every trash entry with trashedAt older than TRASH_RETENTION_DAYS days: deleteForGood
-a failing job is logged (E-13) and not retried before its next interval
+a failing job run is logged (E-13) and not retried before its next interval (STO-C-6)
 ```
 
 **M2 SessionGate** — Traces to: STO-F-4, STO-E-2, STO-E-9. Requires: none.
@@ -916,14 +944,15 @@ Two state machines: an upload, and an item (file or folder).
 ```mermaid
 stateDiagram-v2
     [*] --> created: creation
+    created --> stored: size 0, saved at creation
     created --> receiving: first chunk
-    receiving --> receiving: chunk, pause, resume
+    receiving --> receiving: chunk, pause, resume; a chunk above UPLOAD_CHUNK_BYTES is refused (E-1)
     receiving --> finalizing: last chunk
     finalizing --> stored: saved
     receiving --> failed: refused type or size
     receiving --> cancelled: member cancels
     created --> cancelled: member cancels
-    finalizing --> failed: store error or refused type
+    finalizing --> failed: folder gone (E-3), store error (E-8), or refused type (E-6)
     created --> expired: no activity for UPLOAD_ORPHAN_HOURS
     receiving --> expired: no activity for UPLOAD_ORPHAN_HOURS
     stored --> [*]
@@ -932,12 +961,14 @@ stateDiagram-v2
     cancelled --> [*]
 ```
 
+In every end state of an upload (stored, failed, cancelled, expired) its upload resource is removed ([STO-F-52]); a later request for it is answered with 404 `not-found`.
+
 ```mermaid
 stateDiagram-v2
     [*] --> live: created or uploaded
     live --> trashed: delete
     trashed --> live: restore
-    trashed --> gone: delete for good, purge after TRASH_RETENTION_DAYS, or account deletion
+    trashed --> gone: delete for good, purge after TRASH_RETENTION_DAYS, or (draft) account deletion
     live --> gone: final deletion before STO-US-6, account deletion
     gone --> [*]
 ```
@@ -954,14 +985,14 @@ stateDiagram-v2
 
 | Story | Requirements | Modules | Tests |
 | --- | --- | --- | --- |
-| STO-US-1 | STO-F-1 to F-5, F-35, F-36, F-46, F-47; STO-NF-7; STO-E-2, E-3, E-8, E-9, E-11; STO-C-1 to C-3, C-10 | M1 to M3, M10, P1 to P3 | STO-T-1 to T-5, T-32 to T-35, T-53, T-54 |
-| STO-US-2 | STO-F-8 to F-11, F-16, F-34, F-38, F-42, F-43, F-45, F-48; STO-U-1 to U-4, U-10; STO-NF-4, NF-9; STO-E-1, E-4 to E-6; STO-C-4, C-7 to C-9 | M1, M3, M4, M6, M8, M9 | STO-T-6 to T-9, T-14, T-30, T-36 to T-39, T-52 |
-| STO-US-3 | STO-F-12 to F-15; STO-U-5; STO-NF-3, NF-10; STO-E-13; STO-C-6 | M4, M7, M9 | STO-T-10 to T-13, T-30 |
-| STO-US-4 | STO-F-17 to F-20; STO-NF-5 | M3, M4 | STO-T-15 to T-18, T-40 to T-45 |
-| STO-US-5 | STO-F-21 to F-25, F-39, F-40; STO-U-6, U-8, U-9; STO-NF-1; STO-E-1, E-4, E-7 | M1, M3, M8, M10 | STO-T-19 to T-22, T-30, T-36, T-49 |
+| STO-US-1 | STO-F-1 to F-5, F-35, F-36, F-46, F-47; STO-NF-7, NF-12; STO-E-2, E-3, E-8, E-9, E-11; STO-C-1 to C-3, C-10 | M1 to M3, M10, P1 to P3 | STO-T-1 to T-5, T-32 to T-35, T-53, T-54 |
+| STO-US-2 | STO-F-8 to F-11, F-16, F-53, F-34, F-38, F-42, F-43, F-45, F-48; STO-U-1 to U-4, U-10; STO-NF-4, NF-9; STO-E-1, E-4 to E-6; STO-C-4, C-7 to C-9 | M1, M3, M4, M6, M8, M9 | STO-T-6 to T-9, T-14, T-30, T-58, T-59, T-60, T-36 to T-39, T-52 |
+| STO-US-3 | STO-F-12 to F-15, F-52; STO-U-5; STO-NF-3, NF-10; STO-E-13; STO-C-6 | M4, M7, M9 | STO-T-10 to T-13, T-30 |
+| STO-US-4 | STO-F-17 to F-20; STO-NF-5 | M3, M4 | STO-T-15 to T-18, T-40 to T-45, T-57 |
+| STO-US-5 | STO-F-21 to F-25, F-39, F-40; STO-U-6, U-8, U-9; STO-NF-1; STO-E-1, E-4, E-7 | M1, M3, M8, M10 | STO-T-19 to T-22, T-30, T-36, T-49, T-60 |
 | STO-US-6 | STO-F-26, F-27, F-29, F-41, F-50, F-51; STO-U-7, U-11, U-13; STO-E-4 | M1, M3, M7, M8 | STO-T-23 to T-25, T-30, T-50, T-51 |
 | STO-US-7 | STO-F-30 to F-33, F-37, F-49; STO-U-12; STO-NF-2; STO-E-10, E-12; STO-C-5 | M1, M5, M8 | STO-T-26 to T-29, T-46 to T-48 |
-| IDN-US-8 (account deletion of identity) | STO-F-44; STO-NF-6; STO-E-14 | M1, M3, M7 | STO-T-31, T-55, T-56 |
+| IDN-US-8 (account deletion of identity, draft) | STO-F-44 (*draft*); STO-NF-6 (*draft*); STO-E-14 (*draft*) | M1, M3 | STO-T-31, T-55, T-56 (draft) |
 
 ## 17. Test Concept & TDD Contract
 
@@ -990,6 +1021,8 @@ Test documents that a person runs: the protocol of the 5 GiB run ([STO-F-14]), `
 | STO-T-52 | M6 | events for Ada's and Ben's streams; a stream whose session turns invalid after 60 s; the gate times out | each member receives only their own events; the invalid stream ends; the timeout is no session | STO-F-10, STO-E-9 |
 | STO-T-53 | M3 | a failing P1, P2, or P3 at each step of `finalizeUpload` of §10, example 11 | in every case E-8, no row, no document, no object left by the request | STO-F-35, STO-E-8 |
 | STO-T-54 | M3, A1 to A3 | the same cases of port behaviour against the fake and the real adapter | identical results | STO-F-2 |
+| STO-T-57 | M3 | `purge-trash` and the member's delete for good run on the same trash entry with a barrier between the steps; a second holder of the same content | the count of the shared content is lowered once per deleted file row; the other holder's file stays readable | STO-F-18, STO-F-5, STO-F-29 |
+| STO-T-58 | M3 | a replace with byte-identical content as in §10, example 4, step 8, before STO-US-6 (final deletion of the target) | the new file has a new ID; the count stays 1; the object is not removed at any moment | STO-F-18, STO-F-9 |
 
 ### Acceptance Tests
 
@@ -1006,10 +1039,10 @@ One test per acceptance criterion; test names in code carry the `AC` ID. Tests r
 | STO-T-7 | Name conflict | STO-AC-2.4, STO-F-9, STO-F-38, STO-E-4 | a folder holding `report.pdf` | the seven steps of §10, example 4 | the answers and names of the table |
 | STO-T-8 | Live list | STO-AC-2.5, STO-F-10 | Ada's event stream open for her folder and Ben's stream for his | Ada's upload finishes | Ada's stream receives `folder-changed` with the folder's ID; Ben's receives nothing |
 | STO-T-9 | Chunked protocol | STO-AC-2.7, STO-F-11, STO-F-42, STO-F-45 | `UPLOAD_CHUNK_BYTES=5242880` | a file of 12 MiB is uploaded | 3 chunks (5, 5, 2 MiB) are accepted, a 6 MiB chunk is refused, the file is stored, `upload.received` rose by 12 MiB |
-| STO-T-10 | Resume | STO-AC-3.2, STO-F-12 | an upload of 12 MiB whose connection is cut after the first chunk | the client asks for the offset and sends the rest | the offset is 5 MiB; no byte is sent twice; the stored bytes equal the source |
+| STO-T-10 | Resume | STO-AC-3.2, STO-F-12, STO-F-52 | an upload of 12 MiB whose connection is cut after the first chunk | the client asks for the offset and sends the rest; afterwards `HEAD` and `PATCH` are sent to the finished upload | the offset is 5 MiB; no byte is sent twice; the stored bytes equal the source; the later requests get 404 `not-found` |
 | STO-T-11 | Pause on the server side | STO-AC-3.3, STO-F-13 | an upload stopped after one chunk at a fixed clock | the clock moves 23 hours, the client asks for the offset, and sends the rest | the offset is unchanged, and the file is stored; after 25 hours the upload is gone (404) |
 | STO-T-12 | Large files | STO-AC-3.4, STO-F-14, STO-NF-3 | the default limits and a file of 5 GiB (documented run); a file of 12 MiB with a connection cut in the middle (automated) | the file is uploaded and read back | identical bytes and hash; the peak memory of `storage` stayed at or under 256 MB in the documented run; the result is in the table of the test protocol |
-| STO-T-13 | Clean-up of uploads | STO-AC-3.5, STO-F-15, STO-E-13 | an upload with its last activity 25 hours ago and one 23 hours ago | the job `cleanup-uploads` runs (once with a failing store, once normally) | the 25-hour upload and its bytes are gone, the other remains; the failing run logs an error and removes nothing |
+| STO-T-13 | Clean-up of uploads | STO-AC-3.5, STO-F-15, STO-E-13, STO-NF-10 | an upload with its last activity 25 hours ago and one 23 hours ago | the job `cleanup-uploads` runs (once with a failing store, once normally) | the failing run logs an error and removes nothing; the normal run removes the 25-hour upload and its bytes, and the other remains |
 | STO-T-14 | Hash on completion | STO-AC-2.6, STO-F-16 | an upload of the bytes `abc` | the last chunk arrives | the stored fingerprint is `ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad`; no fingerprint exists before the last chunk |
 | STO-T-15 | Reference instead of copy | STO-AC-4.2, STO-F-17 | Ada's stored file | Ben uploads identical bytes | one object in the object store, count 2, Ben's uploaded object is gone |
 | STO-T-16 | Reference counting | STO-AC-4.3, STO-F-18 | three files of one content | two are deleted, then the third | the object stays until the third; then it is removed |
@@ -1021,7 +1054,7 @@ One test per acceptance criterion; test names in code carry the `AC` ID. Tests r
 | STO-T-22 | Owner only | STO-AC-5.4, STO-F-24, STO-E-3 | Ada's folder and Ben as the caller | Ben creates, renames, moves, copies, and deletes in it | each is refused with 404 `not-found`; Ada's folder is unchanged |
 | STO-T-23 | Delete to trash | STO-AC-6.1, STO-F-26, STO-F-41 | a file and a folder with a file, after STO-US-6 | both are deleted | neither is listed; each has one entry in `GET /trash`; the content is unchanged and `GET /files/{id}/content` of the inner file answers 404 |
 | STO-T-24 | Restore | STO-AC-6.2, STO-F-27, STO-F-41, STO-F-50, STO-F-51 | the situations of §10, example 6, and a trash entry deleted for good | the entries are restored with each choice; one is deleted for good | the results of the table; the entry deleted for good leaves nothing behind |
-| STO-T-25 | Automatic purge | STO-AC-6.4, STO-F-29 | entries deleted 29 and 31 days ago | the job `purge-trash` runs | the 31-day entry is finally deleted with its content; the other remains |
+| STO-T-25 | Automatic purge | STO-AC-6.4, STO-F-29, STO-NF-10 | entries deleted 29 and 31 days ago | the job `purge-trash` runs, once with a failing store and once normally | the failing run removes nothing; the normal run finally deletes the 31-day entry with its content; the other remains |
 | STO-T-26 | Single file | STO-AC-7.1, STO-F-30, STO-F-43 | a stored `Übersicht Q3.pdf` | it is downloaded | the bytes are equal, the headers are those of §10, example 9; the first byte arrives within 500 ms on the local stack |
 | STO-T-27 | Folder as ZIP | STO-AC-7.2, STO-F-31, STO-F-49, STO-NF-3 | the selections of §10, example 12, and a folder of 5 GiB (documented run) | they are downloaded | the entries of the example, stored without compression; the archive of 5 GiB is complete and the peak memory stayed at or under 256 MB |
 | STO-T-28 | Range requests | STO-AC-7.3, STO-F-32, STO-E-10 | a stored file of 1,000 bytes | the requests of §10, example 8 are sent | the answers of the table |
@@ -1032,13 +1065,15 @@ One test per acceptance criterion; test names in code carry the `AC` ID. Tests r
 
 | ID | Title | Covers | Given | When | Then |
 | --- | --- | --- | --- | --- | --- |
-| STO-T-31 | Account deletion | STO-F-44, STO-NF-6, STO-E-3, IDN-AC-8.2 | Ada with files, folders, trash entries, a shared content object with Ben, and an unfinished upload | `DELETE /internal/members/{Ada}` with the secret on the internal port, then without it, then `/api/storage/internal/members/{Ada}` through the reverse proxy | 204 only when everything is gone: no row, no unfinished upload; the shared content object stays for Ben with count 1; the call without the secret gets 404, and so does the path through the proxy |
+| STO-T-31 | Account deletion (*draft*) | STO-F-44, STO-NF-6, STO-E-3, IDN-AC-8.2 | Ada with files, folders, trash entries, a shared content object with Ben, and an unfinished upload | `DELETE /internal/members/{Ada}` with the secret on the internal port, then without it, then `/api/storage/internal/members/{Ada}` through the reverse proxy | 204 only when everything is gone: no row, no unfinished upload; the shared content object stays for Ben with count 1; the call without the secret gets 404, and so does the path through the proxy |
 | STO-T-32 | All or nothing | STO-F-35, STO-E-8, STO-E-11 | the real stores with each one made unavailable in turn | an upload completes | 503 `storage-unavailable` each time and no file, content object, document, or object of the request; a failing removal after commit still answers success and the job `cleanup-orphans` removes the rest |
-| STO-T-33 | Clean-up net | STO-F-36 | an object without a record, a document without a record, a count-0 content object, and a deletion marker whose account is gone, each older than the grace period | the job `cleanup-orphans` runs | all four are gone; a young one and one inside a running upload remain |
+| STO-T-33 | Clean-up net | STO-F-36 | an object without a record, a document without a record, and a count-0 content object, each older than the grace period | the job `cleanup-orphans` runs | all three are gone; a young one and one inside a running upload remain |
 | STO-T-34 | No names in telemetry | STO-NF-4, STO-NF-9 | an upload of `Geheim Q3.pdf` by Ada and a failing download | the standard output and the exported telemetry are searched | the file name, the fingerprint, and Ada's member ID appear nowhere; the records hold only the fields of [STO-NF-9] |
-| STO-T-35 | Start without internet | STO-NF-8, STO-NF-7 | the stack with no route to the internet | the member's day of STO-T-30 runs without the end-to-end steps of the pages | every step works; the operator documentation names the encryption responsibility |
-| STO-T-55 | Account deletion is safe to repeat | STO-F-44, STO-NF-6, STO-E-8 | the data of Ada as in §10, example 13, with the metadata store failing after her files are removed | the call is made, repeated after the failure, and repeated once more | 503 first and the marker stays; the second call deletes the rest and answers 204; the third answers 204; Ben's shared content stays |
-| STO-T-56 | Writes blocked during deletion | STO-E-14, STO-F-44 | Ada's deletion marker is set | Ada creates an upload, a folder, and a rename, and lists her root folder | 401 `no-session` for the writes and nothing is written; the listing is answered |
+| STO-T-35 | Start without internet | STO-NF-8, STO-NF-7, STO-NF-12 | the stack with no route to the internet | the member's day of STO-T-30 runs without the end-to-end steps of the pages | every step works; the operator documentation names the encryption responsibility and the volumes to back up |
+| STO-T-59 | Empty file | STO-F-53, STO-F-16 | an upload that declares the size 0 | it is created | no chunk is needed; the file exists with size 0, its fingerprint is `e3b0c442…b855`, and the answer carries `Stash-File-Id` |
+| STO-T-60 | Names across files and folders | STO-F-22, STO-E-4, STO-F-9, STO-U-3 | a folder holding the file `a` and the folder `b` | a folder `a`, a file `b`, an upload `b`, and a rename of `a` to `b` are tried, in parallel as well | each is refused with 409 `name-taken` and the right `existingKind`; of two parallel creations of the same name, exactly one succeeds |
+| STO-T-55 | Account deletion is safe to repeat (*draft*) | STO-F-44, STO-NF-6, STO-E-8 | the data of Ada as in §10, example 13, with the metadata store failing after her files are removed | the call is made, repeated after the failure, and repeated once more | 503 first and the marker stays; the second call deletes the rest and answers 204; the third answers 204; Ben's shared content stays |
+| STO-T-56 | Writes blocked during deletion (*draft*) | STO-E-14, STO-F-44 | Ada's deletion marker is set | Ada creates an upload, a folder, and a rename, and lists her root folder | 401 `no-session` for the writes and nothing is written; the listing is answered |
 
 ### Synthetic Test Data Strategy
 
@@ -1056,6 +1091,5 @@ Every acceptance criterion and every binding requirement of §4 to §6 and §9 i
 | --- | --- |
 | STO-NF-1 | Measured with the load tests of R13 ([load-tests.md](load-tests.md)); not asserted in CI because timing on shared runners is unreliable. |
 | STO-NF-2 | Checked once in STO-T-26 on the local stack and measured under load in R13. |
-| STO-NF-10 | Follows from STO-F-12, STO-F-15, and STO-F-29, which STO-T-11, STO-T-13, and STO-T-25 test; the privacy template naming both is a document change (§15). |
 | STO-E-12 | Unit test of M5 with a failing object store, written with slice 1 of STO-US-7. |
 | STO-E-13 | Covered by the failing run of STO-T-13. |
