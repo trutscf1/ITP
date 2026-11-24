@@ -1,13 +1,15 @@
 import type { DependencyCheck, HealthReport } from "@stash/contracts";
 
 /**
- * Module cms-health (`gam-ai-knowledge/concepts/public-content.md` §16, PUB-F-9, PUB-F-31). Slice 1
- * of PUB-US-1 holds the essential check `content-store`; the check `administrator-account` joins
- * with slice 2 (PUB-AC-1.7).
+ * Module cms-health (`gam-ai-knowledge/concepts/public-content.md` §16, PUB-F-9, PUB-F-31). It holds the
+ * essential check `content-store` and the non-essential check `administrator-account` (PUB-AC-1.7).
  */
 
 /** What asks the content store a question; resolves when it answers, rejects when it cannot. */
 export type ContentStoreProbe = () => Promise<unknown>;
+
+/** Whether a CMS administrator exists (`editor-accounts.hasAdministrator`, PUB-F-10). */
+export type AdministratorProbe = () => Promise<boolean>;
 
 export interface HealthOptions {
   /** The release version of the build (`0.0.0-dev` for local builds). */
@@ -81,11 +83,28 @@ function statusOf(checks: DependencyCheck[]): HealthReport["status"] {
  */
 export async function health(
   probeContentStore: ContentStoreProbe,
+  hasAdministrator: AdministratorProbe,
   options: HealthOptions,
 ): Promise<HealthReport> {
-  const checks = [
-    await runCheck("content-store", true, probeContentStore, options.timeoutMs),
-  ];
+  const contentStore = await runCheck(
+    "content-store",
+    true,
+    probeContentStore,
+    options.timeoutMs,
+  );
+  // PUB-F-9: down while no administrator exists, and also down while content-store is down.
+  const administrator: DependencyCheck =
+    contentStore.status === "down"
+      ? { name: "administrator-account", essential: false, status: "down" }
+      : await runCheck(
+          "administrator-account",
+          false,
+          async () => {
+            if (!(await hasAdministrator())) throw new Error("unclaimed");
+          },
+          options.timeoutMs,
+        );
+  const checks = [contentStore, administrator];
   return {
     unit: "cms",
     version: options.version,
