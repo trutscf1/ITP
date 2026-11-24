@@ -121,12 +121,13 @@ model Folder {
   teamId              Uuid              @map("team_id")
   team                Team              @relation(fields: [teamId], references: [id], onDelete: Cascade)
   parentId            Uuid?             @map("parent_id")
-  parent              Folder?           @relation(fields: [parentId], references: [id], onDelete: Cascade)
-  name                String
+  parent              Folder?           @relation(fields: [parentId, teamId], references: [id, teamId], onDelete: Cascade)
+  name              String
   inheritsPermissions Boolean           @default(true) @map("inherits_permissions")
   createdAt           TimestamptzString @default(now()) @map("created_at")
   updatedAt           TimestamptzString @default(now()) @map("updated_at")
 
+  @@unique([id, teamId])
   @@unique([parentId, name])
   @@index([teamId])
   @@index([teamId], where: sql`parent_id IS NULL`, unique: true, name: "folders_one_root_per_team")
