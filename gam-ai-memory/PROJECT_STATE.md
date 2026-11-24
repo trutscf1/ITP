@@ -37,8 +37,8 @@ See [GOAL.md](../gam-ai-knowledge/GOAL.md).
 <!-- agent-memory:auto -->
 - **Updated:** 2026-11-24
 - **Branch:** chore/migrate-gam-engineering
-- **Builds on:** 3d49ba497 chore(repo): complete gam-ai-memory folder and wire agent-memory hook [no-req]
-- **Commits since the reference point:** 20 (2026-11-10)
+- **Builds on:** d79a832ff chore(repo): keep AI attribution in commits only [no-req]
+- **Commits since the reference point:** 21 (2026-11-10)
 - **Agent memory files:**
   - Claude Code: feedback-mr-reviewers.md (2026-11-03)
 <!-- /agent-memory:auto -->

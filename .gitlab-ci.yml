@@ -12,6 +12,7 @@ workflow:
 
 include:
   - local: gam-engineering/ci/gitlab-docs.yml
+  - local: gam-engineering/ci/gitlab-pipeline.yml
 
 stages:
   - test

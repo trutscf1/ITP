@@ -58,7 +58,9 @@ Refs: #<issue>
 
 ## CI/CD
 
-GitLab CI (`.gitlab-ci.yml`) runs one pipeline per change: a merge request pipeline while an MR is open, otherwise a branch pipeline on every push to a feature branch, `dev`, or `main`; the jobs are defined by `gam-ai-knowledge/concepts/scaffolding.md` SCF-F-15, plus the documentation checks in `gam-engineering/ci/gitlab-docs.yml` (markdown lint and `gam-ai-knowledge/tools/doc-check.mjs`, including the rule `AC-TEST` for tests carrying the `AC` IDs). "Pipeline must succeed" is enabled as a merge check. Deployment on push to `main` follows with roadmap item R14.
+GitLab CI (`.gitlab-ci.yml`) runs one pipeline per change: a merge request pipeline while an MR is open, otherwise a branch pipeline on every push to a feature branch, `dev`, or `main`; the jobs are defined by `gam-ai-knowledge/concepts/scaffolding.md` SCF-F-15, plus the markdown lint in `gam-engineering/ci/gitlab-docs.yml` and the gam checks of `gam-engineering/pipeline.json` in the generated `gam-engineering/ci/gitlab-pipeline.yml` (`gam-docs` runs `gam-ai-knowledge/tools/doc-check.mjs --status`, including the rule `AC-TEST` for tests carrying the `AC` IDs; `gam-limits`, `gam-guard`, `gam-eol`, `gam-architecture-node`). "Pipeline must succeed" is enabled as a merge check. Deployment on push to `main` follows with roadmap item R14.
+
+The project keeps its own pipeline (ADR-0008); merged into `gam-engineering/pipeline.json` on 2026-11-24 (Q360, *gam checks only*): the decision records only the gam checks the project's pipeline lacks, and both pipelines are the gate. The same checks run locally with `node gam-engineering/local-pipeline.mjs` (location `both`, Q361).
 
 ## Deviations from the profile
 
@@ -173,7 +175,7 @@ Record time on the issue or MR with `/spend` (§9): one entry per work session, 
 An issue is done, and its MR may be merged, only when every item holds:
 
 1. All acceptance criteria `AC-n.m` of the issue are met and demonstrated by a passing acceptance test carrying the AC ID. `gam-ai-knowledge/tools/doc-check.mjs` rule `AC-TEST` checks that a test name carries the ID; in the MR pipeline it fails for every criterion the MR's slice delivers that has none (`MANIFEST.md`, "What the script checks").
-2. All tests pass in CI; no test is skipped without a written reason in the MR.
+2. The pipeline is green at every location recorded in `gam-engineering/pipeline.json` (P-PIPE-2), and the project's own CI pipeline (`.gitlab-ci.yml`) is green. No test is skipped without a written reason in the MR.
 3. Every commit follows "Commit messages" above; every commit touching production code names a requirement ID (P-GIT-4).
 4. The owning concept document (and Part H, if affected) is updated in the same MR (P-GIT-5, P-HUM-3).
 5. The consistency check (goal → story → requirement) shows no new orphan or contradiction if documentation changed.
