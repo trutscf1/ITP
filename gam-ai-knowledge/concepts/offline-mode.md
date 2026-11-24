@@ -98,7 +98,7 @@ Defined in [CONTEXT.md](../CONTEXT.md) and used here exactly: **member**, **acco
 Used only in this document:
 
 - **Device**: one browser profile on one machine. Offline data belongs to a device and to an account on it.
-- **Revision**: the text the file storage assigns to a file or folder and changes whenever its content, name, or parent folder changes.
+- **Revision**: the text the file storage assigns to a file or folder and changes whenever its content, name, or parent folder changes. The revision of a folder changes only with its own name or parent, never with the files inside it, so a change inside a folder is no conflict for a rename of the folder.
 - **Base revision**: the revision of a file or folder that a queued action was made against.
 - **Synchronization**: the run that sends the queue to the server in order and brings marked files and metadata up to date.
 - **Conflict kind**: `changed` (the revision on the server differs from the base revision), `deleted` (the target no longer exists on the server), or `name-taken` (a rename, move, or upload would give an entry a name that exists in its folder).
@@ -119,20 +119,20 @@ The user stories and their acceptance criteria are the work items in [work-items
 | OFF-F-4 | Home Screen on iOS | The web client MUST provide what iOS needs to add it to the Home Screen with name and icon (a touch icon, the standalone display mode). Its correct behaviour on iOS is checked by hand once a device is available; no automated test claims it (Q338). | OFF-AC-1.5 (Installation on iOS) |
 | OFF-F-5 | Offline status | While the device has no connection to the server, every page of the app MUST show the status "Offline" in text. It MUST show the status within 3 seconds after the connection is lost and remove it within 3 seconds after the connection is back and the server answered. | OFF-AC-1.4 (Offline status) |
 | OFF-F-6 | Mark for offline | A member MUST be able to mark a file or a folder as available offline and to remove the mark, in the file browser. A marking applies to the signed-in account on this device; a folder mark includes every file and folder inside it. A member can mark only what they may read. | OFF-AC-2.1 (Mark for offline) |
-| OFF-F-7 | Folder marks follow the folder | At every synchronization the app MUST add the files and folders that were added to a marked folder on the server to the offline marks, and MUST remove the ones that were removed or moved out. | OFF-AC-2.7 (Folder marks follow the folder) |
+| OFF-F-7 | Folder marks follow the folder | At every synchronization the app MUST add the files and folders that were added to a marked folder on the server to the offline marks, and MUST remove the ones that were removed or moved out. A file added this way MUST be copied only if it passes the check of [OFF-F-11]. | OFF-AC-2.7 (Folder marks follow the folder) |
 | OFF-F-8 | Copy and metadata | For every marked file the app MUST keep an offline copy of the content of its current revision on the device, and the metadata (identifier, name, size, type, parent folder, revision, change time) of the file and of every folder on its path MUST be replicated to the device. A copy MUST be written completely or not at all. | OFF-AC-2.2 (Local storage) |
 | OFF-F-9 | Open offline | A member MUST be able to open an offline copy without a network in the preview of the web client; for a type the preview cannot show, the app MUST offer to save the copy from the device. | OFF-AC-2.3 (Open offline) |
 | OFF-F-10 | Overview and removal | The offline overview MUST list every offline mark with name, size, and the time of the last synchronization, MUST show the used offline storage and the offline storage limit in megabytes, and MUST let the member remove each mark. Removing a mark MUST delete the offline copies that no other mark keeps and update the used storage at once. | OFF-AC-2.4 (Usage and removal) |
-| OFF-F-11 | Storage limit | Before a marking is accepted the app MUST add the size of the files it would copy to the offline storage already used on the device and compare the sum with `OFFLINE_STORAGE_LIMIT_MB`. If the sum is larger, the app MUST refuse the whole marking and store nothing of it; if it is equal or smaller, the app MUST accept it. | OFF-AC-2.5 (Storage limit) |
+| OFF-F-11 | Storage limit | Before a marking is accepted the app MUST add the size of the files it would copy to the offline storage already used on the device and compare the sum with `OFFLINE_STORAGE_LIMIT_MB`. If the sum is larger, the app MUST refuse the whole marking and store nothing of it; if it is equal or smaller, the app MUST accept it. The same check MUST run before every other write of content to the device: a file pulled in by [OFF-F-7] and a new revision of a marked file replacing its copy (the size of the old copy is subtracted from the used storage). A file that does not pass is not copied, an existing copy stays as it was, its mark is shown as "not up to date", and the notice of [OFF-U-5] names the file. The limit therefore cannot be exceeded by a later synchronization. | OFF-AC-2.5 (Storage limit) |
 | OFF-F-12 | Sign-out clears the device | When a member signs out, the app MUST first show the number of queued actions that are not synchronized and let the member cancel or confirm; after the confirmation, or at once without such actions, it MUST delete the offline copies, the replicated metadata, the marks, and the queue of that account from the device within 5 seconds. | OFF-AC-2.6 (Sign-out clears the device) |
 | OFF-F-13 | Action queue | While the device has no connection, renaming, moving, deleting, and uploading a file or folder MUST be put into a queue, in the order they were made, with the base revision of the target. The queue MUST survive closing the app and restarting the device. | OFF-AC-3.1 (Queue) |
-| OFF-F-14 | Automatic synchronization | Within 10 seconds after the connection is back and the session is valid, the app MUST start the synchronization without a member action. It MUST show how many queued actions are done of how many, and it MUST retry a failed run with a pause that doubles up to `OFFLINE_SYNC_RETRY_MAX_SECONDS`. | OFF-AC-3.2 (Automatic sync) |
-| OFF-F-15 | Conflict detection | For every queued action the synchronization MUST compare the base revision with the revision on the server and detect a conflict of one of the kinds of §2: `changed`, `deleted`, or `name-taken`. An action without a conflict MUST be applied; the server MUST NOT apply a change whose base revision is outdated (§15). | OFF-AC-3.3 (Conflicts) |
+| OFF-F-14 | Automatic synchronization | Within 10 seconds after the connection is back and the session is valid, the app MUST start the synchronization without a member action. It MUST show how many queued actions are done of how many, and it MUST retry a failed run with a pause that starts at 1 second and doubles up to `OFFLINE_SYNC_RETRY_MAX_SECONDS`. | OFF-AC-3.2 (Automatic sync) |
+| OFF-F-15 | Conflict detection | For every queued action the synchronization MUST compare the base revision with the revision on the server and detect a conflict of one of the kinds of §2: `changed`, `deleted`, or `name-taken`. An action without a conflict MUST be applied; the server MUST NOT apply a change whose base revision is outdated (§15). Every request of an action MUST carry its action identifier; a repeated request with an identifier the server already applied MUST NOT apply the action again and MUST answer with the result of the first time (§15). | OFF-AC-3.3 (Conflicts) |
 | OFF-F-16 | Conflict resolution | For a conflict the member MUST choose between their version, the server version, and keep both; "keep both" MUST be preselected. For the kind `deleted` only "restore my version" (preselected) and "accept the deletion" are offered. The action stays queued, in state `conflict`, until the member has chosen; the other actions go on. | OFF-AC-3.3 (Conflicts) |
 | OFF-F-17 | Keep both | "Keep both" MUST leave the server version unchanged and MUST store the member's version as an additional file or folder named by the offline copy name of §2, in the same folder. No name of a person MUST be part of it. | OFF-AC-3.3 (Conflicts) |
 | OFF-F-18 | Removed or no longer readable | When a marked file was deleted on the server, or the member may no longer read it, the next synchronization MUST delete its offline copy and its mark and show a notice naming it. A queued action on it is a conflict of the kind `deleted`. | OFF-AC-3.5 (File removed on the server) |
 | OFF-F-19 | Rejected actions | If the server refuses a queued action (permission, validation), the action MUST get the state `rejected` with the reason of the error response and stay in the queue until the member discards it. Later actions that do not depend on it MUST go on. | OFF-AC-3.6 (Rejected actions stay visible) |
-| OFF-F-20 | Nothing leaves unconfirmed | A queued action MUST leave the queue only when the server confirmed it, the member chose a resolution that was applied, or the member discarded it. Closing the app, a lost connection, a failed run, and an expired session MUST NOT remove or change it. | OFF-AC-3.4 (No data loss) |
+| OFF-F-20 | Nothing leaves unconfirmed | A queued action MUST leave the queue only when the server confirmed it, the member chose a resolution that was applied, or the member discarded it. Closing the app, a lost connection, a failed run, and an expired session MUST NOT remove or change it. An action that was `syncing` when the app ended MUST be sent again with the same action identifier at the next synchronization and becomes `done` with the answer of the server, whether the first request was applied or not. | OFF-AC-3.4 (No data loss) |
 
 ## 5. User Interaction Requirements
 
@@ -144,16 +144,16 @@ The users of these requirements are members of every kind of input (mouse, touch
 | OFF-U-2 | Conflict dialog | The conflict dialog MUST show for both versions the name, size, and change time, MUST be operable by keyboard alone, MUST move the focus into itself when it opens and back when it closes, and MUST name the preselected choice. | OFF-AC-3.3 (Conflicts) |
 | OFF-U-3 | Progress announced | The synchronization progress MUST be shown as text ("3 of 7 changes synchronized") and announced to screen readers at most once every 5 seconds and at the end. | OFF-AC-3.2 (Automatic sync) |
 | OFF-U-4 | Sign-out warning | The sign-out warning MUST name the number of unsynchronized changes, offer "Cancel" and "Sign out and discard", and, if the device is online, offer to synchronize first. | OFF-AC-2.6 (Sign-out clears the device) |
-| OFF-U-5 | Limit message | The message of a refused marking MUST name the limit and the used storage in megabytes and say how much of the marking did not fit. | OFF-AC-2.5 (Storage limit) |
+| OFF-U-5 | Limit message | The message of a refused marking MUST name the limit and the used storage in megabytes and say how much of the marking did not fit; for a file that did not pass during a synchronization, it MUST name the file. | OFF-AC-2.5 (Storage limit) |
 
 ## 6. Non-Functional Requirements
 
 | ID | Title | Requirement | Derives from |
 | --- | --- | --- | --- |
-| OFF-NF-1 | Start from the shell in 3 seconds | An installed app without a network MUST show its first screen within 3 seconds after the start, on a reference device of the team. | OFF-AC-1.2 (Start without network) |
+| OFF-NF-1 | Start from the shell in 3 seconds | An installed app without a network MUST show its first screen within 3 seconds after the start, on the reference device. The reference device is the Chromium of the pipeline's browser job with the processor slowed down by the factor 4 (browser throttling), the shell in the cache of the app, and the network switched off; the time is measured from the navigation start to the first contentful paint. | OFF-AC-1.2 (Start without network) |
 | OFF-NF-2 | No data loss | In every scenario of §10 and of the tests [OFF-T-18] and [OFF-T-35] to [OFF-T-40], the content of a member's file and every queued action MUST still exist after the run: on the server, on the device, or as a discarded action the member chose to discard. | OFF-AC-3.4 (No data loss) |
 | OFF-NF-3 | Data on the device | The device MUST hold only the content of marked files, the metadata named in [OFF-F-8], the marks, the queue, and the setting of the member. It MUST NOT hold a password, a password hash, or the content of an unmarked file, and it MUST NOT write the name of a file or the name of a person into any telemetry. | OFF-AC-2.2 (Local storage) |
-| OFF-NF-4 | One account per store | The offline data of one account MUST be unreadable for every other account on the same device; a second account that signs in finds no offline data of the first. | OFF-AC-2.6 (Sign-out clears the device) |
+| OFF-NF-4 | One account per store | The offline data of one account MUST be logically separated from every other account on the same device (separate stores per account key; this is no protection against someone with access to the browser profile); a second account that signs in finds no offline data of the first. | OFF-AC-2.6 (Sign-out clears the device) |
 | OFF-NF-5 | No outside services | Installing, starting offline, and synchronizing MUST NOT load a script, font, image, or any other resource from a host outside the installation, and MUST NOT report usage to one. | G-1.S1 |
 | OFF-NF-6 | Accessible screens | The offline status, the offline overview, and the conflict dialog MUST pass the accessibility checker of the pipeline in every theme with 0 violations. | G-1.S2 |
 | OFF-NF-7 | Resolution within two actions | Choosing the preselected resolution of a conflict MUST take at most two actions on the keyboard (focus is already inside the dialog; confirm). | OFF-AC-3.3 (Conflicts) |
@@ -197,7 +197,7 @@ On the device; the relational model of [scaffolding.md](scaffolding.md) §8 is u
 
 | Field | Type | Rule |
 | --- | --- | --- |
-| `id` | text | Generated on the device |
+| `id` | text | Generated on the device once, when the action is made; it is the action identifier that every request of this action sends to the server and never changes |
 | `accountKey` | text | |
 | `seq` | integer | Order of creation, unique per account |
 | `kind` | `rename`, `move`, `delete`, `upload` | |
@@ -261,7 +261,7 @@ An action in `done` or `discarded` is removed from the queue; no other state rem
 
 **Example 6 — rejected action ([OFF-F-19], [OFF-E-4]).** The member lost write permission on `Team/Docs` while offline and had renamed `Docs/x.txt`. The server answers 403 with the error code `forbidden`. The action shows as rejected with "no permission" and stays until the member discards it; the other queued actions are synchronized.
 
-**Example 7 — closed during synchronization ([OFF-F-20], [OFF-NF-2]).** Action 2 of 4 is `syncing` when the member closes the app. At the next start with a network, action 1 is `done`, action 2 is `pending` again (the server decides by the base revision whether it was applied: if the revision already changed by this very action, it is `done`), and 3 and 4 follow.
+**Example 7 — closed during synchronization ([OFF-F-20], [OFF-NF-2]).** Action 2 of 4 is `syncing` when the member closes the app. At the next start with a network, action 1 is `done`, action 2 is sent again with the same action identifier. If the server had applied the first request, it answers with the stored result and applies nothing a second time (an upload does not meet `name-taken` against itself); action 2 is `done`. If it had not, the server applies it now. Then 3 and 4 follow.
 
 ## 11. Integration Points
 
@@ -345,6 +345,7 @@ The existing parts of the system this feature touches, checked on 2026-11-17. Ea
 - Every file and folder gets a `revision` (text) that changes with its content, name, or parent folder.
 - A rename, move, delete, or content change accepts the base revision and answers with the error code `conflict` and the current revision when it is outdated. The error codes `conflict` and `forbidden` are added to `ErrorResponse` of [scaffolding.md](scaffolding.md) §8 by the MR of the first slice of `OFF-US-3`.
 - A list of the changes in a folder tree since a revision, for [OFF-F-7].
+- Every changing request accepts the action identifier (header `Idempotency-Key`). The storage keeps, per account, the identifier and the result of each applied request for at least 7 days; a repeated identifier gets the stored result and changes nothing. The retention is longer than the longest realistic time offline that [OFF-F-20] must cover in one run; an identifier older than the retention is treated as new.
 
 **Configuration:** the two variables of §8 join the configuration of `web` ([SCF-F-11]) and `.env.example`.
 
@@ -421,8 +422,8 @@ The seams at which the tests of §17 run (P-DES-2):
 | Story | Requirements | Modules | Tests |
 | --- | --- | --- | --- |
 | OFF-US-1 | OFF-F-1 to F-5; OFF-U-1; OFF-NF-1, NF-5; OFF-E-6; OFF-C-1, C-5 | M9, M10 | OFF-T-1 to T-5, T-19, T-24 |
-| OFF-US-2 | OFF-F-6 to F-12; OFF-U-4, U-5; OFF-NF-3, NF-4, NF-6; OFF-E-1, E-5, E-7; OFF-C-2, C-3 | M1 to M4, M8, M10 | OFF-T-6 to T-12, T-20, T-22, T-23, T-25 to T-33 |
-| OFF-US-3 | OFF-F-13 to F-20; OFF-U-2, U-3; OFF-NF-2, NF-7; OFF-E-2, E-3, E-4, E-8; OFF-C-4 | M5 to M7, M10 | OFF-T-13 to T-18, T-21, T-34 to T-40 |
+| OFF-US-2 | OFF-F-6 to F-12; OFF-U-4, U-5; OFF-NF-3, NF-4, NF-6; OFF-E-1, E-5, E-7; OFF-C-2, C-3 | M1 to M4, M8, M10 | OFF-T-6 to T-12, T-20, T-22, T-23, T-25 to T-33, T-41 |
+| OFF-US-3 | OFF-F-13 to F-20; OFF-U-2, U-3; OFF-NF-2, NF-7; OFF-E-2, E-3, E-4, E-8; OFF-C-4 | M5 to M7, M10 | OFF-T-13 to T-18, T-21, T-34 to T-40, T-42 |
 
 ## 17. Test Concept & TDD Contract
 
@@ -435,6 +436,8 @@ Values from §10. Each test name in code carries its ID and the requirement IDs 
 | OFF-T-24 | M9 | The manifest of the web client | Name `stash`, icons 192 and 512 pixels and one maskable icon, display `standalone`, start address, theme colour; touch icon present | OFF-F-1, OFF-F-4 |
 | OFF-T-25 | M2 | limit 500 MB, used 480 MB, files of 15, 10, and 8 MB | `wouldFit` is false; nothing stored | OFF-F-11, OFF-U-5 |
 | OFF-T-26 | M2 | limit 500 MB, used 480 MB, one file of 20 MB | `wouldFit` is true; used reads 500 MB | OFF-F-11 |
+| OFF-T-41 | M4 | limit 500 MB, used 495 MB; a marked folder gets a new file of 10 MB on the server; a marked file of 4 MB gets a new revision of 12 MB | The new file is not copied; the replacement of the 4 MB copy by 12 MB (495 - 4 + 12 = 503) is not done, the old copy stays, both marks read "not up to date", the notice names the files; used stays 495 MB | OFF-F-7, OFF-F-11, OFF-U-5 |
+| OFF-T-42 | M6 | the stub server gets the same action identifier twice | The second request changes nothing and returns the stored result of the first | OFF-F-15, OFF-F-20 |
 | OFF-T-27 | M2 | `put` interrupted after half of the bytes | No copy exists, the used bytes are unchanged | OFF-F-8 |
 | OFF-T-28 | M2 | A copy whose bytes were changed after the checksum | `get` answers `damaged`; if the stub server is online the copy is fetched again | OFF-E-5 |
 | OFF-T-29 | M2 | The browser store refuses a write (stub) | No copy, no mark, the message of [OFF-E-1]; earlier copies remain | OFF-E-1 |
@@ -443,11 +446,11 @@ Values from §10. Each test name in code carries its ID and the requirement IDs 
 | OFF-T-32 | M8 | Two accounts with data; `wipe` of the first | Nothing of the first remains; the second is unchanged; the data of the first cannot be read through the second | OFF-NF-3, OFF-NF-4 |
 | OFF-T-33 | M8 | Two unsynchronized actions | `unsynchronizedCount` is 2; the warning text of [OFF-U-4] names it and its three choices | OFF-F-12, OFF-U-4 |
 | OFF-T-34 | M5 | Four actions made offline, app restarted | The queue holds them in the order 1 to 4 with their base revisions | OFF-F-13 |
-| OFF-T-35 | M6 | Action 2 `syncing`, the app closed (stub) | At restart action 2 is `pending` or `done` as the revision of the server says; none is lost | OFF-F-20, OFF-NF-2 |
+| OFF-T-35 | M6 | Action 2 `syncing`, the app closed (stub) | At restart action 2 is sent again with the same action identifier; the stub that had applied the first request answers with its stored result, and action 2 is `done` and was applied once; the stub that had not applied it applies it once; none is lost | OFF-F-20, OFF-NF-2 |
 | OFF-T-36 | M6 | Stub server answers `conflict` `changed`, `deleted`, `name-taken`, and `forbidden` | The states `conflict` (three kinds) and `rejected` with the code; other actions go on | OFF-F-15, OFF-F-19, OFF-E-4 |
 | OFF-T-37 | M7 | Choices "mine", "server", "both" for each kind. Target folder missing: the queued upload of `Plan.pdf` (2026-11-17) into the team folder `Archive`, which another member deleted on the server | The effects of [OFF-F-16] and [OFF-F-17]; for `deleted` only two choices, the preselected one restores. For the missing folder: conflict of the kind `deleted`; "restore my version" stores `Plan (offline copy 2026-11-17).pdf` in the root folder of the team, "accept the deletion" discards the action and stores nothing | OFF-F-16, OFF-E-8 |
 | OFF-T-38 | M7 | `Plan.pdf`, `Reports`, a name without extension, existing names | The names of §10, example 2, with counters; no name of a person | OFF-F-17 |
-| OFF-T-39 | M6 | The stub server unreachable for three runs, then back | Pauses double up to the maximum; the state is unchanged; the run then succeeds | OFF-F-14, OFF-E-2 |
+| OFF-T-39 | M6 | The stub server unreachable for three runs, then back | The pauses are 1, 2, and 4 seconds, double up to the maximum; the state is unchanged; the run then succeeds | OFF-F-14, OFF-E-2 |
 | OFF-T-40 | M6 | Session invalid when the connection returns | No synchronization, no deletion, the sign-in request of [OFF-E-3]; after the sign-in the run starts | OFF-E-3, OFF-F-20 |
 
 ### Acceptance Tests
@@ -481,7 +484,7 @@ One test per acceptance criterion; test names in code carry the `AC` ID.
 | --- | --- | --- | --- | --- | --- |
 | OFF-T-19 | Offline start without internet | OFF-NF-5, OFF-C-1, OFF-C-5, OFF-E-6 | the local stack without a connection to the internet; a browser with and one without offline support | the app is installed, started, and used with a marking | no request leaves the installation; the second browser works online and shows the notice of [OFF-E-6] |
 | OFF-T-20 | Two accounts on one device | OFF-NF-4 | two accounts that signed in one after the other | the second signs in | it finds no marks, copies, or queue of the first |
-| OFF-T-21 | Restart during synchronization | OFF-F-20, OFF-C-4 | four queued actions and a device restart in the middle | the app starts again | no action is lost or applied twice |
+| OFF-T-21 | Restart during synchronization | OFF-F-20, OFF-C-4 | four queued actions, one of them an upload, and a device restart in the middle | the app starts again | no action is lost, and the server applied each action exactly once (the upload meets no `name-taken` against itself) |
 | OFF-T-22 | Accessibility of the screens | OFF-NF-6 | the status, the overview, and the conflict dialog in each theme | the accessibility checker runs | 0 violations |
 | OFF-T-23 | Replication round trip | OFF-F-8, OFF-C-2, OFF-C-3 | a started storage unit and the device store | a file is marked, changed on the server, and synchronized | the device holds the new revision and the metadata of its folders |
 
@@ -491,7 +494,7 @@ The values of §10 are the test data: the limit table, the offline copy names, t
 
 ### CI Test Constraints
 
-The unit tests ([OFF-T-24] to [OFF-T-40]) and the file tests ([OFF-T-1], [OFF-T-24]) run in the `test` job without network. The browser tests ([OFF-T-2], [OFF-T-4], [OFF-T-8], [OFF-T-14], [OFF-T-15], [OFF-T-19], [OFF-T-22]) need a browser and the started web client and run in the job of the accessibility check or its successor. [OFF-T-5] is checked by hand on a device and recorded in the merge request.
+The unit tests ([OFF-T-24] to [OFF-T-42]) and the file tests ([OFF-T-1], [OFF-T-24]) run in the `test` job without network. The browser tests ([OFF-T-2], [OFF-T-4], [OFF-T-6], [OFF-T-8], [OFF-T-9] to [OFF-T-18], [OFF-T-19], [OFF-T-20], [OFF-T-21], [OFF-T-22], [OFF-T-23]) need a browser and the started web client and run in the job of the accessibility check or its successor. [OFF-T-5] is checked by hand on a device and recorded in the merge request.
 
 ### Test Coverage Matrix & Untested Justifications
 
