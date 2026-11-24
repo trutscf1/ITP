@@ -7,14 +7,22 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json && node scripts/copy-assets.mjs",
     "start": "node dist/main.js",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
     "test": "node --test \"src/**/*.test.ts\""
   },
   "dependencies": {
-    "@stash/telemetry": "workspace:*"
+    "@stash/contracts": "workspace:*",
+    "@stash/telemetry": "workspace:*",
+    "@strapi/strapi": "5.62.0",
+    "@strapi/utils": "5.62.0",
+    "pg": "8.22.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router-dom": "6.30.3",
+    "styled-components": "6.1.19"
   },
   "devDependencies": {
     "@stash/config": "workspace:*",

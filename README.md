@@ -163,6 +163,7 @@ The repository is public, so all content must be licence-free. Licences of what 
 | dotenv | BSD-2-Clause | reads the `.env` file in `packages/db` |
 | Prisma | Apache-2.0 | database access, schema, and migrations (`packages/db`) |
 | node-postgres (`pg`) | MIT | seed command and database tests of `packages/db` |
+| Strapi (`@strapi/strapi`, `@strapi/utils`), React Router, styled-components | MIT | headless CMS of the `cms` unit (Community Edition only); React Router and styled-components are peer dependencies of its admin panel |
 | TypeScript | Apache-2.0 | language |
 | Biome | MIT or Apache-2.0 | lint and format |
 | pnpm, Turborepo | MIT | package manager and task runner |

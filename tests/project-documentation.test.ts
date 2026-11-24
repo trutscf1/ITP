@@ -66,6 +66,10 @@ function licenceLabel(name: string): string | undefined {
   const labels: Record<string, string> = {
     "@asteasolutions/zod-to-openapi": "zod-to-openapi",
     "@biomejs/biome": "Biome",
+    "@strapi/strapi": "Strapi",
+    "@strapi/utils": "Strapi",
+    "react-router-dom": "React Router",
+    "styled-components": "styled-components",
     dotenv: "dotenv",
     next: "Next.js",
     pg: "node-postgres",

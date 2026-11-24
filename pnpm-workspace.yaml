@@ -16,6 +16,11 @@ minimumReleaseAge: 10080
 # 2026-10-13: an old, widely used release, not a new publication. Exactly this version only.
 trustPolicyExclude:
   - semver@6.3.1
+  # The admin panel of Strapi (PUB-US-1, unit cms) pulls in the packages below. Each is an old
+  # release of a maintenance line, published long before the check existed, not a new publication
+  # (reviewed 2026-11-17, publish dates checked in the npm registry). Exactly these versions only.
+  - react-redux@8.1.3
+  - jose@4.15.9
 
 # The pinned Prisma CLI (the image db-migrate runs it) pulls in hono 4.11.4, @hono/node-server
 # 1.19.9 (both via @prisma/dev) and lodash 4.17.21 (via chevrotain), which have known high
@@ -26,3 +31,10 @@ overrides:
   "hono@<4.12.25": ">=4.12.25 <5"
   "@hono/node-server@<1.19.10": ">=1.19.10 <2"
   "lodash@<4.18.0": ">=4.18.0 <5"
+  # @strapi/admin (the admin panel of the cms unit, PUB-US-1) pins webpack-dev-middleware 7.4.6,
+  # which pnpm refuses as a trust downgrade: published 2026-09-03 without the trust evidence that
+  # earlier releases carried. The panel needs the package for `strapi develop` only, never in the
+  # built image. The release before it (7.4.5) is pinned here instead of switching the trust
+  # check off for 7.4.6. Remove the override once a Strapi release depends on a version that
+  # passes the check.
+  "webpack-dev-middleware@7.4.6": "7.4.5"

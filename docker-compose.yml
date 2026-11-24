@@ -2,7 +2,7 @@
 # one `docker compose up`. Every setting comes from `.env` (SCF-AC-2.2); `.env.example` lists
 # every variable. Every service has a health check, and a service starts only after the
 # services it depends on are healthy (SCF-AC-2.4). The units `identity`, `storage`, `worker`,
-# and `cms` join when their code runs (gam-ai-knowledge/concepts/scaffolding.md, SCF-F-1).
+# join when their code runs; `cms` and `cms-db` are here (PUB-US-1) (gam-ai-knowledge/concepts/scaffolding.md, SCF-F-1).
 services:
   # Relational database (SCF-C-8).
   postgres:
@@ -218,6 +218,64 @@ services:
     networks:
       - backend
 
+  # Content management system (PUB-US-1, slice 1; concept public-content.md). Strapi with its own
+  # PostgreSQL database; only the health check is routed through the proxy until slice 2.
+  cms-db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${CMS_DB_NAME:?set CMS_DB_NAME in .env}
+      POSTGRES_USER: ${CMS_DB_USER:?set CMS_DB_USER in .env}
+      POSTGRES_PASSWORD: ${CMS_DB_PASSWORD:?set CMS_DB_PASSWORD in .env}
+    networks:
+      - backend
+    volumes:
+      - cms-db-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  cms:
+    build:
+      context: .
+      dockerfile: apps/cms/Dockerfile
+    restart: unless-stopped
+    environment:
+      HOST: 0.0.0.0
+      PORT: "1337"
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: cms-db
+      DATABASE_PORT: "5432"
+      DATABASE_NAME: ${CMS_DB_NAME:?set CMS_DB_NAME in .env}
+      DATABASE_USERNAME: ${CMS_DB_USER:?set CMS_DB_USER in .env}
+      DATABASE_PASSWORD: ${CMS_DB_PASSWORD:?set CMS_DB_PASSWORD in .env}
+      APP_KEYS: ${CMS_APP_KEYS:?set CMS_APP_KEYS in .env}
+      API_TOKEN_SALT: ${CMS_API_TOKEN_SALT:?set CMS_API_TOKEN_SALT in .env}
+      ADMIN_JWT_SECRET: ${CMS_ADMIN_JWT_SECRET:?set CMS_ADMIN_JWT_SECRET in .env}
+      TRANSFER_TOKEN_SALT: ${CMS_TRANSFER_TOKEN_SALT:?set CMS_TRANSFER_TOKEN_SALT in .env}
+      ENCRYPTION_KEY: ${CMS_ENCRYPTION_KEY:?set CMS_ENCRYPTION_KEY in .env}
+      JWT_SECRET: ${CMS_JWT_SECRET:?set CMS_JWT_SECRET in .env}
+      TELEMETRY_ENABLED: ${TELEMETRY_ENABLED:-true}
+      TELEMETRY_ENDPOINT: ${TELEMETRY_ENDPOINT:-http://collector:4318}
+      TELEMETRY_EXPORT_INTERVAL_MS: ${TELEMETRY_EXPORT_INTERVAL_MS:-15000}
+      TELEMETRY_TRACE_SAMPLE_RATIO: ${TELEMETRY_TRACE_SAMPLE_RATIO:-1}
+      TELEMETRY_BUFFER_LIMIT: ${TELEMETRY_BUFFER_LIMIT:-2048}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      cms-db:
+        condition: service_healthy
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO /dev/null http://127.0.0.1:1337/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
   # Observability stack (profile "observability", OBS-F-5; concept observability.md §16, slice 1
   # of OBS-US-1). The six containers share the memory budget of OBS-NF-8 (1472 MB of 1536 MB);
   # none publishes a port except the dashboard tool on 127.0.0.1 (OBS-NF-7). The configuration
@@ -409,6 +467,7 @@ networks:
 
 volumes:
   postgres-data:
+  cms-db-data:
   redis-data:
   mongo-data:
   mongo-config:

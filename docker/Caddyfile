@@ -17,6 +17,13 @@
 	request_header -tracestate
 	request_header -baggage
 
+	# Health of the content management system (PUB-AC-1.1); the rest of /cms follows with PUB-US-1
+	# slice 2.
+	handle /cms/health {
+		rewrite * /health
+		reverse_proxy cms:1337
+	}
+
 	handle {
 		reverse_proxy web:{$WEB_PORT}
 	}
