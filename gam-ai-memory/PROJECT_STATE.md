@@ -37,8 +37,8 @@ See [GOAL.md](../gam-ai-knowledge/GOAL.md).
 <!-- agent-memory:auto -->
 - **Updated:** 2026-11-24
 - **Branch:** feature/168-registration-page
-- **Builds on:** 6ed819b83 chore(repo): merge dev into feature/168-registration-page [no-req]
-- **Commits since the reference point:** 75 (2026-11-10)
+- **Builds on:** be85020d5 docs(repo): export the chat logs of schwaigc [no-req]
+- **Commits since the reference point:** 76 (2026-11-10)
 - **Agent memory files:**
   - Claude Code: feedback_no-agent-time-booking.md (2026-11-02)
   - Claude Code: feedback_no-claude-coauthor.md (2026-10-06)
