@@ -66,7 +66,7 @@ Every acceptance criterion has an acceptance test ([OFF-T-1] to [OFF-T-18]). The
 
 ### Development Path
 
-Path A (frontloaded). The draft of 2026-10-06 was grilled on 2026-11-17 (Phases 1 to 6 in one session; Q335 to Q339, assumptions A1 to A12). Q335 to Q338 were decided by `trutscf1`; the assumptions are for the owner and the reviewers to confirm in the merge request. Nothing in this document is approved until the Phase 4 gate is passed.
+Path A (frontloaded). The draft of 2026-10-06 was grilled on 2026-11-17 (Phases 1 to 6 in one session; Q335 to Q339, assumptions A1 to A12). Q335 to Q338 were decided by `trutscf1`; the owner confirmed A1 to A7 in Q339 and A8 to A12 on 2026-11-24 (Q372); only the reviewers confirm the assumptions in the merge request. Nothing in this document is approved until the Phase 4 gate is passed.
 
 ### Synthesis Dependencies
 
@@ -298,8 +298,9 @@ Verbatim rounds: the AI chat export in `docs/prompts/` (P-GRILL-2). No ADR was n
 | Q337 | Storage limit | One limit per device, set by the operator (`OFFLINE_STORAGE_LIMIT_MB`, default 500) | A full browser store breaks the app |
 | Q338 | iOS | Prepared and checked by hand; Chrome and Edge binding | Honest scope without a test device |
 | Q339 | Shared understanding | Q335 to Q338 and A1 to A7 confirmed; the concept is written | — |
+| Q372 | Assumptions A8 to A12 | Confirmed by trutscf1 on 2026-11-24 | — |
 
-Assumptions to be confirmed by the owner and the reviewers (P-GRILL-4); A1 to A7 were stated in the grilling round, A8 to A12 were added while writing:
+Assumptions A1 to A12 are confirmed by the owner (A1 to A7 in Q339, A8 to A12 on 2026-11-24 in Q372); the reviewers confirm them at the Phase 4 gate (P-GRILL-4). A1 to A7 were stated in the grilling round, A8 to A12 were added while writing:
 
 | A | Assumption | Where it holds |
 | --- | --- | --- |
