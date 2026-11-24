@@ -7,7 +7,7 @@ updated: "[YYYY-MM-DD]"
 ---
 # Project state
 
-The overall state of the project, updated at every handover. The task in progress is in [CURRENT_TASK.md](CURRENT_TASK.md).
+The overall state of the project, updated at every sync and handover. The task in progress is in [CURRENT_TASK.md](CURRENT_TASK.md).
 
 ## Goal
 
@@ -33,3 +33,10 @@ The overall state of the project, updated at every handover. The task in progres
 
 - **Default branch:** [main]
 - **Last release:** [version or —]
+
+## Written by script
+
+The pre-commit hook of `tools/agent-memory.mjs` rewrites only the block between the markers: date, branch, the commit this one builds on, commits since the last session entry, and the agents' memory files. Edit nothing between the markers.
+
+<!-- agent-memory:auto -->
+<!-- /agent-memory:auto -->

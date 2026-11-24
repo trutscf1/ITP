@@ -1,6 +1,6 @@
 ---
 name: gam-delivery
-description: Delivery commands of the gam-engineering process (manifest Phase 7 and release) — cut an approved concept's user stories into epic and story issues (tickets), implement one issue test-first with a work branch and MR (implement), build all issues of a feature in parallel subagents with one MR per issue (implement-all), review an MR against its acceptance criteria and the Definition of Done (review), answer review threads (revise), merge under the project's merge policy with the status update (merge), release with tag and notes (release), end a session by saving its state in the project (stopp). Use when /gam-engineering routes here, or when the developer runs /gam-delivery tickets, implement, implement-all, review, revise, merge, release, or stopp.
+description: Delivery commands of the gam-engineering process (manifest Phase 7 and release) — cut an approved concept's user stories into epic and story issues (tickets), implement one issue test-first with a work branch and MR (implement), build all issues of a feature in parallel subagents with one MR per issue (implement-all), review an MR against its acceptance criteria and the Definition of Done (review), answer review threads (revise), merge under the project's merge policy with the status update (merge), release with tag and notes (release), end a session by saving its state in the project (stopp), remove merged worktrees and work branches and report the open ones (cleanup). Use when /gam-engineering routes here, or when the developer runs /gam-delivery tickets, implement, implement-all, review, revise, merge, release, stopp, or cleanup.
 ---
 
 # gam-delivery
@@ -19,6 +19,7 @@ Before the first step, apply the shared rules of the core once per session — s
 | `merge <MR>` | [references/merge.md](references/merge.md) |
 | `release [<version>]` | [references/release.md](references/release.md) |
 | `stopp` | [references/stopp.md](references/stopp.md) |
+| `cleanup` | [references/cleanup.md](references/cleanup.md) |
 
 ## Merge policy
 
