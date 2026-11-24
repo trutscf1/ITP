@@ -5,6 +5,23 @@
 # Example password of a worked example in the identity concept, not a credential.
 9fe9ddd47550af59b8be547183be79efcf1febbd:documentation/concepts/identity.md:generic-api-key:319
 
+# Synthetic secret of the identity tests (IDENTITY_AUTH_SECRET = "0123…cdef"), not a credential;
+# the test stack only (IDN-US-1, #45).
+b94e6887a9d1ad1f7124a0fe0dbfa81f85f207c6:apps/identity/src/main.test.ts:generic-api-key:46
+5d89d03b46ab28bc6f0b9c6b42ff589d67e9a181:tests/identity-stack.test.ts:generic-api-key:130
+0aab83c6c1a9c7f68a38acde0f4a666d8ec4a91e:apps/identity/src/test-support/harness.ts:generic-api-key:76
+060a8e20a26c8b147b40e0daa93f85ecc4902fb2:packages/contracts/src/identity/config.test.ts:generic-api-key:9
+
+# Test password of the identity concept (concepts/identity.md §17, "Synthetic Test Data
+# Strategy"), not a credential.
+0aab83c6c1a9c7f68a38acde0f4a666d8ec4a91e:apps/identity/src/test-support/harness.ts:generic-api-key:12
+060a8e20a26c8b147b40e0daa93f85ecc4902fb2:packages/contracts/src/identity/identity.test.ts:generic-api-key:19
+
+# Synthetic secret and the password of a second, racing registration in the race test of the
+# review of !62 (IDN-F-6), not credentials.
+730f61b6f23e1e966a551ffa052b03b61aa32df2:apps/identity/src/registration-race.test.ts:generic-api-key:31
+730f61b6f23e1e966a551ffa052b03b61aa32df2:apps/identity/src/registration-race.test.ts:generic-api-key:73
+
 # Example password of the identity concept (IDN-T-47, "Drei-blaue-Wolken-7") in the test output
 # that a chat export of schwaigc quotes, not a credential (R5 grill, !78).
 2d535968197a75274a54c7db6fc3e5383e8f3ed4:docs/prompts/schwaigc/claude/2026-11-24-215b68bb-dafe-4123-b464-6fceea677d3f.md:generic-api-key:488

@@ -109,3 +109,91 @@ Answer: "Slice für schwaigc (Recommended)".
 **Q14 - Konzept-MR:** Branch `concept/identity` pushen und MR nach dev öffnen (Part of #115; die Freigabe des MR ist das Phase-4-Gate)? Wer soll reviewen?
 
 Answer: "Push + MR, Review trutscf1 (Recommended)".
+
+## Round 6 — 2026-11-17 — implementation of IDN-US-1, slice 1, and its review (`tschudea07`)
+
+Decisions taken during the implementation of #45 and its review, relayed by the coordinating agent; the answers are recorded as relayed.
+
+**Q336 - Fehlercodes:** Werden die Fehlercodes von `identity` innerhalb von #45 in die `ErrorResponse`-Tabelle von `scaffolding.md` §8 aufgenommen?
+
+Answer: the identity error codes are added to `scaffolding.md` §8 within #45.
+
+**Q341 - ROADMAP-Stufe R3:** Bleibt R3 Identity auf der Stufe `concept`, solange IDN-US-3, -4, -5, -7, -8 Entwürfe sind?
+
+Answer: R3 stays at the stage `concept`; recorded as a deviation from P-ROAD-4 in `WORKFLOW.md`.
+
+**Q342 - Better Auth:** Wird Better Auth als HTTP-Handler eingebunden oder als Bibliothek hinter eigenen Endpunkten?
+
+Answer: Better Auth as a library behind own endpoints ([ADR-0009](../adr/0009-better-auth-as-library-behind-own-endpoints.md)).
+
+**Q344 - Umfang der Review-Korrekturen:** Welche Punkte des Reviews von #45 werden behoben?
+
+Answer: the mandatory items plus the cheap smells (2026-11-17).
+
+**Q345 - Neuer Bestätigungslink beim Login:** Was heißt "höchstens einmal pro `CONFIRMATION_LINK_TTL_HOURS`" in [IDN-E-5]?
+
+Answer: a confirmation link is resent once per validity period: the first refused login sends a new link (the older one becomes invalid), further refused logins send none until `CONFIRMATION_LINK_TTL_HOURS` have passed since that resend (2026-11-17).
+
+**Q346 - Bereinigungsfrist bei erneuter Registrierung:** Startet eine erneute Registrierung einer unbestätigten Adresse die Frist von [IDN-F-31] neu?
+
+Answer: yes, a re-registration restarts the clean-up period (2026-11-17).
+
+Assumption stated with the implementation, not rejected:
+
+- **A17**: [IDN-F-5] runs the bot check after the request throttle ([IDN-F-35]) instead of "before anything else", because [IDN-T-20] needs the answer 429 before the bot check is asked.
+
+**Q350 - Stage R3:** Der Statuscheck (auch in der CI) verlangt nach dem Merge von IDN-US-1 zwingend 'in progress' für R3. Das widerspricht Q341 ('concept' lassen). Mit 'in progress' braucht doc-check Testzeilen für die Entwurfs-ACs von IDN-US-3, -4, -5, -7, -8. Lösung?
+
+Answer: Geplante Testzeilen (Recommended). R3 goes to `in progress`; §17 gets one planned test row per draft acceptance criterion (IDN-T-29 to IDN-T-45), written out when its story is grilled; the deviation of Q341 is removed from `WORKFLOW.md` (2026-11-17).
+
+## Round 7 — 2026-11-17 — implementation of IDN-US-2, slice 1 (`tschudea07`)
+
+From the review of #45 (inbox of `tschudea07`), asked when #46 started; answers verbatim in the AI chat export of `tschudea07`.
+
+**Q352 - X-Forwarded-For:** Wie soll identity den Header nur vom Reverse-Proxy annehmen?
+
+Answer: TRUSTED_PROXY per DNS (Recommended). New variable `TRUSTED_PROXY` (default `proxy`); `identity` resolves it and reads `X-Forwarded-For` only from that address; every other peer is counted by its connection address (§8 "Client address").
+
+**Q353 - Kosten von /login begrenzen:** Wie begrenzen, wenn der Fehlversuch erst nach der Argon2id-Prüfung gezählt wird?
+
+Answer: Vorab reservieren (Recommended). The attempt is counted before the password check; beyond `LOGIN_MAX_FAILURES` the login is refused with [IDN-E-6] without a hash run ([IDN-F-9], M4).
+
+**Q354 - Issue #46:** Beschreibung aus der Story-Datei aktualisieren?
+
+Answer: Ja, aktualisieren (Recommended). #46 carries the story sentence and IDN-AC-2.1 to IDN-AC-2.6 of the story file.
+
+## Round 8 — 2026-11-17 — implementation of IDN-US-6, slice 1 (`tschudea07`)
+
+**Q358 - Issue #50:** Story-Satz und AC-Tabelle aus der Story-Datei IDN-US-6 übernehmen?
+
+Answer: Ja, aktualisieren (Recommended). #50 carries the story sentence and IDN-AC-6.1 to IDN-AC-6.6 of the story file.
+
+Assumption stated with the implementation, not rejected:
+
+- **A18**: the branch of #50 starts from `feature/46-log-in-and-log-out`, and its draft MR targets that branch, because !62 and the MR of #46 are not merged yet.
+
+## Round 9 — 2026-11-24 — implementation of IDN-US-1, slice 2 (`schwaigc`, #168)
+
+Asked when #168 started; answers verbatim in the AI chat export of `schwaigc` (`docs/prompts/schwaigc/manual/2026-11-24.md`).
+
+**Q407 - Field errors:** IDN-U-1 requires errors next to each field, but §5/§8 give no texts for them (no German ones at all). How do we get the texts?
+
+Answer: I draft them into §8 (Recommended). §8 gets the table "Field and form texts" with English and German texts per rule and per error answer; IDN-U-1 points to it.
+
+**Q408 - Confirmation on /login:** IDN-AC-1.4 says the login page shows the confirmation, but there is no text, and the login page is #169. What does #168 deliver?
+
+Answer: Message only, form in #169 (Recommended). New [IDN-U-8]; #168 creates `/login` with the notice only, #169 adds the form.
+
+**Q409 - New link:** For `kind=confirm`, which action sends a new link: a refused login ([IDN-E-5]) or registering again ([IDN-F-6])?
+
+Answer: Link to /login (Recommended). [IDN-U-7] names the link to `/login`; registering again would replace the password.
+
+**Q410 - Page tests:** §16/§17 named the end-to-end job of the Web track for the page tests of slices 2, which does not exist yet (WEB-US-4). How are the criteria of #168 tested?
+
+Answer: node --test + SSR (Recommended). §16 *Design for Testability* names the unit test runner of `web`; §17 gets [IDN-T-46] to [IDN-T-51], and [IDN-T-52] for the language of the pages (review of #168); the browser journeys stay with WEB-US-4.
+
+Assumptions stated with the implementation, not rejected:
+
+- **A19**: the pages of `web` choose their language like [IDN-F-38] (first supported language of `Accept-Language`, German otherwise) and set `lang` on their content, because the root layout still has a fixed `lang="en"` (inbox of `schwaigc`, 2026-11-10).
+- **A20**: the branch of #168 starts from `feature/45-register-by-e-mail`, and its draft MR targets `dev` and is marked ready once !62 is merged (Q1 of 2026-11-24, as A18).
+- **A21**: `web` gets `REGISTRATION_ENABLED`, `CAPTCHA_ENABLED`, and `CAPTCHA_SITE_KEY` in its own configuration (M1 of `scaffolding.track-web.md`), and `docker-compose.yml` passes the same values to `web` as to `identity`.

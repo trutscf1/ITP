@@ -4,7 +4,7 @@ format: gam-ai-knowledge/1
 title: "IDN-US-6 Reset the password"
 audience: [product, developer, reviewer, agent]
 id-prefix: "IDN"
-status: ready
+status: in-progress
 sprint: 2
 ---
 # IDN-US-6 Reset the password
@@ -33,7 +33,7 @@ One user story of [Identity: accounts, external login, MFA](epic.md) and the acc
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
 | 1 — reset request and new password (`tschudea07`) | IDN-AC-6.1, IDN-AC-6.2 (server), IDN-AC-6.3, IDN-AC-6.4, IDN-AC-6.5, IDN-AC-6.6 | IDN-US-2 slice 1 | #50 |
-| 2 — forgot-password and new-password pages (`schwaigc`) | IDN-AC-6.2 (page), IDN-AC-6.3 (message) | slice 1 | — |
+| 2 — forgot-password and new-password pages (`schwaigc`) | IDN-AC-6.1 (invalid-link page), IDN-AC-6.2 (page), IDN-AC-6.3 (message), IDN-AC-6.4 (message) | slice 1 | #170 |
 
 - **Story issue:** #50
 - **Weight:** 2

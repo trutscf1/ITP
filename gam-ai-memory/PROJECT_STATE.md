@@ -36,8 +36,13 @@ See [GOAL.md](../gam-ai-knowledge/GOAL.md).
 
 <!-- agent-memory:auto -->
 - **Updated:** 2026-11-24
-- **Branch:** concept/storage-core
-- **Builds on:** afbfc58f3 fix(repo): exempt the example password quoted in a chat export from the secret scan [SCF-F-15]
-- **Commits since the reference point:** n/a (no reference point)
-- **Agent memory files:** none found
+- **Branch:** feature/168-registration-page
+- **Builds on:** d5b052221 docs(repo): export the chat logs of schwaigc [no-req]
+- **Commits since the reference point:** 74 (2026-11-10)
+- **Agent memory files:**
+  - Claude Code: feedback_no-agent-time-booking.md (2026-11-02)
+  - Claude Code: feedback_no-claude-coauthor.md (2026-10-06)
+  - Claude Code: feedback_no-risky-commands.md (2026-11-24)
+  - Claude Code: reference_commitlint-rules.md (2026-11-17)
+  - Claude Code: reference_pnpm-via-npx.md (2026-10-27)
 <!-- /agent-memory:auto -->
