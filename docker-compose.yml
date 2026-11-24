@@ -91,7 +91,7 @@ services:
 
   # Object storage with an S3 interface. The master answers on 9333 once the server is up.
   seaweedfs:
-    image: chrislusf/seaweedfs:4.51
+    image: chrislusf/seaweedfs:4.55
     restart: unless-stopped
     command: ["server", "-dir=/data", "-filer", "-s3"]
     networks:
@@ -422,7 +422,7 @@ services:
   # OBS-F-24). No login form, no self-registration, no update check, no usage reporting, no
   # plugin download (OBS-NF-1, OBS-NF-6).
   grafana:
-    image: grafana/grafana:13.2.5
+    image: grafana/grafana:13.2.6
     profiles: [observability]
     restart: unless-stopped
     mem_limit: 256m
