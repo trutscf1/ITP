@@ -26,6 +26,7 @@ One user story of [Scaffolding & shared contracts](epic.md) and the acceptance c
 | SCF-AC-4.3 | Own users table | The relational schema | A user is created | An own `users` table holds a row in a 1:1 relation to the Better Auth user table |
 | SCF-AC-4.4 | Seed data | A fresh local database | The seed script runs | Test data (user, team, folder) exists for local development |
 | SCF-AC-4.5 | Migrations at start | A container of the stack | It starts | `prisma db migrate` (in Prisma 8 the successor of `prisma migrate deploy`) finishes without errors |
+| SCF-AC-4.6 | Folder stays in its team | A folder of team A | A child folder of it is created for team B | The database rejects the row |
 
 ## Slices
 
@@ -35,7 +36,8 @@ The vertical slices that deliver this story. One slice is delivered by the story
 | --- | --- | --- | --- |
 | 1 — Schema, migrations, seed, migrating at start | SCF-AC-4.2, SCF-AC-4.3, SCF-AC-4.4, SCF-AC-4.5 | — | #41 |
 | 2 — ER diagram of the schema | SCF-AC-4.1 (human step: draw the diagram of `scaffolding.md` §8 in Vertabelo, export it, embed it) | slice 1 | #151 |
+| 3 — Folder stays in its team | SCF-AC-4.6 | slice 1 | #152 |
 
 - **Story issue:** #41
-- **Weight:** 5 (slice 1: 4, slice 2: 1)
+- **Weight:** 7 (slice 1: 4, slice 2: 1, slice 3: 2)
 - **Depends on:** SCF-US-2 (Local development environment with Docker Compose, #39)

@@ -222,3 +222,40 @@ describe("SCF-AC-4.5 Migrations at start", { skip }, () => {
     );
   });
 });
+
+describe("SCF-AC-4.6 Folder stays in its team", { skip }, () => {
+  it("SCF-T-41 the database rejects a child folder whose team differs from its parent's team [SCF-F-29]", async () => {
+    const url = await migratedDatabase();
+    const [teamA, teamB] = await query<{ id: string }>(
+      url,
+      "INSERT INTO teams (name) VALUES ('Team A'), ('Team B') RETURNING id",
+    );
+    const [root] = await query<{ id: string }>(
+      url,
+      "INSERT INTO folders (team_id, name) VALUES ($1, 'Root A') RETURNING id",
+      [teamA?.id],
+    );
+    await assert.rejects(
+      query(
+        url,
+        "INSERT INTO folders (team_id, parent_id, name) VALUES ($1, $2, 'Stray')",
+        [teamB?.id, root?.id],
+      ),
+      /folders_parent_id_team_id_fkey/,
+      "a child folder of another team was accepted",
+    );
+    await query(
+      url,
+      "INSERT INTO folders (team_id, parent_id, name) VALUES ($1, $2, 'Child')",
+      [teamA?.id, root?.id],
+    );
+    await assert.rejects(
+      query(url, "UPDATE folders SET team_id = $1 WHERE id = $2", [
+        teamB?.id,
+        root?.id,
+      ]),
+      /folders_parent_id_team_id_fkey/,
+      "a parent folder moved to another team while it has children",
+    );
+  });
+});

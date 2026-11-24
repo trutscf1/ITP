@@ -1,0 +1,5 @@
+# go-jose v4.1.4 (denial of service when parsing JWKs with RSA keys, fixed in 4.1.6) in the tempo
+# binary of grafana/tempo:2.10.10, the newest release (3.1.1 ships the same); built into the
+# stash-tempo image. Tempo is not published and parses no JWKs from outside. Upstream must rebuild
+# the image. Only this image carries it since #172: grafana 13.2.6 and the other images are fixed.
+CVE-2026-116587 exp:2027-01-11
