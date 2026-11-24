@@ -93,6 +93,29 @@ export function generateOpenApiDocument(
       400: error("Invalid input"),
       401: error("Wrong e-mail address or password"),
       403: error("The e-mail address is not confirmed"),
+      429: error("Login locked after failed attempts (IDN-F-9)"),
+    },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: identityApiPath("logout"),
+    summary: "Log out: end the session of the session cookie",
+    responses: {
+      204: { description: "Always; the session cookie is cleared (IDN-F-8)" },
+    },
+  });
+
+  registry.registerPath({
+    method: "get",
+    path: identityApiPath("session"),
+    summary: "Session check: the member of the session cookie",
+    responses: {
+      200: {
+        description: "The member of a valid session (IDN-F-37)",
+        content: { "application/json": { schema: sessionInfoSchema } },
+      },
+      401: error("No valid session"),
     },
   });
 

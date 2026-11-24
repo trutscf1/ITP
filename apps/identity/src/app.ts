@@ -15,12 +15,13 @@ import {
 } from "@stash/contracts";
 import { type Context, Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
-import { setCookie } from "hono/cookie";
+import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import type { AfterAnswer } from "./after-answer.ts";
 import type { AuthCore } from "./auth-core.ts";
 import type { BotCheck } from "./bot-check.ts";
-import { clientIp } from "./client-ip.ts";
+import type { ClientAddress } from "./client-ip.ts";
 import type { Logger } from "./logger.ts";
+import { logIn } from "./login.ts";
 import { chooseLanguage, type Mailer } from "./mailer.ts";
 import { register } from "./registration.ts";
 import type { SessionStore } from "./sessions.ts";
@@ -49,6 +50,8 @@ export interface AppDeps {
   afterAnswer: AfterAnswer;
   logger: Logger;
   clock: () => Date;
+  /** The address the throttle counts: X-Forwarded-For only from the reverse proxy (Q352). */
+  clientAddress: ClientAddress;
   probes: Probes;
 }
 
@@ -106,6 +109,7 @@ export function createApp(deps: AppDeps): Hono {
     afterAnswer,
     logger,
     clock,
+    clientAddress,
   } = deps;
   const app = new Hono();
   const limitBody = bodyLimit({
@@ -150,7 +154,7 @@ export function createApp(deps: AppDeps): Hono {
   // then the bot check "before anything else" of the input (IDN-F-5), then the input (IDN-E-1).
   // The e-mail goes out after the answer (IDN-F-6, IDN-E-11).
   app.post(identityPaths.register, limitBody, async (context) => {
-    const ip = clientIp(context);
+    const ip = await clientAddress(context);
     const counted = await throttle.countRequest(ip);
     if (!counted.ok) {
       return fail(context, "too-many-requests", {
@@ -201,66 +205,85 @@ export function createApp(deps: AppDeps): Hono {
     );
   });
 
-  // The login of IDN-US-2 as far as IDN-US-1 needs it (IDN-F-7, IDN-F-11, IDN-E-4, IDN-E-5):
-  // validate, verify the password (a dummy hash for an unknown address, so both take the same
-  // time), then refuse an unconfirmed account or open the session. The throttle steps of the
-  // login order (concept §16) are IDN-US-2.
+  // The session cookie of IDN-F-36: it expires with the session, and logout clears it with the
+  // same attributes.
+  const cookieOptions = {
+    httpOnly: true,
+    sameSite: "Lax",
+    path: "/",
+    secure: config.PUBLIC_ORIGIN.startsWith("https://"),
+  } as const;
+  function setSessionCookie(
+    context: Context,
+    token: string,
+    maxAgeSeconds: number,
+  ) {
+    setCookie(context, sessionCookie, token, {
+      ...cookieOptions,
+      maxAge: maxAgeSeconds,
+    });
+  }
+
+  // IDN-F-7, IDN-F-9, IDN-F-11, IDN-E-4 to IDN-E-6: the order of the login is in login.ts.
   app.post(identityPaths.login, limitBody, async (context) => {
     const parsed = loginInputSchema.safeParse(await readObject(context));
     if (!parsed.success) return fail(context, "validation-failed");
-    const { email, password } = parsed.data;
-
-    const account = await auth.findAccount(email);
-    let correct = false;
-    if (account?.passwordHash) {
-      correct = await auth.verifyPassword(account.passwordHash, password);
-    } else {
-      await auth.verifyDummy(password);
-    }
-    if (!account || !correct) return fail(context, "invalid-credentials");
-
-    if (!account.emailVerified) {
-      // IDN-E-5 (Q345): the first refused login sends a new link, which replaces the older
-      // ones; the next ones send none until CONFIRMATION_LINK_TTL_HOURS have passed.
-      if (await throttle.claimResend(account.id)) {
-        let token: string;
-        try {
-          token = await auth.replaceConfirmationLink(
-            account.id,
-            clock(),
-            config.CONFIRMATION_LINK_TTL_HOURS,
-          );
-        } catch (error) {
-          await throttle.releaseResend(account.id);
-          throw error;
-        }
-        const to = account.email;
-        const language = chooseLanguage(context.req.header("accept-language"));
-        afterAnswer.run("confirmation", () =>
-          mailer.sendConfirmation({ to, language, token }),
-        );
+    const result = await logIn(
+      {
+        auth,
+        sessions,
+        throttle,
+        mailer,
+        afterAnswer,
+        clock,
+        confirmationLinkTtlHours: config.CONFIRMATION_LINK_TTL_HOURS,
+      },
+      parsed.data,
+      {
+        ip: await clientAddress(context),
+        userAgent: context.req.header("user-agent") ?? "",
+        language: chooseLanguage(context.req.header("accept-language")),
+      },
+    );
+    switch (result.kind) {
+      case "locked":
+        return fail(context, "too-many-requests", {
+          "Retry-After": String(result.retryAfterSeconds),
+        });
+      case "invalid-credentials":
+      case "address-not-confirmed":
+        return fail(context, result.kind);
+      case "logged-in": {
+        setSessionCookie(context, result.token, result.maxAgeSeconds);
+        return context.json(result.info);
       }
-      return fail(context, "address-not-confirmed");
     }
+  });
 
-    const userId = await auth.memberId(account.id);
-    if (!userId) throw new Error("account without a users row");
-    const session = await sessions.create({
-      accountId: account.id,
-      userId,
-      ipAddress: clientIp(context),
-      userAgent: context.req.header("user-agent") ?? "",
-      now: clock(),
-    });
-    setCookie(context, sessionCookie, session.token, {
-      httpOnly: true,
-      sameSite: "Lax",
-      path: "/",
-      secure: config.PUBLIC_ORIGIN.startsWith("https://"),
-      maxAge: session.maxAgeSeconds,
-    });
+  // IDN-F-8: ends the session at once; without a valid session the answer is the same.
+  app.post(identityPaths.logout, async (context) => {
+    const token = getCookie(context, sessionCookie);
+    if (token) await sessions.delete(token);
+    deleteCookie(context, sessionCookie, cookieOptions);
+    return context.body(null, 204);
+  });
+
+  // IDN-F-37, IDN-F-34, IDN-E-9: the session check of every unit (ADR-0007). A renewal sends the
+  // cookie again with the new lifetime (IDN-F-36).
+  app.get(identityPaths.session, async (context) => {
+    const token = getCookie(context, sessionCookie);
+    const session = token ? await sessions.read(token, clock()) : undefined;
+    if (!token || !session) return fail(context, "no-session");
+    const account = await auth.accountById(session.record.accountId);
+    if (!account) {
+      await sessions.delete(token);
+      return fail(context, "no-session");
+    }
+    if (session.renewedMaxAgeSeconds !== undefined) {
+      setSessionCookie(context, token, session.renewedMaxAgeSeconds);
+    }
     const info: SessionInfo = {
-      userId,
+      userId: session.record.userId,
       name: account.name,
       email: account.email,
     };
@@ -274,6 +297,8 @@ export function createApp(deps: AppDeps): Hono {
     [identityPaths.register]: "POST",
     [identityPaths.confirm]: "GET",
     [identityPaths.login]: "POST",
+    [identityPaths.logout]: "POST",
+    [identityPaths.session]: "GET",
   };
   for (const [path, allowed] of Object.entries(methods)) {
     app.all(path, (context) =>

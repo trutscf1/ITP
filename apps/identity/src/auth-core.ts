@@ -42,6 +42,8 @@ export interface AuthCore {
   /** Spends the time of a verification on a dummy hash, for an address without an account (IDN-F-11). */
   verifyDummy(password: string): Promise<void>;
   findAccount(email: string): Promise<Account | undefined>;
+  /** Name and address of an account, for the session check (IDN-F-37); undefined when gone. */
+  accountById(id: string): Promise<{ name: string; email: string } | undefined>;
   /**
    * Creates an unconfirmed account with its credential and its confirmation link, in one
    * transaction (IDN-F-4); the database creates its `users` row. Returns the id and the token.
@@ -227,6 +229,11 @@ export async function createAuthCore(
         emailVerified: found.user.emailVerified,
         passwordHash: credential?.password ?? undefined,
       };
+    },
+
+    async accountById(id) {
+      const user = await internalAdapter.findUserById(id);
+      return user ? { name: user.name, email: user.email } : undefined;
     },
 
     createAccount: ({ name, email, passwordHash, now, validityHours }) =>

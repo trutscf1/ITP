@@ -10,6 +10,8 @@ export const identityPaths = {
   register: "/register",
   confirm: "/confirm",
   login: "/login",
+  logout: "/logout",
+  session: "/session",
 } as const;
 
 export type IdentityPathName = keyof typeof identityPaths;
