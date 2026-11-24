@@ -16,3 +16,8 @@ b94e6887a9d1ad1f7124a0fe0dbfa81f85f207c6:apps/identity/src/main.test.ts:generic-
 # Strategy"), not a credential.
 0aab83c6c1a9c7f68a38acde0f4a666d8ec4a91e:apps/identity/src/test-support/harness.ts:generic-api-key:12
 060a8e20a26c8b147b40e0daa93f85ecc4902fb2:packages/contracts/src/identity/identity.test.ts:generic-api-key:19
+
+# Synthetic secret and the password of a second, racing registration in the race test of the
+# review of !62 (IDN-F-6), not credentials.
+730f61b6f23e1e966a551ffa052b03b61aa32df2:apps/identity/src/registration-race.test.ts:generic-api-key:31
+730f61b6f23e1e966a551ffa052b03b61aa32df2:apps/identity/src/registration-race.test.ts:generic-api-key:73
