@@ -100,6 +100,9 @@ WebConfig {
   WORKER_HEALTH_URL: http(s) url,     default "http://worker:3003/health"
   CMS_HEALTH_URL: http(s) url,        default "http://cms:1337/health"
   OPENAPI_FILE: path, 1..512 chars,   default "../../packages/contracts/dist/openapi.json"   // relative to the working directory apps/web (A3)
+  REGISTRATION_ENABLED: true|false,   default true                     // identity.md §8, #168
+  CAPTCHA_ENABLED: true|false,        default false                    // identity.md §8, #168
+  CAPTCHA_SITE_KEY: string, 0..512 chars, default ""                  // required when CAPTCHA_ENABLED (problem "required when CAPTCHA_ENABLED is true")
 }
 
 ConfigProblem { name: string, reason: string }        // never the value
@@ -111,7 +114,7 @@ loadWebConfigValue(environment: map<string, string>, name) -> ok(value) | failed
   check only the variable name, with the same default and reason as above
 ```
 
-A variable that is missing or empty takes its default. A value outside its range is a problem with the reasons `expected an integer between 1 and 65535`, `expected an integer between 1 and 60000`, `expected 1 to 64 characters`, `expected 1 to 512 characters`, `expected an http or https URL`. `OPENAPI_FILE` names the generated API description (M6); its default is the assumed output path of the generation command and is corrected when the contracts core (#8) fixes the path. The defaults of the four URLs are the container addresses (service name = unit name, Q58); the native start ([SCF-F-3]) sets the four URLs to `http://localhost:<port>/health` with the ports of §8. `loadWebConfig` only returns; printing and exiting are M7's job. `loadWebConfigValue` serves a handler that needs one value at request time (M6): an invalid other variable does not break it, because the whole check runs at startup in M7 ([SCF-F-11]); W-22 tests it.
+A variable that is missing or empty takes its default. A value outside its range is a problem with the reasons `expected true or false`, `required when CAPTCHA_ENABLED is true`, `expected an integer between 1 and 65535`, `expected an integer between 1 and 60000`, `expected 1 to 64 characters`, `expected 1 to 512 characters`, `expected an http or https URL`. `OPENAPI_FILE` names the generated API description (M6); its default is the assumed output path of the generation command and is corrected when the contracts core (#8) fixes the path. The defaults of the four URLs are the container addresses (service name = unit name, Q58); the native start ([SCF-F-3]) sets the four URLs to `http://localhost:<port>/health` with the ports of §8. `loadWebConfig` only returns; printing and exiting are M7's job. `loadWebConfigValue` serves a handler that needs one value at request time (M6): an invalid other variable does not break it, because the whole check runs at startup in M7 ([SCF-F-11]); W-22 tests it.
 
 Until the configuration helper of the contracts core exists, `config.ts` holds a local function with the same signature; it is replaced, not kept, when the helper is merged.
 Traces to: SCF-F-11, SCF-F-17, SCF-NF-8, SCF-E-1. Requires: configuration helper (contracts core), export path `@stash/contracts/web`.

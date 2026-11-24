@@ -171,3 +171,29 @@ Answer: Ja, aktualisieren (Recommended). #50 carries the story sentence and IDN-
 Assumption stated with the implementation, not rejected:
 
 - **A18**: the branch of #50 starts from `feature/46-log-in-and-log-out`, and its draft MR targets that branch, because !62 and the MR of #46 are not merged yet.
+
+## Round 9 — 2026-11-24 — implementation of IDN-US-1, slice 2 (`schwaigc`, #168)
+
+Asked when #168 started; answers verbatim in the AI chat export of `schwaigc` (`docs/prompts/schwaigc/manual/2026-11-24.md`).
+
+**Q407 - Field errors:** IDN-U-1 requires errors next to each field, but §5/§8 give no texts for them (no German ones at all). How do we get the texts?
+
+Answer: I draft them into §8 (Recommended). §8 gets the table "Field and form texts" with English and German texts per rule and per error answer; IDN-U-1 points to it.
+
+**Q408 - Confirmation on /login:** IDN-AC-1.4 says the login page shows the confirmation, but there is no text, and the login page is #169. What does #168 deliver?
+
+Answer: Message only, form in #169 (Recommended). New [IDN-U-8]; #168 creates `/login` with the notice only, #169 adds the form.
+
+**Q409 - New link:** For `kind=confirm`, which action sends a new link: a refused login ([IDN-E-5]) or registering again ([IDN-F-6])?
+
+Answer: Link to /login (Recommended). [IDN-U-7] names the link to `/login`; registering again would replace the password.
+
+**Q410 - Page tests:** §16/§17 named the end-to-end job of the Web track for the page tests of slices 2, which does not exist yet (WEB-US-4). How are the criteria of #168 tested?
+
+Answer: node --test + SSR (Recommended). §16 *Design for Testability* names the unit test runner of `web`; §17 gets [IDN-T-46] to [IDN-T-51]; the browser journeys stay with WEB-US-4.
+
+Assumptions stated with the implementation, not rejected:
+
+- **A19**: the pages of `web` choose their language like [IDN-F-38] (first supported language of `Accept-Language`, German otherwise) and set `lang` on their content, because the root layout still has a fixed `lang="en"` (inbox of `schwaigc`, 2026-11-10).
+- **A20**: the branch of #168 starts from `feature/45-register-by-e-mail`, and its draft MR targets `dev` and is marked ready once !62 is merged (Q1 of 2026-11-24, as A18).
+- **A21**: `web` gets `REGISTRATION_ENABLED`, `CAPTCHA_ENABLED`, and `CAPTCHA_SITE_KEY` in its own configuration (M1 of `scaffolding.track-web.md`), and `docker-compose.yml` passes the same values to `web` as to `identity`.

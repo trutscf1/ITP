@@ -163,17 +163,18 @@ Rows of IDN-US-1, -2, and -6 are binding. Rows marked *draft* belong to stories 
 
 ## 5. User Interaction Requirements
 
-The pages are built in `web` (Q13). Texts are given in English; the German texts are in §8 ("Message texts").
+The pages are built in `web` (Q13). Texts are given in English; the German texts are in §8 ("Message texts"). The pages choose their language like [IDN-F-38]: the first supported language of the request's `Accept-Language` header, German otherwise, and mark their content with that `lang` (A19).
 
 | ID | Title | Requirement | Derives from |
 | --- | --- | --- | --- |
-| IDN-U-1 | Field errors | The registration and new-password forms MUST show each rule violation next to its field before sending, as text linked to the field for screen readers, and MUST keep the entered name and e-mail address. | IDN-AC-1.1 (Shared validation) |
+| IDN-U-1 | Field errors | The registration and new-password forms MUST show each rule violation next to its field before sending, with the field texts of §8 ("Field and form texts", Q407), as text linked to the field for screen readers, and MUST keep the entered name and e-mail address. An error answer of `identity` to a form that passed this check MUST be shown above the form with the form texts of §8. | IDN-AC-1.1 (Shared validation) |
 | IDN-U-2 | Strength bar | The strength bar MUST show its level as text (`Weak`, `Fair`, `Good`, `Strong`), not only as colour, and update while typing. | IDN-AC-1.2 (Password rules) |
 | IDN-U-3 | Check your mailbox | After a registration or reset request, the page MUST show "Check your mailbox. If the address can be used, we have sent you an e-mail." | IDN-AC-1.6 (No account disclosure), IDN-AC-6.4 (Identical answer) |
 | IDN-U-4 | Login messages | The login page MUST show "E-mail address or password is wrong." for [IDN-E-4], "Please confirm your e-mail address first. We have sent you a new link." for [IDN-E-5], and "Too many attempts. Try again in 15 minutes or reset your password." for [IDN-E-6]. | IDN-AC-2.5 (Generic error), IDN-AC-2.3 (Lock after failed logins) |
 | IDN-U-5 | After reset | After a reset, the login page MUST show "Your password was changed. Please log in again." | IDN-AC-6.3 (Sessions ended) |
 | IDN-U-6 | Registration closed | With the registration closed, `/register` MUST show "Registration is closed. Ask the operator of this installation for an account." | IDN-AC-1.7 (Registration closed) |
-| IDN-U-7 | Invalid link | An invalid or expired confirmation or reset link MUST lead to a page that says "This link is invalid or has expired." and offers the action that sends a new one. | IDN-AC-1.4 (E-mail confirmation), IDN-AC-6.1 (Limited link) |
+| IDN-U-7 | Invalid link | An invalid or expired confirmation or reset link MUST lead to a page that says "This link is invalid or has expired." and offers the action that sends a new one. For a confirmation link (`/link-invalid?kind=confirm`) that action is a link to `/login` with the text "Log in to get a new link.", because a refused login of an unconfirmed account sends a new link ([IDN-E-5]) without replacing the password (Q409). | IDN-AC-1.4 (E-mail confirmation), IDN-AC-6.1 (Limited link) |
+| IDN-U-8 | Address confirmed | `/login?confirmed=1` MUST show "Your e-mail address is confirmed. You can log in now." above the login form; slice 2 of IDN-US-1 delivers the page with this notice, slice 2 of IDN-US-2 adds the form (Q408). | IDN-AC-1.4 (E-mail confirmation) |
 
 ## 6. Non-Functional Requirements
 
@@ -295,7 +296,26 @@ Character classes: lower-case letters, upper-case letters, digits, everything el
 | `SESSION_CHECK_TIMEOUT_MS` | 100..5000 (also read by `web` and `storage`) | `1000` |
 | `TRUSTED_PROXY` | host name or IP address of the reverse proxy (Q352); fixed to `proxy` in `docker-compose.yml`, a commented default in `.env.example` | `proxy` |
 
-**Message texts (German).** IDN-U-3: „Prüfe dein Postfach. Wenn die Adresse verwendet werden kann, haben wir dir eine E-Mail geschickt.“ IDN-U-4: „E-Mail-Adresse oder Passwort ist falsch.“, „Bitte bestätige zuerst deine E-Mail-Adresse. Wir haben dir einen neuen Link geschickt.“, „Zu viele Versuche. Versuche es in 15 Minuten wieder oder setze dein Passwort zurück.“ IDN-U-5: „Dein Passwort wurde geändert. Bitte melde dich neu an.“ IDN-U-6: „Die Registrierung ist geschlossen. Frag den Betreiber dieser Installation nach einem Konto.“ IDN-U-7: „Dieser Link ist ungültig oder abgelaufen.“
+**Message texts (German).** IDN-U-3: „Prüfe dein Postfach. Wenn die Adresse verwendet werden kann, haben wir dir eine E-Mail geschickt.“ IDN-U-4: „E-Mail-Adresse oder Passwort ist falsch.“, „Bitte bestätige zuerst deine E-Mail-Adresse. Wir haben dir einen neuen Link geschickt.“, „Zu viele Versuche. Versuche es in 15 Minuten wieder oder setze dein Passwort zurück.“ IDN-U-5: „Dein Passwort wurde geändert. Bitte melde dich neu an.“ IDN-U-6: „Die Registrierung ist geschlossen. Frag den Betreiber dieser Installation nach einem Konto.“ IDN-U-7: „Dieser Link ist ungültig oder abgelaufen.“ „Melde dich an, um einen neuen Link zu bekommen.“ IDN-U-8: „Deine E-Mail-Adresse ist bestätigt. Du kannst dich jetzt anmelden.“
+
+**Field and form texts** (IDN-U-1, IDN-U-2, Q407). The registration form maps each issue of `RegistrationInput` to one text of its field; a field shows only its first text in this order.
+
+| Field or answer | Rule | English | German |
+| --- | --- | --- | --- |
+| name | empty after trimming | Enter your name. | Gib deinen Namen ein. |
+| name | more than 100 characters | Use at most 100 characters. | Verwende höchstens 100 Zeichen. |
+| email | not an `Email` of the contract | Enter an e-mail address such as ada@example.org. | Gib eine E-Mail-Adresse wie ada@example.org ein. |
+| password | `too-short` | Use at least 12 characters. | Verwende mindestens 12 Zeichen. |
+| password | `too-long` | Use at most 128 characters. | Verwende höchstens 128 Zeichen. |
+| password | `common` | This password is too common. Choose another one. | Dieses Passwort ist zu verbreitet. Wähle ein anderes. |
+| strength bar | label and levels | Password strength: Weak, Fair, Good, Strong | Passwortstärke: Schwach, Mittel, Gut, Stark |
+| form | `validation-failed` | Please check your entries. | Bitte prüfe deine Eingaben. |
+| form | `bot-check-failed` | The bot check failed. Please try again. | Die Bot-Prüfung ist fehlgeschlagen. Bitte versuche es noch einmal. |
+| form | `too-many-requests` | Too many attempts. Please wait a minute and try again. | Zu viele Versuche. Warte eine Minute und versuche es noch einmal. |
+| form | `registration-closed` | the text of IDN-U-6 | the text of IDN-U-6 |
+| form | any other answer or no answer | Registration did not work. Please try again later. | Die Registrierung hat nicht geklappt. Bitte versuche es später noch einmal. |
+
+**Configuration of `web` for the pages** (slice 2, M8; added to M1 of `scaffolding.track-web.md`): `REGISTRATION_ENABLED` (`true`, `false`, default `true`) decides between the form and the text of IDN-U-6; `CAPTCHA_ENABLED` (`true`, `false`, default `false`) and `CAPTCHA_SITE_KEY` (1..512 characters, required when `CAPTCHA_ENABLED=true`) decide whether the page loads the bot-check widget of [IDN-C-5] with that site key. `web` reads the same values as `identity` from `docker-compose.yml`, so the page and the server agree.
 
 **E-mails.** Confirmation: subject "Confirm your e-mail address for stash" / „Bestätige deine E-Mail-Adresse für stash“, body with the link `<PUBLIC_ORIGIN>/api/identity/confirm?token=<t>` and its validity in hours. Notice: subject "Someone tried to register with your address" / „Jemand wollte sich mit deiner Adresse registrieren“, body without a link, with the advice to reset the password if it was the member. Reset: subject "Reset your stash password" / „Setze dein stash-Passwort zurück“, link `<PUBLIC_ORIGIN>/reset-password?token=<t>` and its validity in minutes.
 
@@ -558,13 +578,13 @@ stateDiagram-v2
 - **M4** takes the session store and a clock as parameters; tests use a real store from the test stack and a fixed clock. A lock holds the time it ends and a session its expiry, both read against that clock; the expiry of the keys only removes them afterwards. The failure window itself runs on the time of the session store, so a test of it sends its attempts within that window.
 - **Client address** takes a name resolver; tests pass the address of the connection the way the HTTP server does and a stub resolver (Q352).
 - **`identity` over HTTP**: tests start M1 with the test database (`TEST_DATABASE_URL`), a session store, a recording SMTP stub, and a bot-check stub that answers yes or no; they call the endpoints of §8 and read the stub's e-mails.
-- **`web` pages**: the end-to-end runner of `STACK.md` §4 against `web` with `identity` running (slices 2).
+- **`web` pages**: the unit test runner of `web` (`STACK.md` §4, `node --test` with `react-dom/server`) for slices 2: the form rules and the answer handling are pure functions, and every page and form view is rendered on the server with fixed props and checked in its HTML (Q410). The journeys through a browser with `identity` running are end-to-end scenarios of WEB-US-4.
 
 ### Requirement Traceability Matrix
 
 | Story | Requirements | Modules | Tests |
 | --- | --- | --- | --- |
-| IDN-US-1 | IDN-F-1 to F-6, F-30 to F-32, F-35, F-38; IDN-U-1 to U-3, U-6, U-7; IDN-NF-1, NF-4 to NF-6; IDN-E-1 to E-3, E-7, E-8, E-11; IDN-C-2 to C-5, C-7, C-8 | M1 to M3, M5 to M8 | IDN-T-1 to T-9, T-21 to T-26 |
+| IDN-US-1 | IDN-F-1 to F-6, F-30 to F-32, F-35, F-38; IDN-U-1 to U-3, U-6 to U-8; IDN-NF-1, NF-4 to NF-6; IDN-E-1 to E-3, E-7, E-8, E-11; IDN-C-2 to C-5, C-7, C-8 | M1 to M3, M5 to M8 | IDN-T-1 to T-9, T-21 to T-26, T-46 to T-51 |
 | IDN-US-2 | IDN-F-7 to F-11, F-34, F-36, F-37; IDN-U-4; IDN-NF-2, NF-3, NF-7; IDN-E-4 to E-6, E-9, E-10; IDN-C-1, C-6 | M1, M2, M4, M8, M9 | IDN-T-10 to T-15, T-27, T-28 |
 | IDN-US-6 | IDN-F-25 to F-29, F-33; IDN-U-3, U-5, U-7; IDN-E-1 to E-3, E-7 | M1, M2, M4 to M6, M8 | IDN-T-16 to T-20 |
 
@@ -626,6 +646,12 @@ One test per acceptance criterion; test names in code carry the `AC` ID.
 | IDN-T-43 | Check for the reverse proxy (*draft*) | IDN-AC-7.2, IDN-F-40 | planned; written out when its story is grilled (Q350) | — | — |
 | IDN-T-44 | Confirmed by password (*draft*) | IDN-AC-8.1, IDN-F-41 | planned; written out when its story is grilled (Q350) | — | — |
 | IDN-T-45 | Files deleted (*draft*) | IDN-AC-8.2, IDN-F-42 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-46 | Registration page validates before sending | IDN-AC-1.1, IDN-F-1, IDN-U-1 | the registration form of `web` | the name `"   "`, a name of 101 characters, and the e-mail address `ada@example` are checked, and the form is drawn with the resulting errors | each input gets the field text of §8 next to its field, linked by `aria-describedby`, with the entered values kept; no request is sent |
+| IDN-T-47 | Strength bar as text | IDN-AC-1.2, IDN-F-2, IDN-U-2 | the registration form of `web` | `kurz123`, `password1234`, and `Drei-blaue-Wolken-7` are entered | the first two are refused with their field text; the bar reads `Weak`, `Weak`, and `Strong` (German `Schwach`, `Schwach`, `Stark`) |
+| IDN-T-48 | Confirmation result pages | IDN-AC-1.4, IDN-U-7, IDN-U-8 | `web` | `/login?confirmed=1` and `/link-invalid?kind=confirm` are drawn | the login page shows the text of IDN-U-8; the invalid-link page shows the text of IDN-U-7 and a link to `/login` |
+| IDN-T-49 | Bot check only when switched on | IDN-AC-1.5, IDN-F-5 | `CAPTCHA_ENABLED=false`, then `true` with a site key | `/register` is drawn and a registration is sent | off: no widget and no script of the provider, and the body has no `botToken`; on: the widget with the site key, and its token is sent as `botToken` |
+| IDN-T-50 | Same message for every answer 202 | IDN-AC-1.6, IDN-U-3 | the registration form of `web` | `identity` answers 202 `{ "status": "check-mailbox" }` | the form is replaced by the text of IDN-U-3 |
+| IDN-T-51 | Registration page closed | IDN-AC-1.7, IDN-F-30, IDN-U-6 | `REGISTRATION_ENABLED=false` | `/register` is drawn | the page shows the text of IDN-U-6 and no form |
 
 ### Synthetic Test Data Strategy
 
