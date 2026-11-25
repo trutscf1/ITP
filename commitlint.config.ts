@@ -37,12 +37,23 @@ const mergedBeforeReview: string[] = [
   "test(observability): prove the start entry and heartbeat of cms in the started stack [OBS-AC-1.1] [OBS-T-1]",
 ];
 
+// Two commits of !69 (340f895c6, 1f4cf5d33) with an unknown scope and two requirement IDs. They
+// stay as they are by decision of the developer (no history rewrite), so only these exact
+// messages pass (WORKFLOW.md "Commit messages").
+const trailer = "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>";
+const rewriteExceptions: string[] = [
+  `test(observability): add the pipeline job rule-test for the alert rule test [OBS-AC-2.3, OBS-T-33]\n\nRefs #164\n\n${trailer}`,
+  `ci(observability): run the rule test of the alert rule in the job rule-test [OBS-AC-2.3, OBS-T-33]\n\nCloses #164\n\n${trailer}`,
+];
+
 const config: UserConfig = {
   extends: ["@commitlint/config-conventional"],
   plugins: [plugin],
   ignores: [
     (message) =>
-      [...beforeWorkflow, ...mergedBeforeReview].includes(message.trimEnd()),
+      [...beforeWorkflow, ...mergedBeforeReview, ...rewriteExceptions].includes(
+        message.trimEnd(),
+      ),
   ],
   rules: {
     "scope-enum": [
