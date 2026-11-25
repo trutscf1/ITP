@@ -86,24 +86,21 @@ export async function health(
   hasAdministrator: AdministratorProbe,
   options: HealthOptions,
 ): Promise<HealthReport> {
-  const contentStore = await runCheck(
-    "content-store",
-    true,
-    probeContentStore,
-    options.timeoutMs,
-  );
+  // SCF-NF-3: both checks start at the same time, so the report takes at most one timeout.
+  const [contentStore, asked] = await Promise.all([
+    runCheck("content-store", true, probeContentStore, options.timeoutMs),
+    runCheck(
+      "administrator-account",
+      false,
+      async () => {
+        if (!(await hasAdministrator())) throw new Error("unclaimed");
+      },
+      options.timeoutMs,
+    ),
+  ]);
   // PUB-F-9: down while no administrator exists, and also down while content-store is down.
   const administrator: DependencyCheck =
-    contentStore.status === "down"
-      ? { name: "administrator-account", essential: false, status: "down" }
-      : await runCheck(
-          "administrator-account",
-          false,
-          async () => {
-            if (!(await hasAdministrator())) throw new Error("unclaimed");
-          },
-          options.timeoutMs,
-        );
+    contentStore.status === "down" ? { ...asked, status: "down" } : asked;
   const checks = [contentStore, administrator];
   return {
     unit: "cms",

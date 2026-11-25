@@ -764,9 +764,14 @@ rules:
   1. unit = cms; check content-store (essential): ok if a read of the content store answers within
      HEALTH_CHECK_TIMEOUT_MS, else down.
   2. check administrator-account (essential: false): ok if editor-accounts.hasAdministrator() is true;
-     down otherwise, and also down while content-store is down.
-  3. status by SCF-F-6: ok, degraded (only the non-essential check is down), or down.
-  4. No host, port, credential, or version of a dependency appears (SCF-NF-4).
+     down otherwise, and also down while content-store is down (its answer is then discarded).
+     A question that fails or does not answer within HEALTH_CHECK_TIMEOUT_MS is down as well; the
+     report does not tell it apart from "no administrator", because it holds no error details
+     (rule 5).
+  3. Both checks start at the same time, so health() takes at most one HEALTH_CHECK_TIMEOUT_MS
+     and stays within HEALTH_TIMEOUT_MS (SCF-NF-3).
+  4. status by SCF-F-6: ok, degraded (only the non-essential check is down), or down.
+  5. No host, port, credential, or version of a dependency appears (SCF-NF-4).
 ```
 
 Traces to: [PUB-F-9], [PUB-F-31]. Requires: `editor-accounts`; [SCF-F-5], [SCF-F-6].
