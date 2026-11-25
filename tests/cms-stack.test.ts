@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { describe, it } from "node:test";
+import { after, before, describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
 
@@ -142,3 +143,103 @@ describe("PUB-AC-1.1 CMS container: Strapi runs as a container with its own Post
     }
   });
 });
+
+// ---------------------------------------------------------------------------------------------
+// Stack test (PUB-T-1, dynamic half): starts the real stack. STACK_TEST=1 switches it on (needs
+// Docker with Compose v2); until the pipeline offers a container runtime it runs locally and the
+// result is stated in the merge request ("CI Test Constraints").
+// ---------------------------------------------------------------------------------------------
+
+const stackTestOn = process.env.STACK_TEST === "1";
+const composeArgs = [
+  "compose",
+  "-p",
+  "stash-cms-test",
+  "--env-file",
+  ".env.example",
+  "-f",
+  "docker-compose.yml",
+];
+
+function dockerCompose(args: string[]): string {
+  return execFileSync("docker", [...composeArgs, ...args], {
+    cwd: root,
+    encoding: "utf8",
+    maxBuffer: 32 * 1024 * 1024,
+  });
+}
+
+function rows(table: string): number {
+  const sql = `select count(*) from ${table}`;
+  return Number(
+    dockerCompose([
+      "exec",
+      "-T",
+      "cms-db",
+      "sh",
+      "-c",
+      `psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "${sql}"`,
+    ]).trim(),
+  );
+}
+
+describe(
+  "PUB-AC-1.1 CMS in the started stack (PUB-T-1)",
+  {
+    skip: stackTestOn
+      ? false
+      : "stack test: set STACK_TEST=1 to start the stack with Docker (PUB-T-1 runs locally until CI offers a container runtime)",
+  },
+  () => {
+    before(() => {
+      dockerCompose([
+        "up",
+        "-d",
+        "--build",
+        "--wait",
+        "--wait-timeout",
+        "600",
+        "cms",
+        "proxy",
+      ]);
+    });
+    after(() => {
+      dockerCompose(["down", "-v"]);
+    });
+
+    it("PUB-AC-1.1 PUB-T-1 answers /cms/health through the proxy with the report of cms, the content store essential and ok", () => {
+      const answer = JSON.parse(
+        dockerCompose([
+          "exec",
+          "-T",
+          "proxy",
+          "wget",
+          "-qO-",
+          "http://127.0.0.1:80/cms/health",
+        ]),
+      ) as {
+        unit: string;
+        checks: { name: string; essential: boolean; status: string }[];
+      };
+      assert.equal(answer.unit, "cms");
+      const store = answer.checks.find(
+        (check) => check.name === "content-store",
+      );
+      assert.equal(store?.essential, true);
+      assert.equal(store?.status, "ok");
+    });
+
+    it("PUB-AC-1.5 PUB-F-7 holds the example content of the first start in the content store, in every content type", () => {
+      for (const table of [
+        "landing_sections",
+        "help_categories",
+        "help_articles",
+        "changelog_entries",
+        "legal_pages",
+        "images",
+      ]) {
+        assert.ok(rows(table) > 0, `${table} holds no seeded row`);
+      }
+    });
+  },
+);

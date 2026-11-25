@@ -120,18 +120,24 @@ describe(
 
     it("OBS-AC-1.1 holds the log entry `unit started` with service.name cms in the log store and the heartbeat of cms in the metric store within 60 seconds of its start (OBS-F-1, OBS-F-11, OBS-F-25, OBS-T-1)", async () => {
       const log = await eventually(() => {
-        const answer = get("http://loki:3100/loki/api/v1/query_range", {
-          query: '{service_name="cms"} |= "unit started"',
-        });
-        return answer.includes("unit started") && answer.includes('"cms"');
+        const answer = JSON.parse(
+          get("http://loki:3100/loki/api/v1/query_range", {
+            query: '{service_name="cms"} |= "unit started"',
+          }),
+        ) as { data?: { result?: unknown[] } };
+        return (answer.data?.result?.length ?? 0) > 0;
       }, 60);
-      const heartbeat = await eventually(
-        () =>
+      const heartbeat = await eventually(() => {
+        const answer = JSON.parse(
           get("http://prometheus:9090/api/v1/query", {
-            query: 'unit_running{service_name="cms"}',
-          }).includes('"value"'),
-        60,
-      );
+            // The OTLP metric `unit_running` (unit 1) is stored by Prometheus as `unit_running_ratio`.
+            query: 'unit_running_ratio{service_name="cms"}',
+          }),
+        ) as { data?: { result?: { value?: [number, string] }[] } };
+        return (answer.data?.result ?? []).some(
+          (series) => series.value?.[1] === "1",
+        );
+      }, 60);
       assert.ok(log, "the start entry of cms did not reach the log store");
       assert.ok(
         heartbeat,
