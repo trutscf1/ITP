@@ -189,8 +189,10 @@ services:
     depends_on:
       web:
         condition: service_healthy
+    # backend as well: /cms/health is forwarded to cms, which is on the backend network only.
     networks:
       - frontend
+      - backend
     ports:
       - "${PROXY_PORT:?set PROXY_PORT in .env}:80"
     volumes:
