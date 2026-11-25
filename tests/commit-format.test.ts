@@ -91,6 +91,19 @@ describe("SCF-AC-6.1 Commits from before the workflow", () => {
     }
   });
 
+  it("SCF-AC-6.1 accepts the one message that was merged through !77 before its review was resolved", async () => {
+    assert.equal(
+      await check(
+        "test(observability): prove the start entry and heartbeat of cms in the started stack [OBS-AC-1.1] [OBS-T-1]\n",
+      ),
+      true,
+    );
+    assert.equal(
+      await check("test(observability): prove something else [OBS-AC-1.1]\n"),
+      false,
+    );
+  });
+
   it("SCF-AC-6.1 still rejects a new message that only resembles them", async () => {
     assert.equal(await check("setup the stack"), false);
     assert.equal(await check("feat: added prisma\n\nRefs: #41"), false);

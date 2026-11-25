@@ -30,10 +30,20 @@ const beforeWorkflow: string[] = [
   "added mongoDB to docker stack",
 ];
 
+// One commit that reached feature/78-headless-cms through !77 before its review was resolved
+// (e48fa5739, the scope `observability` is not in the list below). It is not rewritten, by
+// decision of the developer (WORKFLOW.md "Commit messages").
+const mergedBeforeReview: string[] = [
+  "test(observability): prove the start entry and heartbeat of cms in the started stack [OBS-AC-1.1] [OBS-T-1]",
+];
+
 const config: UserConfig = {
   extends: ["@commitlint/config-conventional"],
   plugins: [plugin],
-  ignores: [(message) => beforeWorkflow.includes(message.trimEnd())],
+  ignores: [
+    (message) =>
+      [...beforeWorkflow, ...mergedBeforeReview].includes(message.trimEnd()),
+  ],
   rules: {
     "scope-enum": [
       RuleConfigSeverity.Error,

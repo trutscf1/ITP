@@ -51,6 +51,7 @@ Refs: #<issue>
 - Description in English, lowercase start, about 50 characters, understandable without looking the ID up.
 - Checked by commitlint (`commitlint.config.ts`) in the commit-msg hook and again in CI (job `commit-messages`). The hook is active after `pre-commit install` in each clone. Examples: `gam-ai-knowledge/concepts/scaffolding.md` §10, example 4.
 - Exception: the three commits on `dev` from before the workflow (`a8c6590ad` "setup", `3ea2a4675` "feat: added prisma", `231f5773e` "added mongoDB to docker stack") cannot be rewritten, so `commitlint.config.ts` lets exactly these messages pass. Without it, the job `commit-messages` of every release MR `dev` → `main` fails (review of !36).
+- Exception: commit `e48fa5739` `test(observability): prove the start entry and heartbeat of cms in the started stack [OBS-AC-1.1] [OBS-T-1]` carries a scope that is not in the list above. It reached `feature/78-headless-cms` through !77 (merge `c4308b50c`) before the review of !77 was resolved. By decision of the developer (trutscf1) there is no history rewrite; `commitlint.config.ts` lets exactly this message pass (`mergedBeforeReview`). Every other message is still checked.
 
 ## Changelog
 
