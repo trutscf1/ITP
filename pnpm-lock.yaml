@@ -9,7 +9,7 @@ overrides:
   '@hono/node-server@<1.19.10': '>=1.19.10 <2'
   lodash@<4.18.0: '>=4.18.0 <5'
   postcss@<8.5.18: '>=8.5.18 <9'
-  zod@<4.6.6: '>=4.6.6 <5'
+  zod@>=4 <4.6.6: '>=4.6.6 <5'
 
 importers:
 
@@ -9820,6 +9820,9 @@ packages:
   zeptomatch@2.1.0:
     resolution: {integrity: sha512-KiGErG2J0G82LSpniV0CtIzjlJ10E04j02VOudJsPyPwNZgGnRKQy7I1R7GMyg/QswnE4l7ohSGrQbQbjXPPDA==}
 
+  zod@3.25.76:
+    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+
   zod@4.6.7:
     resolution: {integrity: sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg==}
 
@@ -17437,7 +17440,7 @@ snapshots:
       '@types/koa': 2.15.2
       co-body: 6.2.0
       formidable: 2.1.5
-      zod: 4.6.7
+      zod: 3.25.76
 
   koa-compose@4.1.0: {}
 
@@ -17491,7 +17494,7 @@ snapshots:
     dependencies:
       crc: 3.8.0
       is-type-of: 2.2.0
-      zod: 4.6.7
+      zod: 3.25.76
 
   koa-static@5.0.0:
     dependencies:
@@ -20534,6 +20537,8 @@ snapshots:
     dependencies:
       grammex: 3.1.13
       graphmatch: 1.1.1
+
+  zod@3.25.76: {}
 
   zod@4.6.7: {}
 

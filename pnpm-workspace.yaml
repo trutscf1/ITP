@@ -39,7 +39,17 @@ overrides:
   # The admin panel and the core of Strapi (PUB-US-1, unit cms) pull in postcss 8.4.49 (via
   # styled-components) and zod 4.4.3 and 3.25.76 (via @strapi/admin and koa-body), which have known
   # high vulnerabilities with a fix (SCF-AC-5.2, SCF-NF-6). The override moves them to the patched
-  # releases; koa-body uses only basic zod schemas (object, boolean, string, union, nativeEnum),
-  # which zod 4 still supports. Remove an override once Strapi no longer needs it.
+  # releases. Only the 4.x line of zod is raised: koa-body and koa-session need zod 3 (a 4.x release
+  # breaks koa-session at start: z.function(...).args is not a function). Remove an override once
+  # Strapi no longer needs it.
   "postcss@<8.5.18": ">=8.5.18 <9"
-  "zod@<4.6.6": ">=4.6.6 <5"
+  "zod@>=4 <4.6.6": ">=4.6.6 <5"
+
+# zod 3.25.76 of koa-body (@strapi/core) is flagged for memory exhaustion while validating oversized
+# input (GHSA-mrhx-c7xc-m3w5); the fix exists in zod 4 only, and koa-body cannot run on it (see the
+# override of zod above). koa-body validates only its own static options once at start with zod,
+# never request data, so the flaw cannot be reached. Reviewed 2026-11-25 (SCF-AC-5.3); remove the
+# entry once Strapi no longer depends on zod 3.
+auditConfig:
+  ignoreGhsas:
+    - GHSA-mrhx-c7xc-m3w5
