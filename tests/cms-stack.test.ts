@@ -229,6 +229,28 @@ describe(
       assert.equal(store?.status, "ok");
     });
 
+    it("PUB-AC-1.7 PUB-T-7 reports degraded and names administrator-account on a fresh installation, while the store is ok", () => {
+      const answer = JSON.parse(
+        dockerCompose([
+          "exec",
+          "-T",
+          "proxy",
+          "wget",
+          "-qO-",
+          "http://127.0.0.1:80/cms/health",
+        ]),
+      ) as {
+        status: string;
+        checks: { name: string; essential: boolean; status: string }[];
+      };
+      assert.equal(answer.status, "degraded");
+      const administrator = answer.checks.find(
+        (check) => check.name === "administrator-account",
+      );
+      assert.equal(administrator?.status, "down");
+      assert.equal(administrator?.essential, false);
+    });
+
     it("PUB-AC-1.5 PUB-F-7 holds the example content of the first start in the content store, in every content type", () => {
       for (const table of [
         "landing_sections",
