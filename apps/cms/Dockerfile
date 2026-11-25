@@ -22,6 +22,9 @@ RUN pnpm install --frozen-lockfile --filter @stash/cms... \
  && rm -rf node_modules apps/*/node_modules packages/*/node_modules tests/node_modules \
  && CI=1 pnpm install --frozen-lockfile --prod --prefer-offline --filter @stash/cms...
 
+# The upload plugin of Strapi stores files in public/uploads and aborts when the folder is missing
+# (PUB-F-13); the user node owns it.
+RUN mkdir -p apps/cms/public/uploads
 ENV NODE_ENV=production STRAPI_TELEMETRY_DISABLED=true
 EXPOSE 1337
 WORKDIR /app/apps/cms

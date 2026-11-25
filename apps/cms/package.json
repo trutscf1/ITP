@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "scripts": {
     "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
     "build": "tsc -p tsconfig.build.json && node scripts/copy-assets.mjs",
-    "start": "node dist/main.js",
+    "start": "node dist/src/main.js",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
     "test": "node --test \"src/**/*.test.ts\""

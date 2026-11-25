@@ -140,9 +140,11 @@ export function createStrapiSeedStore(strapi: StrapiLike): SeedStore {
         );
       }
       for (const category of content.helpCategories) {
+        const name = { de: category.name.de, en: category.name.en };
         const categoryId = await write(
           "api::help-category.help-category",
-          { de: { name: category.name.de }, en: { name: category.name.en } },
+          // The name is the component shared.localized-name with both languages, in every locale.
+          { de: { name }, en: { name } },
           undefined,
           { position: category.position },
         );
