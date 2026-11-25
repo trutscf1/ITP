@@ -90,7 +90,7 @@ The planned technology is listed in the project proposal ([docs/projektantrag.md
 
 ## Data model
 
-The relational schema as it stands, defined in `packages/db` (Prisma 8) and drawn with every column in [gam-ai-knowledge/concepts/scaffolding.md](gam-ai-knowledge/concepts/scaffolding.md) §8, "Relational data model" (story `SCF-US-4`). Table names are plural, as the SQL style guide of the school demands. The application's own `users` table is in a 1:1 relation to the user table of the authentication library: the database creates the `users` row with every auth user. Files, share links, quotas, and the audit log join with their features. The diagram drawn in Vertabelo follows as an export (open human step).
+The relational schema as it stands, defined in `packages/db` (Prisma 8) and drawn with every column in [gam-ai-knowledge/concepts/scaffolding.md](gam-ai-knowledge/concepts/scaffolding.md) §8, "Relational data model" (story `SCF-US-4`). Table names are plural, as the SQL style guide of the school demands. The application's own `users` table is in a 1:1 relation to the user table of the authentication library: the database creates the `users` row with every auth user. Files, share links, quotas, and the audit log join with their features. The diagram is drawn as Mermaid text and rendered to [gam-ai-knowledge/images/er-diagram.png](gam-ai-knowledge/images/er-diagram.png) (ADR-0011).
 
 ```mermaid
 erDiagram

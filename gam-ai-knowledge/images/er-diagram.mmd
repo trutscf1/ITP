@@ -1,0 +1,86 @@
+erDiagram
+    auth_users ||--|| users : "has exactly one"
+    auth_users ||--o{ auth_sessions : "has"
+    auth_users ||--o{ auth_accounts : "has"
+    users ||--o{ team_members : "belongs to teams through"
+    teams ||--o{ team_members : "has"
+    teams ||--o{ folders : "owns"
+    folders |o--o{ folders : "contains"
+    folders ||--o{ folder_permissions : "grants"
+    users |o--o{ folder_permissions : "is granted"
+
+    auth_users {
+        text id PK
+        text name
+        text email UK
+        bool email_verified
+        text image
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    auth_sessions {
+        text id PK
+        text user_id FK
+        text token UK
+        timestamptz expires_at
+        text ip_address
+        text user_agent
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    auth_accounts {
+        text id PK
+        text user_id FK
+        text account_id
+        text provider_id
+        text access_token
+        text refresh_token
+        text id_token
+        timestamptz access_token_expires_at
+        timestamptz refresh_token_expires_at
+        text scope
+        text password
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    auth_verifications {
+        text id PK
+        text identifier
+        text value
+        timestamptz expires_at
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    users {
+        uuid id PK
+        text auth_user_id FK, UK
+        timestamptz created_at
+    }
+    teams {
+        uuid id PK
+        text name
+        timestamptz created_at
+    }
+    team_members {
+        uuid team_id PK, FK
+        uuid user_id PK, FK
+        text role
+        timestamptz created_at
+    }
+    folders {
+        uuid id PK
+        uuid team_id FK
+        uuid parent_id FK
+        text name
+        bool inherits_permissions
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    folder_permissions {
+        uuid id PK
+        uuid folder_id FK
+        uuid user_id FK
+        text role
+        text level
+        timestamptz created_at
+    }

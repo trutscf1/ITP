@@ -34,7 +34,7 @@ The vertical slices that deliver this story. One slice is delivered by the story
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
 | 1 — Documentation in the README | SCF-AC-7.1, SCF-AC-7.2, SCF-AC-7.3, SCF-AC-7.5; embeds a draft ER diagram | — | #85 |
-| 2 — ER diagram in the documentation | SCF-AC-7.4 | SCF-US-4 slice 2 (the Vertabelo export, #151) | #109 |
+| 2 — ER diagram in the documentation | SCF-AC-7.4 | SCF-US-4 slice 2 (the rendered Mermaid export, #151) | #109 |
 
 - **Story issue:** #85
 - **Weight:** 3 (slice 1: 2, slice 2: 1)

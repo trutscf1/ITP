@@ -21,7 +21,7 @@ One user story of [Scaffolding & shared contracts](epic.md) and the acceptance c
 
 | ID | Title | Given | When | Then |
 | --- | --- | --- | --- | --- |
-| SCF-AC-4.1 | ER diagram | The project documentation | A reader opens the data model | It shows the ER diagram created in Vertabelo, with plural table names as the SQL style guide demands |
+| SCF-AC-4.1 | ER diagram | The project documentation | A reader opens the data model | It shows the ER diagram, drawn as Mermaid text and rendered to an image, with plural table names as the SQL style guide demands |
 | SCF-AC-4.2 | Schema matches diagram | The Prisma schema (Prisma ≥ 8) | A developer compares it with the ER diagram | The schema maps the diagram and its migrations are versioned in the repository |
 | SCF-AC-4.3 | Own users table | The relational schema | A user is created | An own `users` table holds a row in a 1:1 relation to the Better Auth user table |
 | SCF-AC-4.4 | Seed data | A fresh local database | The seed script runs | Test data (user, team, folder) exists for local development |
@@ -35,7 +35,7 @@ The vertical slices that deliver this story. One slice is delivered by the story
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
 | 1 — Schema, migrations, seed, migrating at start | SCF-AC-4.2, SCF-AC-4.3, SCF-AC-4.4, SCF-AC-4.5 | — | #41 |
-| 2 — ER diagram of the schema | SCF-AC-4.1 (human step: draw the diagram of `scaffolding.md` §8 in Vertabelo, export it, embed it) | slice 1 | #151 |
+| 2 — ER diagram of the schema | SCF-AC-4.1 (draw the diagram of `scaffolding.md` §8 as Mermaid text, render it to a PNG, embed it; ADR-0011) | slice 1 | #151 |
 | 3 — Folder stays in its team | SCF-AC-4.6 | slice 1 | #152 |
 
 - **Story issue:** #41
