@@ -63,6 +63,7 @@ Every acceptance criterion of the three ready stories has one acceptance test in
 | Q6, Q7 New stories | IDN-US-7 operator role from a configured address list; IDN-US-8 delete my account | R2 needs operator logins; the right to deletion |
 | Q8 Lock | IP and account counted separately, 15 minutes; reset stays possible | Guessing is stopped without letting strangers lock a member out |
 | Q9 Session check | Every unit asks `identity` per request (ADR-0007) | Logout takes effect everywhere at once |
+| Q352, Q353 Guessing protection | Only the reverse proxy may name the client address; an attempt is counted before the password is checked | No other container can choose the counted address, and no flood of attempts runs the costly password hash |
 | Q10, Q11 Technology | Turnstile, Hono (`STACK.md` §3) | No Google tracking; small TypeScript server |
 | Q13 Pages | Built by the owner of `web` as slice 2 of each story | Tracks stay separate |
 
@@ -121,11 +122,11 @@ Rows of IDN-US-1, -2, and -6 are binding. Rows marked *draft* belong to stories 
 | IDN-F-2 | Password rules | A password MUST have 12 to 128 characters and MUST NOT equal, ignoring case, an entry of the common-password list. Both rules MUST be checked by `web` before sending and by `identity`. `web` MUST show a strength bar with the four levels `weak`, `fair`, `good`, `strong` computed by M3 (§8); the bar only advises and blocks nothing beyond the two rules. | IDN-AC-1.2 (Password rules) |
 | IDN-F-3 | Password hashing | `identity` MUST store a password only as a hash of the algorithm and parameters of [IDN-C-2]. A password MUST NOT be stored, logged, or returned in plain text anywhere. | IDN-AC-1.3 (Password hashing) |
 | IDN-F-4 | E-mail confirmation | After a registration with a new address, `identity` MUST create the account with `emailVerified = false` and send a confirmation e-mail with a confirmation link valid for `CONFIRMATION_LINK_TTL_HOURS` hours. Opening a valid link MUST set `emailVerified = true`, invalidate the link, and redirect to `/login?confirmed=1`. A login of an unconfirmed account MUST be refused with [IDN-E-5]. | IDN-AC-1.4 (E-mail confirmation) |
-| IDN-F-5 | Bot check | While `CAPTCHA_ENABLED` is true, `identity` MUST verify the bot-check token of every registration and reset request with the provider of [IDN-C-5] before anything else and refuse a missing or rejected token with [IDN-E-2]. While it is false, `web` MUST NOT load the bot check and `identity` MUST NOT require or send a token. | IDN-AC-1.5 (Bot check), IDN-AC-6.5 (Protected endpoint) |
+| IDN-F-5 | Bot check | While `CAPTCHA_ENABLED` is true, `identity` MUST verify the bot-check token of every registration and reset request with the provider of [IDN-C-5] after the request throttle ([IDN-F-35]) and before the input is checked or anything is stored, and refuse a missing or rejected token with [IDN-E-2]; a missing token is refused without a call to the provider. While it is false, `web` MUST NOT load the bot check and `identity` MUST NOT require or send a token. | IDN-AC-1.5 (Bot check), IDN-AC-6.5 (Protected endpoint) |
 | IDN-F-6 | No account disclosure | A valid registration MUST always be answered with HTTP 202 and `{ "status": "check-mailbox" }`. For an address of a confirmed account, `identity` MUST NOT change the account and MUST send the notice e-mail instead of a confirmation link. For an address of an unconfirmed account, it MUST keep the account, replace its name and password hash by the new ones, and send a new confirmation link (A15). | IDN-AC-1.6 (No account disclosure) |
 | IDN-F-7 | Password login | `POST /api/identity/login` with the e-mail address and password of a confirmed account MUST create a session ([IDN-F-34]) and answer 200 with the `SessionInfo` of §8 and the session cookie. | IDN-AC-2.1 (Password login) |
 | IDN-F-8 | Logout | `POST /api/identity/logout` MUST delete the session of the session cookie from the session store, answer 204, and clear the cookie. From then on, a session check with that token MUST answer "no session" ([IDN-F-37]). Without a valid session it MUST also answer 204. | IDN-AC-2.2 (Logout ends the session) |
-| IDN-F-9 | Lock after failed logins | `identity` MUST count failed logins per IP address and, separately, per e-mail address (also for addresses without an account) in windows of `LOGIN_FAILURE_WINDOW_SECONDS` seconds. When a counter reaches `LOGIN_MAX_FAILURES`, it MUST lock that IP address for every login, or that e-mail address for the password login, for `LOGIN_LOCK_MINUTES` minutes and answer [IDN-E-6]. A lock of an e-mail address MUST NOT block the reset request or the new password of [IDN-US-6]. A successful login MUST reset the counter of its e-mail address. | IDN-AC-2.3 (Lock after failed logins) |
+| IDN-F-9 | Lock after failed logins | `identity` MUST count failed logins per IP address and, separately, per e-mail address (also for addresses without an account) in windows of `LOGIN_FAILURE_WINDOW_SECONDS` seconds. When a counter reaches `LOGIN_MAX_FAILURES`, it MUST lock that IP address for every login, or that e-mail address for the password login, for `LOGIN_LOCK_MINUTES` minutes and answer [IDN-E-6]. A lock of an e-mail address MUST NOT block the reset request or the new password of [IDN-US-6]. A successful login MUST reset the counter of its e-mail address. An attempt MUST be counted before its password is checked; an attempt that finds `LOGIN_MAX_FAILURES` attempts of its IP or e-mail address already counted in the window MUST be answered with [IDN-E-6] without a password check (Q353). | IDN-AC-2.3 (Lock after failed logins) |
 | IDN-F-10 | Protected pages | A request to a page of `web` under `/files`, `/settings`, or `/dashboard` without a valid session MUST be redirected with 303 to `/login?next=<path>`, where `<path>` is the requested path; after a successful login `web` MUST go to `<path>` if it starts with a single `/`, else to `/dashboard`. | IDN-AC-2.4 (Protected pages) |
 | IDN-F-11 | Generic login error | A login with an unknown e-mail address or a wrong password MUST be answered with [IDN-E-4], with the same status, body, and, within 50 ms, the same answer time in both cases. | IDN-AC-2.5 (Generic error) |
 | IDN-F-12 | Provider buttons (*draft*) | The login page MUST show one login button for each external login provider configured, and none for the others. | IDN-AC-3.1 (Provider buttons) |
@@ -147,7 +148,7 @@ Rows of IDN-US-1, -2, and -6 are binding. Rows marked *draft* belong to stories 
 | IDN-F-28 | Identical answer | A valid reset request MUST be answered with HTTP 202 and `{ "status": "check-mailbox" }` whether an account with the address exists or not; for an unknown address no e-mail MUST be sent. | IDN-AC-6.4 (Identical answer) |
 | IDN-F-29 | Protected reset endpoint | The reset request MUST be counted by the request throttle of [IDN-F-35] and checked by the bot check of [IDN-F-5]. | IDN-AC-6.5 (Protected endpoint) |
 | IDN-F-30 | Registration closed | While `REGISTRATION_ENABLED` is false, `identity` MUST refuse every registration with [IDN-E-8] and `web` MUST show the page `/register` with the message of [IDN-U-6] instead of the form. Login, logout, and reset MUST work unchanged. | IDN-AC-1.7 (Registration closed) |
-| IDN-F-31 | Unconfirmed accounts removed | `identity` MUST delete, at least once per hour, every account with `emailVerified = false` created more than `UNCONFIRMED_ACCOUNT_TTL_DAYS` days ago, together with its `users` row, its credentials, and its open links. | IDN-AC-1.8 (Unconfirmed accounts removed) |
+| IDN-F-31 | Unconfirmed accounts removed | `identity` MUST delete, at least once per hour, every account with `emailVerified = false` created or last registered ([IDN-F-6], Q346) more than `UNCONFIRMED_ACCOUNT_TTL_DAYS` days ago, together with its `users` row, its credentials, and its open links. | IDN-AC-1.8 (Unconfirmed accounts removed) |
 | IDN-F-32 | Own users row | Creating an account MUST create its `users` row in the same transaction ([SCF-F-24]); no account MAY exist without one. | IDN-AC-1.4 (E-mail confirmation) |
 | IDN-F-33 | Reset confirms the address | A successful reset MUST set `emailVerified = true` (A9). | IDN-AC-6.6 (Reset confirms the address) |
 | IDN-F-34 | Session lifetime | A session MUST expire `SESSION_TTL_DAYS` days after its last renewal. A session check of a session older than one day since its last renewal MUST renew it. An expired session MUST be treated as no session and be deleted from the session store. | IDN-AC-2.6 (Session lifetime) |
@@ -162,17 +163,18 @@ Rows of IDN-US-1, -2, and -6 are binding. Rows marked *draft* belong to stories 
 
 ## 5. User Interaction Requirements
 
-The pages are built in `web` (Q13). Texts are given in English; the German texts are in §8 ("Message texts").
+The pages are built in `web` (Q13). Texts are given in English; the German texts are in §8 ("Message texts"). The pages choose their language like [IDN-F-38]: the first supported language of the request's `Accept-Language` header, German otherwise, and mark their content with that `lang` (A19).
 
 | ID | Title | Requirement | Derives from |
 | --- | --- | --- | --- |
-| IDN-U-1 | Field errors | The registration and new-password forms MUST show each rule violation next to its field before sending, as text linked to the field for screen readers, and MUST keep the entered name and e-mail address. | IDN-AC-1.1 (Shared validation) |
+| IDN-U-1 | Field errors | The registration and new-password forms MUST show each rule violation next to its field before sending, with the field texts of §8 ("Field and form texts", Q407), as text linked to the field for screen readers, and MUST keep the entered name and e-mail address. An error answer of `identity` to a form that passed this check MUST be shown above the form with the form texts of §8. | IDN-AC-1.1 (Shared validation) |
 | IDN-U-2 | Strength bar | The strength bar MUST show its level as text (`Weak`, `Fair`, `Good`, `Strong`), not only as colour, and update while typing. | IDN-AC-1.2 (Password rules) |
 | IDN-U-3 | Check your mailbox | After a registration or reset request, the page MUST show "Check your mailbox. If the address can be used, we have sent you an e-mail." | IDN-AC-1.6 (No account disclosure), IDN-AC-6.4 (Identical answer) |
 | IDN-U-4 | Login messages | The login page MUST show "E-mail address or password is wrong." for [IDN-E-4], "Please confirm your e-mail address first. We have sent you a new link." for [IDN-E-5], and "Too many attempts. Try again in 15 minutes or reset your password." for [IDN-E-6]. | IDN-AC-2.5 (Generic error), IDN-AC-2.3 (Lock after failed logins) |
 | IDN-U-5 | After reset | After a reset, the login page MUST show "Your password was changed. Please log in again." | IDN-AC-6.3 (Sessions ended) |
 | IDN-U-6 | Registration closed | With the registration closed, `/register` MUST show "Registration is closed. Ask the operator of this installation for an account." | IDN-AC-1.7 (Registration closed) |
-| IDN-U-7 | Invalid link | An invalid or expired confirmation or reset link MUST lead to a page that says "This link is invalid or has expired." and offers the action that sends a new one. | IDN-AC-1.4 (E-mail confirmation), IDN-AC-6.1 (Limited link) |
+| IDN-U-7 | Invalid link | An invalid or expired confirmation or reset link MUST lead to a page that says "This link is invalid or has expired." and offers the action that sends a new one. For a confirmation link (`/link-invalid?kind=confirm`) that action is a link to `/login` with the text "Log in to get a new link.", because a refused login of an unconfirmed account sends a new link ([IDN-E-5]) without replacing the password (Q409). | IDN-AC-1.4 (E-mail confirmation), IDN-AC-6.1 (Limited link) |
+| IDN-U-8 | Address confirmed | `/login?confirmed=1` MUST show "Your e-mail address is confirmed. You can log in now." above the login form; slice 2 of IDN-US-1 delivers the page with this notice, slice 2 of IDN-US-2 adds the form (Q408). | IDN-AC-1.4 (E-mail confirmation) |
 
 ## 6. Non-Functional Requirements
 
@@ -212,9 +214,10 @@ session:<token-hash>         -> SessionRecord, expiry = SESSION_TTL_DAYS days, r
 account-sessions:<accountId> -> set of token hashes (for IDN-F-27)
 fail:ip:<ip>                 -> counter, expiry = LOGIN_FAILURE_WINDOW_SECONDS
 fail:email:<email-lowercase> -> counter, expiry = LOGIN_FAILURE_WINDOW_SECONDS
-lock:ip:<ip>                 -> 1, expiry = LOGIN_LOCK_MINUTES
-lock:email:<email-lowercase> -> 1, expiry = LOGIN_LOCK_MINUTES
+lock:ip:<ip>                 -> end time of the lock (ms), expiry = LOGIN_LOCK_MINUTES
+lock:email:<email-lowercase> -> end time of the lock (ms), expiry = LOGIN_LOCK_MINUTES
 req:ip:<ip>                  -> counter, expiry = 60 s (IDN-F-35)
+resend:<accountId>           -> 1, expiry = CONFIRMATION_LINK_TTL_HOURS (IDN-E-5, Q345)
 
 SessionRecord { accountId: string, userId: uuid, expiresAt: timestamp, ipAddress: string, userAgent: string }
 ```
@@ -226,7 +229,9 @@ RegistrationInput { name: string 1..100 after trim, email: Email, password: Pass
 LoginInput        { email: Email, password: string 1..128 }
 ResetRequestInput { email: Email, botToken: optional<string> }
 NewPasswordInput  { token: string 1..200, password: Password }
-Email    = string 3..254, lowercased and trimmed, one "@" with at least one character before it and a dot in the part after it
+Email    = string 3..254, lowercased and trimmed; a local part of the signs of an RFC 5322 dot-atom (letters,
+           digits, !#$%&'*+/=?^_`{|}~.-), one "@", and a domain of letters, digits, and hyphens with at least
+           one dot between its labels; so no comma, semicolon, angle bracket, quote, or white space (review of !62)
 Password = string 12..128, not in the common-password list (case-insensitive)
 Strength = enum(weak|fair|good|strong)   // weak: < 12 chars or listed; fair: 12..15 chars of one character class;
                                          // good: 12..15 chars of two or more classes, or 16+ of one; strong: 16+ of two or more classes
@@ -240,6 +245,7 @@ Character classes: lower-case letters, upper-case letters, digits, everything el
 
 | Method and path | Body | Success | Errors |
 | --- | --- | --- | --- |
+| `GET /health` | — | 200 `HealthReport` of [SCF-F-5] with the essential checks `relational-database` and `session-store` (status `down` while either does not answer within `HEALTH_CHECK_TIMEOUT_MS`) | — |
 | `POST /register` | `RegistrationInput` | 202 `Accepted` | E-1, E-2, E-3, E-8 |
 | `GET /confirm?token=<t>` | — | 303 to `/login?confirmed=1` | 303 to `/link-invalid?kind=confirm` (E-7) |
 | `POST /login` | `LoginInput` | 200 `SessionInfo` + session cookie | E-1, E-4, E-5, E-6 |
@@ -247,6 +253,10 @@ Character classes: lower-case letters, upper-case letters, digits, everything el
 | `GET /session` | — | 200 `SessionInfo` | 401 E-9 |
 | `POST /password-reset/request` | `ResetRequestInput` | 202 `Accepted` | E-1, E-2, E-3 |
 | `POST /password-reset` | `NewPasswordInput` | 204 | E-1, E-7 |
+
+**Client address.** The throttle counts the address the reverse proxy writes as the last entry of `X-Forwarded-For`; the proxy replaces what the client sent, and `identity` publishes no port. The header is read only from a connection whose address is the one `TRUSTED_PROXY` names, resolved by the name service and kept for 30 seconds (Q352); every other peer, such as another unit on the network `frontend`, and a call without the header, is counted by the address of its connection.
+
+**Confirmation and reset tokens.** A reset token has 256 random bits like a confirmation token; `auth_verifications` holds `identifier = "reset:" + hex(SHA-256(token))` and `value = account id`, and a new reset link deletes the older ones of the account ([IDN-F-25]). A confirmation token has 256 random bits. `auth_verifications` holds `identifier = "confirm:" + hex(SHA-256(token))` and `value = account id`, so the token itself is stored nowhere ([IDN-NF-5]). "At most once per `CONFIRMATION_LINK_TTL_HOURS`" in [IDN-E-5] means (Q345): the first refused login of an unconfirmed account sends a new link, which replaces every older link of the account, and sets `resend:<accountId>` with that expiry; further refused logins send no link while the key exists. Registering again ([IDN-F-6]) also replaces the older links. The e-mails of [IDN-F-6] and [IDN-E-5] are sent after the answer, so the answer does not wait for the SMTP host ([IDN-E-11]).
 
 **Error codes** added to the `ErrorResponse` table of `scaffolding.md` §8 (§15):
 
@@ -264,6 +274,10 @@ Character classes: lower-case letters, upper-case letters, digits, everything el
 
 | Variable | Valid values | Default |
 | --- | --- | --- |
+| `PORT` | 1..65535 | `3001` |
+| `APP_VERSION` | 1..64 characters | `0.0.0-dev` |
+| `HEALTH_CHECK_TIMEOUT_MS` | 1..60000 | `1000` |
+| `DATABASE_URL` | `postgresql://` URL | — (required) |
 | `PUBLIC_ORIGIN` | absolute `http://` or `https://` URL | `http://localhost:8080` |
 | `IDENTITY_AUTH_SECRET` | at least 32 characters | — (required) |
 | `REDIS_URL` | `redis://` URL | — (required) |
@@ -280,8 +294,28 @@ Character classes: lower-case letters, upper-case letters, digits, everything el
 | `CAPTCHA_SITE_KEY`, `CAPTCHA_SECRET_KEY` | non-empty when `CAPTCHA_ENABLED=true` | — |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_FROM` | host, 1..65535, e-mail address | `mailpit`, `1025`, `no-reply@stash.local` |
 | `SESSION_CHECK_TIMEOUT_MS` | 100..5000 (also read by `web` and `storage`) | `1000` |
+| `TRUSTED_PROXY` | host name or IP address of the reverse proxy (Q352); fixed to `proxy` in `docker-compose.yml`, a commented default in `.env.example` | `proxy` |
 
-**Message texts (German).** IDN-U-3: „Prüfe dein Postfach. Wenn die Adresse verwendet werden kann, haben wir dir eine E-Mail geschickt.“ IDN-U-4: „E-Mail-Adresse oder Passwort ist falsch.“, „Bitte bestätige zuerst deine E-Mail-Adresse. Wir haben dir einen neuen Link geschickt.“, „Zu viele Versuche. Versuche es in 15 Minuten wieder oder setze dein Passwort zurück.“ IDN-U-5: „Dein Passwort wurde geändert. Bitte melde dich neu an.“ IDN-U-6: „Die Registrierung ist geschlossen. Frag den Betreiber dieser Installation nach einem Konto.“ IDN-U-7: „Dieser Link ist ungültig oder abgelaufen.“
+**Message texts (German).** IDN-U-3: „Prüfe dein Postfach. Wenn die Adresse verwendet werden kann, haben wir dir eine E-Mail geschickt.“ IDN-U-4: „E-Mail-Adresse oder Passwort ist falsch.“, „Bitte bestätige zuerst deine E-Mail-Adresse. Wir haben dir einen neuen Link geschickt.“, „Zu viele Versuche. Versuche es in 15 Minuten wieder oder setze dein Passwort zurück.“ IDN-U-5: „Dein Passwort wurde geändert. Bitte melde dich neu an.“ IDN-U-6: „Die Registrierung ist geschlossen. Frag den Betreiber dieser Installation nach einem Konto.“ IDN-U-7: „Dieser Link ist ungültig oder abgelaufen.“ „Melde dich an, um einen neuen Link zu bekommen.“ IDN-U-8: „Deine E-Mail-Adresse ist bestätigt. Du kannst dich jetzt anmelden.“
+
+**Field and form texts** (IDN-U-1, IDN-U-2, Q407). The registration form maps each issue of `RegistrationInput` to one text of its field; a field shows only its first text in this order.
+
+| Field or answer | Rule | English | German |
+| --- | --- | --- | --- |
+| name | empty after trimming | Enter your name. | Gib deinen Namen ein. |
+| name | more than 100 characters | Use at most 100 characters. | Verwende höchstens 100 Zeichen. |
+| email | not an `Email` of the contract | Enter an e-mail address such as ada@example.org. | Gib eine E-Mail-Adresse wie ada@example.org ein. |
+| password | `too-short` | Use at least 12 characters. | Verwende mindestens 12 Zeichen. |
+| password | `too-long` | Use at most 128 characters. | Verwende höchstens 128 Zeichen. |
+| password | `common` | This password is too common. Choose another one. | Dieses Passwort ist zu verbreitet. Wähle ein anderes. |
+| strength bar | label and levels | Password strength: Weak, Fair, Good, Strong | Passwortstärke: Schwach, Mittel, Gut, Stark |
+| form | `validation-failed` | Please check your entries. | Bitte prüfe deine Eingaben. |
+| form | `bot-check-failed` | The bot check failed. Please try again. | Die Bot-Prüfung ist fehlgeschlagen. Bitte versuche es noch einmal. |
+| form | `too-many-requests` | Too many attempts. Please wait a minute and try again. | Zu viele Versuche. Warte eine Minute und versuche es noch einmal. |
+| form | `registration-closed` | the text of IDN-U-6 | the text of IDN-U-6 |
+| form | any other answer or no answer | Registration did not work. Please try again later. | Die Registrierung hat nicht geklappt. Bitte versuche es später noch einmal. |
+
+**Configuration of `web` for the pages** (slice 2, M8; added to M1 of `scaffolding.track-web.md`): `REGISTRATION_ENABLED` (`true`, `false`, default `true`) decides between the form and the text of IDN-U-6; `CAPTCHA_ENABLED` (`true`, `false`, default `false`) and `CAPTCHA_SITE_KEY` (1..512 characters, required when `CAPTCHA_ENABLED=true`) decide whether the page loads the bot-check widget of [IDN-C-5] with that site key. `web` reads the same values as `identity` from `docker-compose.yml`, so the page and the server agree.
 
 **E-mails.** Confirmation: subject "Confirm your e-mail address for stash" / „Bestätige deine E-Mail-Adresse für stash“, body with the link `<PUBLIC_ORIGIN>/api/identity/confirm?token=<t>` and its validity in hours. Notice: subject "Someone tried to register with your address" / „Jemand wollte sich mit deiner Adresse registrieren“, body without a link, with the advice to reset the password if it was the member. Reset: subject "Reset your stash password" / „Setze dein stash-Passwort zurück“, link `<PUBLIC_ORIGIN>/reset-password?token=<t>` and its validity in minutes.
 
@@ -361,7 +395,7 @@ Character classes: lower-case letters, upper-case letters, digits, everything el
 
 ## 13. Resolved Questions & ADRs
 
-Verbatim rounds: [identity.qa-log.md](identity.qa-log.md). ADR: [ADR-0007](../adr/0007-session-check-through-identity.md) (session check through `identity`, Q9), which closes the question ADR-0001 left to R3.
+Verbatim rounds: [identity.qa-log.md](identity.qa-log.md). ADRs: [ADR-0007](../adr/0007-session-check-through-identity.md) (session check through `identity`, Q9), which closes the question ADR-0001 left to R3; [ADR-0009](../adr/0009-better-auth-as-library-behind-own-endpoints.md) (the authentication library behind the own endpoints of §8, Q342 of 2026-11-17).
 
 | Q | Title | Decision | Rationale |
 | --- | --- | --- | --- |
@@ -379,6 +413,8 @@ Verbatim rounds: [identity.qa-log.md](identity.qa-log.md). ADR: [ADR-0007](../ad
 | Q12 | Shared understanding | Confirmed | — |
 | Q13 | Pages in `web` | Slice 2 of each story, built by schwaigc | Tracks stay separate |
 | Q14 | Merge request | Reviewed by `trutscf1`; its approval is the Phase 4 gate | Most affected by §15 |
+| Q352 | Client address | `X-Forwarded-For` only from the address `TRUSTED_PROXY` names (§8) | Another container on the network `frontend` could choose the counted address |
+| Q353 | Cost of a login | Count the attempt before the password check ([IDN-F-9], M4) | A flood of parallel attempts would otherwise run the 19 MiB hash before the lock answers |
 
 **Open questions for the school management** (legal; not decided by the team or an agent):
 
@@ -408,7 +444,7 @@ Verbatim rounds: [identity.qa-log.md](identity.qa-log.md). ADR: [ADR-0007](../ad
 
 | Document | Change | Reason | Carried out by |
 | --- | --- | --- | --- |
-| [scaffolding.md](scaffolding.md) §8, `ErrorResponse` | Add the seven codes of §8 to the enum and the code table. | [SCF-F-21] | `trutscf1`, inbox; before slice 1 of IDN-US-1 is merged |
+| [scaffolding.md](scaffolding.md) §8, `ErrorResponse` | Add the seven codes of §8 to the enum and the code table. | [SCF-F-21] | done by `tschudea07` in slice 1 of IDN-US-1 (#45) on 2026-11-17 (Q336), reviewed by `trutscf1` in its merge request |
 | [observability.md](observability.md) §8, secret key list | Add `botToken`, `confirmationToken`, `resetToken`. | [IDN-NF-4] | `trutscf1`, inbox |
 | [public-content.md](public-content.md) [PUB-F-22] | Name the periods of [IDN-F-31], [IDN-NF-2], and [IDN-NF-3] in the paragraphs on member accounts and IP addresses. | Privacy | `trutscf1`, inbox |
 | `web` (schwaigc) | Slices 2 of IDN-US-1, -2, -6: pages, forms, route guard. | Q13 | `schwaigc`, issues cut with `tickets` |
@@ -462,23 +498,57 @@ function strength(password) -> Strength
 **M4 Throttle** — Traces to: IDN-F-9, IDN-F-35. Requires: IDN-C-6.
 
 ```text
-function beforeLogin(ip, email) -> ok | locked(retryAfterSeconds)
-  1. if lock:ip:<ip> or lock:email:<email> exists: return locked(longest remaining expiry)
-function afterLogin(ip, email, success)
-  1. if success: delete fail:email:<email>; return
-  2. increment fail:ip:<ip> and fail:email:<email> (expiry set on first increment)
-  3. for each counter that reached LOGIN_MAX_FAILURES: set its lock key with expiry LOGIN_LOCK_MINUTES
+function reserveLogin(ip, email, now) -> reservation(ipCount, emailCount) | locked(retryAfterSeconds)
+  1. if lock:ip:<ip> or lock:email:<email> holds a time after now: return locked(seconds to the later one)
+  2. increment fail:ip:<ip> and fail:email:<email> (expiry set on first increment, one transaction)
+  3. if either count is above LOGIN_MAX_FAILURES: take both increments back and
+     return locked(remaining window of that counter)          // parallel attempts, Q353
+  4. return reservation
+function settleLogin(reservation, success, now)
+  1. if success: delete fail:email:<email>, take the increment of fail:ip:<ip> back; return
+  2. for each count of the reservation that reached LOGIN_MAX_FAILURES: set its lock key to
+     now + LOGIN_LOCK_MINUTES with that expiry and delete its counter, so counting starts afresh
 function countRequest(ip) -> ok | refused(retryAfterSeconds)      // registration and reset request
 ```
 
-**M2 AuthCore login order** — Traces to: IDN-F-7, IDN-F-9, IDN-F-11, IDN-E-5.
+**M2 AuthCore login order** (`apps/identity/src/login.ts`) — Traces to: IDN-F-7, IDN-F-9, IDN-F-11, IDN-E-5.
 
 ```text
 1. validate LoginInput (E-1)
-2. Throttle.beforeLogin (E-6)
+2. Throttle.reserveLogin (E-6): a locked login costs no password check (Q353)
 3. verify password; for an unknown address hash a dummy password, so both cases take the same time
-4. Throttle.afterLogin(success)
+4. Throttle.settleLogin(success)
 5. wrong: E-4; unconfirmed: E-5; else create session, set cookie, answer SessionInfo
+```
+
+**M1 reset order** (`apps/identity/src/reset.ts`) — Traces to: IDN-F-25 to IDN-F-29, IDN-F-33, IDN-E-7.
+
+```text
+reset request: Throttle.countRequest(ip) (E-3), BotCheck (E-2), validate ResetRequestInput (E-1);
+               answer 202 Accepted; after the answer, for a known address only: replace its reset
+               links by a new one (identifier "reset:" + hash) and send the e-mail, so neither the
+               answer nor its time tells whether the address has an account
+new password:  validate NewPasswordInput (E-1, the link stays usable);
+               the link must exist and be unexpired (E-7) before the password is hashed;
+               delete every session of account-sessions:<accountId> (a failing session store
+               stops here, E-10, and the old password stays);
+               one transaction: delete the link (only the request that deletes it goes on), replace
+               the hash or create the credential of an account without one, set
+               emailVerified = true, delete every reset link of the account;
+               delete the sessions again (a login under way); answer 204
+```
+
+**M1 registration order** — Traces to: IDN-F-1, IDN-F-5, IDN-F-6, IDN-F-30, IDN-F-35.
+
+```text
+1. Throttle.countRequest(ip) (E-3)         // every request counts, valid or not
+2. REGISTRATION_ENABLED is false: E-8
+3. CAPTCHA_ENABLED: BotCheck.verify(botToken) (E-2); a missing token is refused without a call
+4. validate RegistrationInput (E-1)
+5. hash the password, also for the address of a confirmed account, so the answer time does not tell
+6. confirmed account: notice e-mail; unconfirmed: replace name and hash, delete its links, send a new link;
+   no account: create it (the database creates its users row), send a link
+7. answer 202 Accepted
 ```
 
 ### Inter-Module Interfaces
@@ -505,15 +575,16 @@ stateDiagram-v2
 ### Design for Testability
 
 - **M3** is pure: tests call `passwordProblems` and `strength` with the values of §10, example 1.
-- **M4** takes the session store and a clock as parameters; tests use a real store from the test stack and a fixed clock.
+- **M4** takes the session store and a clock as parameters; tests use a real store from the test stack and a fixed clock. A lock holds the time it ends and a session its expiry, both read against that clock; the expiry of the keys only removes them afterwards. The failure window itself runs on the time of the session store, so a test of it sends its attempts within that window.
+- **Client address** takes a name resolver; tests pass the address of the connection the way the HTTP server does and a stub resolver (Q352).
 - **`identity` over HTTP**: tests start M1 with the test database (`TEST_DATABASE_URL`), a session store, a recording SMTP stub, and a bot-check stub that answers yes or no; they call the endpoints of §8 and read the stub's e-mails.
-- **`web` pages**: the end-to-end runner of `STACK.md` §4 against `web` with `identity` running (slices 2).
+- **`web` pages**: the unit test runner of `web` (`STACK.md` §4, `node --test` with `react-dom/server`) for slices 2: the form rules and the answer handling are pure functions, and every page and form view is rendered on the server with fixed props and checked in its HTML (Q410). The journeys through a browser with `identity` running are end-to-end scenarios of WEB-US-4.
 
 ### Requirement Traceability Matrix
 
 | Story | Requirements | Modules | Tests |
 | --- | --- | --- | --- |
-| IDN-US-1 | IDN-F-1 to F-6, F-30 to F-32, F-35, F-38; IDN-U-1 to U-3, U-6, U-7; IDN-NF-1, NF-4 to NF-6; IDN-E-1 to E-3, E-7, E-8, E-11; IDN-C-2 to C-5, C-7, C-8 | M1 to M3, M5 to M8 | IDN-T-1 to T-9, T-21 to T-26 |
+| IDN-US-1 | IDN-F-1 to F-6, F-30 to F-32, F-35, F-38; IDN-U-1 to U-3, U-6 to U-8; IDN-NF-1, NF-4 to NF-6; IDN-E-1 to E-3, E-7, E-8, E-11; IDN-C-2 to C-5, C-7, C-8 | M1 to M3, M5 to M8 | IDN-T-1 to T-9, T-21 to T-26, T-46 to T-52 |
 | IDN-US-2 | IDN-F-7 to F-11, F-34, F-36, F-37; IDN-U-4; IDN-NF-2, NF-3, NF-7; IDN-E-4 to E-6, E-9, E-10; IDN-C-1, C-6 | M1, M2, M4, M8, M9 | IDN-T-10 to T-15, T-27, T-28 |
 | IDN-US-6 | IDN-F-25 to F-29, F-33; IDN-U-3, U-5, U-7; IDN-E-1 to E-3, E-7 | M1, M2, M4 to M6, M8 | IDN-T-16 to T-20 |
 
@@ -558,6 +629,30 @@ One test per acceptance criterion; test names in code carry the `AC` ID.
 | IDN-T-18 | Reset ends every session | IDN-AC-6.3, IDN-F-27 | an account logged in on two devices | the password is reset | both old cookies get 401; login with the new password 200 |
 | IDN-T-19 | Identical reset answer | IDN-AC-6.4, IDN-F-28 | one known and one unknown address | a reset is requested for each | both 202 `{ "status": "check-mailbox" }`; only the known address gets an e-mail |
 | IDN-T-20 | Reset protected and confirms | IDN-AC-6.5, IDN-AC-6.6, IDN-F-29, IDN-F-33 | `CAPTCHA_ENABLED=true` with the stub answering no; an unconfirmed account | a reset request without a passing token; 6 requests within 60 s; then a reset of the unconfirmed account | 400 `bot-check-failed`; the 6th gets 429; after the reset the account logs in without confirming |
+| IDN-T-29 | Provider buttons (*draft*) | IDN-AC-3.1, IDN-F-12 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-30 | Account on first login (*draft*) | IDN-AC-3.2, IDN-F-13 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-31 | Link and unlink (*draft*) | IDN-AC-3.3, IDN-F-14 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-32 | Cancelled login (*draft*) | IDN-AC-3.4, IDN-F-15 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-33 | Activation (*draft*) | IDN-AC-4.1, IDN-F-16 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-34 | Code at login (*draft*) | IDN-AC-4.2, IDN-F-17 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-35 | Backup codes (*draft*) | IDN-AC-4.3, IDN-F-18 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-36 | Deactivation (*draft*) | IDN-AC-4.4, IDN-F-19 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-37 | Encrypted secrets (*draft*) | IDN-AC-4.5, IDN-F-20 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-38 | Manage passkeys (*draft*) | IDN-AC-5.1, IDN-F-21 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-39 | Browser support (*draft*) | IDN-AC-5.2, IDN-F-22 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-40 | Several passkeys (*draft*) | IDN-AC-5.3, IDN-F-23 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-41 | Counts as MFA (*draft*) | IDN-AC-5.4, IDN-F-24 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-42 | Role from the configuration (*draft*) | IDN-AC-7.1, IDN-F-39 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-43 | Check for the reverse proxy (*draft*) | IDN-AC-7.2, IDN-F-40 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-44 | Confirmed by password (*draft*) | IDN-AC-8.1, IDN-F-41 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-45 | Files deleted (*draft*) | IDN-AC-8.2, IDN-F-42 | planned; written out when its story is grilled (Q350) | — | — |
+| IDN-T-46 | Registration page validates before sending | IDN-AC-1.1, IDN-F-1, IDN-U-1 | the registration form of `web` | the name `"   "`, a name of 101 characters, and the e-mail address `ada@example` are checked, and the form is drawn with the resulting errors | each input gets the field text of §8 next to its field, linked by `aria-describedby`, with the entered values kept; no request is sent |
+| IDN-T-47 | Strength bar as text | IDN-AC-1.2, IDN-F-2, IDN-U-2 | the registration form of `web` | `kurz123`, `password1234`, and `Drei-blaue-Wolken-7` are entered | the first two are refused with their field text; the bar reads `Weak`, `Weak`, and `Strong` (German `Schwach`, `Schwach`, `Stark`) |
+| IDN-T-48 | Confirmation result pages | IDN-AC-1.4, IDN-U-7, IDN-U-8 | `web` | `/login?confirmed=1` and `/link-invalid?kind=confirm` are drawn | the login page shows the text of IDN-U-8; the invalid-link page shows the text of IDN-U-7 and a link to `/login` |
+| IDN-T-49 | Bot check only when switched on | IDN-AC-1.5, IDN-F-5 | `CAPTCHA_ENABLED=false`, then `true` with a site key | `/register` is drawn and a registration is sent | off: no widget and no script of the provider, and the body has no `botToken`; on: the widget with the site key, and its token is sent as `botToken` |
+| IDN-T-50 | Same message for every answer 202 | IDN-AC-1.6, IDN-U-3 | the registration form of `web` | `identity` answers 202 `{ "status": "check-mailbox" }` | the form is replaced by the text of IDN-U-3 |
+| IDN-T-51 | Registration page closed | IDN-AC-1.7, IDN-F-30, IDN-U-6 | `REGISTRATION_ENABLED=false` | `/register` is drawn | the page shows the text of IDN-U-6 and no form |
+| IDN-T-52 | Language of the pages | IDN-F-38, IDN-U-1 (A19) | the pages of M8 | `Accept-Language` is `en-GB,de;q=0.5`, `de-AT,en;q=0.8`, `fr-FR,en;q=0.7,de;q=0.9`, `fr`, and missing | English, German, German, German, German; the content carries that `lang` |
 
 ### Synthetic Test Data Strategy
 

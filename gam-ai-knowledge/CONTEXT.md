@@ -152,3 +152,27 @@ The at most four values a member chose in the appearance menu: theme, colour mod
 **Profile**:
 The member's own record in stash, at most one per member and separate from the account; today it holds the appearance preferences. The word names this record only, never the account.
 *Avoid*: account (for this record), settings
+
+**Offline mark**:
+The choice of a member that a file or folder is available without a network on one device; a folder mark includes everything inside it.
+*Avoid*: favourite, pin, sync flag
+
+**Offline copy**:
+The content of a marked file that the app keeps on the device.
+*Avoid*: cache, download
+
+**Offline overview**:
+The screen that lists the offline marks of a member with the used offline storage and lets them remove each mark.
+*Avoid*: offline manager
+
+**Queued action**:
+A rename, move, delete, or upload that a member made without a network and that waits to be synchronized.
+*Avoid*: pending change, outbox entry
+
+**Conflict**:
+The case that a file or folder changed on the server after the revision a queued action was made against, or that its name is taken; the member chooses their version, the server version, or keeps both.
+*Avoid*: merge problem, sync error
+
+**Offline storage limit**:
+The most storage that the offline copies of one device may use, set by the operator.
+*Avoid*: quota (the quotas of teams are a different thing)

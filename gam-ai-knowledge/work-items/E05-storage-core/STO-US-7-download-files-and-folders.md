@@ -9,7 +9,7 @@ sprint: 3
 ---
 # STO-US-7 Download files and folders
 
-One user story of [Storage core: folders, resumable upload, deduplication](epic.md) and the acceptance criteria that decide when it is done. This file is the single source for both; the story issue copies them verbatim (P-DOC-6, P-TRK-2). The story was written by the team as tracker issue US-25 and brought into this form on 2026-10-06; its owner reviews the wording.
+One user story of [Storage core: folders, resumable upload, deduplication](epic.md) and the acceptance criteria that decide when it is done. This file is the single source for both; the story issue copies them verbatim (P-DOC-6, P-TRK-2). The story was written by the team as tracker issue US-25 and brought into this form on 2026-10-06; its owner reviews the wording. On 2026-11-24 the grilling named the archive rules and cut the slices ([question log](../../concepts/storage-core.qa-log.md), Q427, Q440, A16, A20, A23).
 
 ## User story
 
@@ -21,18 +21,19 @@ One user story of [Storage core: folders, resumable upload, deduplication](epic.
 
 | ID | Title | Given | When | Then |
 | --- | --- | --- | --- | --- |
-| STO-AC-7.1 | Single file | A stored file | A member downloads it | It is delivered with the correct file name and MIME type |
-| STO-AC-7.2 | Folder as ZIP | A folder or a selection of several items | A member downloads it | It is streamed as a ZIP archive without holding the whole archive in memory |
+| STO-AC-7.1 | Single file | A stored file | A member downloads it | It is delivered with the correct file name and media type |
+| STO-AC-7.2 | Folder as ZIP | A folder or a selection of several items, also over 4 GiB | A member downloads it | It is streamed as a ZIP archive without holding the whole archive in memory |
 | STO-AC-7.3 | Range requests | A stored file | A client sends an HTTP range request | The requested range is delivered |
 | STO-AC-7.4 | Permission check | Any download | It is requested | The permission is checked for that download |
 
 ## Slices
 
-The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it.
+The vertical slices that deliver this story. One slice is delivered by the story issue itself; every further slice is a child issue of it. Cut of 2026-11-24 from the architecture chapter of the concept (§16, A23).
 
 | Slice | Delivers | Blocked by | Issue |
 | --- | --- | --- | --- |
-| 1 — whole story | STO-AC-7.1, STO-AC-7.2, STO-AC-7.3, STO-AC-7.4 | — | #62 |
+| 1 — File download with ranges and archive download (`storage`) | STO-AC-7.1, STO-AC-7.2, STO-AC-7.3, STO-AC-7.4 | STO-US-1 slice 2 | #62 |
+| 2 — Download actions in the file browser (`web`) | STO-AC-7.1 (page), STO-AC-7.2 (page) | slice 1; STO-US-5 slice 2 | — |
 
 - **Story issue:** #62
 - **Weight:** 3

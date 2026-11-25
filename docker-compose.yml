@@ -1,8 +1,8 @@
 # Local stack (SCF-US-2, slice 1): the data services, the reverse proxy, and `web`, started by
 # one `docker compose up`. Every setting comes from `.env` (SCF-AC-2.2); `.env.example` lists
 # every variable. Every service has a health check, and a service starts only after the
-# services it depends on are healthy (SCF-AC-2.4). The units `identity`, `storage`, and `worker`
-# join when their code runs; `cms` and `cms-db` are here (PUB-US-1). Units and their order:
+# services it depends on are healthy (SCF-AC-2.4). The units `storage` and `worker` join when
+# their code runs; `cms` and `cms-db` are here (PUB-US-1). Units and their order:
 # gam-ai-knowledge/concepts/scaffolding.md (SCF-F-1).
 services:
   # Relational database (SCF-C-8).
@@ -160,6 +160,9 @@ services:
       # External services are switched off by default; e-mail goes to mailpit (SCF-AC-2.3).
       OAUTH_ENABLED: ${OAUTH_ENABLED:?set OAUTH_ENABLED in .env}
       CAPTCHA_ENABLED: ${CAPTCHA_ENABLED:?set CAPTCHA_ENABLED in .env}
+      # The registration page shows the form and the bot-check widget with the same values as identity (#168).
+      REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:?set REGISTRATION_ENABLED in .env}
+      CAPTCHA_SITE_KEY: ${CAPTCHA_SITE_KEY:-}
       SMTP_HOST: mailpit
       SMTP_PORT: "1025"
     depends_on:
@@ -179,6 +182,60 @@ services:
       retries: 5
       start_period: 20s
 
+  # The `identity` unit (concepts/identity.md): registration, confirmation, login. Reaches the
+  # browser through the reverse proxy at /api/identity (docker/Caddyfile) and publishes no port.
+  # Every setting of the table "Configuration of `identity`" (§8) comes from `.env`; e-mail goes
+  # to mailpit (SCF-AC-2.3), and the bot check is off by default.
+  identity:
+    build:
+      context: .
+      dockerfile: apps/identity/Dockerfile
+    restart: unless-stopped
+    environment:
+      PORT: ${IDENTITY_PORT:?set IDENTITY_PORT in .env}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:?set PUBLIC_ORIGIN in .env}
+      IDENTITY_AUTH_SECRET: ${IDENTITY_AUTH_SECRET:?set IDENTITY_AUTH_SECRET in .env}
+      REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:?set REGISTRATION_ENABLED in .env}
+      CONFIRMATION_LINK_TTL_HOURS: ${CONFIRMATION_LINK_TTL_HOURS:?set CONFIRMATION_LINK_TTL_HOURS in .env}
+      UNCONFIRMED_ACCOUNT_TTL_DAYS: ${UNCONFIRMED_ACCOUNT_TTL_DAYS:?set UNCONFIRMED_ACCOUNT_TTL_DAYS in .env}
+      RESET_LINK_TTL_MINUTES: ${RESET_LINK_TTL_MINUTES:?set RESET_LINK_TTL_MINUTES in .env}
+      SESSION_TTL_DAYS: ${SESSION_TTL_DAYS:?set SESSION_TTL_DAYS in .env}
+      LOGIN_MAX_FAILURES: ${LOGIN_MAX_FAILURES:?set LOGIN_MAX_FAILURES in .env}
+      LOGIN_FAILURE_WINDOW_SECONDS: ${LOGIN_FAILURE_WINDOW_SECONDS:?set LOGIN_FAILURE_WINDOW_SECONDS in .env}
+      LOGIN_LOCK_MINUTES: ${LOGIN_LOCK_MINUTES:?set LOGIN_LOCK_MINUTES in .env}
+      REQUEST_LIMIT_PER_MINUTE: ${REQUEST_LIMIT_PER_MINUTE:?set REQUEST_LIMIT_PER_MINUTE in .env}
+      CAPTCHA_ENABLED: ${CAPTCHA_ENABLED:?set CAPTCHA_ENABLED in .env}
+      CAPTCHA_SITE_KEY: ${CAPTCHA_SITE_KEY:-}
+      CAPTCHA_SECRET_KEY: ${CAPTCHA_SECRET_KEY:-}
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+      SMTP_FROM: ${SMTP_FROM:?set SMTP_FROM in .env}
+      SESSION_CHECK_TIMEOUT_MS: ${SESSION_CHECK_TIMEOUT_MS:?set SESSION_CHECK_TIMEOUT_MS in .env}
+      # Only the reverse proxy may set the client address of the throttle (Q352).
+      TRUSTED_PROXY: proxy
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mailpit:
+        condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
+    networks:
+      - frontend
+      - backend
+    healthcheck:
+      # The health report answers 200 even while a dependency is down (SCF-F-5, SCF-F-6); the
+      # container is healthy unless the report says `down`. An empty answer is unhealthy too.
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:$${PORT}/health | grep -qv '\"status\":\"down\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
   # Reverse proxy: one origin for the browser (SCF-F-4). Routes for the other units are added
   # in docker/Caddyfile as they join the stack.
   proxy:
@@ -186,6 +243,7 @@ services:
     restart: unless-stopped
     environment:
       WEB_PORT: ${WEB_PORT:?set WEB_PORT in .env}
+      IDENTITY_PORT: ${IDENTITY_PORT:?set IDENTITY_PORT in .env}
     depends_on:
       web:
         condition: service_healthy

@@ -1,0 +1,8 @@
+# Orca settings of this repository (gam-engineering, P-WS-13). Written only in stealth mode: the gam- folders are
+# git-ignored there, so every Orca workspace shares the main folder's copy instead of having none.
+# Your own keys and entries stay on every migrate.
+worktree:
+  sharedDirectories:
+    - gam-ai-knowledge
+    - gam-ai-memory
+    - gam-engineering

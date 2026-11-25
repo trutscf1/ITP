@@ -25,7 +25,7 @@ Without git, each git step is replaced as follows:
 | `revise` | Not available; findings are fixed in the implement loop. |
 | `merge <MR>` under the merge policy (P-MR-4…6) | `merge <issue>`, the close step: run `review` if no clean one is recorded, check P-MR-3 without the pipeline, set the issue to `Status: done`, update the status (P-ROAD-4). No question is asked and the merge keys are not read. |
 | `release`, tag, release MR (P-VER-1, P-MR-5) | Not available; the command says so and stops. |
-| `gam-engineering/tools/merge.ps1`, `gam-engineering/tools/MERGING.md` | Not copied. |
+| `gam-engineering/tools/merge.mjs`, `gam-engineering/tools/MERGING.md` | Not copied. |
 | `node gam-ai-knowledge/tools/doc-check.mjs --status`, the CI job | Skipped; `node gam-ai-knowledge/tools/doc-check.mjs` without `--status` and the markdown lint still run. |
 | Team mode (P-TEAM) | Not available; `team` says that it needs git and stops. |
 | ROADMAP stage `in dev` | Reached when the feature's last story is closed; `released` is never set. |

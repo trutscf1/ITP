@@ -2,7 +2,9 @@
 // Blocks the end of a turn once per state when work is still open in git: uncommitted changes, commits not pushed,
 // or a work branch not merged into the integration branch (dev, or main in trunk mode, P-GIT-9). The agent then
 // checks what else is open and asks the developer with an AskUserQuestion pop-up. Never loops, never repeats for an
-// unchanged state (a developer who answered "Later" is not nagged again on the next turn).
+// unchanged state (a developer who answered "Later" is not nagged again on the next turn). A branch without an upstream
+// counts only the commits no remote has, so a fresh worktree at the tip of main stays silent (Q583). In an Orca session
+// open work always ends in a pop-up, also under merge policy auto (Q583).
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
@@ -42,15 +44,17 @@ const branch = git(root, ["rev-parse", "--abbrev-ref", "HEAD"]);
 if (!branch || branch === "HEAD") process.exit(0);
 const env = projectEnv(root);
 const integration = env.GAM_ENGINEERING_BRANCHES === "trunk" ? "main" : "dev";
+// An Orca session (Q583): the developer watches the workspace and decides commit, push, and merge in a pop-up.
+const orca = Boolean(process.env.ORCA_APP_VERSION) || process.env.CLAUDE_CODE_ENTRYPOINT === "orca";
 // Under merge policy auto the agent merges without a pop-up (P-MR-4), so an unmerged branch alone is no reason to ask.
-const mergeAsks = env.GAM_ENGINEERING_MERGE !== "auto";
+const mergeAsks = env.GAM_ENGINEERING_MERGE !== "auto" || orca;
 
 const dirty = git(root, ["status", "--porcelain"]);
 const hasUpstream = git(root, ["rev-parse", "--abbrev-ref", "@{u}"]) !== "";
 const hasRemote = git(root, ["remote"]) !== "";
 const unpushed = hasUpstream
   ? Number(git(root, ["rev-list", "--count", "@{u}..HEAD"]) || 0)
-  : hasRemote ? Number(git(root, ["rev-list", "--count", "HEAD"]) || 0) : 0;
+  : hasRemote ? Number(git(root, ["rev-list", "--count", "HEAD", "--not", "--remotes"]) || 0) : 0;
 const unmerged =
   branch !== integration && git(root, ["rev-parse", "--verify", "-q", integration]) !== ""
     ? Number(git(root, ["rev-list", "--count", `${integration}..HEAD`]) || 0)
@@ -74,8 +78,11 @@ try {
 }
 
 const check = `(inbox entries handled, status and docs updated, P-GIT-5 and P-ROAD-4; tests and pipeline green, P-MR-3)`;
-// Under merge policy auto the developer has decided in advance: commit and push without a pop-up.
-const action = mergeAsks
+// Under merge policy auto the developer has decided in advance: commit and push without a pop-up; not in Orca (Q583).
+const action = orca
+  ? `then ask the developer with an AskUserQuestion pop-up, never in chat (Orca session, Q583): commit and push now, ` +
+    `merge now (/gam-engineering merge, under the merge policy P-MR-4), or later.`
+  : mergeAsks
   ? `then ask the developer with an AskUserQuestion pop-up, never in chat: commit, push, or merge now, later, or not. ` +
     `A merge follows the merge policy (P-MR-4).`
   : `then commit and push without asking (merge policy auto, P-GIT-11); if the check fails, report what is missing instead.`;

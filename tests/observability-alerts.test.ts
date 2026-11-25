@@ -88,7 +88,7 @@ const dockerImage =
 const ruleToolSkip =
   localPromtool || dockerImage
     ? false
-    : "offline rule test: neither promtool nor the pinned metric store image is available locally (OBS-T-33 runs where one of them is, §17; the pipeline job `rule-test` of #164 runs it on the pinned image)";
+    : "offline rule test: neither promtool nor the pinned metric store image is available locally (OBS-T-33 runs where one of them is, §17; the pipeline job `rule-test` runs it on the pinned image)";
 
 /**
  * The offline rule test of OBS-C-3: a local `promtool`, or the pinned image of the metric store
@@ -426,5 +426,60 @@ describe("OBS-AC-2.3 Started stack (OBS-T-10)", { skip: stackSkip }, () => {
       firing.annotations.summary,
       "Unit storage: 6.0 % of 100 requests failed in the last 5 minutes.",
     );
+  });
+});
+
+// ---------------------------------------------------------------------------------------------
+// Pipeline job `rule-test` (#164, OBS-T-33): the CI job `test` has neither promtool nor Docker,
+// so the job `rule-test` runs the rule test on the pinned image of the metric store.
+// ---------------------------------------------------------------------------------------------
+
+type CiJob = {
+  image?: string | { name: string; entrypoint?: string[] };
+  stage?: string;
+  needs?: (string | { job: string; artifacts?: boolean })[];
+  script?: string[];
+  allow_failure?: unknown;
+};
+
+describe("OBS-AC-2.3 Pipeline job rule-test (OBS-T-33, OBS-C-3)", () => {
+  const ci = parse(readText(".gitlab-ci.yml")) as Record<
+    string,
+    CiJob | undefined
+  >;
+  const job = ci["rule-test"];
+
+  it("OBS-AC-2.3 has a pipeline job rule-test on the image of the metric store pinned in the stack definition (OBS-T-33)", () => {
+    assert.ok(job, "the job rule-test exists");
+    const image = typeof job.image === "string" ? job.image : job.image?.name;
+    assert.equal(image, prometheusImage);
+    assert.equal(prometheusImage, "prom/prometheus:v3.15.1");
+    assert.equal(job.stage, "test");
+    assert.notEqual(job.allow_failure, true);
+  });
+
+  it("OBS-AC-2.3 runs promtool test rules in the job against the data file of example 5 and the rendered rule file (OBS-T-33)", () => {
+    assert.ok(job, "the job rule-test exists");
+    const script = (job.script ?? []).join("\n");
+    assert.match(script, /promtool test rules/);
+    assert.match(script, /alert-error-rate\.test\.yml/);
+    assert.match(script, /alert-rules\.yml/);
+  });
+
+  it("OBS-AC-2.3 renders the rule file with the configuration step in a job the rule-test job waits for (OBS-F-28, OBS-T-33)", () => {
+    assert.ok(job, "the job rule-test exists");
+    const needs = (job.needs ?? []).map((n) =>
+      typeof n === "string" ? n : n.job,
+    );
+    assert.equal(needs.length, 1);
+    const render = ci[needs[0]];
+    assert.ok(render, "the render job exists");
+    assert.match((render.script ?? []).join("\n"), /check-config\.ts/);
+  });
+
+  it("OBS-AC-2.3 names the job rule-test in section 17 of the concept as the place where the rule test runs (OBS-T-33)", () => {
+    const concept = readText("gam-ai-knowledge/concepts/observability.md");
+    assert.match(concept, /runs them in the job `rule-test`/);
+    assert.doesNotMatch(concept, /until the job `rule-test`/);
   });
 });

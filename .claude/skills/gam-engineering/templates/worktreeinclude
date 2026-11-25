@@ -1,0 +1,6 @@
+# Git-ignored files Orca and Claude Code copy into every new git worktree (gam-engineering, P-WS-13).
+# Literal paths only, one per line; a path that does not exist is skipped. Your own lines stay on every migrate.
+CLAUDE.local.md
+.claude/settings.local.json
+.env
+.env.local

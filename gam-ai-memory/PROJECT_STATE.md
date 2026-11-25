@@ -33,3 +33,16 @@ See [GOAL.md](../gam-ai-knowledge/GOAL.md).
 
 - **Default branch:** `dev` (releases are tagged on `main`)
 - **Last release:** v0.1.0
+
+<!-- agent-memory:auto -->
+- **Updated:** 2026-11-24
+- **Branch:** feature/168-registration-page
+- **Builds on:** d5b052221 docs(repo): export the chat logs of schwaigc [no-req]
+- **Commits since the reference point:** 74 (2026-11-10)
+- **Agent memory files:**
+  - Claude Code: feedback_no-agent-time-booking.md (2026-11-02)
+  - Claude Code: feedback_no-claude-coauthor.md (2026-10-06)
+  - Claude Code: feedback_no-risky-commands.md (2026-11-24)
+  - Claude Code: reference_commitlint-rules.md (2026-11-17)
+  - Claude Code: reference_pnpm-via-npx.md (2026-10-27)
+<!-- /agent-memory:auto -->

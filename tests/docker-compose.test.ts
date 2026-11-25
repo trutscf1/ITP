@@ -157,7 +157,13 @@ describe("SCF-AC-2.2 Configuration by environment", () => {
   it("SCF-AC-2.2 keeps only placeholders as secrets in .env.example", () => {
     for (const [name, value] of documentedVariables()) {
       if (/PASSWORD|SECRET|TOKEN|KEY/.test(name)) {
-        assert.equal(value, "change-me", `${name} is not a placeholder`);
+        // "change-me", or the same word repeated where a variable needs a minimum length
+        // (IDENTITY_AUTH_SECRET: at least 32 characters).
+        assert.match(
+          value,
+          /^change-me(-change-me)*$/,
+          `${name} is not a placeholder`,
+        );
       }
     }
   });

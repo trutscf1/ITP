@@ -37,7 +37,7 @@ Runs the rebuild of [rebuild.md](rebuild.md) in the folder, with one fresh subag
 ## Green check and cleanup
 
 1. **Green check.** Run [Green check](rebuild.md#green-check) steps 1 to 3 on the check tier, in the repository of the folder (`git -C <folder>`) (RB-F-37); its steps 5 and 6 do not apply here. Add the number of tests that ran and the name of each failing test to what the subagents returned.
-2. **Remove.** Whatever the result, run `git worktree remove --force <checkout>` from the folder and then delete the folder. When either cannot be removed, print the path to remove by hand; the project stays unchanged (RB-E-9).
+2. **Remove.** Whatever the result, run `git worktree remove --force <checkout>` from the folder and then delete the folder. `--force` is the one exception to *never with `--force`* (SP-9, Q476): it is used only after checking that `<checkout>` is the `gam-rebuild-…-<date>` folder this run created, never on another entry of `git worktree list` ([Parallel sessions: Cleanup](../../gam-engineering/references/parallel.md#cleanup)). When either cannot be removed, print the path to remove by hand; the project stays unchanged (RB-E-9).
 3. **Verdict.** Write a DrillRun as JSON to a file outside the project (`stop`, left out when the drill was not stopped; `testsRun`; `failingTests`; `questions`, each with `document`, `section`, and `question`), run `node gam-engineering/tools/rebuild.mjs verdict <file>`, and print its word as the line `Verdict: <word>` (RB-F-39). The verdict is the helper's, never the agent's own judgment: `rebuildable` only for no question, at least one test, and no failing test.
 4. Continue with [Report and record](#report-and-record).
 

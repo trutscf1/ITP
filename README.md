@@ -162,7 +162,11 @@ The repository is public, so all content must be licence-free. Licences of what 
 | Zod, zod-to-openapi (`@asteasolutions/zod-to-openapi`) | MIT | shared contracts and the generated API description (`packages/contracts`) |
 | dotenv | BSD-2-Clause | reads the `.env` file in `packages/db` |
 | Prisma | Apache-2.0 | database access, schema, and migrations (`packages/db`) |
-| node-postgres (`pg`) | MIT | seed command and database tests of `packages/db` |
+| node-postgres (`pg`) | MIT | seed command and database tests of `packages/db`; database pool of `apps/identity` |
+| Better Auth (`better-auth`), Hono (`hono`, `@hono/node-server`), `@node-rs/argon2`, ioredis | MIT | accounts, HTTP server, password hash, and session store client of `apps/identity` |
+| nodemailer | MIT-0 | sends the e-mails of `apps/identity` |
+| `smtp-server`, mailparser | MIT-0, MIT | recording mail server in the tests of `apps/identity` |
+| List of the 10,000 most common passwords (`packages/contracts/src/identity/common-passwords.ts`) | Open Government Licence v3.0 (NCSC, United Kingdom, `PwnedPasswordsTop100k`, via the MIT-licensed SecLists repository) | refuses common passwords at registration; source and licence are named in the file |
 | Strapi (`@strapi/strapi`, `@strapi/utils`), React Router, styled-components | MIT | headless CMS of the `cms` unit (Community Edition only); React Router and styled-components are peer dependencies of its admin panel |
 | TypeScript | Apache-2.0 | language |
 | Biome | MIT or Apache-2.0 | lint and format |

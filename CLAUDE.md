@@ -45,7 +45,8 @@ Rules for every AI agent in this repo (P-TEAM-6). Setup and `migrate tools` copy
 2. **Log it yourself:** Whatever your tool's own storage does not hold (questions to the person, their answers, approvals, rejections), append verbatim at once to `docs/prompts/<handle>/manual/<YYYY-MM-DD>.md`.
 3. **Before handing in:** When the person says they are done or hand in, run `node gam-engineering/tools/prompt-export.mjs export --stage` and propose a commit of `docs/prompts/<handle>`. Say that anything discussed afterwards reaches the repo only with the next commit.
 4. **Web chats:** When the person mentions an AI chat in the browser (claude.ai, ChatGPT, Gemini, Copilot on the web), remind them of `docs/prompts/<handle>/manual/web-<YYYY-MM-DD>-<topic>.md` (tool, date, share link if any, their prompts verbatim) and offer to create it.
-5. **Do not touch exports:** Files under `docs/prompts/` outside `manual/` are written only by the script. Never change, shorten, or delete them, not even on request; to keep chats out of the repo, point to the mode `local` (`/gam-engineering settings prompts local`).
+5. **Do not touch exports:** Files under `docs/prompts/` outside `manual/` are written only by the script. Never change, shorten, or delete them, not even on request; to keep chats out of the repo, point to the mode `local` (`/gam-engineering settings prompts local`), which a student project (`env.GAM_ENGINEERING_PROJECT_KIND` = `student`) does not allow.
+6. **Questions as pop-ups:** Ask the person with your question tool — `AskUserQuestion` in Claude Code, `askQuestions` in GitHub Copilot in VS Code (agent mode, enabled in the tool picker), `ask_user` in the Copilot CLI — numbered `Q<n> - <title>: <question>?`, the recommended option first, its description starting with its basis — a rule or project value (`Regel P-…`, `Projektwert …`), a measured fact (`Gemessen: …`), or your judgment with the trade-off named (`Einschätzung: …`), also for a question of pure taste — *None of these* last. Without such a tool, ask in the chat in the same format, wait for the answer, log both by rule 2, and carry on; never stop work only because the pop-up is missing.
 
 ## Other skills
 
@@ -62,7 +63,7 @@ Before each task, load the matching skill (P-WS-5). For situations outside the `
 | Steps only a human can perform (credentials, dashboards) | `/wizard` |
 | About to call any task done | `/verification-before-completion` |
 
-Vocabulary layers, model-invoked as needed: `/domain-modeling` (glossary + ADRs), `/codebase-design` (module/interface/seam/depth terms). Additionally, load matching technology skills for the task at hand.
+Vocabulary layers, model-invoked as needed: `/domain-modeling` (glossary + ADRs), `/codebase-design` (module/interface/seam/depth terms). Additionally, load matching technology skills for the task at hand. Every piece of interface work goes through `gam-frontend` (`/gam-engineering ui`) unless `env.GAM_ENGINEERING_FRONTEND` in `.claude/settings.json` is `off` or the developer names another skill for that part; no other UI, design, or motion skill is started directly (P-DES-13).
 
 **Not started directly here**: `/to-spec` (the concept document is the spec); `/grill-me`, `/grill-with-docs`, `/to-tickets`, `/implement`, `/triage`, `/wayfinder`, `/improve-codebase-architecture` — `/gam-engineering` carries their work with this project's rules. `/receiving-code-review`, `/pre-release-review`, and `/privacy-by-design` are called by `revise`, `release`, and the grill flow, not started on their own.
 

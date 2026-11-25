@@ -1,5 +1,6 @@
 # Reverse proxy of the local stack (SCF-F-4): one origin, routed by path prefix. `web` serves
-# `/`. The prefixes /api/identity, /api/storage, and /cms are added when the units run.
+# `/`. The prefix /api/identity routes to `identity`; /api/storage and /cms are added when the
+# units run.
 {
 	admin off
 	auto_https off
@@ -22,6 +23,12 @@
 	handle /cms/health {
 		rewrite * /health
 		reverse_proxy cms:1337
+	}
+
+	# `identity` (IDN-US-1): the prefix is stripped, so /api/identity/health reaches /health
+	# (scaffolding.md §8, routing table).
+	handle_path /api/identity/* {
+		reverse_proxy identity:{$IDENTITY_PORT}
 	}
 
 	handle {
