@@ -98,17 +98,20 @@ describe("SCF-AC-4.1 ER diagram", () => {
     }
   });
 
-  it(
-    "SCF-T-18 the diagram drawn in Vertabelo is embedded as an export [SCF-F-22]",
-    {
-      todo: "slice 2 of SCF-US-4 (#151): draw the diagram of §8 in Vertabelo and embed the export",
-    },
-    () => {
-      assert.ok(
-        existsSync(join(root, "gam-ai-knowledge", "images", "er-diagram.png")),
-      );
-    },
-  );
+  it("SCF-T-18 the diagram rendered from its Mermaid text form is embedded as an export [SCF-F-22]", () => {
+    const images = join(root, "gam-ai-knowledge", "images");
+    assert.ok(
+      existsSync(join(images, "er-diagram.mmd")),
+      "the Mermaid source is missing",
+    );
+    const png = join(images, "er-diagram.png");
+    assert.ok(existsSync(png), "the PNG export is missing");
+    assert.deepEqual(
+      [...readFileSync(png).subarray(0, 8)],
+      [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a],
+      "er-diagram.png is not a PNG file",
+    );
+  });
 });
 
 describe("SCF-AC-4.2 Schema matches diagram", () => {
