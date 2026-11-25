@@ -114,19 +114,48 @@ describe("PUB-AC-1.7 Unclaimed administrator: the check administrator-account", 
     }
   });
 
-  it("PUB-AC-1.7 does not ask about the administrator while content-store is down", async () => {
-    let asked = false;
+  it("PUB-AC-1.7 reports administrator-account down while content-store is down, whatever the question answers", async () => {
     const report = await health(
       async () => {
         throw new Error("down");
       },
+      claimed,
+      options,
+    );
+    assert.equal(report.status, "down");
+    assert.equal(report.checks[1]?.status, "down");
+  });
+
+  it("PUB-AC-1.7 SCF-NF-3 runs both checks at the same time, so a slow content store and a silent question take one timeout, not two", async () => {
+    const timeoutMs = 200;
+    const started = performance.now();
+    const report = await health(
+      () => new Promise<void>((resolve) => setTimeout(resolve, 150)),
+      () => new Promise<boolean>(() => undefined),
+      { version: "0.0.0-dev", timeoutMs },
+    );
+    const elapsed = performance.now() - started;
+    assert.equal(report.status, "degraded");
+    assert.equal(report.checks[0]?.status, "ok");
+    assert.equal(report.checks[1]?.status, "down");
+    assert.ok(
+      elapsed < timeoutMs + 100,
+      `took ${Math.round(elapsed)} ms, more than one timeout of ${timeoutMs} ms`,
+    );
+  });
+
+  it("PUB-AC-1.7 PUB-T-77 PUB-F-31 holds nothing of a failed administrator question in the report", async () => {
+    const report = await health(
+      async () => undefined,
       async () => {
-        asked = true;
-        return true;
+        throw new Error(
+          'relation "admin_users" does not exist at cms-db:5432 (PostgreSQL 18.1)',
+        );
       },
       options,
     );
-    assert.equal(asked, false);
+    const text = JSON.stringify(report);
+    assert.ok(!/admin_users|relation|cms-db|5432|PostgreSQL|18\.1/.test(text));
     assert.equal(report.checks[1]?.status, "down");
   });
 });
