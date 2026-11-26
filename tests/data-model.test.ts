@@ -104,6 +104,17 @@ describe("SCF-AC-4.1 ER diagram", () => {
       existsSync(join(images, "er-diagram.mmd")),
       "the Mermaid source is missing",
     );
+    const concept = readFileSync(
+      join(root, "gam-ai-knowledge", "concepts", "scaffolding.md"),
+      "utf8",
+    );
+    const block = concept.match(/```mermaid\n(erDiagram\n[\s\S]*?)```/);
+    assert.ok(block?.[1], "scaffolding.md holds no mermaid erDiagram block");
+    assert.equal(
+      readFileSync(join(images, "er-diagram.mmd"), "utf8").trim(),
+      block?.[1]?.trim(),
+      "er-diagram.mmd differs from the diagram in §8; render the PNG again",
+    );
     const png = join(images, "er-diagram.png");
     assert.ok(existsSync(png), "the PNG export is missing");
     assert.deepEqual(
