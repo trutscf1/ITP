@@ -4,7 +4,7 @@ format: gam-ai-knowledge/1
 title: "SCF-US-4 Data model and relational schema"
 audience: [product, developer, reviewer, agent]
 id-prefix: "SCF"
-status: in-progress
+status: done
 sprint: 2
 ---
 # SCF-US-4 Data model and relational schema

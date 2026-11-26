@@ -19,7 +19,7 @@ Every story whose `sprint` field is 2, in the order of the product backlog. A st
 
 | Story | Epic | Status | Weight | Issue |
 | --- | --- | --- | --- | --- |
-| [SCF-US-4 Data model and relational schema](../E01-scaffolding/SCF-US-4-data-model-and-relational-schema.md) | E01 Scaffolding & shared contracts | in-progress | 5 | #41 |
+| [SCF-US-4 Data model and relational schema](../E01-scaffolding/SCF-US-4-data-model-and-relational-schema.md) | E01 Scaffolding & shared contracts | done | 5 | #41 |
 | [OBS-US-1 Telemetry of every unit](../E02-observability/OBS-US-1-telemetry-of-every-unit.md) | E02 Observability baseline | review | 8 | #82 |
 | [OBS-US-2 Operations dashboards and alerts](../E02-observability/OBS-US-2-operations-dashboards-and-alerts.md) | E02 Observability baseline | review | 5 | #83 |
 | [IDN-US-1 Register by e-mail](../E03-identity/IDN-US-1-register-by-e-mail.md) | E03 Identity: accounts, external login, MFA | done | 5 | #45 |
